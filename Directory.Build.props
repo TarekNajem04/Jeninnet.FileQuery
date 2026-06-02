@@ -77,7 +77,7 @@
         <PackageReleaseNotes>See CHANGELOG.md at https://github.com/TarekNajem04/Jeninnet.FileQuery</PackageReleaseNotes>
         <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
         <!-- Set the minimum NuGet client version required to install this package -->
-        <MinClientVersion>7.3.0</MinClientVersion>
+        <MinClientVersion>6.0.0</MinClientVersion>
     </PropertyGroup>
 
     <ItemGroup>
