@@ -1,0 +1,94 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Jeninnet.FileQuery.Benchmarks</name>
+    </assembly>
+    <members>
+        <member name="T:Jeninnet.FileQuery.Benchmarks.CharacterClassMatcherBenchmark">
+            <summary>
+            Measures <see cref="T:Jeninnet.FileQuery.Matching.Compiled.GitIgnoreInstructionMatcher"/> performance when
+            patterns contain character classes.
+            </summary>
+        </member>
+        <member name="M:Jeninnet.FileQuery.Benchmarks.CharacterClassMatcherBenchmark.Match_LiteralClass">
+            <summary>Baseline: literal set [abc5].</summary>
+        </member>
+        <member name="M:Jeninnet.FileQuery.Benchmarks.CharacterClassMatcherBenchmark.Match_RangeClass">
+            <summary>Range: [0-9] — most common real-world class.</summary>
+        </member>
+        <member name="M:Jeninnet.FileQuery.Benchmarks.CharacterClassMatcherBenchmark.Match_PosixClass">
+            <summary>POSIX: [[:digit:]] — new in v1.0; must not regress.</summary>
+        </member>
+        <member name="M:Jeninnet.FileQuery.Benchmarks.CharacterClassMatcherBenchmark.Match_NegatedClass">
+            <summary>Negated class [!abc] — requires extra negation branch.</summary>
+        </member>
+        <member name="T:Jeninnet.FileQuery.Benchmarks.PatternCompilationColdStartBenchmark">
+            <summary>
+            Measures the cold-start compilation cost for a realistic mixed pattern set.
+            </summary>
+        </member>
+        <member name="M:Jeninnet.FileQuery.Benchmarks.PatternCompilationColdStartBenchmark.CompileHybrid">
+            <summary>
+            Hybrid compilation through PatternClassifier (auto-detect mode).
+            Exercises the full canonicalize → classify → compile pipeline.
+            </summary>
+        </member>
+        <member name="M:Jeninnet.FileQuery.Benchmarks.PatternCompilationColdStartBenchmark.CompileGitIgnoreKnownKind">
+            <summary>
+            Known-kind compilation: PatternKind is supplied directly.
+            After the bypass fix, this skips CanonicalPatternInput and the classifier
+            entirely — expected to allocate significantly less than CompileHybrid.
+            </summary>
+        </member>
+        <member name="M:Jeninnet.FileQuery.Benchmarks.PatternCompilationColdStartBenchmark.BuildViaFluentApi">
+            <summary>
+            Full FileQuery.From(...).Where(...).Build() path — the real public API cost.
+            </summary>
+        </member>
+        <member name="T:Jeninnet.FileQuery.Benchmarks.PatternPipelineAllocationBenchmark">
+            <summary>
+            Measures allocations in the compiled pattern set constructor
+            for single-kind vs mixed-kind pattern sets.
+            </summary>
+        </member>
+        <member name="M:Jeninnet.FileQuery.Benchmarks.PatternPipelineAllocationBenchmark.Compile_PureGitIgnore">
+            <summary>
+            Pure GitIgnore set — after lazy allocation fix, Glob and Regex
+            sub-lists must not be allocated (target: savings of ~2 List allocations).
+            </summary>
+        </member>
+        <member name="M:Jeninnet.FileQuery.Benchmarks.PatternPipelineAllocationBenchmark.Compile_MixedKinds">
+            <summary>
+            Mixed set—all three sub-lists are legitimately needed.
+            </summary>
+        </member>
+        <member name="T:Jeninnet.FileQuery.Benchmarks.RegexMatcherCacheBenchmark">
+            <summary>
+            Measures the warm-cache vs cold-cache cost for regex pattern matching.
+            </summary>
+        </member>
+        <member name="M:Jeninnet.FileQuery.Benchmarks.RegexMatcherCacheBenchmark.Match_WarmCache_Sensitive">
+            <summary>
+            Cache hit — same pattern text + same case sensitivity as GlobalSetup.
+            Expected: ~85 ns, 0 B (Regex object already exists in cache).
+            </summary>
+        </member>
+        <member name="M:Jeninnet.FileQuery.Benchmarks.RegexMatcherCacheBenchmark.Match_WarmCache_Insensitive">
+            <summary>
+            First insensitive call after sensitive calls — cache miss for the
+            new (pattern, Insensitive) key. Expected: slightly higher than baseline.
+            </summary>
+        </member>
+        <member name="T:Jeninnet.FileQuery.Benchmarks.TraversalStrategyBenchmark">
+            <summary>
+            Compares DFS and BFS traversal strategies under identical conditions.
+            </summary>
+        </member>
+        <member name="M:Jeninnet.FileQuery.Benchmarks.TraversalStrategyBenchmark.QueryFiles_DepthFirst">
+            <summary>Depth-first traversal — baseline (current default).</summary>
+        </member>
+        <member name="M:Jeninnet.FileQuery.Benchmarks.TraversalStrategyBenchmark.QueryFiles_BreadthFirst">
+            <summary>Breadth-first traversal — must not be dramatically slower.</summary>
+        </member>
+    </members>
+</doc>

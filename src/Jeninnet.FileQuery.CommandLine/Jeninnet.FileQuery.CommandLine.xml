@@ -1,0 +1,170 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Jeninnet.FileQuery.CommandLine</name>
+    </assembly>
+    <members>
+        <member name="T:Jeninnet.FileQuery.CommandLine.CommandLinePatternOptions">
+            <summary>
+            Defines the command-line options used to specify file matching patterns.
+            </summary>
+        </member>
+        <member name="P:Jeninnet.FileQuery.CommandLine.CommandLinePatternOptions.Patterns">
+            <summary>
+            Gets the command-line option for specifying untyped patterns.
+            </summary>
+        </member>
+        <member name="P:Jeninnet.FileQuery.CommandLine.CommandLinePatternOptions.Gitignore">
+            <summary>
+            Gets the command-line option for specifying GitIgnore-style patterns.
+            </summary>
+        </member>
+        <member name="P:Jeninnet.FileQuery.CommandLine.CommandLinePatternOptions.Glob">
+            <summary>
+            Gets the command-line option for specifying glob-style patterns.
+            </summary>
+        </member>
+        <member name="P:Jeninnet.FileQuery.CommandLine.CommandLinePatternOptions.RegularExpression">
+            <summary>
+            Gets the command-line option for specifying regular expression patterns.
+            </summary>
+        </member>
+        <member name="M:Jeninnet.FileQuery.CommandLine.CommandLinePatternOptions.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:Jeninnet.FileQuery.CommandLine.CommandLinePatternOptions"/> class.
+            </summary>
+        </member>
+        <member name="M:Jeninnet.FileQuery.CommandLine.CommandLinePatternOptions.GetCommandOptions">
+            <summary>
+            Returns all supported command-line options.
+            </summary>
+        </member>
+        <member name="T:Jeninnet.FileQuery.CommandLine.CommandLinePatternParser">
+            <summary>
+            Parses command-line input into a <see cref="T:Jeninnet.FileQuery.CommandLine.PatternOptions"/> object.
+            </summary>
+        </member>
+        <member name="M:Jeninnet.FileQuery.CommandLine.CommandLinePatternParser.Parse(System.CommandLine.ParseResult,Jeninnet.FileQuery.CommandLine.CommandLinePatternOptions)">
+            <summary>
+            Extracts raw pattern values from <see cref="T:System.CommandLine.ParseResult"/> using defined options.
+            </summary>
+            <param name="parseResult">The parsed command-line input.</param>
+            <param name="options">The command-line option definitions.</param>
+            <returns>A <see cref="T:Jeninnet.FileQuery.CommandLine.PatternOptions"/> instance containing all extracted values.</returns>
+        </member>
+        <member name="T:Jeninnet.FileQuery.CommandLine.PatternBuilder">
+            <summary>
+            Builds a classified dictionary of file patterns from command-line options.
+            </summary>
+            <remarks>
+            Consolidates --patterns, and --gitignore into a single GitIgnore list
+            following the "last rule wins" principle.
+            </remarks>
+        </member>
+        <member name="M:Jeninnet.FileQuery.CommandLine.PatternBuilder.Build(System.CommandLine.ParseResult,Jeninnet.FileQuery.CommandLine.CommandLinePatternOptions)">
+            <summary>
+            Builds pattern dictionary from a parsed command-line result.
+            </summary>
+            <param name="parseResult">The parsed command-line input.</param>
+            <param name="options">The command-line option definitions.</param>
+            <returns>Dictionary mapping <see cref="T:Jeninnet.FileQuery.Enums.PatternKind"/> to lists of patterns.</returns>
+        </member>
+        <member name="M:Jeninnet.FileQuery.CommandLine.PatternBuilder.Build(Jeninnet.FileQuery.CommandLine.PatternOptions)">
+            <summary>
+            Builds pattern dictionary from a <see cref="T:Jeninnet.FileQuery.CommandLine.PatternOptions"/> instance.
+            </summary>
+            <param name="options">Parsed pattern options.</param>
+            <returns>Dictionary mapping <see cref="T:Jeninnet.FileQuery.Enums.PatternKind"/> to lists of patterns.</returns>
+        </member>
+        <member name="M:Jeninnet.FileQuery.CommandLine.PatternBuilder.Build(System.String,System.String,System.String,System.String)">
+            <summary>
+            Builds pattern dictionary from raw string values.
+            </summary>
+            <param name="patterns">The pattern string to be parsed and classified.</param>
+            <param name="gitignore">GitIgnore-style patterns.</param>
+            <param name="glob">Glob-style patterns.</param>
+            <param name="regex">Regex-style patterns.</param>
+            <returns>Dictionary mapping <see cref="T:Jeninnet.FileQuery.Enums.PatternKind"/> to lists of patterns.</returns>
+        </member>
+        <member name="T:Jeninnet.FileQuery.CommandLine.PatternOptions">
+            <summary>
+            Immutable container for parsed pattern options.
+            </summary>
+            <param name="Patterns">The patterns string to be parsed and classified.</param>
+            <param name="Gitignore">GitIgnore-style patterns.</param>
+            <param name="Glob">Glob-style patterns.</param>
+            <param name="RegularExpression">Regex-style patterns.</param>
+        </member>
+        <member name="M:Jeninnet.FileQuery.CommandLine.PatternOptions.#ctor(System.String,System.String,System.String,System.String)">
+            <summary>
+            Immutable container for parsed pattern options.
+            </summary>
+            <param name="Patterns">The patterns string to be parsed and classified.</param>
+            <param name="Gitignore">GitIgnore-style patterns.</param>
+            <param name="Glob">Glob-style patterns.</param>
+            <param name="RegularExpression">Regex-style patterns.</param>
+        </member>
+        <member name="P:Jeninnet.FileQuery.CommandLine.PatternOptions.Patterns">
+            <summary>The patterns string to be parsed and classified.</summary>
+        </member>
+        <member name="P:Jeninnet.FileQuery.CommandLine.PatternOptions.Gitignore">
+            <summary>GitIgnore-style patterns.</summary>
+        </member>
+        <member name="P:Jeninnet.FileQuery.CommandLine.PatternOptions.Glob">
+            <summary>Glob-style patterns.</summary>
+        </member>
+        <member name="P:Jeninnet.FileQuery.CommandLine.PatternOptions.RegularExpression">
+            <summary>Regex-style patterns.</summary>
+        </member>
+        <member name="T:Jeninnet.FileQuery.CommandLine.PatternSplitter">
+            <summary>
+            Provides utilities for parsing lists of pattern expressions from a single input string.
+            <para>
+            This parser is responsible only for splitting and normalizing multi-pattern input.
+            </para>
+            <para>
+            Typical usage:
+            <code>
+            var patterns = PatternSplitter.Split("*.cs;!bin/**");
+            </code>
+            </para>
+            <para>
+            Separators are configurable and default to semicolon (<c>;</c>).
+            Empty entries are removed automatically.
+            </para>
+            </summary>
+        </member>
+        <member name="F:Jeninnet.FileQuery.CommandLine.PatternSplitter.DEFAULT_PATTERN_SEPARATOR">
+            <summary>
+            The default character used to separate multiple patterns in a string.
+            </summary>
+        </member>
+        <member name="M:Jeninnet.FileQuery.CommandLine.PatternSplitter.Split(System.String,System.Char)">
+            <summary>
+            Splits a multi-pattern string into individual pattern expressions.
+            <para>
+            This method does not interpret escape sequences or quoting rules.
+            It is intended for simple, configuration-style pattern lists.
+            </para>
+            </summary>
+            <param name="input">The raw pattern list string (e.g., <c>"*.cs;!bin/**"</c>).</param>
+            <param name="separator">The character used to separate patterns. Defaults to <c>';'</c>.</param>
+            <returns>A sequence of individual pattern strings, trimmed and with empty entries removed.</returns>
+            <exception cref="T:System.ArgumentNullException"> Thrown when <paramref name="input"/> is <c>null</c>.</exception>
+        </member>
+        <member name="M:Jeninnet.FileQuery.CommandLine.PatternSplitter.Split(System.String,System.Char[])">
+            <summary>
+            Splits a multi-pattern string using multiple possible separators.
+            <para>
+            This overload is useful when accepting user input from CLI or
+            configuration files where separators may vary (e.g., <c>','</c>,
+            <c>';'</c>, or whitespace).
+            </para>
+            </summary>
+            <param name="input">The raw pattern list string.</param>
+            <param name="separators">A set of characters used to separate patterns.</param>
+            <returns>A sequence of individual pattern strings, trimmed and with empty entries removed.</returns>
+            <exception cref="T:System.ArgumentNullException">Thrown when <paramref name="input"/> or <paramref name="separators"/> is <c>null</c>.</exception>
+        </member>
+    </members>
+</doc>

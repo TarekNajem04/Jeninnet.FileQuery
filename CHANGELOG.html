@@ -1,0 +1,46 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <title>Changelog</title>
+    <meta http-equiv="cache-control" content="no-cache">
+</head>
+<body>
+
+    <h1 id="changelog">Changelog</h1>
+<p>All notable changes to this project will be documented in this file.</p>
+<p>The format is based on <a href="https://keepachangelog.com/en/1.1.0/">Keep a Changelog</a>.
+Versioning follows <a href="https://semver.org/spec/v2.0.0.html">Semantic Versioning</a>.</p>
+<hr />
+<h2 id="100---2026-04-17"><a href="https://github.com/TarekNajem04/Jeninnet.FileQuery/releases/tag/v1.0.0">1.0.0</a> - 2026-04-17</h2>
+<h3 id="added">Added</h3>
+<ul>
+<li><code>FileQueryRuntime.Create()</code> — composition root for creating a default engine instance.</li>
+<li><code>IFileQueryEngine</code> — core engine interface with synchronous <code>Execute</code> and asynchronous <code>ExecuteAsync</code> methods.</li>
+<li><code>FileQueryBuilder</code> — fluent API for constructing file queries (<code>From</code>, <code>Where</code>, <code>UsingGitIgnore</code>, <code>UsingGlob</code>, <code>UsingRegex</code>, <code>UsingHybrid</code>, <code>IgnoreCase</code>, <code>WithRecursion</code>).</li>
+<li><code>FileQueryOptions</code> — immutable query configuration covering recursion depth, case sensitivity, symlink policy, and traversal strategy.</li>
+<li><code>PatternInput</code> — public pattern configuration type supporting raw patterns, explicitly typed patterns, and interpretation mode.</li>
+<li><strong>GitIgnore matcher</strong> — directory-aware pattern evaluation with negation, root anchoring, directory-only rules, and recursive wildcards.</li>
+<li><strong>Glob matcher</strong> — classic wildcard matching (<code>*</code>, <code>**</code>, <code>?</code>, <code>[a-z]</code>, <code>[!abc]</code>) applied to full normalized paths.</li>
+<li><strong>Regex matcher</strong> — full .NET regular expression matching via the <code>r:</code> prefix.</li>
+<li><strong>Hybrid matcher</strong> — unified pipeline that supports all three pattern dialects in a single query.</li>
+<li>Pattern classification, canonicalization, tokenization, and invariant enforcement pipeline.</li>
+<li><code>TraversalFrontier</code> — <code>ArrayPool&lt;T&gt;</code>-backed frontier supporting both depth-first and breadth-first traversal strategies.</li>
+<li>Zero-allocation hot path — all matcher evaluation produces no heap allocations.</li>
+<li><code>Jeninnet.FileQuery.CommandLine</code> — <code>System.CommandLine</code> integration mapping <code>--patterns</code>, <code>--gitignore</code>, <code>--glob</code>, and <code>--regex</code> arguments into engine pattern input.</li>
+<li><code>Jeninnet.FileQuery.DependencyInjection</code> — <code>AddFileQuery()</code> extension method for <code>Microsoft.Extensions.DependencyInjection</code>.</li>
+<li>Six sample projects covering basic matching, pattern language, recursive traversal, hybrid matching, regex matching, and advanced DI + CLI usage.</li>
+<li>BenchmarkDotNet benchmark suite covering all matchers, pattern tokenization, classification, and traversal.</li>
+<li>Architecture tests enforcing layer boundaries, zero-allocation contract, and matcher construction authority.</li>
+<li>Full XML documentation on all public members.</li>
+<li>Symbol packages (<code>.snupkg</code>) for debugger step-through support.</li>
+</ul>
+<h3 id="notes">Notes</h3>
+<ul>
+<li>Targets <code>net10.0</code>. Requires .NET 10 or later.</li>
+<li>All three packages versioned together at <code>1.0.0</code>.</li>
+<li>The <code>PatternMatchingMode</code> property on <code>FileQueryOptions</code> applies only when <code>PatternInterpretationMode.Specific</code> is set. In the default <code>Hybrid</code> mode it is ignored.</li>
+<li>GitIgnore sub-set results take precedence over Glob and Regex sub-sets in hybrid mode. A GitIgnore inclusion is final; Glob and Regex matchers can re-include paths excluded by GitIgnore but cannot exclude paths that GitIgnore has included.</li>
+</ul>
+
+</body>
+</html>

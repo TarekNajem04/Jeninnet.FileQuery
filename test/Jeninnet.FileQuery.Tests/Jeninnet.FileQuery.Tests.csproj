@@ -1,0 +1,36 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <OutputType>Exe</OutputType>
+        <IsTestProject>true</IsTestProject>
+        <IsPackable>false</IsPackable>
+        <NoWarn>$(NoWarn);1591;RS1036</NoWarn>
+    </PropertyGroup>
+    
+    <PropertyGroup>
+        <!-- Enable the settings and folder builder directly in the project's root directory. -->
+        <RunSettingsFilePath>$(MSBuildProjectDirectory)\.runsettings</RunSettingsFilePath>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="coverlet.collector">
+          <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+          <PrivateAssets>all</PrivateAssets>
+        </PackageReference>
+        <PackageReference Include="coverlet.msbuild">
+          <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+          <PrivateAssets>all</PrivateAssets>
+        </PackageReference>
+        <PackageReference Include="Moq" />
+        <PackageReference Include="MSTest" />
+        <PackageReference Include="Microsoft.Extensions.DependencyInjection" />
+        <PackageReference Include="System.CommandLine" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\..\src\Jeninnet.FileQuery\Jeninnet.FileQuery.csproj" />
+        <ProjectReference Include="..\..\src\Jeninnet.FileQuery.CommandLine\Jeninnet.FileQuery.CommandLine.csproj" />
+        <ProjectReference Include="..\..\src\Jeninnet.FileQuery.DependencyInjection\Jeninnet.FileQuery.DependencyInjection.csproj" />
+    </ItemGroup>
+
+</Project>

@@ -1,0 +1,8 @@
+{
+    "profiles": {
+        "AITools.Console": {
+            "commandName": "Project",
+            "commandLineArgs": "--patterns \"**;!*.exe;!Microsoft*.dll\""
+        }
+    }
+}

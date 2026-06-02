@@ -1,0 +1,79 @@
+{
+    "$schema": "https://raw.githubusercontent.com/dotnet/docfx/main/schemas/docfx.schema.json",
+
+    "metadata": [
+        {
+            "src": [
+                {
+                    "src": "../src",
+                    "files": [
+                        "Jeninnet.FileQuery/Jeninnet.FileQuery.csproj",
+                        "Jeninnet.FileQuery.CommandLine/Jeninnet.FileQuery.CommandLine.csproj",
+                        "Jeninnet.FileQuery.DependencyInjection/Jeninnet.FileQuery.DependencyInjection.csproj"
+                    ]
+                }
+            ],
+            "dest": "api",
+            "includePrivateMembers": false,
+            "disableGitFeatures": false,
+            "disableDefaultFilter": false,
+            "noRestore": false,
+            "namespaceLayout": "nested",
+            "memberLayout": "separatePages",
+            "allowCompilationErrors": false
+        }
+    ],
+
+    "build": {
+        "content": [
+            {
+                "files": [ "api/**.yml", "api/index.md" ]
+            },
+            {
+                "files": [
+                    "**.md",
+                    "toc.yml"
+                ],
+                "exclude": [
+                    "_site/**",
+                    "api/**"
+                ]
+            }
+        ],
+
+        "resource": [
+            {
+                "files": [ "images/**" ]
+            }
+        ],
+
+        "output": "_site",
+
+        "template": [ "default", "modern" ],
+
+        "globalMetadata": {
+            "_appName": "Jeninnet.FileQuery",
+            "_appTitle": "Jeninnet.FileQuery Documentation",
+            "_appFaviconPath": "images/favicon.ico",
+            "_appLogoPath": "images/logo.svg",
+            "_enableSearch": true,
+            "_disableContribution": false,
+            "_gitContribute": {
+                "repo": "https://github.com/TarekNajem04/Jeninnet.FileQuery",
+                "branch": "main",
+                "apiSpecFolder": "docs/api"
+            },
+            "_gitUrlPattern": "github"
+        },
+
+        "sitemap": {
+            "baseUrl": "https://tareknajem04.github.io/Jeninnet.FileQuery"
+        },
+
+        "xref": [
+            "https://learn.microsoft.com/en-us/dotnet/.xrefmap.json"
+        ],
+
+        "pdf": false
+    }
+}

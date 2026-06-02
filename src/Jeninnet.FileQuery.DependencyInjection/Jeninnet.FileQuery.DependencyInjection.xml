@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Jeninnet.FileQuery.DependencyInjection</name>
+    </assembly>
+    <members>
+        <member name="T:Jeninnet.FileQuery.DependencyInjection.Extensions.ServiceCollectionExtensions">
+            <summary>
+            Provides extension methods for registering the <see cref="T:Jeninnet.FileQuery.FileQueryRuntime"/> subsystem
+            with a dependency injection container.
+            </summary>
+        </member>
+        <member name="M:Jeninnet.FileQuery.DependencyInjection.Extensions.ServiceCollectionExtensions.AddFileQuery(Microsoft.Extensions.DependencyInjection.IServiceCollection)">
+            <summary>
+            Adds <see cref="T:Jeninnet.FileQuery.FileQueryRuntime"/> services to the DI container.
+            </summary>
+            <param name="services">The <see cref="T:Microsoft.Extensions.DependencyInjection.IServiceCollection"/> to register services into.</param>
+            <returns>The updated <see cref="T:Microsoft.Extensions.DependencyInjection.IServiceCollection"/>.</returns>
+        </member>
+    </members>
+</doc>

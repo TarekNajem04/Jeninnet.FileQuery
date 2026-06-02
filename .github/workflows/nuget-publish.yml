@@ -1,0 +1,149 @@
+name: Publish NuGet Packages
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+
+permissions:
+  contents: write
+  id-token: write
+
+env:
+  DOTNET_SKIP_FIRST_TIME_EXPERIENCE: true
+  DOTNET_NOLOGO: true
+  DOTNET_CLI_TELEMETRY_OPTOUT: true
+
+  # Temporary until GitHub fully migrates Actions to Node 24.
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
+  PACKAGES_DIR: artifacts/packages
+
+concurrency:
+  group: publish-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+
+  publish:
+
+    name: Publish
+
+    runs-on: ubuntu-latest
+
+    environment:
+      name: production
+
+    steps:
+
+      - name: Checkout
+        uses: actions/checkout@v6.0.2
+        with:
+          fetch-depth: 0
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v5.3.0
+        with:
+          dotnet-version: 10.0.x
+
+      - name: Resolve Version
+        id: version
+        shell: bash
+        run: |
+          VERSION="${GITHUB_REF_NAME#v}"
+
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+
+          echo "Publishing version: $VERSION"
+
+      - name: Verify Package Versions
+        shell: pwsh
+        run: |
+          $expected = "${{ steps.version.outputs.version }}"
+
+          $projects = @(
+            "src/Jeninnet.FileQuery/Jeninnet.FileQuery.csproj",
+            "src/Jeninnet.FileQuery.CommandLine/Jeninnet.FileQuery.CommandLine.csproj",
+            "src/Jeninnet.FileQuery.DependencyInjection/Jeninnet.FileQuery.DependencyInjection.csproj"
+          )
+
+          foreach ($project in $projects)
+          {
+            [xml]$xml = Get-Content $project
+
+            $actual =
+              $xml.Project.PropertyGroup.Version |
+              Select-Object -First 1
+
+            if ($actual -ne $expected)
+            {
+              throw "$project version '$actual' does not match tag version '$expected'."
+            }
+          }
+
+      - name: Restore
+        run: dotnet restore
+
+      - name: Build
+        run: dotnet build --configuration Release --no-restore
+
+      - name: Test
+        run: >
+          dotnet test
+          --configuration Release
+          --no-build
+          --logger "console;verbosity=normal"
+
+      - name: Create Output Directory
+        run: mkdir -p ${{ env.PACKAGES_DIR }}
+
+      - name: Pack Jeninnet.FileQuery
+        run: >
+          dotnet pack
+          src/Jeninnet.FileQuery/Jeninnet.FileQuery.csproj
+          -c Release
+          --no-build
+          /p:EnablePackageValidation=true
+          --output ${{ env.PACKAGES_DIR }}
+
+      - name: Pack Jeninnet.FileQuery.CommandLine
+        run: >
+          dotnet pack
+          src/Jeninnet.FileQuery.CommandLine/Jeninnet.FileQuery.CommandLine.csproj
+          -c Release
+          --no-build
+          /p:EnablePackageValidation=true
+          --output ${{ env.PACKAGES_DIR }}
+
+      - name: Pack Jeninnet.FileQuery.DependencyInjection
+        run: >
+          dotnet pack
+          src/Jeninnet.FileQuery.DependencyInjection/Jeninnet.FileQuery.DependencyInjection.csproj
+          -c Release
+          --no-build
+          /p:EnablePackageValidation=true
+          --output ${{ env.PACKAGES_DIR }}
+
+      - name: Upload Packages Artifact
+        uses: actions/upload-artifact@v7.0.1
+        with:
+          name: nuget-packages-${{ steps.version.outputs.version }}
+          path: ${{ env.PACKAGES_DIR }}
+          retention-days: 30
+
+      - name: Publish To NuGet
+        run: >
+          dotnet nuget push
+          "${{ env.PACKAGES_DIR }}/*.nupkg"
+          --source https://api.nuget.org/v3/index.json
+          --skip-duplicate
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v${{ steps.version.outputs.version }}
+          generate_release_notes: true
+
+          files: |
+            ${{ env.PACKAGES_DIR }}/*.nupkg
+            ${{ env.PACKAGES_DIR }}/*.snupkg

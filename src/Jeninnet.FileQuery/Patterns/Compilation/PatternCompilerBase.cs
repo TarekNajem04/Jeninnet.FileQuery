@@ -1,0 +1,21 @@
+﻿namespace Jeninnet.FileQuery.Patterns.Compilation;
+
+/// <summary>
+/// Base class for all pattern compilers.
+/// </summary>
+internal abstract class PatternCompilerBase : IPatternCompiler {
+    public abstract PatternKind PatternKind { get; }
+
+    public ICompiledPattern Compile(PatternCompilationContext context) {
+        ArgumentNullException.ThrowIfNull(context);
+
+        if(context.Pattern.Type != PatternKind) {
+            throw new PatternException(
+                $"Compiler {GetType().Name} cannot compile {context.Pattern.Type}");
+        }
+
+        return CompileCore(context);
+    }
+
+    protected abstract ICompiledPattern CompileCore(PatternCompilationContext context);
+}

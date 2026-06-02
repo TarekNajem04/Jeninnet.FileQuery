@@ -1,0 +1,119 @@
+<Solution>
+    <Folder Name="/benchmarks/">
+        <Project Path="benchmarks/Jeninnet.FileQuery.Benchmarks.csproj" />
+    </Folder>
+    <Folder Name="/samples/">
+        <Project Path="samples/AdvancedUsage/AdvancedUsage.csproj" />
+        <Project Path="samples/BasicMatching/BasicMatching.csproj" />
+        <Project Path="samples/HybridMatcher/HybridMatcher.csproj" />
+        <Project Path="samples/LogFiltering/LogFiltering.csproj" />
+        <Project Path="samples/PatternLanguage/PatternLanguage.csproj" />
+        <Project Path="samples/RecursiveTraversal/RecursiveTraversal.csproj" />
+        <Project Path="samples/RegexMatching/RegexMatching.csproj" />
+    </Folder>
+    <Folder Name="/Solution Items/">
+        <File Path=".editorconfig" />
+        <File Path=".gitattributes" />
+        <File Path=".gitignore" />
+        <File Path="CHANGELOG.md" />
+        <File Path="CODE_OF_CONDUCT.md" />
+        <File Path="CONTRIBUTING.md" />
+        <File Path="DeleteBinObjOutputFolders.bat" />
+        <File Path="Directory.Build.props" />
+        <File Path="Directory.Build.targets" />
+        <File Path="Directory.Packages.props" />
+        <File Path="global.json" />
+        <File Path="LICENSE" />
+        <File Path="README.md" />
+        <File Path="SECURITY.md" />
+        <File Path="SUPPORT.md" />
+    </Folder>
+    <Folder Name="/Solution Items/.github/">
+        <File Path=".github/PULL_REQUEST_TEMPLATE.md" />
+        <File Path="ROADMAP.md" />
+    </Folder>
+    <Folder Name="/Solution Items/.github/ISSUE_TEMPLATE/">
+        <File Path=".github/ISSUE_TEMPLATE/bug_report.yml" />
+        <File Path=".github/ISSUE_TEMPLATE/config.yml" />
+        <File Path=".github/ISSUE_TEMPLATE/feature_request.yml" />
+    </Folder>
+    <Folder Name="/Solution Items/.github/workflows/">
+        <File Path=".github/workflows/ci.yml" />
+        <File Path=".github/workflows/nuget-publish.yml" />
+        <File Path=".github/workflows/sonarcloud.yml" />
+    </Folder>
+    <Folder Name="/Solution Items/docs/">
+        <File Path="docs/ARCHITECTURE_NOTICE.md" />
+        <File Path="docs/command-line-integration.md" />
+        <File Path="docs/docfx.json" />
+        <File Path="docs/matching-layer.md" />
+        <File Path="docs/pattern-modes.md" />
+        <File Path="docs/README.md" />
+    </Folder>
+    <Folder Name="/Solution Items/docs/architecture/">
+        <File Path="docs/architecture/engine-architecture.md" />
+        <File Path="docs/architecture/hybrid-matcher.md" />
+        <File Path="docs/architecture/matcher-invariants.md" />
+        <File Path="docs/architecture/pattern-classification.md" />
+        <File Path="docs/architecture/pattern-tokenization.md" />
+    </Folder>
+    <Folder Name="/Solution Items/docs/articles/">
+        <File Path="docs/articles/introducing-jeninnet-filequery.md" />
+    </Folder>
+    <Folder Name="/Solution Items/docs/contributing/">
+        <File Path="docs/contributing/contributing-guide.md" />
+        <File Path="docs/contributing/project-structure.md" />
+        <File Path="docs/contributing/testing.md" />
+    </Folder>
+    <Folder Name="/Solution Items/docs/getting-started/">
+        <File Path="docs/getting-started/basic-patterns.md" />
+        <File Path="docs/getting-started/nstallation.md" />
+        <File Path="docs/getting-started/quick-start.md" />
+    </Folder>
+    <Folder Name="/Solution Items/docs/guides/">
+        <File Path="docs/guides/cli-usage.md" />
+        <File Path="docs/guides/dependency-injection.md" />
+    </Folder>
+    <Folder Name="/Solution Items/docs/introduction/">
+        <File Path="docs/introduction/design-goals.md" />
+        <File Path="docs/introduction/overview.md" />
+    </Folder>
+    <Folder Name="/Solution Items/docs/performance/">
+        <File Path="docs/performance/allocation-strategy.md" />
+        <File Path="docs/performance/benchmarking.md" />
+        <File Path="docs/performance/design-for-performance.md" />
+        <File Path="docs/performance/matcher-performance.md" />
+        <File Path="docs/performance/performance.md" />
+        <File Path="docs/performance/traversal-model.md" />
+    </Folder>
+    <Folder Name="/Solution Items/docs/reference/">
+        <File Path="docs/reference/gitignore-patterns.md" />
+        <File Path="docs/reference/glob-patterns.md" />
+        <File Path="docs/reference/pattern-overview.md" />
+        <File Path="docs/reference/pattern-precedence.md" />
+        <File Path="docs/reference/regex-patterns.md" />
+    </Folder>
+    <Folder Name="/Solution Items/docs/runtime/">
+        <File Path="docs/runtime/case-sensitivity.md" />
+        <File Path="docs/runtime/filequery-runtime.md" />
+        <File Path="docs/runtime/recursion-depth.md" />
+        <File Path="docs/runtime/traversal-model.md" />
+    </Folder>
+    <Folder Name="/Solution Items/docs/specification/">
+        <File Path="docs/specification/pattern-language.md" />
+    </Folder>
+    <Folder Name="/Solution Items/docs/traversal/" />
+    <Folder Name="/Solution Items/docs/whitepaper/">
+        <File Path="docs/whitepaper/jeninnet-filequery-architecture.md" />
+        <File Path="docs/whitepaper/Jeninnet.FileQuery-Whitepaper.md" />
+    </Folder>
+    <Folder Name="/src/">
+        <Project Path="src/Jeninnet.FileQuery.CommandLine/Jeninnet.FileQuery.CommandLine.csproj" />
+        <Project Path="src/Jeninnet.FileQuery.DependencyInjection/Jeninnet.FileQuery.DependencyInjection.csproj" Id="005c5625-30f9-468a-96d1-da623b25435c" />
+        <Project Path="src/Jeninnet.FileQuery/Jeninnet.FileQuery.csproj" />
+    </Folder>
+    <Folder Name="/test/">
+        <Project Path="test/Jeninnet.FileQuery.Tests/Jeninnet.FileQuery.Tests.csproj" />
+    </Folder>
+
+</Solution>

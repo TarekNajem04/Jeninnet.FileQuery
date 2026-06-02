@@ -1,0 +1,39 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <OutputPath>..\..\artifacts\</OutputPath>
+        <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+        <!--
+        Package Version Strategy
+        1.0.0  initial release
+        1.1.0  new features
+        1.1.1  bug fix
+        2.0.0  breaking change        
+        -->
+        <Version>1.0.0</Version>
+
+        <Description>
+            CLI tool for high-performance file system querying.
+        </Description>
+
+        <IncludeSymbols>true</IncludeSymbols>
+        <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Microsoft.CodeAnalysis.NetAnalyzers">
+          <PrivateAssets>all</PrivateAssets>
+          <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
+        <PackageReference Include="System.CommandLine" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\Jeninnet.FileQuery\Jeninnet.FileQuery.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <InternalsVisibleTo Include="Jeninnet.FileQuery.Benchmarks" />
+        <InternalsVisibleTo Include="Jeninnet.FileQuery.Tests" />
+    </ItemGroup>
+</Project>
