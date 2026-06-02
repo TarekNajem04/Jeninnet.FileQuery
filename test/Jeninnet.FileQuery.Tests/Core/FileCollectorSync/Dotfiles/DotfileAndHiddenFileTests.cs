@@ -1,4 +1,4 @@
-namespace Jeninnet.FileQuery.Tests.Core.FileCollectorSync.Dotfiles;
+﻿namespace Jeninnet.FileQuery.Tests.Core.FileCollectorSync.Dotfiles;
 
 /// <summary>
 /// Tests behavior related to dotfiles (.*, .gitignore, .config etc.).

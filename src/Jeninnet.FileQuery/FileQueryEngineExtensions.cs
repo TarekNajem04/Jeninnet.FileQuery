@@ -1,4 +1,4 @@
-namespace Jeninnet.FileQuery;
+﻿namespace Jeninnet.FileQuery;
 
 /// <summary>
 /// Provides extension methods for <see cref="IFileQueryEngine"/> and related types

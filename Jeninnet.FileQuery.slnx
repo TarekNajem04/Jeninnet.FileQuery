@@ -102,7 +102,6 @@
     <Folder Name="/Solution Items/docs/specification/">
         <File Path="docs/specification/pattern-language.md" />
     </Folder>
-    <Folder Name="/Solution Items/docs/traversal/" />
     <Folder Name="/Solution Items/docs/whitepaper/">
         <File Path="docs/whitepaper/jeninnet-filequery-architecture.md" />
         <File Path="docs/whitepaper/Jeninnet.FileQuery-Whitepaper.md" />

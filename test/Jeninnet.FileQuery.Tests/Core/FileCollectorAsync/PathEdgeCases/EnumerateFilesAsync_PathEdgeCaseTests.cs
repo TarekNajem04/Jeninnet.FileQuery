@@ -1,4 +1,4 @@
-namespace Jeninnet.FileQuery.Tests.Core.FileCollectorAsync.PathEdgeCases;
+﻿namespace Jeninnet.FileQuery.Tests.Core.FileCollectorAsync.PathEdgeCases;
 
 /// <summary>
 /// Async tests verifying behavior on tricky or unusual paths.

@@ -1,4 +1,4 @@
-namespace Jeninnet.FileQuery.Tests.Core.FileCollectorAsync.StressAndEdges;
+﻿namespace Jeninnet.FileQuery.Tests.Core.FileCollectorAsync.StressAndEdges;
 
 /// <summary>
 /// Stress and edge-case tests designed to detect rare async bugs:

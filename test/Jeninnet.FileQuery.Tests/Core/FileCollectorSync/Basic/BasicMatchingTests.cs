@@ -1,4 +1,4 @@
-namespace Jeninnet.FileQuery.Tests.Core.FileCollectorSync.Basic;
+﻿namespace Jeninnet.FileQuery.Tests.Core.FileCollectorSync.Basic;
 
 [TestClass]
 public class BasicMatchingTests {

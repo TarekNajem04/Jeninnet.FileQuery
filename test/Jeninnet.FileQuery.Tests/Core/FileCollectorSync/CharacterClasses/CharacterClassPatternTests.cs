@@ -1,4 +1,4 @@
-namespace Jeninnet.FileQuery.Tests.Core.FileCollectorSync.CharacterClasses;
+﻿namespace Jeninnet.FileQuery.Tests.Core.FileCollectorSync.CharacterClasses;
 
 /// <summary>
 /// Tests character classes: [abc], [a-z], [!abc], etc.

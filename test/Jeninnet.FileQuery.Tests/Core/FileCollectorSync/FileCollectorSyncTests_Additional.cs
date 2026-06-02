@@ -1,4 +1,4 @@
-namespace Jeninnet.FileQuery.Tests.Core.FileCollectorSync;
+﻿namespace Jeninnet.FileQuery.Tests.Core.FileCollectorSync;
 
 [TestClass]
 public class FileQueryEngineSyncTests_Additional {

@@ -1,4 +1,4 @@
-namespace Jeninnet.FileQuery.Tests.Core.FileCollectorSync.Negation;
+﻿namespace Jeninnet.FileQuery.Tests.Core.FileCollectorSync.Negation;
 
 /// <summary>
 /// Tests GitIgnore-style negation rules (!pattern).

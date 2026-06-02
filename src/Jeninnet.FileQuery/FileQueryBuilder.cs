@@ -1,4 +1,4 @@
-namespace Jeninnet.FileQuery;
+﻿namespace Jeninnet.FileQuery;
 
 /// <summary>
 /// Provides a fluent API for configuring file system queries.

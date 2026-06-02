@@ -1,4 +1,4 @@
-namespace Jeninnet.FileQuery.Tests.Core.FileCollectorSync.Wildcards;
+﻿namespace Jeninnet.FileQuery.Tests.Core.FileCollectorSync.Wildcards;
 
 /// <summary>
 /// Tests complex wildcard patterns: "*", "**", "?", and combinations.
