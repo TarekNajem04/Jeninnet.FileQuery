@@ -1,0 +1,12 @@
+- name: Pattern Overview
+  href: pattern-overview.md
+- name: GitIgnore Patterns
+  href: gitignore-patterns.md
+- name: Glob Patterns
+  href: glob-patterns.md
+- name: Regex Patterns
+  href: regex-patterns.md
+- name: Pattern Precedence
+  href: pattern-precedence.md
+- name: Pattern Semantics
+  href: pattern-semantics.md

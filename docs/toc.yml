@@ -1,16 +1,16 @@
 - name: Introduction
-  href: introduction/
+  href: introduction/toc.yml
 - name: Getting Started
-  href: getting-started/
+  href: getting-started/toc.yml
 - name: Guides
-  href: guides/
+  href: guides/toc.yml
 - name: Performance
-  href: performance/
+  href: performance/toc.yml
 - name: Reference
-  href: reference/
+  href: reference/toc.yml
 - name: Architecture
-  href: architecture/
+  href: architecture/toc.yml
 - name: Articles
-  href: articles/
+  href: articles/toc.yml
 - name: API Reference
-  href: api/
+  href: api/index.md
