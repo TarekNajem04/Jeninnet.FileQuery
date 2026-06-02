@@ -6,10 +6,26 @@ on:
   push:
     branches:
       - main
+    paths:
+      - 'src/**'
+      - 'test/**'
+      - 'benchmarks/**'
+      - '**.csproj'
+      - 'Directory.Packages.props'
+      - 'Directory.Build.props'
+      - '.github/workflows/ci.yml'
 
   pull_request:
     branches:
       - main
+    paths:
+      - 'src/**'
+      - 'test/**'
+      - 'benchmarks/**'
+      - '**.csproj'
+      - 'Directory.Packages.props'
+      - 'Directory.Build.props'
+      - '.github/workflows/ci.yml'
 
 permissions:
   contents: read
@@ -36,7 +52,7 @@ jobs:
     steps:
 
       - name: Checkout
-        uses: actions/checkout@v6.0.3
+        uses: actions/checkout@v6.0.2
 
       - name: Setup .NET
         uses: actions/setup-dotnet@v5.3.0
@@ -67,7 +83,7 @@ jobs:
     steps:
 
       - name: Checkout
-        uses: actions/checkout@v6.0.3
+        uses: actions/checkout@v6.0.2
         with:
           fetch-depth: 0
 
@@ -109,7 +125,7 @@ jobs:
     steps:
 
       - name: Checkout
-        uses: actions/checkout@v6.0.3
+        uses: actions/checkout@v6.0.2
 
       - name: Setup .NET
         uses: actions/setup-dotnet@v5.3.0
@@ -140,7 +156,7 @@ jobs:
     steps:
 
       - name: Checkout
-        uses: actions/checkout@v6.0.3
+        uses: actions/checkout@v6.0.2
         with:
           fetch-depth: 0
 
@@ -188,7 +204,7 @@ jobs:
     steps:
 
       - name: Checkout
-        uses: actions/checkout@v6.0.3
+        uses: actions/checkout@v6.0.2
 
       - name: Setup .NET
         uses: actions/setup-dotnet@v5.3.0
