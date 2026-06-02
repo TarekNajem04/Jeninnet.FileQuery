@@ -44,22 +44,30 @@
         <File Path=".github/workflows/sonarcloud.yml" />
     </Folder>
     <Folder Name="/Solution Items/docs/">
+        <File Path="docs/architecture-refactor-tracking.md" />
         <File Path="docs/ARCHITECTURE_NOTICE.md" />
         <File Path="docs/command-line-integration.md" />
         <File Path="docs/docfx.json" />
         <File Path="docs/matching-layer.md" />
         <File Path="docs/pattern-modes.md" />
         <File Path="docs/README.md" />
+        <File Path="docs/release-checklist.md" />
+        <File Path="docs/testing-and-release-plan.md" />
+        <File Path="docs/toc.yml" />
     </Folder>
     <Folder Name="/Solution Items/docs/architecture/">
         <File Path="docs/architecture/engine-architecture.md" />
         <File Path="docs/architecture/hybrid-matcher.md" />
+        <File Path="docs/architecture/internal-visibility.md" />
         <File Path="docs/architecture/matcher-invariants.md" />
         <File Path="docs/architecture/pattern-classification.md" />
         <File Path="docs/architecture/pattern-tokenization.md" />
+        <File Path="docs/architecture/public-api-options.md" />
+        <File Path="docs/architecture/toc.yml" />
     </Folder>
     <Folder Name="/Solution Items/docs/articles/">
         <File Path="docs/articles/introducing-jeninnet-filequery.md" />
+        <File Path="docs/articles/toc.yml" />
     </Folder>
     <Folder Name="/Solution Items/docs/contributing/">
         <File Path="docs/contributing/contributing-guide.md" />
@@ -68,16 +76,20 @@
     </Folder>
     <Folder Name="/Solution Items/docs/getting-started/">
         <File Path="docs/getting-started/basic-patterns.md" />
+        <File Path="docs/getting-started/installation.md" />
         <File Path="docs/getting-started/nstallation.md" />
         <File Path="docs/getting-started/quick-start.md" />
+        <File Path="docs/getting-started/toc.yml" />
     </Folder>
     <Folder Name="/Solution Items/docs/guides/">
         <File Path="docs/guides/cli-usage.md" />
         <File Path="docs/guides/dependency-injection.md" />
+        <File Path="docs/guides/toc.yml" />
     </Folder>
     <Folder Name="/Solution Items/docs/introduction/">
         <File Path="docs/introduction/design-goals.md" />
         <File Path="docs/introduction/overview.md" />
+        <File Path="docs/introduction/toc.yml" />
     </Folder>
     <Folder Name="/Solution Items/docs/performance/">
         <File Path="docs/performance/allocation-strategy.md" />
@@ -85,6 +97,8 @@
         <File Path="docs/performance/design-for-performance.md" />
         <File Path="docs/performance/matcher-performance.md" />
         <File Path="docs/performance/performance.md" />
+        <File Path="docs/performance/release-benchmark-baseline.md" />
+        <File Path="docs/performance/toc.yml" />
         <File Path="docs/performance/traversal-model.md" />
     </Folder>
     <Folder Name="/Solution Items/docs/reference/">
@@ -92,7 +106,9 @@
         <File Path="docs/reference/glob-patterns.md" />
         <File Path="docs/reference/pattern-overview.md" />
         <File Path="docs/reference/pattern-precedence.md" />
+        <File Path="docs/reference/pattern-semantics.md" />
         <File Path="docs/reference/regex-patterns.md" />
+        <File Path="docs/reference/toc.yml" />
     </Folder>
     <Folder Name="/Solution Items/docs/runtime/">
         <File Path="docs/runtime/case-sensitivity.md" />
