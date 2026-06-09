@@ -6,25 +6,27 @@
         <IsPackable>false</IsPackable>
         <NoWarn>$(NoWarn);1591;RS1036</NoWarn>
     </PropertyGroup>
-    
+
     <PropertyGroup>
         <!-- Enable the settings and folder builder directly in the project's root directory. -->
         <RunSettingsFilePath>$(MSBuildProjectDirectory)\.runsettings</RunSettingsFilePath>
     </PropertyGroup>
 
     <ItemGroup>
+        <PackageReference Include="System.CommandLine" />
         <PackageReference Include="coverlet.collector">
-          <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-          <PrivateAssets>all</PrivateAssets>
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+            <PrivateAssets>all</PrivateAssets>
         </PackageReference>
         <PackageReference Include="coverlet.msbuild">
-          <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-          <PrivateAssets>all</PrivateAssets>
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+            <PrivateAssets>all</PrivateAssets>
         </PackageReference>
-        <PackageReference Include="Moq" />
-        <PackageReference Include="MSTest" />
         <PackageReference Include="Microsoft.Extensions.DependencyInjection" />
-        <PackageReference Include="System.CommandLine" />
+        <PackageReference Include="Moq" />
+        <PackageReference Include="Microsoft.NET.Test.Sdk" />
+        <PackageReference Include="MSTest" />
+        <PackageReference Include="MSTest.TestAdapter" />
     </ItemGroup>
 
     <ItemGroup>

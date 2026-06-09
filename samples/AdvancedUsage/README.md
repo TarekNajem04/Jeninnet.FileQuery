@@ -1,86 +1,92 @@
 ﻿# AdvancedUsage Sample Project
 
-## Purpose
+**Reference implementation showing Dependency Injection, generic hosting, and CommandLine integrations.**
 
-The **AdvancedUsage** project demonstrates how to use the library inside a real application environment:
-
-* Microsoft Generic Host
-* Dependency Injection
-* Command-line parsing
-* Pattern building
-* File traversal
-
-It becomes the **reference integration example** for developers.
+This project demonstrates how to integrate `Jeninnet.FileQuery` in a real-world enterprise application context. It uses Microsoft Generic Host, Dependency Injection, System.CommandLine, and custom console rendering.
 
 ---
 
-# Location in Repository
+## 🏗️ Project Architecture
 
-```
-samples/
-   BasicMatching/
-   PatternLanguage/
-   RecursiveTraversal/
-   RegexMatching/
-   HybridMatcher/
-   AdvancedUsage/
-```
+The sample is split into three main components:
+
+1.  **[Program.cs](./Program.cs)**: Builds a Generic Host, registers CLI commands, and wires services.
+2.  **[CliOptions.cs](./CliOptions.cs)**: Custom class subclassing `CommandLinePatternOptions` to expose pattern-matching options alongside custom application arguments.
+3.  **[FileQueryCommand.cs](./FileQueryCommand.cs)**: Represents the execution command that resolves the registered `IFileQueryEngine` and processes queries.
+4.  **[ConsolePrinter.cs](./ConsolePrinter.cs)**: Outputs formatted discovery paths to the stdout stream.
 
 ---
 
-# Project Structure
+## 🏃 How to Run the Sample
 
-```
-samples/AdvancedUsage/
+Run the project using `dotnet run`:
 
-   AdvancedUsage.csproj
-   Program.cs
-   FileQueryCommand.cs
-   ConsolePrinter.cs
+```bash
+# Build and run the project
+dotnet build samples/AdvancedUsage/AdvancedUsage.csproj
+dotnet run --project samples/AdvancedUsage/AdvancedUsage.csproj -- [arguments]
 ```
+
+### Example Commands:
+
+*   **Auto-Classified Patterns**:
+    ```bash
+    dotnet run --project samples/AdvancedUsage/AdvancedUsage.csproj -- --patterns "src/**/*.cs;!**/*Test*"
+    ```
+*   **GitIgnore Specific Matching**:
+    ```bash
+    dotnet run --project samples/AdvancedUsage/AdvancedUsage.csproj -- --gitignore "bin/;obj/;!**/*.md"
+    ```
+*   **Regex Matching**:
+    ```bash
+    dotnet run --project samples/AdvancedUsage/AdvancedUsage.csproj -- --regex "^src\/.*\.xml$"
+    ```
 
 ---
 
-# Example Usage
+## 💡 Key Design Concepts Shown
 
-Run from command line:
-
-```
-dotnet run -- --patterns  * dotnet run -- --patterns "**;!*.exe;!Microsoft*.dll"
-```
-
-or
-
-```
-dotnet run -- --gitignore "**;!*.txt"
+### 1. Subclassing CommandLinePatternOptions
+Because the constructor of `CommandLinePatternOptions` is protected, the sample shows the correct design pattern of extending it:
+```csharp
+public sealed class CliOptions : CommandLinePatternOptions
+{
+    // Extend with application-specific options if needed
+}
 ```
 
-This sample demonstrates:
-
-* CLI argument parsing
-* Pattern classification
-* DI-based engine resolution
-* File traversal
-
----
-
-# Why This Example Is Important
-
-It demonstrates **three critical integration points**:
-
-```
-Dependency Injection
-Command-line interface
-Pattern builder
+### 2. Generic Host Integration
+Leverages the official `Jeninnet.FileQuery.DependencyInjection` extensions to register traversal and compilation services cleanly:
+```csharp
+var builder = Host.CreateApplicationBuilder(args);
+builder.Services.AddFileQuery();
 ```
 
-Which means developers can use your library in:
+### 3. Separation of CLI Binding and Execution
+`PatternBuilder.Build()` extracts command-line parse results into engine-readable pattern lists. The traversal engine itself remains entirely decoupled from command-line dependencies.
 
-```
-CLI tools
-background services
-desktop applications
-web backends
-```
+### 4. Observability Hooks
+Applications can add progress and diagnostics around the same query produced from CLI input:
 
----
+```csharp
+var progress = new Progress<FileQueryProgress>(snapshot =>
+{
+    Console.WriteLine($"{snapshot.FilesMatched} files matched");
+});
+
+var diagnostics = new Progress<FileQueryDiagnostic>(entry =>
+{
+    Console.WriteLine($"{entry.RelativePath}: {entry.Outcome}");
+});
+
+var query = FileQuery.From(rootDirectory)
+                     .Where(patterns)
+                     .WithDiagnostics(diagnostics)
+                     .WithErrorRecovery(FileQueryErrorRecoveryOptions.Skip)
+                     .Build();
+
+await foreach (var file in engine.ExecuteAsync(query, progress, cancellationToken))
+{
+    Console.WriteLine(file);
+}
+```
