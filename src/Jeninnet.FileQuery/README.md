@@ -6,11 +6,12 @@
 ![GitHub forks](https://img.shields.io/github/forks/TarekNajem04/Jeninnet.FileQuery)
 ![GitHub last commit](https://img.shields.io/github/last-commit/TarekNajem04/Jeninnet.FileQuery)
 ![GitHub Issues](https://img.shields.io/github/issues/TarekNajem04/Jeninnet.FileQuery)
-[![GitHub stars](https://img.shields.io/github/stars/TarekNajem04/Jeninnet.FileQuery&)](https://github.com/TarekNajem04/Jeninnet.FileQuery/stargazers)
+[![GitHub stars](https://img.shields.io/github/stars/TarekNajem04/Jeninnet.FileQuery)](https://github.com/TarekNajem04/Jeninnet.FileQuery/stargazers)
 [![GitHub license](https://img.shields.io/github/license/TarekNajem04/Jeninnet.FileQuery)](https://github.com/TarekNajem04/Jeninnet.FileQuery/blob/main/LICENSE)
 
 ![NuGet Version](https://img.shields.io/nuget/v/Jeninnet.FileQuery)
 [![NuGet downloads](https://img.shields.io/nuget/dt/Jeninnet.FileQuery)](https://www.nuget.org/packages/Jeninnet.FileQuery/)
+
 Absolutely — here is the **entire unified README**, rewritten **fully in English**, **cleanly structured**, and placed **inside a single fenced code block** exactly as you requested.
 
 **Jeninnet.FileQuery** is a high‑performance, deterministic, pattern‑driven file enumeration engine for .NET.
