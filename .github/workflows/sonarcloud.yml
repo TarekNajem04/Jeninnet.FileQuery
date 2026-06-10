@@ -50,7 +50,7 @@ jobs:
     steps:
 
       # ---------------------------------------------------------
-      #1) Checkout — Fixing the shallow clone issue
+      # 1) Checkout — Fixing the shallow clone issue
       # ---------------------------------------------------------
       - name: Checkout repository
         uses: actions/checkout@v6.0.3
@@ -58,7 +58,7 @@ jobs:
           fetch-depth: 0        # Fetch the entire Git history
           submodules: recursive # Ensures no internal shallow clone occurs
       # ---------------------------------------------------------
-      #2) Confirm that the Git history is indeed complete
+      # 2) Confirm that the Git history is indeed complete
       # ---------------------------------------------------------
       - name: Ensure full git history
         run: |
@@ -66,17 +66,7 @@ jobs:
           git fetch --all --tags
 
       # ---------------------------------------------------------
-      #3) A check step to ensure the warehouse is not shallow
-      # ---------------------------------------------------------
-      - name: Verify git history
-        run: |
-          echo "Commit count:"
-          git rev-list --count HEAD
-          echo "Last 5 commits:"
-          git --no-pager log --oneline -5
-
-      # ---------------------------------------------------------
-      #4) Setup Java (required for SonarScanner)
+      # 3) Setup Java (required for SonarScanner)
       # ---------------------------------------------------------
       - name: Setup Java 17
         uses: actions/setup-java@v5.2.0
@@ -85,7 +75,7 @@ jobs:
           java-version: "17"
 
       # ---------------------------------------------------------
-      # 5) Setup .NET
+      # 4) Setup .NET
       # ---------------------------------------------------------
       - name: Setup .NET 10
         uses: actions/setup-dotnet@v5.3.0
@@ -93,7 +83,7 @@ jobs:
           dotnet-version: "10.0.x"
 
       # ---------------------------------------------------------
-      # 6) Cache NuGet
+      # 5) Cache NuGet
       # ---------------------------------------------------------
       - name: Cache NuGet packages
         uses: actions/cache@v5
@@ -102,7 +92,7 @@ jobs:
           key: ${{ runner.os }}-nuget-${{ hashFiles('**/*.csproj') }}
 
       # ---------------------------------------------------------
-      # 7) Cache SonarCloud
+      # 6) Cache SonarCloud
       # ---------------------------------------------------------
       - name: Cache SonarCloud
         uses: actions/cache@v5
@@ -111,13 +101,13 @@ jobs:
           key: ${{ runner.os }}-sonar
 
       # ---------------------------------------------------------
-      # 8) Install SonarScanner
+      # 7) Install SonarScanner
       # ---------------------------------------------------------
       - name: Install SonarScanner
         run: dotnet tool install --global dotnet-sonarscanner
 
       # ---------------------------------------------------------
-      # 9) Sonar BEGIN — Start Analysis
+      # 8) Sonar BEGIN — Start Analysis
       # ---------------------------------------------------------
       - name: Begin SonarCloud analysis
         run: |
@@ -129,23 +119,24 @@ jobs:
             /d:sonar.qualitygate.wait=true \
             /d:sonar.cs.vstest.reportsPaths="TestResults/**/*.trx" \
             /d:sonar.cs.opencover.reportsPaths="**/coverage.opencover.xml" \
+            /d:sonar.projectBaseDir="." \
             /d:sonar.scm.provider=git \
             /d:sonar.scm.forceReloadAll=true
 
       # ---------------------------------------------------------
-      # 10) Restore
+      # 9) Restore
       # ---------------------------------------------------------
       - name: Restore dependencies
         run: dotnet restore
 
       # ---------------------------------------------------------
-      # 11) Build
+      # 10) Build
       # ---------------------------------------------------------
       - name: Build solution
         run: dotnet build -c Release --no-restore
 
       # ---------------------------------------------------------
-      # 12) Test + Coverage
+      # 11) Test + Coverage
       # ---------------------------------------------------------
       - name: Run tests with coverage
         run: |
@@ -154,7 +145,7 @@ jobs:
             --results-directory TestResults
 
       # ---------------------------------------------------------
-      # 13) Sonar END — Analysis Complete
+      # 12) Sonar END — Analysis Complete
       # ---------------------------------------------------------
       - name: End SonarCloud analysis
         run: |
