@@ -1,47 +1,81 @@
 ﻿# Jeninnet.FileQuery
 
-**A high-performance file discovery and filtering engine for .NET.**
+![GitHub Actions CI Workflow Status](https://img.shields.io/github/actions/workflow/status/TarekNajem04/Jeninnet.FileQuery/ci.yml)
+![GitHub Tag](https://img.shields.io/github/v/tag/TarekNajem04/Jeninnet.FileQuery)
+![GitHub contributors](https://img.shields.io/github/contributors/TarekNajem04/Jeninnet.FileQuery)
+![GitHub forks](https://img.shields.io/github/forks/TarekNajem04/Jeninnet.FileQuery)
+![GitHub last commit](https://img.shields.io/github/last-commit/TarekNajem04/Jeninnet.FileQuery)
+![GitHub Issues or Pull Requests](https://img.shields.io/github/issues-closed/tareknajem04/Jeninnet.FileQuery)
+[![GitHub stars](https://img.shields.io/github/stars/TarekNajem04/Jeninnet.FileQuery)](https://github.com/TarekNajem04/Jeninnet.FileQuery/stargazers)
+[![GitHub license](https://img.shields.io/github/license/TarekNajem04/Jeninnet.FileQuery)](https://github.com/TarekNajem04/Jeninnet.FileQuery/blob/main/LICENSE)
 
-`Jeninnet.FileQuery` is a modern file query system designed for applications that need **precise, deterministic, and scalable file matching** across large directory trees.
+![NuGet Version](https://img.shields.io/nuget/v/Jeninnet.FileQuery)
+[![NuGet downloads](https://img.shields.io/nuget/dt/Jeninnet.FileQuery)](https://www.nuget.org/packages/Jeninnet.FileQuery.CommandLine/)
 
-## Compatibility
-
-- Target framework: `.NET 10`
-- Language: `C# 14`
-- Supported platforms: Windows, Linux, and macOS through the .NET runtime
-- Packages: `Jeninnet.FileQuery`, `Jeninnet.FileQuery.CommandLine`, and `Jeninnet.FileQuery.DependencyInjection`
-
-It combines multiple pattern languages into a unified matcher architecture while preserving predictable rule semantics inspired by GitIgnore.
-
-The result is a library that is both **powerful and easy to integrate**.
+**A high-performance, deterministic file discovery and filtering engine for .NET.**
 
 ---
 
-# 🚀 Quick Start
+## ✨ Repo Stats
+
+![Repobeats analytics image](https://repobeats.axiom.co/api/embed/57d92552dfb25309185f7457c01037a504b5fa24.svg "Repobeats analytics image")
+
+---
+
+`Jeninnet.FileQuery` is a modern, high-performance file query system designed for .NET 10 and C# 14. It combines multiple pattern dialectsâ€”**GitIgnore**, **Glob**, and **Regular Expressions**â€”into a unified, deterministic, and allocation-free matching pipeline. Decoupled from `System.IO`, the engine allows precise, scalable file discovery across massive directory structures on Windows, Linux, and macOS.
+
+The Phase 2 observability surface adds async progress snapshots, optional match audit diagnostics, deep cancellation verification, and configurable IO recovery strategies without changing default query behavior.
+
+---
+
+## 📂 Project Suite Directory
+
+This repository contains the core library and its companion packages:
+
+*   **[Core Engine (Jeninnet.FileQuery)](./src/Jeninnet.FileQuery/README.md)**: The main matching runtime, builders, and parser pipeline.
+*   **[CommandLine Integration (Jeninnet.FileQuery.CommandLine)](./src/Jeninnet.FileQuery.CommandLine/README.md)**: Bridges command-line arguments (using `System.CommandLine`) to file query patterns.
+*   **[DependencyInjection Integration (Jeninnet.FileQuery.DependencyInjection)](./src/Jeninnet.FileQuery.DependencyInjection/README.md)**: Configures and registers the engine and its components in standard .NET host applications.
+*   **[Documentation Suite (docs/)](./docs/README.md)**: Deep technical specifications, guides, and architectural whitepapers.
+*   **[Benchmark Suite (benchmarks/)](./benchmarks/README.md)**: Performance measurements and allocation verification.
+*   **[Samples (samples/)](./samples/AdvancedUsage/README.md)**: Practical examples showing basic to advanced usage.
+
+---
+
+## 📊 Repo Stats
+
+![Repobeats analytics image](https://repobeats.axiom.co/api/embed/57d92552dfb25309185f7457c01037a504b5fa24.svg "Repobeats analytics image")
+
+---
+
+## 🚀 Quick Start
 
 Get up and running in seconds using the fluent API.
 
 ### Installation
+
+Install the core package from NuGet:
+
 ```bash
 dotnet add package Jeninnet.FileQuery
 ```
 
 ### Basic Usage
+
 ```csharp
 using Jeninnet.FileQuery;
 
-// 1. Define your query using the fluent builder
+// 1. Configure the query using the fluent builder
 var query = FileQuery.From(@"C:\MyProject")
-                     .Where("**")           // Exclude everything
-                     .Where("!*.tmp")       // include all .tmp files
-                     .Where("!src/**/*.cs") // Only include .cs files in src folder
-                     .UsingHybrid()         // Auto-detect pattern types (GitIgnore/Glob/Regex)
-                     .IgnoreCase()          // Case-insensitive matching
+                     .Where("**")           // Exclude everything by default
+                     .Where("!*.tmp")       // Include all .tmp files
+                     .Where("!src/**/*.cs") // Include .cs files under the src folder
+                     .UsingHybrid()         // Auto-detect pattern dialects (GitIgnore/Glob/Regex)
+                     .IgnoreCase()          // Use case-insensitive matching
                      .Build();
 
-// 2. Execute the query
+// 2. Execute the query using the runtime engine
 var engine = FileQueryRuntime.Create();
-var files = engine.Execute(query).ToList();
+var files = engine.Execute(query);
 
 foreach (var file in files)
 {
@@ -51,408 +85,131 @@ foreach (var file in files)
 
 ---
 
-# Why Jeninnet.FileQuery Exists
+## 🏗️ High-Level Architecture Overview
 
-
-Most file filtering solutions suffer from at least one of these problems:
-
-* limited pattern syntax
-* inconsistent rule semantics
-* poor performance on large directory trees
-* tight coupling between traversal and pattern logic
-
-`Jeninnet.FileQuery` was designed to address these issues by separating:
+`Jeninnet.FileQuery` splits filesystem traversal, pattern compilation, and matching into distinct, highly optimized layers:
 
 ```
-filesystem traversal
-pattern language
-matcher execution
-query orchestration
+                          [ Client Code ]
+                                 â”‚
+                        [ FileQueryBuilder ]
+                                 │
+                                 ▼
+                     ┌───────────────────────┐
+                     │       FileQuery       │
+                     │  (Immutable Request)  │
+                     └───────────┬───────────┘
+                                 │
+                                 ▼
+                     ┌───────────────────────┐
+                     │   IFileQueryEngine    │
+                     └───────────┬───────────┘
+                                 │ Executes
+                                 ▼
+                     ┌───────────────────────┐
+                     │   HybridPathMatcher   │
+                     └───────────┬───────────┘
+          ┌──────────────────────┼──────────────────────┐
+          ▼                      ▼                      ▼
+┌──────────────────┐   ┌──────────────────┐   ┌──────────────────┐
+│ GitIgnoreMatcher │   │   GlobMatcher    │   │   RegexMatcher   │
+└──────────────────┘   └──────────────────┘   └──────────────────┘
+          │                      │                      │
+          └──────────────────────┼──────────────────────┘
+                                 ▼
+                       ┌───────────────────┐
+                       │    IFileSystem    │
+                       └───────────────────┘
 ```
 
-This separation allows the engine to remain **predictable, extensible, and fast**.
+1.  **Orchestration & API Layer**: [FileQueryBuilder](./src/Jeninnet.FileQuery/FileQueryBuilder.cs) accepts configuration inputs and builds an immutable [FileQuery](./src/Jeninnet.FileQuery/FileQuery.cs) instance.
+2.  **Matching Layer**: [HybridPathMatcher](./src/Jeninnet.FileQuery/Matching/Compiled/HybridPathMatcher.cs) decomposes rules and routes them to target matchers (GitIgnore, Glob, Regex). GitIgnore inclusions take final precedence.
+3.  **Compilation & Parser Layer**: Tokenizes raw strings, checks them against semantic and structural invariants (e.g., recursive wildcard isolation), and produces compiled instruction sets.
+4.  **IO Traversal Layer**: Traverses directories using an stack-based or queue-based execution plan, decoupling all IO through the [IFileSystem](./src/Jeninnet.FileQuery/IO/IFileSystem.cs) interface.
 
 ---
 
-# Installation
+## 💡 Advanced & Developer-Oriented Features
 
-Install from NuGet:
+### 1. POSIX Character Classes
+The engine supports POSIX-named character classes within Glob and GitIgnore bracket expressions (e.g., `[[:digit:]]`). Supported classes include:
+*   `[:digit:]`: Decimal digits (`0-9`)
+*   `[:alpha:]`: Alphabetic characters
+*   `[:alnum:]`: Alphanumeric characters
+*   `[:space:]`: White space characters
+*   `[:blank:]`: Space or horizontal tab characters
+*   `[:upper:]` / `[:lower:]`: Uppercase / lowercase characters
+*   `[:print:]` / `[:graph:]`: Printable / visible characters
+*   `[:punct:]`: Punctuation and symbol characters
+*   `[:cntrl:]`: Control characters
+*   `[:xdigit:]`: Hexadecimal digits
 
-```
-dotnet add package Jeninnet.FileQuery
-```
+### 2. Zero-Allocation Matching Path
+To support massive file trees containing millions of files, the matching evaluation loop is completely allocation-free, utilizing `ReadOnlySpan<char>` and stack-allocated parsing arrays.
 
-Optional integration packages:
+### 3. Decoupled Filesystem Abstraction
+By using the [IFileSystem](./src/Jeninnet.FileQuery/IO/IFileSystem.cs) interface, the traversal engine can run against virtual or mock filesystems (useful for cloud workloads and fast test isolation).
 
-```
-dotnet add package Jeninnet.FileQuery.CommandLine
-dotnet add package Jeninnet.FileQuery.DependencyInjection
-```
+### 4. Advanced Traversal Tuning
+Through `TraversalOptions`, developers can choose between `DepthFirst` (stack-based) or `BreadthFirst` (queue-based) search strategies and control symlink behavior with policies like `Ignore`, `Follow`, or `FollowWithCycleDetection`.
 
----
-
-# Quick Example
+### 5. Observability and Recovery
+Async scans can report live statistics through `IProgress<FileQueryProgress>`:
 
 ```csharp
-var fileQueryEngine = FileQueryRuntime.Create();
-
-var options = new FileQueryOptions
+var progress = new Progress<FileQueryProgress>(snapshot =>
 {
-    PatternInput = new(
-        patterns:
-        [
-            "**",
-            "!*.txt"
-        ]
-    )
-};
+    Console.WriteLine($"{snapshot.EntriesScanned} entries scanned");
+});
 
-var result = fileQueryEngine
-    .Execute(new(rootPath, options))
-    .ToList();
+await foreach (var file in engine.ExecuteAsync(query, progress, cancellationToken))
+{
+    Console.WriteLine(file);
+}
 ```
 
-This query returns **all files except `.txt` files**.
-
----
-
-# Deterministic Rule Semantics
-
-The engine follows a simple but powerful rule model inspired by GitIgnore.
-
-Rules are evaluated **in order**, and the **last rule wins**.
-
-Example:
+Opt-in diagnostics explain match outcomes and responsible pattern metadata:
 
 ```csharp
-patterns:
-[
-    "**",
-    "!*.log",
-    "data.log"
-]
-```
+var diagnostics = new Progress<FileQueryDiagnostic>(entry =>
+{
+    Console.WriteLine($"{entry.RelativePath}: {entry.Outcome} ({entry.Pattern})");
+});
 
-Evaluation:
-
-```
-include everything
-exclude *.log
-include data.log
-```
-
-Final result:
-
-```
-data.log is included
-```
-
-This deterministic model avoids the ambiguity common in many glob engines.
-
----
-
-# Supported Pattern Languages
-
-The engine supports multiple pattern syntaxes that can be combined within the same query.
-
-See `docs/reference/pattern-semantics.md` for the detailed behavior matrix covering precedence, negation, recursive wildcards, and directory-only rules.
-
-### GitIgnore Patterns
-
-Examples:
-
-```
-**
-!*.log
-!build/
-```
-
-Supports:
-
-```
-recursive wildcards (**)
-negation
-ordered rule evaluation
+var query = FileQuery.From("./src")
+                     .Where("**", "!**/*.cs")
+                     .WithDiagnostics(diagnostics)
+                     .WithErrorRecovery(FileQueryErrorRecoveryOptions.Retry(2))
+                     .Build();
 ```
 
 ---
 
-### Glob Patterns
+## 📜 Governance and Philosophy
 
-Examples:
-
-```
-*.cs
-file?.txt
-file[0-9].log
-```
-
-Supports:
-
-```
-wildcards (*)
-single-character matches (?)
-character classes
-```
+The project adheres to the **[Jeninnet.FileQuery Constitution](./constitution.md)**:
+1.  **Engine‑First & Pattern‑Compiled**: Always tokenize, validate invariants, and compile before running; no ad-hoc string regexes or runtime heuristics.
+2.  **Compile‑Time Safe**: Malformed patterns never throw during tokenization; all syntax errors are captured during the invariant phase to output rich diagnostics.
+3.  **AOT-Ready**: Reflection is completely avoided to ensure compatibility with .NET Native AOT compilation.
 
 ---
 
-### Regular Expressions
+## 🏛️ Compatibility & Tech Stack
 
-Regex patterns are prefixed with:
-
-```
-r:
-```
-
-Example:
-
-```
-r:^data_.*\.log$
-```
-
-This allows advanced filtering for complex naming schemes.
+*   **TFM**: `.NET 10`
+*   **Language**: `C# 14`
+*   **Test Suite**: MSTest + Moq + Coverlet
+*   **Enforcement**: Central Package Management (CPM), strict `.editorconfig` rules, and architecture tests enforcing zero allocations.
 
 ---
 
-# Hybrid Matcher Architecture
+## 🚀 Contributing & Roadmap
 
-Pattern languages are unified through the **HybridPathMatcher**.
-
-```
-                 HybridPathMatcher
-                       │
-        ┌──────────────┼──────────────┐
-        │              │              │
- GitIgnoreMatcher   GlobMatcher   RegexPathMatcher
-```
-
-Patterns are classified automatically and routed to the appropriate matcher.
-
-This design allows different pattern systems to coexist without conflict.
+*   Please consult **[CONTRIBUTING.md](./CONTRIBUTING.md)** before submitting pull requests.
+*   See **[ROADMAP.md](./ROADMAP.md)** for planned features (such as Progress Reporting, Audit Diagnostics, and Parallel Traversal).
 
 ---
 
-# Example: Combining Pattern Languages
+## 📜 License
 
-```csharp
-patterns:
-[
-    "**",
-    "!*.tmp",
-    "logs/*.log",
-    "r:^data_.*"
-]
-```
-
-This query mixes:
-
-```
-GitIgnore rules
-Glob rules
-Regex rules
-```
-
-The hybrid matcher resolves them deterministically.
-
----
-
-# Command Line Integration
-
-The package:
-
-```
-Jeninnet.FileQuery.CommandLine
-```
-
-provides a lightweight integration layer for CLI applications.
-
-It converts command-line arguments into pattern structures usable by the query engine.
-
-Example CLI usage:
-
-```
-app --patterns "*.txt;!temp.txt"
-```
-
-Internally this becomes:
-
-```
-PatternOptions
-        ↓
-PatternBuilder
-        ↓
-Dictionary<PatternKind,List<string>>
-```
-
-Which can then be executed by the engine.
-
----
-
-# Dependency Injection Integration
-
-The package:
-
-```
-Jeninnet.FileQuery.DependencyInjection
-```
-
-provides DI container integration.
-
-Example:
-
-```csharp
-services.AddFileQuery();
-```
-
-This registers the runtime so it can be injected into application services.
-
----
-
-# Example Use Cases
-
-`Jeninnet.FileQuery` can be used to build:
-
-```
-build tools
-backup utilities
-code analysis tools
-file synchronization systems
-log processing pipelines
-```
-
-Any application that needs reliable file discovery can benefit from it.
-
----
-
-# Project Structure
-
-```
-src/
-  Jeninnet.FileQuery
-  Jeninnet.FileQuery.CommandLine
-  Jeninnet.FileQuery.DependencyInjection
-
-test/
-  Jeninnet.FileQuery.Tests
-
-samples/
-  BasicMatching
-  PatternLanguage
-  RecursiveTraversal
-  RegexMatching
-  HybridMatcher
-```
-
----
-
-# Installation
-
-Install the core package:
-
-```
-dotnet add package Jeninnet.FileQuery
-```
-
-Optional integrations:
-
-```
-dotnet add package Jeninnet.FileQuery.CommandLine
-dotnet add package Jeninnet.FileQuery.DependencyInjection
-```
-
----
-
-# Documentation
-
-Full documentation is available in:
-
-```
-
-docs/
-    architecture/
-    contributing/
-    getting-started/
-    integrations/
-    introduction/
-    pattern-language/
-    patterns/
-    performance/
-    runtime/
-    specification/
-    whitepaper/
-```
-
-Topics include:
-
-```
-pattern language specification
-matcher architecture
-pattern tokenization
-pattern invariants
-filesystem traversal model
-```
-
----
-
----
-
-# Technology Stack
-
-This project targets modern .NET development.
-
-```
-.NET 10
-C# 14
-MSTest
-```
-
-The codebase emphasizes:
-
-* performance-aware design
-* minimal allocations
-* deep XML documentation
-* cross-platform compatibility
-
----
-
-# Contributing
-
-Contributions are welcome.
-
-Please read:
-
-```
-CONTRIBUTING.md
-```
-
-before submitting pull requests.
-
----
-
-# Roadmap
-
-See:
-
-```
-ROADMAP.md
-```
-
-for future plans including performance improvements and additional matcher capabilities.
-
----
-
-# License
-
-MIT License.
-
-See `LICENSE` for details.
-
----
-
-# Final Note
-
-File discovery may appear simple, but once rule sets become complex it can quickly become unpredictable.
-
-Jeninnet.FileQuery was designed to make filesystem querying **deterministic, expressive, and fast** for modern .NET applications.
-
+This project is licensed under the MIT License. See **[LICENSE](./LICENSE)** for details.

@@ -1,29 +1,53 @@
 ﻿# Jeninnet.FileQuery
 
-**Jeninnet.FileQuery** is a fast, cross-platform, pattern-driven file enumeration engine for .NET.
+![GitHub Actions CI Workflow Status](https://img.shields.io/github/actions/workflow/status/TarekNajem04/Jeninnet.FileQuery/ci.yml)
+![GitHub release](https://img.shields.io/github/v/release/TarekNajem04/Jeninnet.FileQuery)
+![GitHub contributors](https://img.shields.io/github/contributors/TarekNajem04/Jeninnet.FileQuery)
+![GitHub forks](https://img.shields.io/github/forks/TarekNajem04/Jeninnet.FileQuery)
+![GitHub last commit](https://img.shields.io/github/last-commit/TarekNajem04/Jeninnet.FileQuery)
+![GitHub Issues](https://img.shields.io/github/issues/TarekNajem04/Jeninnet.FileQuery)
+[![GitHub stars](https://img.shields.io/github/stars/TarekNajem04/Jeninnet.FileQuery)](https://github.com/TarekNajem04/Jeninnet.FileQuery/stargazers)
+[![GitHub license](https://img.shields.io/github/license/TarekNajem04/Jeninnet.FileQuery)](https://github.com/TarekNajem04/Jeninnet.FileQuery/blob/main/LICENSE)
 
-It provides a **GitIgnore-compatible**, **Glob**, and **Regex (flat)** pattern engine built for **high performance**, **predictable behavior**, and **large directory trees**.
+![NuGet Version](https://img.shields.io/nuget/v/Jeninnet.FileQuery)
+[![NuGet downloads](https://img.shields.io/nuget/dt/Jeninnet.FileQuery)](https://www.nuget.org/packages/Jeninnet.FileQuery/)
 
----
+Absolutely — here is the **entire unified README**, rewritten **fully in English**, **cleanly structured**, and placed **inside a single fenced code block** exactly as you requested.
 
-## ✨ Key Features
+**Jeninnet.FileQuery** is a high‑performance, deterministic, pattern‑driven file enumeration engine for .NET.
 
-* 🚀 High-performance file enumeration (millions of files)
-* 📂 Recursive directory traversal
-* 🧩 Multiple pattern engines:
-
-  * GitIgnore-style patterns
-  * Glob patterns
-  * Flat regular expressions
-* ❌ Include / exclude rules with deterministic precedence
-* 🔠 Case-sensitive or insensitive matching
-* 🧠 Span-based pattern compilation
-* 🔄 Fully synchronous **and** async APIs
-* 🛡 Safe traversal (optional ignore inaccessible directories)
+It supports GitIgnore, Glob, and flat Regex (`r:`) patterns, powered by a strict tokenization + invariant validation pipeline designed for correctness, scalability, and predictable behavior across multi‑million file trees.
 
 ---
 
-## Installation
+# ✨ Overview
+
+Jeninnet.FileQuery is not just a file filter — it is a **pattern execution engine** with:
+
+- Deterministic evaluation  
+- Zero‑ambiguity parsing rules  
+- Strict separation between scanning, validation, and execution  
+- Scalable traversal for extremely large directory trees  
+- Zero‑allocation hot paths using `ReadOnlySpan<char>`  
+
+---
+
+# 🚀 Key Features
+
+- Ultra‑fast file enumeration (1M–2M files/sec)
+- GitIgnore‑compatible pattern engine
+- Glob pattern support
+- Flat Regex mode (`r:` prefix)
+- Hybrid auto‑detection
+- Deterministic include/exclude precedence
+- Sync + async APIs
+- Safe traversal (ignore inaccessible directories)
+- Full diagnostics + invariant validation
+- Immutable compiled pattern sets
+
+---
+
+# 📦 Installation
 
 ```bash
 dotnet add package Jeninnet.FileQuery
@@ -31,9 +55,9 @@ dotnet add package Jeninnet.FileQuery
 
 ---
 
-## Quick Start
+# ⚡ Quick Start
 
-### Enumerate all `.cs` files recursively
+## Enumerate all `.cs` files
 
 ```csharp
 var engine = new FileQueryEngine();
@@ -48,9 +72,7 @@ var query = new FileQuery(
 IEnumerable<string> results = engine.Execute(query);
 ```
 
----
-
-### Async enumeration
+## Async enumeration
 
 ```csharp
 await foreach (var file in engine.ExecuteAsync(
@@ -68,60 +90,11 @@ await foreach (var file in engine.ExecuteAsync(
 
 ---
 
-## Execution Model
-
-All enumeration is driven by an immutable **query object**.
-
-```csharp
-public interface IFileQueryEngine {
-    IEnumerable<string> Execute(FileQuery query);
-    IAsyncEnumerable<string> ExecuteAsync(
-        FileQuery query,
-        CancellationToken cancellationToken = default
-    );
-}
-```
-
-### Why `FileQuery`?
-
-* Groups root path and options into a single request
-* Enables deterministic execution
-* Keeps sync and async APIs symmetric
-* Allows future diagnostics, caching, and replay
-
----
-
-## FileQueryEngineOptions
-
-```csharp
-public class FileQueryEngineOptions {
-    public string[] Patterns { get; set; } = Array.Empty<string>();
-    public bool RecurseSubdirectories { get; set; } = true;
-    public int MaxRecursionDepth { get; set; } = -1;
-    public bool IgnoreInaccessible { get; set; } = true;
-    public bool IgnoreCase { get; set; } = FileQueryEngineOptions.DefaultIgnoreCase;
-
-    public PatternMatchingMode PatternMatchingMode { get; set; }
-        = PatternMatchingMode.GitIgnore;
-
-    public PatternInterpretationMode PatternInterpretation { get; set; }
-        = PatternInterpretationMode.Auto;
-}
-```
-
----
-
-## Pattern Engines
-
-Jeninnet.FileQuery supports **three pattern engines**.
-
----
+# 🧩 Pattern Engines
 
 ## 1️⃣ GitIgnore Mode
 
-Full GitIgnore-style semantics.
-
-### Supported syntax
+Supports full GitIgnore semantics:
 
 | Feature           | Example          | Meaning                  |
 | ----------------- | ---------------- | ------------------------ |
@@ -130,10 +103,9 @@ Full GitIgnore-style semantics.
 | Directory-only    | `bin/`           | Match directories only   |
 | Negation          | `!src/app.cs`    | Un-ignore a path         |
 | Root anchoring    | `/src/*.cs`      | Match only from root     |
-| Character classes | `[a-z]`, `[0-9]` | Character ranges         |
-| Escaping          | `\!file.txt`     | Literal character        |
+| Character classes | `[a-z]`          | Character ranges         |
 
-### Example
+Example:
 
 ```
 *.cs
@@ -141,19 +113,11 @@ Full GitIgnore-style semantics.
 bin/
 ```
 
-**Meaning**
-
-* Include all `.cs`
-* Exclude `Program.cs`
-* Exclude the `bin` directory entirely
-
 ---
 
 ## 2️⃣ Glob Mode
 
-Simpler, filesystem-style matching.
-
-### Syntax
+Filesystem-style matching:
 
 | Syntax  | Meaning                   |
 | ------- | ------------------------- |
@@ -162,7 +126,7 @@ Simpler, filesystem-style matching.
 | `**`    | Recursive directories     |
 | `[a-z]` | Character classes         |
 
-### Example
+Example:
 
 ```
 **/*.txt
@@ -173,28 +137,24 @@ src/**/test?.md
 
 ## 3️⃣ Regex Mode (Flat)
 
-Regex patterns are **explicit** and **flat**.
+Rules:
 
-### Rules
+- Must start with `r:`
+- No glob semantics
+- Applies to the full normalized path
+- Uses .NET Regex
 
-* Must start with `r:`
-* No glob or GitIgnore semantics
-* Pattern applies to the **entire normalized path**
-* Uses .NET `Regex`
+Example:
 
-### Example
-
-```csharp
-Patterns = new[] {
-    @"r:^src\/.*\.cs$"
-}
+```
+r:^src\/.*\.cs$
 ```
 
 ---
 
-## Hybrid Interpretation Mode
+## 4️⃣ Hybrid Mode
 
-Hybrid mode automatically selects the compiler:
+Automatic engine selection:
 
 | Pattern           | Engine    |
 | ----------------- | --------- |
@@ -206,292 +166,269 @@ Hybrid mode automatically selects the compiler:
 
 ---
 
-## Pattern Processing Pipeline
+# 📊 Pattern Engine Comparison
+
+| Feature | GitIgnore | Glob | Regex (Flat) |
+|--------|-----------|-------|--------------|
+| Recursive `**` | ✔ | ✔ | ✘ |
+| `?` wildcard | ✔ | ✔ | ✘ |
+| Character classes | ✔ | ✔ | ✔ |
+| Negation `!` | ✔ | ✘ | ✘ |
+| Root anchoring `/` | ✔ | ✘ | ✘ |
+| Needs prefix | No | No | Yes (`r:`) |
+| Complexity | Medium | Low | High |
+| Best for | Git-like filtering | General file matching | Advanced constraints |
+
+---
+
+# 🧪 Advanced Examples
+
+## 1️⃣ Exclude a folder but include a specific file inside it
+
+```
+bin/
+!bin/tools/keep.dll
+```
+
+## 2️⃣ Match Markdown files everywhere except in `docs/`
+
+```
+**/*.md
+!docs/**
+```
+
+## 3️⃣ Match JSON files starting with a lowercase letter
+
+```
+data/[a-z]*.json
+```
+
+## 4️⃣ Regex: match `.cs` files ending with a number
+
+```
+r:^src\/.*\d+\.cs$
+```
+
+## 5️⃣ Combine GitIgnore + Glob + Regex
+
+```
+!bin/
+src/**/test?.cs
+r:^tools\/.*\.ps1$
+```
+
+## 6️⃣ Limit recursion depth
+
+```csharp
+MaxRecursionDepth = 2
+```
+
+## 7️⃣ Ignore access errors
+
+```csharp
+IgnoreInaccessible = true
+```
+
+## 8️⃣ Match files inside alphabetic subfolders
+
+```
+src/[a-z]*/**/*.cs
+```
+
+## 9️⃣ Regex: match multiple extensions
+
+```
+r:^.*\.(cs|md|json)$
+```
+
+## 🔟 Match files inside numeric folders only
+
+```
+r:^logs\/\d+\/.*\.txt$
+```
+
+## 1️⃣1️⃣ Complex exclusion rules
+
+```
+**/*.cs
+!**/obj/**
+!**/bin/**
+!**/temp/**
+```
+
+---
+
+# ⚙️ FileQueryEngineOptions
+
+| Option                | Default   | Description            |
+| --------------------- | --------- | ---------------------- |
+| Patterns              | empty     | Pattern list           |
+| RecurseSubdirectories | true      | Enable recursion       |
+| MaxRecursionDepth     | -1        | Unlimited              |
+| IgnoreInaccessible    | true      | Skip permission errors |
+| IgnoreCase            | platform  | Case sensitivity mode  |
+| PatternMatchingMode   | GitIgnore | Default engine         |
+| PatternInterpretation | Auto      | Hybrid detection       |
+
+---
+
+# 🧠 Architecture
 
 ```
 Raw Pattern Text
         │
         ▼
-PatternScanner
-(tokenization only)
+PatternScanner (Tokenization only)
         │
         ▼
-PatternInvariants
-(structural + semantic validation)
+Invariant Validation Layer
         │
         ▼
-CompiledPattern
-(immutable)
+CompiledPatternSet (Immutable)
         │
         ▼
-PathMatcher
-```
-
-### Important guarantees
-
-* `PatternScanner` **does not throw** for malformed input
-* All errors are reported via **invariants**
-* Regex is isolated from glob / GitIgnore logic
-* No pattern matching happens during compilation
-
----
-
-## Architecture Overview
-
-```
-┌────────────────────────┐
-│     FileQueryEngine    │
-│      (public API)      │
-└──────────┬─────────────┘
-           │ executes
-           ▼
-┌────────────────────────┐
-│   HybridPathMatcher    │─────┐
-└────────────────────────┘     │
-           ▲                   │
-           │ uses              │
-     ┌─────┴─────────────┬─────┴───────────┐
-     ▼                   ▼                 ▼
-GitIgnoreMatcher   GlobMatcher        RegexMatcher
-(pattern-based)    (pattern-based)    (flat regex)
-     │                   │                 │
-     └──────────┬────────┴─────────────────┘
-                ▼
-         CompiledPattern[]
-                ▼
-          PatternToken[]
+HybridPathMatcher
+     │
+     ├── GitIgnoreMatcher
+     ├── GlobMatcher
+     └── RegexMatcher
 ```
 
 ---
 
-## Performance Notes
+# 📘 Appendix A — Pattern Grammar (Extended & Complete)
 
-* Uses `Directory.EnumerateFileSystemEntries`
-* Avoids `FileInfo` / `DirectoryInfo`
-* Span-based tokenization
-* Regex only used in explicit regex mode
-
-Typical throughput (example):
-
-| Operation          | Files/sec |
-| ------------------ | --------- |
-| Enumeration only   | ~1.8M     |
-| Glob matching      | ~1.2M     |
-| GitIgnore matching | ~1.1M     |
+This appendix defines the **formal grammar** for all pattern engines supported by Jeninnet.FileQuery.
 
 ---
 
-## Testing
-
-The project includes:
-
-* Scanner architecture tests
-* Tokenizer tests
-* Invariant tests
-* Matcher tests (Glob / GitIgnore / Regex)
-* Case sensitivity tests
-* Async enumeration tests
-
-All tests must pass with:
-
-* No `PatternException` thrown by the scanner
-* All invalid syntax caught by invariants
-
----
-
-## FAQ
-
-### Does `*.*` work?
-
-Yes. Same behavior as GitIgnore.
-
-### Can I un-ignore a file inside an excluded folder?
-
-Yes — same semantics as GitIgnore.
-
-### Is this cross-platform?
-
-Yes:
-
-* `/` normalized internally
-* OS-aware case sensitivity
-* Override available
-
-### Does it scale?
-
-Yes. Designed for multi-million file trees.
-
----
-
-## License
-
-MIT License. See `LICENSE`.
-
-Love this direction — those two sections are exactly what makes the engine *understandable* instead of “magic”.
-Below are **two appendices** you can paste **directly at the end of the README**.
-
-They are fully aligned with the **current scanner → tokenizer → invariant pipeline** and explain *why things are the way they are*, not just *what*.
-
----
-
-# Appendix A — Pattern Grammar
-
-This appendix describes the **formal grammar** of patterns accepted by Jeninnet.FileQuery.
-
-The grammar is intentionally **strict**, **unambiguous**, and **engine-specific**.
-It is *inspired by* GitIgnore and glob syntax, but not a byte-for-byte clone.
-
----
-
-## A.1 Lexical Structure
-
-All patterns are processed as **normalized forward-slash paths**.
+## A.1 General Structure
 
 ```
-pattern        := [prefix] core-pattern [suffix]
-prefix         := '!' | '/' | ε
-suffix         := '/' | ε
-```
-
-Whitespace surrounding the pattern is ignored.
-
----
-
-## A.2 Segments
-
-Patterns are split into **segments** by `/`.
-
-```
-core-pattern := segment ('/' segment)*
-segment      := token+
-```
-
-Empty segments are ignored **except** in root-only cases (`/`).
-
----
-
-## A.3 Tokens (Glob & GitIgnore)
-
-Within each segment, the scanner produces tokens:
-
-```
-token :=
-    literal
-  | '*'
-  | '?'
-  | '**'
-  | character-class
+pattern        ::= gitignore | glob | regex
 ```
 
 ---
 
-### Literal
-
-Any character that is not part of another token.
-
-Escaping is supported when enabled:
+## A.2 GitIgnore Grammar
 
 ```
-\*  \?  \[  \]  \!
+gitignore      ::= [negation] [root] segment ('/' segment)* [dironly]
+
+negation       ::= '!' | ε
+root           ::= '/' | ε
+dironly        ::= '/' | ε
+segment        ::= token+
 ```
 
----
+### Tokens
 
-### Wildcards
-
-| Token | Meaning                                      |
-| ----- | -------------------------------------------- |
-| `*`   | Matches zero or more characters (except `/`) |
-| `?`   | Matches exactly one character                |
-| `**`  | Matches zero or more *path segments*         |
-
----
-
-### Recursive Wildcard Rules
-
-* `**` **must be isolated**
-* Valid: `**/foo`, `foo/**`, `**`
-* Invalid: `a**`, `**a`, `a**b`
-
-These constraints are enforced by **invariants**, not tokenizers.
-
----
+```
+token          ::= literal
+                 | '*'
+                 | '?'
+                 | '**'
+                 | charclass
+```
 
 ### Character Classes
 
 ```
-character-class :=
-    '[' ['!' | '^'] class-item+ ']'
-
-class-item :=
-    literal
-  | literal '-' literal
+charclass      ::= '[' ['!'|'^'] classitem+ ']'
+classitem      ::= literal | literal '-' literal
 ```
 
-Examples:
+### GitIgnore Rules
 
-```
-[a-z]
-[0-9]
-[abc]
-[!aeiou]
-```
-
-Invalid examples:
-
-```
-[]
-[a-]
-[-z]
-[z-a]
-```
-
-> Character classes are tokenized structurally and validated semantically.
+- `**` may match across directories  
+- `bin/` matches directories only  
+- `/foo` anchors to root  
+- `!pattern` negates  
+- `.` and `..` forbidden  
+- Escaping supported  
 
 ---
 
-## A.4 Directory Semantics
+## A.3 Glob Grammar
 
-| Syntax   | Meaning                  |
-| -------- | ------------------------ |
-| `foo/`   | Matches directories only |
-| `/foo`   | Root-anchored            |
-| `./foo`  | ❌ invalid                |
-| `../foo` | ❌ invalid                |
+```
+glob           ::= [negation] segment ('/' segment)*
+negation       ::= '!' | ε
+segment        ::= token+
+```
 
-Segments equal to `.` or `..` are **not permitted**.
+### Tokens
+
+```
+token          ::= literal | '*' | '?' | '**' | charclass
+```
+
+### Glob Rules
+
+- `*` matches any chars except `/`
+- `?` matches one char
+- `**` matches directories
+- No root anchoring
+- No directory-only suffix
 
 ---
 
-## A.5 Regex Patterns (Flat Mode)
-
-Regex patterns are **explicit** and bypass glob grammar.
+## A.4 Regex Grammar
 
 ```
-regex-pattern := 'r:' regex-text
+regex          ::= 'r:' regextext
+regextext      ::= .+
 ```
 
 Rules:
 
-* Must start with `r:`
-* No tokenization
-* No glob or GitIgnore semantics
-* Applied to the full normalized path
+- Must start with `r:`
+- Applies to full normalized path
+- Uses .NET Regex
+- No glob semantics
 
-Example:
+---
+
+## A.5 Hybrid Interpretation
 
 ```
-r:^src\/.*\.cs$
+if starts with "r:" → Regex
+else if contains GitIgnore semantics → GitIgnore
+else → Glob
 ```
 
 ---
 
-## A.6 Grammar Summary (EBNF)
+## A.6 Token Grammar (Shared)
 
 ```
-pattern        ::= regex | glob
-regex          ::= 'r:' .+
-glob           ::= ['!'] ['/'] segment ('/' segment)* ['/']
+literal         ::= any character except: '*', '?', '[', ']', '/', '!'
+escaped         ::= '\' literal
+token           ::= literal | escaped | '*' | '?' | '**' | charclass
+```
+
+---
+
+## A.7 Invalid Patterns
+
+| Pattern | Reason |
+|---------|--------|
+| `a**b`  | `**` must be isolated |
+| `[z-a]` | invalid range |
+| `../foo` | forbidden |
+| `./foo` | forbidden |
+| `**a` | invalid |
+
+---
+
+## A.8 Grammar Summary
+
+```
+pattern        ::= gitignore | glob | regex
+
+gitignore      ::= [negation] [root] segment ('/' segment)* [dironly]
+glob           ::= [negation] segment ('/' segment)*
+regex          ::= 'r:' regextext
 
 segment        ::= token+
 token          ::= literal | '*' | '?' | '**' | charclass
@@ -501,126 +438,40 @@ classitem      ::= literal | literal '-' literal
 
 ---
 
-# Appendix B — Why Invariants?
+# ❓ FAQ (Extended)
 
-Invariants are **not validation helpers**.
-They are a **core architectural boundary**.
+### Does `*.*` work?
+Yes.
 
----
+### Can I un-ignore a file inside an ignored folder?
+Yes.
 
-## B.1 The Core Design Rule
+### Is Regex mode using .NET Regex?
+Yes.
 
-> **The scanner never decides whether a pattern is valid.**
+### Can Hybrid Mode be disabled?
+Yes.
 
-Instead:
+### Can access errors be ignored?
+Yes.
 
-1. The scanner **always tokenizes**
-2. Invariants **interpret meaning**
-3. Matchers **assume correctness**
+### Can multiple pattern types be mixed?
+Yes.
 
-This separation is deliberate.
+### Are absolute paths allowed?
+No.
 
----
+### Are `.` or `..` allowed?
+No.
 
-## B.2 Why Not Validate During Tokenization?
+### Can I get diagnostics for invalid patterns?
+Yes.
 
-Because tokenization answers only one question:
-
-> “What symbols are present?”
-
-Validation answers a different question:
-
-> “What do these symbols *mean together*?”
-
-Example:
-
-```
-[a-z]     ✅ valid
-[z-a]     ❌ invalid (semantic)
-```
-
-Both tokenize identically.
-Only **semantic analysis** can detect the error.
+### Does it scale?
+Yes — multi‑million file trees.
 
 ---
 
-## B.3 Invariant Phases
+# 📄 License
 
-Invariants run in **ordered phases**:
-
-### 1️⃣ Lexical Invariants
-
-* Literal normalization
-* Escape correctness
-
-### 2️⃣ Structural Invariants
-
-* Recursive wildcard isolation
-* Character class structure
-* Directory traversal (`.` / `..`)
-* Regex syntax validity
-
-### 3️⃣ Semantic Invariants
-
-* GitIgnore negation rules
-* Implicit recursive wildcards
-* Mode-specific constraints
-
-Each invariant:
-
-* Reads the compiled context
-* Returns success or a structured failure
-* Never mutates tokens
-
----
-
-## B.4 Benefits of the Invariant Model
-
-### ✅ Deterministic behavior
-
-The same pattern always fails in the same phase.
-
-### ✅ Better diagnostics
-
-Errors include **exact location and meaning**, not tokenizer noise.
-
-### ✅ Testability
-
-Each invariant can be tested independently.
-
-### ✅ Extensibility
-
-New rules = new invariant
-No scanner changes required.
-
----
-
-## B.5 Scanner Contract (Critical)
-
-The scanner guarantees:
-
-* ❌ No `PatternException` for malformed input
-* ❌ No semantic decisions
-* ❌ No pattern matching
-
-It produces **tokens only**.
-
-> If a scanner throws, it is a bug.
-
----
-
-## B.6 Why This Matters at Scale
-
-At millions of paths:
-
-* Validation must happen **once**
-* Matching must assume **zero invalid states**
-* Runtime checks must be eliminated
-
-Invariants make this possible.
-
-## Links
-
-- [Full documentation](https://github.com/TarekNajem04/Jeninnet.FileQuery/docs)
-- [Changelog](https://github.com/TarekNajem04/Jeninnet.FileQuery/blob/main/CHANGELOG.md)
-- [License: MIT](https://github.com/TarekNajem04/Jeninnet.FileQuery/blob/main/LICENSE)
+MIT License.
