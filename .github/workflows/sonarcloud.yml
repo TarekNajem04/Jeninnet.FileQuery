@@ -1,70 +1,72 @@
-name: SonarCloud Diagnostics
+name: SonarCloud
 
+# ---------------------------------------------------------
+# Trigger workflow on push and pull requests
+# ---------------------------------------------------------
 on:
-  workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - "src/**"
+      - "test/**"
+      - "**.csproj"
+      - "Directory.Packages.props"
+      - "Directory.Build.props"
+      - ".github/workflows/sonarcloud.yml"
+
+  pull_request:
+    branches:
+      - main
+    types:
+      - opened
+      - synchronize
+      - reopened
+    paths:
+      - "src/**"
+      - "test/**"
+      - "**.csproj"
+      - "Directory.Packages.props"
+      - "Directory.Build.props"
+      - ".github/workflows/sonarcloud.yml"
 
 permissions:
   contents: read
+  pull-requests: write
 
+# ---------------------------------------------------------
+# Global .NET environment settings
+# ---------------------------------------------------------
 env:
   DOTNET_SKIP_FIRST_TIME_EXPERIENCE: true
   DOTNET_NOLOGO: true
   DOTNET_CLI_TELEMETRY_OPTOUT: true
 
 jobs:
-  diagnostics:
-    name: SonarCloud Diagnostics
+  build-analyze:
+    name: Build, Test, Analyze
     runs-on: ubuntu-latest
 
     steps:
       # ---------------------------------------------------------
-      # Checkout repository with full history
+      # 1) Checkout repository (disable shallow clone)
       # ---------------------------------------------------------
       - name: Checkout repository
         uses: actions/checkout@v6.0.3
         with:
-          fetch-depth: 0
-          submodules: recursive
+          fetch-depth: 0          # Fetch full git history
+          submodules: recursive   # Avoid internal shallow clones
 
       # ---------------------------------------------------------
-      # Git repository diagnostics
+      # 2) Ensure full git history (safety net)
       # ---------------------------------------------------------
-      - name: Git diagnostics
+      - name: Ensure full git history
         run: |
-          echo "=========================================="
-          echo "GIT DIAGNOSTICS"
-          echo "=========================================="
-
-          echo ""
-          echo "Repository shallow state:"
-          git rev-parse --is-shallow-repository
-
-          echo ""
-          echo "Current commit:"
-          git rev-parse HEAD
-
-          echo ""
-          echo "Commit count:"
-          git rev-list --count HEAD
-
-          echo ""
-          echo "Recent commits:"
-          git log --oneline -n 20
-
-          echo ""
-          echo "Branches:"
-          git branch -a
-
-          echo ""
-          echo "Tags:"
-          git tag -l
-
-          echo ""
-          echo "Remote information:"
-          git remote -v
+          git fetch --unshallow || true
+          git fetch --all --tags
 
       # ---------------------------------------------------------
-      # Java
+      # 3) Setup Java (required by SonarScanner)
       # ---------------------------------------------------------
       - name: Setup Java 17
         uses: actions/setup-java@v5.2.0
@@ -73,7 +75,7 @@ jobs:
           java-version: "17"
 
       # ---------------------------------------------------------
-      # .NET
+      # 4) Setup .NET
       # ---------------------------------------------------------
       - name: Setup .NET 10
         uses: actions/setup-dotnet@v5.3.0
@@ -81,51 +83,70 @@ jobs:
           dotnet-version: "10.0.x"
 
       # ---------------------------------------------------------
-      # Install SonarScanner
+      # 5) Cache NuGet packages
       # ---------------------------------------------------------
-      - name: Install SonarScanner
-        run: |
-          dotnet tool install --global dotnet-sonarscanner
+      - name: Cache NuGet packages
+        uses: actions/cache@v5
+        with:
+          path: ~/.nuget/packages
+          key: ${{ runner.os }}-nuget-${{ hashFiles('**/*.csproj') }}
 
       # ---------------------------------------------------------
-      # Sonar begin
+      # 6) Cache SonarCloud
       # ---------------------------------------------------------
-      - name: Begin Sonar analysis
+      - name: Cache SonarCloud
+        uses: actions/cache@v5
+        with:
+          path: ~/.sonar/cache
+          key: ${{ runner.os }}-sonar
+
+      # ---------------------------------------------------------
+      # 7) Install SonarScanner for .NET
+      # ---------------------------------------------------------
+      - name: Install SonarScanner
+        run: dotnet tool install --global dotnet-sonarscanner
+
+      # ---------------------------------------------------------
+      # 8) Begin SonarCloud analysis
+      # ---------------------------------------------------------
+      - name: Begin SonarCloud analysis
         run: |
           dotnet sonarscanner begin \
             /k:"jeninnet-file-query" \
             /o:"jeninnet-file-query" \
             /d:sonar.host.url="https://sonarcloud.io" \
             /d:sonar.token="${{ secrets.SONAR_TOKEN }}" \
-            /d:sonar.verbose=true
+            /d:sonar.qualitygate.wait=true \
+            /d:sonar.cs.vstest.reportsPaths="TestResults/**/*.trx" \
+            /d:sonar.cs.opencover.reportsPaths="**/coverage.opencover.xml" \
+            /d:sonar.scm.provider=git \
+            /d:sonar.scm.forceReloadAll=true
 
       # ---------------------------------------------------------
-      # Restore
+      # 9) Restore dependencies
       # ---------------------------------------------------------
-      - name: Restore
+      - name: Restore dependencies
         run: dotnet restore
 
       # ---------------------------------------------------------
-      # Build
+      # 10) Build solution
       # ---------------------------------------------------------
-      - name: Build
+      - name: Build solution
         run: dotnet build -c Release --no-restore
 
       # ---------------------------------------------------------
-      # Test
+      # 11) Run tests with coverage
       # ---------------------------------------------------------
-      - name: Test
+      - name: Run tests with coverage
         run: |
-          dotnet test \
-            -c Release \
-            --no-build \
-            --logger trx \
+          dotnet test -c Release --no-build \
+            --collect:"XPlat Code Coverage" \
             --results-directory TestResults
 
       # ---------------------------------------------------------
-      # Sonar end
+      # 12) End SonarCloud analysis
       # ---------------------------------------------------------
-      - name: End Sonar analysis
+      - name: End SonarCloud analysis
         run: |
           dotnet sonarscanner end \
             /d:sonar.token="${{ secrets.SONAR_TOKEN }}"
