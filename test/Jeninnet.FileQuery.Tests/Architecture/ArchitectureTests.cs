@@ -44,6 +44,14 @@ public sealed class ArchitectureTests {
     [TestMethod]
     public void Scan_Does_Not_Allocate_Per_Invocation() {
         const string pattern = "**/*.cs";
+        var classified = new ClassifiedPattern(pattern, PatternKind.Glob);
+        var context = new PatternCompilationContext(classified);
+
+        // Warm up to ensure statics/JIT are loaded
+        PatternScanner.Scan(context, PatternSyntaxProfile.Glob);
+
+        // Reset context for actual measurement
+        context = new PatternCompilationContext(classified);
 
 #pragma warning disable S1215 // "GC.Collect" should not be called
         GC.Collect();
@@ -51,10 +59,7 @@ public sealed class ArchitectureTests {
 
         var before = GC.GetAllocatedBytesForCurrentThread();
 
-        PatternScanner.Scan(
-            new(new(Text: pattern, Type: PatternKind.Glob)),
-            PatternSyntaxProfile.Glob
-        );
+        PatternScanner.Scan(context, PatternSyntaxProfile.Glob);
 
         var after = GC.GetAllocatedBytesForCurrentThread();
 
@@ -317,44 +322,56 @@ public sealed class ArchitectureTests {
 
     private static IEnumerable<(string ApiOwner, Type ReferencedType)> GetPublicApiReferences(Assembly assembly) {
         foreach(var type in assembly.GetExportedTypes()) {
-            yield return (type.FullName ?? type.Name, type);
+            foreach(var reference in GetExportedTypeReferences(type)) {
+                yield return reference;
+            }
+        }
+    }
 
-            if(type.BaseType is not null) {
-                yield return ($"{type.FullName}: base type", type.BaseType);
+    private static IEnumerable<(string ApiOwner, Type ReferencedType)> GetExportedTypeReferences(Type type) {
+        yield return (type.FullName ?? type.Name, type);
+
+        if(type.BaseType is not null) {
+            yield return ($"{type.FullName}: base type", type.BaseType);
+        }
+
+        foreach(var interfaceType in type.GetInterfaces()) {
+            yield return ($"{type.FullName}: interface", interfaceType);
+        }
+
+        foreach(var reference in GetMemberApiReferences(type)) {
+            yield return reference;
+        }
+    }
+
+    private static IEnumerable<(string ApiOwner, Type ReferencedType)> GetMemberApiReferences(Type type) {
+        foreach(var constructor in type.GetConstructors(BindingFlags.Public | BindingFlags.Instance)) {
+            foreach(var parameter in constructor.GetParameters()) {
+                yield return ($"{type.FullName}.{constructor.Name} parameter {parameter.Name}", parameter.ParameterType);
+            }
+        }
+
+        foreach(var property in type.GetProperties(BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static)) {
+            yield return ($"{type.FullName}.{property.Name}", property.PropertyType);
+        }
+
+        foreach(var field in type.GetFields(BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static)) {
+            yield return ($"{type.FullName}.{field.Name}", field.FieldType);
+        }
+
+        foreach(var eventInfo in type.GetEvents(BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static)) {
+            yield return ($"{type.FullName}.{eventInfo.Name}", eventInfo.EventHandlerType!);
+        }
+
+        foreach(var method in type.GetMethods(BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static)) {
+            if(method.IsSpecialName) {
+                continue;
             }
 
-            foreach(var interfaceType in type.GetInterfaces()) {
-                yield return ($"{type.FullName}: interface", interfaceType);
-            }
+            yield return ($"{type.FullName}.{method.Name} return type", method.ReturnType);
 
-            foreach(var constructor in type.GetConstructors(BindingFlags.Public | BindingFlags.Instance)) {
-                foreach(var parameter in constructor.GetParameters()) {
-                    yield return ($"{type.FullName}.{constructor.Name} parameter {parameter.Name}", parameter.ParameterType);
-                }
-            }
-
-            foreach(var property in type.GetProperties(BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static)) {
-                yield return ($"{type.FullName}.{property.Name}", property.PropertyType);
-            }
-
-            foreach(var field in type.GetFields(BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static)) {
-                yield return ($"{type.FullName}.{field.Name}", field.FieldType);
-            }
-
-            foreach(var eventInfo in type.GetEvents(BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static)) {
-                yield return ($"{type.FullName}.{eventInfo.Name}", eventInfo.EventHandlerType!);
-            }
-
-            foreach(var method in type.GetMethods(BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static)) {
-                if(method.IsSpecialName) {
-                    continue;
-                }
-
-                yield return ($"{type.FullName}.{method.Name} return type", method.ReturnType);
-
-                foreach(var parameter in method.GetParameters()) {
-                    yield return ($"{type.FullName}.{method.Name} parameter {parameter.Name}", parameter.ParameterType);
-                }
+            foreach(var parameter in method.GetParameters()) {
+                yield return ($"{type.FullName}.{method.Name} parameter {parameter.Name}", parameter.ParameterType);
             }
         }
     }
