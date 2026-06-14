@@ -4,13 +4,15 @@
 /// Tests behavior when encountering directories that cannot be read.
 /// </summary>
 [TestClass]
-public class InaccessibleDirectoryTests {
+public class InaccessibleDirectoryTests
+{
     /// <summary>
     /// Simulates an inaccessible directory and confirms behavior when
     /// IgnoreInaccessible = false (exception must be thrown).
     /// </summary>
     [TestMethod]
-    public void ShouldThrow_WhenDirectoryInaccessible_AndIgnoreInaccessibleFalse() {
+    public void ShouldThrow_WhenDirectoryInaccessible_AndIgnoreInaccessibleFalse()
+    {
         using var env = new TestEnvironment();
 
         env.CreateFile("root.txt");
@@ -28,8 +30,10 @@ public class InaccessibleDirectoryTests {
             ignoreInaccessible: false
         );
 
-        TestAssertEx.Throws<Exception>(() => {
-            try {
+        TestAssertEx.Throws<Exception>(() =>
+        {
+            try
+            {
                 _ = fileQueryEngine.Execute(new(env.Root, options)).ToList();
 
                 // If we reach this point, no exception was thrown → fail explicitly
@@ -39,11 +43,13 @@ public class InaccessibleDirectoryTests {
             }
             catch(Exception ex) when(
                 ex is DirectoryNotFoundException or IOException or UnauthorizedAccessException
-            ) {
+            )
+            {
                 // Valid exception → rethrow so Throws<T> can validate it
                 throw;
             }
-            catch(Exception ex) {
+            catch(Exception ex)
+            {
                 // Unexpected exception → wrap and rethrow (no Assert.Fail here)
                 throw new AssertFailedException(
                     $"Caught unexpected exception: {ex.GetType().Name}", ex
@@ -57,7 +63,8 @@ public class InaccessibleDirectoryTests {
     /// and enumeration continues normally.
     /// </summary>
     [TestMethod]
-    public void ShouldSkipInaccessibleDirectory_WhenIgnoreInaccessibleTrue() {
+    public void ShouldSkipInaccessibleDirectory_WhenIgnoreInaccessibleTrue()
+    {
         using var env = new TestEnvironment();
 
         env.CreateFile("keep.txt");

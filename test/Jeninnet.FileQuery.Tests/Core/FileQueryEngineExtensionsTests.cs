@@ -1,9 +1,11 @@
 ﻿namespace Jeninnet.FileQuery.Tests.Core;
 
 [TestClass]
-public class FileQueryEngineExtensionsTests {
+public class FileQueryEngineExtensionsTests
+{
     [TestMethod]
-    public void From_ShouldCreateBuilder_WhenPathProvided() {
+    public void From_ShouldCreateBuilder_WhenPathProvided()
+    {
         // Arrange
         var path = Path.GetTempPath();
 
@@ -15,7 +17,8 @@ public class FileQueryEngineExtensionsTests {
     }
 
     [TestMethod]
-    public void From_ShouldCreateBuilderWithEngine_WhenEngineAndPathProvided() {
+    public void From_ShouldCreateBuilderWithEngine_WhenEngineAndPathProvided()
+    {
         // Arrange
         var mockEngine = new Mock<IFileQueryEngine>();
         var path = Path.GetTempPath();

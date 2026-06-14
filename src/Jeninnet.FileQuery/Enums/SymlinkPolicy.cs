@@ -4,7 +4,8 @@
 /// <summary>
 /// Defines how symbolic links and reparse points are handled.
 /// </summary>
-public enum SymlinkPolicy : byte {
+public enum SymlinkPolicy : byte
+{
     /// <summary>
     /// Do not follow symbolic links.
     /// </summary>

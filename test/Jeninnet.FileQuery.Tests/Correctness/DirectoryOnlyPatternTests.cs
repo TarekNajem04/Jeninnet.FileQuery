@@ -1,9 +1,11 @@
 ﻿namespace Jeninnet.FileQuery.Tests.Correctness;
 
 [TestClass]
-public sealed class DirectoryOnlyPatternTests {
+public sealed class DirectoryOnlyPatternTests
+{
     [TestMethod]
-    public void DirectoryOnlyPattern_DoesNotMatchFile() {
+    public void DirectoryOnlyPattern_DoesNotMatchFile()
+    {
         var matcher = TestMatcher.Create();
         var pattern = TestPattern.GitIgnore("bin/");
         var context = TestPath.File("bin");
@@ -16,7 +18,8 @@ public sealed class DirectoryOnlyPatternTests {
     }
 
     [TestMethod]
-    public void DirectoryOnlyPattern_MatchesDirectory() {
+    public void DirectoryOnlyPattern_MatchesDirectory()
+    {
         var matcher = TestMatcher.Create();
         var pattern = TestPattern.GitIgnore("bin/");
         var context = TestPath.Directory("bin/");

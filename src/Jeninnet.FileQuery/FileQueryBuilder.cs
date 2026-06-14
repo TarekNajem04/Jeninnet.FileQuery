@@ -13,7 +13,8 @@
 /// <strong>Thread safety:</strong> A single builder instance must not be shared across threads.
 /// </para>
 /// </remarks>
-public sealed class FileQueryBuilder {
+public sealed class FileQueryBuilder
+{
     private IFileQueryEngine? _engine;
     private readonly IFileSystem _fileSystem;
     private readonly string _rootPath;
@@ -22,6 +23,9 @@ public sealed class FileQueryBuilder {
     private PatternMatchingMode _patternMatchingMode = PatternMatchingMode.GitIgnore;
     private CaseSensitivity _caseSensitivity = CaseSensitivity.PlatformDefault;
     private bool _recurse = true;
+    private bool _auditMatches;
+    private IProgress<FileQueryDiagnostic>? _diagnostics;
+    private FileQueryErrorRecoveryOptions? _errorRecovery;
 
     /// <summary>
     /// Initializes a new <see cref="FileQueryBuilder"/> rooted at the specified directory.
@@ -34,12 +38,13 @@ public sealed class FileQueryBuilder {
     /// </param>
     /// <param name="engine">
     /// An optional engine instance. When <see langword="null"/>, the default engine is
-    /// created lazily by <see cref="Execute()"/> or <see cref="ExecuteAsync"/>.
+    /// created lazily by <see cref="Execute()"/> or <see cref="ExecuteAsync(CancellationToken)"/>.
     /// </param>
     /// <exception cref="ArgumentException">
     /// Thrown when <paramref name="rootPath"/> is null or empty.
     /// </exception>
-    internal FileQueryBuilder(string rootPath, IFileSystem fileSystem, IFileQueryEngine? engine = null) {
+    internal FileQueryBuilder(string rootPath, IFileSystem fileSystem, IFileQueryEngine? engine = null)
+    {
         ArgumentException.ThrowIfNullOrEmpty(rootPath);
         ArgumentNullException.ThrowIfNull(fileSystem);
 
@@ -75,10 +80,12 @@ public sealed class FileQueryBuilder {
     /// <exception cref="ArgumentNullException">
     /// Thrown when <paramref name="patterns"/> is <see langword="null"/>.
     /// </exception>
-    public FileQueryBuilder Where(params IEnumerable<string> patterns) {
+    public FileQueryBuilder Where(params IEnumerable<string> patterns)
+    {
         ArgumentNullException.ThrowIfNull(patterns);
 
-        foreach(var pattern in patterns) {
+        foreach(var pattern in patterns)
+        {
             var kind = PatternClassifier.Classify(pattern);
             MergeIntoTypedBucket(kind, [pattern]);
         }
@@ -106,10 +113,12 @@ public sealed class FileQueryBuilder {
     /// <exception cref="InvalidOperationException">
     /// Thrown when <paramref name="patternKind"/> is incompatible with the current <see cref="PatternMatchingMode"/>.
     /// </exception>
-    public FileQueryBuilder Where(PatternKind patternKind, IEnumerable<string> patterns) {
+    public FileQueryBuilder Where(PatternKind patternKind, IEnumerable<string> patterns)
+    {
         ArgumentNullException.ThrowIfNull(patterns);
 
-        if(patternKind is PatternKind.Unknown) {
+        if(patternKind is PatternKind.Unknown)
+        {
             throw new ArgumentException(
                 "Pattern type cannot be Unknown when adding typed patterns.",
                 nameof(patternKind));
@@ -144,11 +153,14 @@ public sealed class FileQueryBuilder {
     /// <exception cref="InvalidOperationException">
     /// Thrown when any key is incompatible with the current <see cref="PatternMatchingMode"/>.
     /// </exception>
-    public FileQueryBuilder Where(Dictionary<PatternKind, List<string>> typedPattern) {
+    public FileQueryBuilder Where(Dictionary<PatternKind, List<string>> typedPattern)
+    {
         ArgumentNullException.ThrowIfNull(typedPattern);
 
-        foreach(var (patternKind, patterns) in typedPattern) {
-            if(patternKind is PatternKind.Unknown) {
+        foreach(var (patternKind, patterns) in typedPattern)
+        {
+            if(patternKind is PatternKind.Unknown)
+            {
                 throw new ArgumentException(
                     "Pattern type cannot be Unknown when adding typed patterns.",
                     nameof(typedPattern));
@@ -180,7 +192,8 @@ public sealed class FileQueryBuilder {
     /// <param name="separator">The separator character. Defaults to <c>';'</c>.</param>
     /// <returns>The current <see cref="FileQueryBuilder"/> instance for method chaining.</returns>
     /// <exception cref="ArgumentException">Thrown when <paramref name="delimitedPatterns"/> is null or empty.</exception>
-    public FileQueryBuilder Where(string delimitedPatterns, char separator = ';') {
+    public FileQueryBuilder Where(string delimitedPatterns, char separator = ';')
+    {
         ArgumentException.ThrowIfNullOrEmpty(delimitedPatterns);
         return Where(
             delimitedPatterns
@@ -194,7 +207,8 @@ public sealed class FileQueryBuilder {
     /// (auto-detect GitIgnore, Glob, and Regex patterns).
     /// </summary>
     /// <returns>The current <see cref="FileQueryBuilder"/> instance for method chaining.</returns>
-    public FileQueryBuilder UsingHybrid() {
+    public FileQueryBuilder UsingHybrid()
+    {
         _interpretationMode = PatternInterpretationMode.Hybrid;
         return this;
     }
@@ -203,7 +217,8 @@ public sealed class FileQueryBuilder {
     /// Configures the query to interpret all patterns using <c>GitIgnore</c> semantics.
     /// </summary>
     /// <returns>The current <see cref="FileQueryBuilder"/> instance for method chaining.</returns>
-    public FileQueryBuilder UsingGitIgnore() {
+    public FileQueryBuilder UsingGitIgnore()
+    {
         _interpretationMode = PatternInterpretationMode.Specific;
         _patternMatchingMode = PatternMatchingMode.GitIgnore;
         return this;
@@ -213,7 +228,8 @@ public sealed class FileQueryBuilder {
     /// Configures the query to interpret all patterns using <c>Glob</c> semantics.
     /// </summary>
     /// <returns>The current <see cref="FileQueryBuilder"/> instance for method chaining.</returns>
-    public FileQueryBuilder UsingGlob() {
+    public FileQueryBuilder UsingGlob()
+    {
         _interpretationMode = PatternInterpretationMode.Specific;
         _patternMatchingMode = PatternMatchingMode.Glob;
         return this;
@@ -223,7 +239,8 @@ public sealed class FileQueryBuilder {
     /// Configures the query to interpret all patterns using <c>Regex</c> semantics.
     /// </summary>
     /// <returns>The current <see cref="FileQueryBuilder"/> instance for method chaining.</returns>
-    public FileQueryBuilder UsingRegex() {
+    public FileQueryBuilder UsingRegex()
+    {
         _interpretationMode = PatternInterpretationMode.Specific;
         _patternMatchingMode = PatternMatchingMode.Regex;
         return this;
@@ -238,7 +255,8 @@ public sealed class FileQueryBuilder {
     /// <see langword="true"/> to recurse into subdirectories (default); <see langword="false"/> to restrict to the root only.
     /// </param>
     /// <returns>The current <see cref="FileQueryBuilder"/> instance for method chaining.</returns>
-    public FileQueryBuilder WithRecursion(bool recurse = true) {
+    public FileQueryBuilder WithRecursion(bool recurse = true)
+    {
         _recurse = recurse;
         return this;
     }
@@ -247,7 +265,8 @@ public sealed class FileQueryBuilder {
     /// Restricts traversal to the root directory only. Equivalent to <c>WithRecursion(false)</c>.
     /// </summary>
     /// <returns>The current <see cref="FileQueryBuilder"/> instance for method chaining.</returns>
-    public FileQueryBuilder WithoutRecursion() {
+    public FileQueryBuilder WithoutRecursion()
+    {
         _recurse = false;
         return this;
     }
@@ -260,10 +279,38 @@ public sealed class FileQueryBuilder {
     /// <see langword="false"/> for case-sensitive matching.
     /// </param>
     /// <returns>The current <see cref="FileQueryBuilder"/> instance for method chaining.</returns>
-    public FileQueryBuilder IgnoreCase(bool ignoreCase = true) {
+    public FileQueryBuilder IgnoreCase(bool ignoreCase = true)
+    {
         _caseSensitivity = ignoreCase
             ? CaseSensitivity.Insensitive
             : CaseSensitivity.Sensitive;
+        return this;
+    }
+
+    /// <summary>
+    /// Enables optional match diagnostics for each evaluated filesystem entry.
+    /// </summary>
+    /// <param name="diagnostics">The diagnostic sink that receives audit entries.</param>
+    /// <returns>The current <see cref="FileQueryBuilder"/> instance for method chaining.</returns>
+    public FileQueryBuilder WithDiagnostics(IProgress<FileQueryDiagnostic> diagnostics)
+    {
+        ArgumentNullException.ThrowIfNull(diagnostics);
+
+        _auditMatches = true;
+        _diagnostics = diagnostics;
+        return this;
+    }
+
+    /// <summary>
+    /// Configures how traversal recovers from IO errors.
+    /// </summary>
+    /// <param name="errorRecovery">The IO error recovery policy.</param>
+    /// <returns>The current <see cref="FileQueryBuilder"/> instance for method chaining.</returns>
+    public FileQueryBuilder WithErrorRecovery(FileQueryErrorRecoveryOptions errorRecovery)
+    {
+        ArgumentNullException.ThrowIfNull(errorRecovery);
+
+        _errorRecovery = errorRecovery;
         return this;
     }
 
@@ -285,6 +332,22 @@ public sealed class FileQueryBuilder {
         => GetEngine().ExecuteAsync(Build(), cancellationToken);
 
     /// <summary>
+    /// Executes the query asynchronously using the configured or default engine and reports traversal progress.
+    /// </summary>
+    /// <param name="progress">The progress sink that receives traversal snapshots.</param>
+    /// <param name="cancellationToken">A token to cancel the async enumeration.</param>
+    /// <returns>An async enumerable of matching absolute file paths.</returns>
+    public IAsyncEnumerable<string> ExecuteAsync(
+        IProgress<FileQueryProgress> progress,
+        CancellationToken cancellationToken = default
+    )
+    {
+        ArgumentNullException.ThrowIfNull(progress);
+
+        return GetEngine().ExecuteAsync(Build(), progress, cancellationToken);
+    }
+
+    /// <summary>
     /// Builds the immutable <see cref="FileQuery"/> descriptor from the current configuration.
     /// </summary>
     /// <remarks>
@@ -298,12 +361,15 @@ public sealed class FileQueryBuilder {
     /// <exception cref="InvalidOperationException">
     /// Thrown when the root path is null or whitespace.
     /// </exception>
-    public FileQuery Build() {
-        if(string.IsNullOrWhiteSpace(_rootPath)) {
+    public FileQuery Build()
+    {
+        if(string.IsNullOrWhiteSpace(_rootPath))
+        {
             throw new InvalidOperationException("Root path must be specified.");
         }
 
-        if(!_fileSystem.DirectoryExists(_rootPath)) {
+        if(!_fileSystem.DirectoryExists(_rootPath))
+        {
             throw new DirectoryNotFoundException($"The specified root path does not exist: '{_rootPath}'");
         }
 
@@ -320,7 +386,10 @@ public sealed class FileQueryBuilder {
             recurseSubdirectories: _recurse,
             ignoreInaccessible: true,
             patternMatchingMode: _patternMatchingMode,
-            caseSensitivity: _caseSensitivity
+            caseSensitivity: _caseSensitivity,
+            auditMatches: _auditMatches,
+            diagnostics: _diagnostics,
+            errorRecovery: _errorRecovery
         );
 
         options.Validate();
@@ -339,13 +408,16 @@ public sealed class FileQueryBuilder {
     /// </summary>
     /// <param name="patternKind">The semantic type of the pattern.</param>
     /// <param name="patterns">A sequence of patterns to merge.</param>
-    private void MergeIntoTypedBucket(PatternKind patternKind, IEnumerable<string> patterns) {
-        if(!_patternStorage.TryGetValue(patternKind, out var bucket)) {
-            _patternStorage[patternKind] = new HashSet<string>(patterns);
+    private void MergeIntoTypedBucket(PatternKind patternKind, IEnumerable<string> patterns)
+    {
+        if(!_patternStorage.TryGetValue(patternKind, out var bucket))
+        {
+            _patternStorage[patternKind] = [.. patterns];
             return;
         }
 
-        foreach(var pattern in patterns) {
+        foreach(var pattern in patterns)
+        {
             bucket.Add(pattern);
         }
     }
@@ -359,12 +431,15 @@ public sealed class FileQueryBuilder {
     /// Thrown when the combination of <paramref name="patternKind"/> and
     /// <see cref="_patternMatchingMode"/> is invalid.
     /// </exception>
-    private void ValidatePatternType(PatternKind patternKind) {
-        if(_interpretationMode != PatternInterpretationMode.Specific) {
+    private void ValidatePatternType(PatternKind patternKind)
+    {
+        if(_interpretationMode != PatternInterpretationMode.Specific)
+        {
             return;
         }
 
-        var conflict = (_patternMatchingMode, patternKind) switch {
+        var conflict = (_patternMatchingMode, patternKind) switch
+        {
             (PatternMatchingMode.Glob, PatternKind.GitIgnore) => true,
             (PatternMatchingMode.Glob, PatternKind.Regex) => true,
             (PatternMatchingMode.GitIgnore, PatternKind.Glob) => true,
@@ -374,7 +449,8 @@ public sealed class FileQueryBuilder {
             _ => false
         };
 
-        if(conflict) {
+        if(conflict)
+        {
             throw new InvalidOperationException(
                 $"Cannot add '{patternKind}' patterns when 'PatternMatchingMode' is set to '{_patternMatchingMode}'.");
         }

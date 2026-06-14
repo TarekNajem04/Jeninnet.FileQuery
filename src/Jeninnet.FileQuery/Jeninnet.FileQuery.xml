@@ -8,11 +8,15 @@
             <summary>
             Collects files from a directory tree using a pattern-based matcher (GitIgnore/Glob/Flat hybrid).
             </summary>
+            <param name="traversal">The traversal executor.</param>
+            <param name="planBuilder">The traversal plan builder.</param>
         </member>
         <member name="M:Jeninnet.FileQuery.Engine.FileQueryEngine.#ctor(Jeninnet.FileQuery.Traversal.ITraversalExecutor,Jeninnet.FileQuery.Traversal.ITraversalPlanBuilder)">
             <summary>
             Collects files from a directory tree using a pattern-based matcher (GitIgnore/Glob/Flat hybrid).
             </summary>
+            <param name="traversal">The traversal executor.</param>
+            <param name="planBuilder">The traversal plan builder.</param>
         </member>
         <member name="T:Jeninnet.FileQuery.Enums.CaseSensitivity">
             <summary>
@@ -231,6 +235,7 @@
             Converts the case-sensitivity mode into a <see cref="T:System.StringComparison"/>
             suitable for span-based comparisons.
             </summary>
+            <param name="caseSensitivity">The case-sensitivity mode to convert.</param>
         </member>
         <member name="T:Jeninnet.FileQuery.Extensions.MatchOutcomeExtensions">
             <summary>
@@ -317,6 +322,8 @@
             <summary>
             Immutable descriptor representing a file query definition.
             </summary>
+            <param name="rootPath">The root directory of the query.</param>
+            <param name="options">The configuration options.</param>
             <remarks>
             <para>
             A <see cref="T:Jeninnet.FileQuery.FileQuery"/> describes WHAT should be queried:
@@ -334,6 +341,8 @@
             <summary>
             Immutable descriptor representing a file query definition.
             </summary>
+            <param name="rootPath">The root directory of the query.</param>
+            <param name="options">The configuration options.</param>
             <remarks>
             <para>
             A <see cref="T:Jeninnet.FileQuery.FileQuery"/> describes WHAT should be queried:
@@ -369,6 +378,8 @@
             Creates a <see cref="T:Jeninnet.FileQuery.FileQuery"/> without validating that the root path exists.
             Intended for unit tests only.
             </summary>
+            <param name="rootPath">The root directory path.</param>
+            <param name="options">The query configuration options.</param>
         </member>
         <member name="T:Jeninnet.FileQuery.FileQueryBuilder">
             <summary>
@@ -549,6 +560,20 @@
             </param>
             <returns>The current <see cref="T:Jeninnet.FileQuery.FileQueryBuilder"/> instance for method chaining.</returns>
         </member>
+        <member name="M:Jeninnet.FileQuery.FileQueryBuilder.WithDiagnostics(System.IProgress{Jeninnet.FileQuery.FileQueryDiagnostic})">
+            <summary>
+            Enables optional match diagnostics for each evaluated filesystem entry.
+            </summary>
+            <param name="diagnostics">The diagnostic sink that receives audit entries.</param>
+            <returns>The current <see cref="T:Jeninnet.FileQuery.FileQueryBuilder"/> instance for method chaining.</returns>
+        </member>
+        <member name="M:Jeninnet.FileQuery.FileQueryBuilder.WithErrorRecovery(Jeninnet.FileQuery.FileQueryErrorRecoveryOptions)">
+            <summary>
+            Configures how traversal recovers from IO errors.
+            </summary>
+            <param name="errorRecovery">The IO error recovery policy.</param>
+            <returns>The current <see cref="T:Jeninnet.FileQuery.FileQueryBuilder"/> instance for method chaining.</returns>
+        </member>
         <member name="M:Jeninnet.FileQuery.FileQueryBuilder.Execute">
             <summary>
             Executes the query synchronously using the configured or default engine.
@@ -559,6 +584,14 @@
             <summary>
             Executes the query asynchronously using the configured or default engine.
             </summary>
+            <param name="cancellationToken">A token to cancel the async enumeration.</param>
+            <returns>An async enumerable of matching absolute file paths.</returns>
+        </member>
+        <member name="M:Jeninnet.FileQuery.FileQueryBuilder.ExecuteAsync(System.IProgress{Jeninnet.FileQuery.FileQueryProgress},System.Threading.CancellationToken)">
+            <summary>
+            Executes the query asynchronously using the configured or default engine and reports traversal progress.
+            </summary>
+            <param name="progress">The progress sink that receives traversal snapshots.</param>
             <param name="cancellationToken">A token to cancel the async enumeration.</param>
             <returns>An async enumerable of matching absolute file paths.</returns>
         </member>
@@ -597,6 +630,56 @@
             <see cref="F:Jeninnet.FileQuery.FileQueryBuilder._patternMatchingMode"/> is invalid.
             </exception>
         </member>
+        <member name="T:Jeninnet.FileQuery.FileQueryDiagnostic">
+            <summary>
+            Describes an audited match decision for a filesystem entry.
+            </summary>
+            <param name="Path">The absolute path evaluated by the engine.</param>
+            <param name="RelativePath">The normalized path relative to the query root.</param>
+            <param name="EntryKind">The evaluated entry kind.</param>
+            <param name="Outcome">The final match outcome before traversal decisions are applied.</param>
+            <param name="Reason">A concise explanation for the outcome.</param>
+            <param name="PatternKind">The kind of pattern responsible for the outcome, when available.</param>
+            <param name="Pattern">The source pattern responsible for the outcome, when available.</param>
+            <param name="PatternIndex">The zero-based source pattern index responsible for the outcome, when available.</param>
+        </member>
+        <member name="M:Jeninnet.FileQuery.FileQueryDiagnostic.#ctor(System.String,System.String,System.String,System.String,System.String,System.Nullable{Jeninnet.FileQuery.Enums.PatternKind},System.String,System.Nullable{System.Int32})">
+            <summary>
+            Describes an audited match decision for a filesystem entry.
+            </summary>
+            <param name="Path">The absolute path evaluated by the engine.</param>
+            <param name="RelativePath">The normalized path relative to the query root.</param>
+            <param name="EntryKind">The evaluated entry kind.</param>
+            <param name="Outcome">The final match outcome before traversal decisions are applied.</param>
+            <param name="Reason">A concise explanation for the outcome.</param>
+            <param name="PatternKind">The kind of pattern responsible for the outcome, when available.</param>
+            <param name="Pattern">The source pattern responsible for the outcome, when available.</param>
+            <param name="PatternIndex">The zero-based source pattern index responsible for the outcome, when available.</param>
+        </member>
+        <member name="P:Jeninnet.FileQuery.FileQueryDiagnostic.Path">
+            <summary>The absolute path evaluated by the engine.</summary>
+        </member>
+        <member name="P:Jeninnet.FileQuery.FileQueryDiagnostic.RelativePath">
+            <summary>The normalized path relative to the query root.</summary>
+        </member>
+        <member name="P:Jeninnet.FileQuery.FileQueryDiagnostic.EntryKind">
+            <summary>The evaluated entry kind.</summary>
+        </member>
+        <member name="P:Jeninnet.FileQuery.FileQueryDiagnostic.Outcome">
+            <summary>The final match outcome before traversal decisions are applied.</summary>
+        </member>
+        <member name="P:Jeninnet.FileQuery.FileQueryDiagnostic.Reason">
+            <summary>A concise explanation for the outcome.</summary>
+        </member>
+        <member name="P:Jeninnet.FileQuery.FileQueryDiagnostic.PatternKind">
+            <summary>The kind of pattern responsible for the outcome, when available.</summary>
+        </member>
+        <member name="P:Jeninnet.FileQuery.FileQueryDiagnostic.Pattern">
+            <summary>The source pattern responsible for the outcome, when available.</summary>
+        </member>
+        <member name="P:Jeninnet.FileQuery.FileQueryDiagnostic.PatternIndex">
+            <summary>The zero-based source pattern index responsible for the outcome, when available.</summary>
+        </member>
         <member name="T:Jeninnet.FileQuery.FileQueryEngineExtensions">
             <summary>
             Provides extension methods for <see cref="T:Jeninnet.FileQuery.IFileQueryEngine"/> and related types
@@ -608,6 +691,63 @@
             <param name="engine">The engine.</param>
             <param name="rootPath">The root directory from which traversal begins.</param>
             <returns>A query builder used to configure and execute a file query.</returns>
+        </member>
+        <member name="T:Jeninnet.FileQuery.FileQueryErrorAction">
+            <summary>
+            Defines how traversal handles recoverable IO errors.
+            </summary>
+        </member>
+        <member name="F:Jeninnet.FileQuery.FileQueryErrorAction.Skip">
+            <summary>
+            Skip the failing entry or directory and continue traversal.
+            </summary>
+        </member>
+        <member name="F:Jeninnet.FileQuery.FileQueryErrorAction.Retry">
+            <summary>
+            Retry the failing IO operation before applying abort behavior.
+            </summary>
+        </member>
+        <member name="F:Jeninnet.FileQuery.FileQueryErrorAction.Abort">
+            <summary>
+            Abort traversal by propagating the IO exception.
+            </summary>
+        </member>
+        <member name="T:Jeninnet.FileQuery.FileQueryErrorRecoveryOptions">
+            <summary>
+            Configures recoverable IO error handling during traversal.
+            </summary>
+            <param name="Action">The recovery action to apply when a recoverable IO exception occurs.</param>
+            <param name="MaxRetryAttempts">The maximum retry count used when <paramref name="Action"/> is <see cref="F:Jeninnet.FileQuery.FileQueryErrorAction.Retry"/>.</param>
+        </member>
+        <member name="M:Jeninnet.FileQuery.FileQueryErrorRecoveryOptions.#ctor(Jeninnet.FileQuery.FileQueryErrorAction,System.Int32)">
+            <summary>
+            Configures recoverable IO error handling during traversal.
+            </summary>
+            <param name="Action">The recovery action to apply when a recoverable IO exception occurs.</param>
+            <param name="MaxRetryAttempts">The maximum retry count used when <paramref name="Action"/> is <see cref="F:Jeninnet.FileQuery.FileQueryErrorAction.Retry"/>.</param>
+        </member>
+        <member name="P:Jeninnet.FileQuery.FileQueryErrorRecoveryOptions.Action">
+            <summary>The recovery action to apply when a recoverable IO exception occurs.</summary>
+        </member>
+        <member name="P:Jeninnet.FileQuery.FileQueryErrorRecoveryOptions.MaxRetryAttempts">
+            <summary>The maximum retry count used when <paramref name="Action"/> is <see cref="F:Jeninnet.FileQuery.FileQueryErrorAction.Retry"/>.</summary>
+        </member>
+        <member name="P:Jeninnet.FileQuery.FileQueryErrorRecoveryOptions.Skip">
+            <summary>
+            Gets the default skip policy.
+            </summary>
+        </member>
+        <member name="P:Jeninnet.FileQuery.FileQueryErrorRecoveryOptions.Abort">
+            <summary>
+            Gets the default abort policy.
+            </summary>
+        </member>
+        <member name="M:Jeninnet.FileQuery.FileQueryErrorRecoveryOptions.Retry(System.Int32)">
+            <summary>
+            Creates a retry policy with the specified retry attempt count.
+            </summary>
+            <param name="maxRetryAttempts">The maximum retry attempts before the error is propagated.</param>
+            <returns>A retry recovery policy.</returns>
         </member>
         <member name="T:Jeninnet.FileQuery.FileQueryOptions">
             <summary>
@@ -699,6 +839,21 @@
             and symbolic link handling.
             </summary>
         </member>
+        <member name="P:Jeninnet.FileQuery.FileQueryOptions.AuditMatches">
+            <summary>
+            Gets a value indicating whether match diagnostics are emitted during traversal.
+            </summary>
+        </member>
+        <member name="P:Jeninnet.FileQuery.FileQueryOptions.Diagnostics">
+            <summary>
+            Gets the diagnostic sink used when <see cref="P:Jeninnet.FileQuery.FileQueryOptions.AuditMatches"/> is enabled.
+            </summary>
+        </member>
+        <member name="P:Jeninnet.FileQuery.FileQueryOptions.ErrorRecovery">
+            <summary>
+            Gets the configured IO error recovery policy.
+            </summary>
+        </member>
         <member name="M:Jeninnet.FileQuery.FileQueryOptions.Validate">
             <summary>
             Validates this options instance for internal consistency.
@@ -707,6 +862,36 @@
             Thrown when <see cref="P:Jeninnet.FileQuery.FileQueryOptions.MaxRecursionDepth"/> is less than
             <see cref="F:Jeninnet.FileQuery.FileQueryOptions.UNLIMITED_RECURSION_DEPTH"/>.
             </exception>
+        </member>
+        <member name="T:Jeninnet.FileQuery.FileQueryProgress">
+            <summary>
+            Represents a point-in-time progress snapshot reported during file query traversal.
+            </summary>
+            <param name="DirectoriesVisited">The number of directories opened for enumeration.</param>
+            <param name="EntriesScanned">The number of filesystem entries inspected.</param>
+            <param name="FilesMatched">The number of files yielded by the query.</param>
+            <param name="CurrentPath">The most recent filesystem path inspected.</param>
+        </member>
+        <member name="M:Jeninnet.FileQuery.FileQueryProgress.#ctor(System.Int64,System.Int64,System.Int64,System.String)">
+            <summary>
+            Represents a point-in-time progress snapshot reported during file query traversal.
+            </summary>
+            <param name="DirectoriesVisited">The number of directories opened for enumeration.</param>
+            <param name="EntriesScanned">The number of filesystem entries inspected.</param>
+            <param name="FilesMatched">The number of files yielded by the query.</param>
+            <param name="CurrentPath">The most recent filesystem path inspected.</param>
+        </member>
+        <member name="P:Jeninnet.FileQuery.FileQueryProgress.DirectoriesVisited">
+            <summary>The number of directories opened for enumeration.</summary>
+        </member>
+        <member name="P:Jeninnet.FileQuery.FileQueryProgress.EntriesScanned">
+            <summary>The number of filesystem entries inspected.</summary>
+        </member>
+        <member name="P:Jeninnet.FileQuery.FileQueryProgress.FilesMatched">
+            <summary>The number of files yielded by the query.</summary>
+        </member>
+        <member name="P:Jeninnet.FileQuery.FileQueryProgress.CurrentPath">
+            <summary>The most recent filesystem path inspected.</summary>
         </member>
         <member name="T:Jeninnet.FileQuery.FileQueryRuntime">
             <summary>
@@ -736,6 +921,15 @@
             Asynchronous variant of <see cref="M:Jeninnet.FileQuery.IFileQueryEngine.Execute(Jeninnet.FileQuery.FileQuery)"/>.
             </summary>
             <param name="query">The query descriptor defining the search parameters.</param>
+            <param name="cancellationToken">The token to monitor for cancellation requests.</param>
+            <returns>An async enumerable of matching file paths.</returns>
+        </member>
+        <member name="M:Jeninnet.FileQuery.IFileQueryEngine.ExecuteAsync(Jeninnet.FileQuery.FileQuery,System.IProgress{Jeninnet.FileQuery.FileQueryProgress},System.Threading.CancellationToken)">
+            <summary>
+            Asynchronous variant of <see cref="M:Jeninnet.FileQuery.IFileQueryEngine.Execute(Jeninnet.FileQuery.FileQuery)"/> with progress reporting.
+            </summary>
+            <param name="query">The query descriptor defining the search parameters.</param>
+            <param name="progress">The progress sink that receives traversal snapshots.</param>
             <param name="cancellationToken">The token to monitor for cancellation requests.</param>
             <returns>An async enumerable of matching file paths.</returns>
         </member>
@@ -853,13 +1047,13 @@
             Gets the singleton instance of the <see cref="T:Jeninnet.FileQuery.IO.FileSystem"/>.
             </summary>
         </member>
-        <member name="M:Jeninnet.FileQuery.IO.FileSystem.Enumerate(System.String,System.Boolean)">
+        <member name="M:Jeninnet.FileQuery.IO.FileSystem.Enumerate(System.String,System.Boolean,Jeninnet.FileQuery.FileQueryErrorRecoveryOptions)">
             <summary>
             Enumerates entries in the specified directory using a guarded approach to handle accessibility.
             </summary>
             <inheritdoc/>
         </member>
-        <member name="M:Jeninnet.FileQuery.IO.FileSystem.EnumerateAsync(System.String,System.Boolean,System.Threading.CancellationToken)">
+        <member name="M:Jeninnet.FileQuery.IO.FileSystem.EnumerateAsync(System.String,System.Boolean,Jeninnet.FileQuery.FileQueryErrorRecoveryOptions,System.Threading.CancellationToken)">
             <inheritdoc/>
         </member>
         <member name="M:Jeninnet.FileQuery.IO.FileSystem.DirectoryExists(System.String)">
@@ -885,12 +1079,16 @@
             Represents a filesystem entry without exposing <see cref="N:System.IO"/> types directly.
             Provides convenient boolean properties for checking common <see cref="T:System.IO.FileAttributes"/> flags.
             </summary>
+            <param name="FullPath">The full absolute path of the filesystem entry.</param>
+            <param name="Attributes">The raw file attribute flags associated with this entry.</param>
         </member>
         <member name="M:Jeninnet.FileQuery.IO.FileSystemEntry.#ctor(System.String,System.IO.FileAttributes)">
             <summary>
             Represents a filesystem entry without exposing <see cref="N:System.IO"/> types directly.
             Provides convenient boolean properties for checking common <see cref="T:System.IO.FileAttributes"/> flags.
             </summary>
+            <param name="FullPath">The full absolute path of the filesystem entry.</param>
+            <param name="Attributes">The raw file attribute flags associated with this entry.</param>
         </member>
         <member name="P:Jeninnet.FileQuery.IO.FileSystemEntry.FullPath">
             <summary>
@@ -980,7 +1178,7 @@
             are handled consistently across the engine based on the <see langword="ignoreInaccessible"/> policy.
             </remarks>
         </member>
-        <member name="M:Jeninnet.FileQuery.IO.FileSystemGuards.EnumerateEntries(System.String,System.Boolean)">
+        <member name="M:Jeninnet.FileQuery.IO.FileSystemGuards.EnumerateEntries(System.String,System.Boolean,Jeninnet.FileQuery.FileQueryErrorRecoveryOptions)">
             <summary>
             Enumerates filesystem entries while applying the configured exception policy.
             </summary>
@@ -988,6 +1186,7 @@
             <param name="ignoreInaccessible">
             If <see langword="true"/>, IO exceptions during initial enumeration are suppressed.
             </param>
+            <param name="errorRecovery">The configured IO error recovery policy.</param>
             <returns>
             A sequence of entry paths, or an empty sequence if the directory is inaccessible and
             <paramref name="ignoreInaccessible"/> is <see langword="true"/>.
@@ -1018,7 +1217,7 @@
             facilitating easier unit testing through mocking.
             </remarks>
         </member>
-        <member name="M:Jeninnet.FileQuery.IO.IFileSystem.Enumerate(System.String,System.Boolean)">
+        <member name="M:Jeninnet.FileQuery.IO.IFileSystem.Enumerate(System.String,System.Boolean,Jeninnet.FileQuery.FileQueryErrorRecoveryOptions)">
             <summary>
             Enumerates all file system entries within the specified directory.
             </summary>
@@ -1027,9 +1226,10 @@
             <see langword="true"/> to silently skip directories that cannot be accessed due to
             permission constraints; otherwise, <see langword="false"/> to let the exception propagate.
             </param>
+            <param name="errorRecovery">The configured IO error recovery policy.</param>
             <returns>A sequence of <see cref="T:Jeninnet.FileQuery.IO.FileSystemEntry"/> representing the discovered files and directories.</returns>
         </member>
-        <member name="M:Jeninnet.FileQuery.IO.IFileSystem.EnumerateAsync(System.String,System.Boolean,System.Threading.CancellationToken)">
+        <member name="M:Jeninnet.FileQuery.IO.IFileSystem.EnumerateAsync(System.String,System.Boolean,Jeninnet.FileQuery.FileQueryErrorRecoveryOptions,System.Threading.CancellationToken)">
             <summary>
             Enumerates all file system entries within the specified directory asynchronously.
             </summary>
@@ -1038,6 +1238,7 @@
             <see langword="true"/> to silently skip directories that cannot be accessed due to
             permission constraints; otherwise, <see langword="false"/> to let the exception propagate.
             </param>
+            <param name="errorRecovery">The configured IO error recovery policy.</param>
             <param name="cancellationToken">The token to monitor for cancellation requests.</param>
             <returns>An asynchronous sequence of <see cref="T:Jeninnet.FileQuery.IO.FileSystemEntry"/> representing the discovered files and directories.</returns>
         </member>
@@ -1177,6 +1378,7 @@
             Converts backslashes to forward slashes without applying full normalization.
             Use only where normalization has already been applied upstream.
             </summary>
+            <param name="path">The path to convert.</param>
         </member>
         <member name="M:Jeninnet.FileQuery.IO.PathUtilities.NormalizeSlow(System.String,System.Boolean)">
             <summary>
@@ -1190,6 +1392,8 @@
             immediately (<c>lastWasSlash = true</c>, <c>startIndex = 2</c>).
             </para>
             </remarks>
+            <param name="input">The normalized string to perform slow normalization on.</param>
+            <param name="trimTrailingSlash">Whether to trim trailing slashes.</param>
         </member>
         <member name="M:Jeninnet.FileQuery.IO.PathUtilities.BuildRelativePath(System.String,Jeninnet.FileQuery.IO.FileSystemEntry)">
             <summary>
@@ -1197,31 +1401,46 @@
             When <paramref name="entry"/> is a directory the returned path ends with <c>'/'</c>,
             which directory-only patterns depend on for precise matching.
             </summary>
+            <param name="rootDir">The root directory of the traversal.</param>
+            <param name="entry">The filesystem entry to build a path for.</param>
         </member>
         <member name="M:Jeninnet.FileQuery.IO.PathUtilities.EnumerateSegments(System.ReadOnlySpan{System.Char},System.Boolean)">
             <summary>Returns a <see cref="T:Jeninnet.FileQuery.IO.PathSegmentEnumerator"/> over the normalized segments.</summary>
+            <param name="normalized">The normalized path to enumerate.</param>
+            <param name="isDirectory">Whether the path represents a directory.</param>
         </member>
         <member name="M:Jeninnet.FileQuery.IO.PathUtilities.CountSegments(System.ReadOnlySpan{System.Char},System.Boolean)">
             <summary>Counts path segments in a normalized path.</summary>
+            <param name="path">The normalized path.</param>
+            <param name="isDirectory">Whether the path represents a directory.</param>
         </member>
         <member name="M:Jeninnet.FileQuery.IO.PathUtilities.SplitNormalizedPath(System.ReadOnlySpan{System.Char},System.Boolean)">
             <summary>Splits a normalized, relative path into its constituent segments.</summary>
+            <param name="normalized">The normalized path to split.</param>
+            <param name="isDirectory">Whether the path represents a directory.</param>
         </member>
         <member name="M:Jeninnet.FileQuery.IO.PathUtilities.TrimTrailingSlash(System.String)">
             <summary>
             Removes a trailing slash from <paramref name="path"/> unless the path
             is a root whose trailing slash is semantically significant.
             </summary>
+            <param name="path">The path to trim.</param>
+        </member>
+        <member name="M:Jeninnet.FileQuery.IO.PathUtilities.EndsWithSlash(System.String)">
+            <summary>Checks if a path ends with a slash.</summary>
+            <param name="path">The path to check.</param>
         </member>
         <member name="M:Jeninnet.FileQuery.IO.PathUtilities.IsDriveRoot(System.String)">
             <summary>
             Returns <see langword="true"/> for Windows drive roots such as <c>"C:/"</c>.
             </summary>
+            <param name="path">The path to check.</param>
         </member>
         <member name="M:Jeninnet.FileQuery.IO.PathUtilities.IsUncRoot(System.String)">
             <summary>
             Returns <see langword="true"/> for UNC roots, with or without a trailing slash.
             </summary>
+            <param name="path">The path to check.</param>
             <remarks>
             <para>
             A UNC root has the form <c>//server/share</c> or <c>//server/share/</c>.
@@ -1293,6 +1512,10 @@
             Attempts to override an excluded file result by checking whether any
             directory-only inclusion rule applies to the file's parent directory.
             </summary>
+            <param name="result">The match result to be updated.</param>
+            <param name="patterns">The compiled patterns to evaluate.</param>
+            <param name="pathView">The path view being evaluated.</param>
+            <param name="comparison">The string comparison to use.</param>
             <returns>
             <see langword="true"/> if the result was overridden to
             <see cref="M:Jeninnet.FileQuery.Matching.MatchResult.Include"/>; otherwise <see langword="false"/>.
@@ -1302,27 +1525,49 @@
             <summary>
             Matches a pattern against the parent directory of the current path.
             </summary>
+            <param name="pattern">The compiled pattern.</param>
+            <param name="pathView">The view of the path segments.</param>
+            <param name="comparison">The string comparison rules.</param>
+            <returns>True if the pattern matches; otherwise, false.</returns>
         </member>
         <member name="M:Jeninnet.FileQuery.Matching.Compiled.GitIgnoreInstructionMatcher.MatchPathAgainstCompiledPattern(Jeninnet.FileQuery.Matching.ICompiledPattern,Jeninnet.FileQuery.IO.PathView,System.StringComparison)">
             <summary>
             Matches a path against a compiled GitIgnore pattern.
             </summary>
+            <param name="pattern">The compiled pattern.</param>
+            <param name="pathView">The view of the path segments.</param>
+            <param name="comparison">The string comparison rules.</param>
+            <returns>True if the path matches the pattern; otherwise, false.</returns>
         </member>
         <member name="M:Jeninnet.FileQuery.Matching.Compiled.GitIgnoreInstructionMatcher.MatchRecursiveSegments(Jeninnet.FileQuery.Matching.ICompiledPattern,System.Int32,System.StringComparison,Jeninnet.FileQuery.IO.PathSegmentEnumerator,System.Int32,System.Boolean)">
             <summary>
             Core recursive segment matcher implementing GitIgnore semantics.
             </summary>
+            <param name="pattern">The compiled pattern.</param>
+            <param name="patternIndex">The index of the pattern segment being matched.</param>
+            <param name="comparison">The string comparison rules.</param>
+            <param name="path">The enumerator for path segments.</param>
+            <param name="remainingSegments">The number of segments left in the path.</param>
+            <param name="isDirectory">Whether the path represents a directory.</param>
         </member>
         <member name="M:Jeninnet.FileQuery.Matching.Compiled.GitIgnoreInstructionMatcher.MatchRecursiveWildcard(Jeninnet.FileQuery.Matching.ICompiledPattern,System.Int32,System.StringComparison,Jeninnet.FileQuery.IO.PathSegmentEnumerator,System.Int32,System.Boolean)">
             <summary>
             Handles recursive wildcard (<c>**</c>) matching with backtracking.
             </summary>
+            <param name="pattern">The compiled pattern.</param>
+            <param name="patternIndex">The index of the pattern segment being matched.</param>
+            <param name="comparison">The string comparison rules.</param>
+            <param name="path">The enumerator for path segments.</param>
+            <param name="remainingSegments">The number of segments left in the path.</param>
+            <param name="isDirectory">Whether the path represents a directory.</param>
         </member>
         <member name="M:Jeninnet.FileQuery.Matching.Compiled.GitIgnoreInstructionMatcher.CanRemainingPatternMatchEmpty(System.Collections.Generic.IReadOnlyList{System.Collections.Generic.IReadOnlyList{Jeninnet.FileQuery.Matching.IPatternToken}},System.Int32)">
             <summary>
             Determines whether all remaining pattern segments can match
             an empty (zero-segment) path.
             </summary>
+            <param name="patternSegments">The collection of segments.</param>
+            <param name="startIndex">The starting index of the remaining segments.</param>
         </member>
         <member name="T:Jeninnet.FileQuery.Matching.Compiled.GlobInstructionMatcher">
             <summary>
@@ -1503,11 +1748,21 @@
             <summary>
             Composite key used to cache compiled <see cref="T:System.Text.RegularExpressions.Regex"/> instances.
             </summary>
+            <param name="Pattern">The regex pattern text.</param>
+            <param name="CaseSensitivity">The case sensitivity setting.</param>
         </member>
         <member name="M:Jeninnet.FileQuery.Matching.Compiled.RegexInstructionMatcher.RegexCacheKey.#ctor(System.String,Jeninnet.FileQuery.Enums.CaseSensitivity)">
             <summary>
             Composite key used to cache compiled <see cref="T:System.Text.RegularExpressions.Regex"/> instances.
             </summary>
+            <param name="Pattern">The regex pattern text.</param>
+            <param name="CaseSensitivity">The case sensitivity setting.</param>
+        </member>
+        <member name="P:Jeninnet.FileQuery.Matching.Compiled.RegexInstructionMatcher.RegexCacheKey.Pattern">
+            <summary>The regex pattern text.</summary>
+        </member>
+        <member name="P:Jeninnet.FileQuery.Matching.Compiled.RegexInstructionMatcher.RegexCacheKey.CaseSensitivity">
+            <summary>The case sensitivity setting.</summary>
         </member>
         <member name="F:Jeninnet.FileQuery.Matching.Compiled.RegexInstructionMatcher._regexCache">
             <summary>
@@ -1528,6 +1783,8 @@
         </member>
         <member name="M:Jeninnet.FileQuery.Matching.Compiled.RegexInstructionMatcher.MatchCore(Jeninnet.FileQuery.Matching.ICompiledPatternSet,Jeninnet.FileQuery.Matching.PathMatchContext)">
             <inheritdoc/>
+            <param name="patterns">The set of compiled patterns to match.</param>
+            <param name="context">The path context containing path information and options.</param>
         </member>
         <member name="M:Jeninnet.FileQuery.Matching.Compiled.RegexInstructionMatcher.GetOrCreateRegex(System.String,Jeninnet.FileQuery.Enums.CaseSensitivity)">
             <summary>
@@ -1546,6 +1803,7 @@
             Extracts the raw regular expression text from the first token of the
             first segment of <paramref name="pattern"/>.
             </summary>
+            <param name="pattern">The compiled pattern to extract the regex from.</param>
             <returns>
             The expression string, or <see langword="null"/> when the pattern does
             not contain a <see cref="T:Jeninnet.FileQuery.Patterns.Syntax.RegularExpressionToken"/>.
@@ -1578,6 +1836,11 @@
             <summary>
             Matches a sequence of pattern tokens against a path segment slice.
             </summary>
+            <param name="tokens">The list of tokens to match.</param>
+            <param name="tokenIndex">The index of the current token.</param>
+            <param name="text">The text to match against.</param>
+            <param name="pos">The current position in the text.</param>
+            <param name="cmp">The string comparison mode.</param>
             <returns>
             The position in <paramref name="text"/> where the match stopped,
             or <see langword="null"/> if no match was found.
@@ -1588,12 +1851,20 @@
             Matches one character from <paramref name="text"/> against the compiled
             <see cref="T:Jeninnet.FileQuery.Patterns.Syntax.CharacterClassToken"/>.
             </summary>
+            <param name="tokens">The list of tokens to match.</param>
+            <param name="tokenIndex">The index of the current token.</param>
+            <param name="cls">The character class to match against.</param>
+            <param name="text">The text to match against.</param>
+            <param name="pos">The current position in the text.</param>
+            <param name="cmp">The string comparison mode.</param>
         </member>
         <member name="M:Jeninnet.FileQuery.Matching.Compiled.SegmentInstructionMatcher.CharacterClassMatches(Jeninnet.FileQuery.Patterns.Syntax.CharacterClasses.CharacterClass,System.Char)">
             <summary>
             Returns <see langword="true"/> when character <paramref name="c"/>
             satisfies the <see cref="T:Jeninnet.FileQuery.Patterns.Syntax.CharacterClasses.CharacterClass"/> definition.
             </summary>
+            <param name="cls">The character class definition.</param>
+            <param name="c">The character to test.</param>
             <remarks>
             <para>
             <strong>Allocation fix:</strong> The previous implementation used
@@ -1612,12 +1883,16 @@
             Pattern-matches a single <see cref="T:Jeninnet.FileQuery.Patterns.Syntax.CharacterClasses.ICharacterClassElement"/> against
             character <paramref name="c"/>.
             </summary>
+            <param name="element">The character class element.</param>
+            <param name="c">The character to test.</param>
         </member>
         <member name="M:Jeninnet.FileQuery.Matching.Compiled.SegmentInstructionMatcher.MatchesPosixClass(System.String,System.Char)">
             <summary>
             Evaluates whether <paramref name="c"/> belongs to the POSIX named class
             <paramref name="name"/>.
             </summary>
+            <param name="name">The name of the POSIX class.</param>
+            <param name="c">The character to test.</param>
             <remarks>
             Unknown POSIX class names return <see langword="false"/> (safe default).
             </remarks>
@@ -1626,6 +1901,11 @@
             <summary>
             Handles the single wildcard <c>*</c> using canonical backtracking.
             </summary>
+            <param name="tokens">The list of tokens to match.</param>
+            <param name="wildcardIndex">The index of the wildcard token.</param>
+            <param name="text">The text to match against.</param>
+            <param name="pos">The current position in the text.</param>
+            <param name="cmp">The string comparison mode.</param>
         </member>
         <member name="T:Jeninnet.FileQuery.Matching.Compiled.SegmentMatchEngine">
             <summary>
@@ -1673,6 +1953,16 @@
         <member name="P:Jeninnet.FileQuery.Matching.ICompiledPattern.PatternKind">
             <summary>
             The type of pattern (Glob, GitIgnore, Regex, etc.) responsible for evaluation.
+            </summary>
+        </member>
+        <member name="P:Jeninnet.FileQuery.Matching.ICompiledPattern.SourceText">
+            <summary>
+            Gets the original source pattern text.
+            </summary>
+        </member>
+        <member name="P:Jeninnet.FileQuery.Matching.ICompiledPattern.SourceIndex">
+            <summary>
+            Gets the zero-based source pattern index, or -1 when unknown.
             </summary>
         </member>
         <member name="T:Jeninnet.FileQuery.Matching.ICompiledPatternSet">
@@ -1729,6 +2019,9 @@
             <summary>
             Internal immutable projection of pattern and matching-related settings.
             </summary>
+            <param name="TypedPatterns">The typed patterns collection.</param>
+            <param name="MatchingMode">The matching mode.</param>
+            <param name="CaseSensitivity">The case sensitivity setting.</param>
             <remarks>
             <para>
             <strong>TypedPatterns key type change (v1.0):</strong>
@@ -1748,6 +2041,9 @@
             <summary>
             Internal immutable projection of pattern and matching-related settings.
             </summary>
+            <param name="TypedPatterns">The typed patterns collection.</param>
+            <param name="MatchingMode">The matching mode.</param>
+            <param name="CaseSensitivity">The case sensitivity setting.</param>
             <remarks>
             <para>
             <strong>TypedPatterns key type change (v1.0):</strong>
@@ -1762,6 +2058,15 @@
             <see cref="T:System.Collections.Generic.IReadOnlyDictionary`2"/> eliminates that copy.
             </para>
             </remarks>
+        </member>
+        <member name="P:Jeninnet.FileQuery.Matching.MatchingConfiguration.TypedPatterns">
+            <summary>The typed patterns collection.</summary>
+        </member>
+        <member name="P:Jeninnet.FileQuery.Matching.MatchingConfiguration.MatchingMode">
+            <summary>The matching mode.</summary>
+        </member>
+        <member name="P:Jeninnet.FileQuery.Matching.MatchingConfiguration.CaseSensitivity">
+            <summary>The case sensitivity setting.</summary>
         </member>
         <member name="T:Jeninnet.FileQuery.Matching.MatchPrecedenceResolver">
             <summary>
@@ -1795,6 +2100,8 @@
             <summary>
             Resolves a single compiled pattern. Zero-allocation: index loop instead of LINQ.
             </summary>
+            <param name="instruction">The compiled pattern instruction to resolve.</param>
+            <param name="context">The match context containing path and matching state.</param>
         </member>
         <member name="T:Jeninnet.FileQuery.Matching.MatchResult">
             <summary>
@@ -1953,11 +2260,15 @@
             <summary>
             Creates a <see cref="T:Jeninnet.FileQuery.Matching.PathMatchContext"/> for a file path.
             </summary>
+            <param name="path">The normalized absolute path of the file.</param>
+            <param name="caseSensitivity">Specifies how character casing should be interpreted.</param>
         </member>
         <member name="M:Jeninnet.FileQuery.Matching.PathMatchContext.CreateDirectoryContext(System.ReadOnlySpan{System.Char},Jeninnet.FileQuery.Enums.CaseSensitivity)">
             <summary>
             Creates a <see cref="T:Jeninnet.FileQuery.Matching.PathMatchContext"/> for a directory path.
             </summary>
+            <param name="path">The normalized absolute path of the directory.</param>
+            <param name="caseSensitivity">Specifies how character casing should be interpreted.</param>
         </member>
         <member name="T:Jeninnet.FileQuery.Matching.PathMatcherFactory">
             <summary>
@@ -2160,11 +2471,71 @@
             <summary>
             Represents extracted structural and semantic signals from a pattern.
             </summary>
+            <param name="IsEmpty">Whether the pattern is empty.</param>
+            <param name="IsRegex">Whether the pattern is a regex.</param>
+            <param name="IsNegated">Whether the pattern is negated.</param>
+            <param name="HasBackslash">Whether the pattern contains a backslash.</param>
+            <param name="HasForwardSlash">Whether the pattern contains a forward slash.</param>
+            <param name="HasWildcard">Whether the pattern contains a wildcard.</param>
+            <param name="HasSingleCharWildcard">Whether the pattern contains a single char wildcard.</param>
+            <param name="HasBracket">Whether the pattern contains a bracket.</param>
+            <param name="HasRecursiveWildcard">Whether the pattern contains a recursive wildcard.</param>
+            <param name="HasEscapedCharacters">Whether the pattern contains escaped characters.</param>
+            <param name="HasGitIgnoreSyntax">Whether the pattern contains gitignore syntax.</param>
+            <param name="SegmentCount">The number of segments.</param>
         </member>
         <member name="M:Jeninnet.FileQuery.Patterns.Analysis.PatternAnalysisResult.#ctor(System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Int32)">
             <summary>
             Represents extracted structural and semantic signals from a pattern.
             </summary>
+            <param name="IsEmpty">Whether the pattern is empty.</param>
+            <param name="IsRegex">Whether the pattern is a regex.</param>
+            <param name="IsNegated">Whether the pattern is negated.</param>
+            <param name="HasBackslash">Whether the pattern contains a backslash.</param>
+            <param name="HasForwardSlash">Whether the pattern contains a forward slash.</param>
+            <param name="HasWildcard">Whether the pattern contains a wildcard.</param>
+            <param name="HasSingleCharWildcard">Whether the pattern contains a single char wildcard.</param>
+            <param name="HasBracket">Whether the pattern contains a bracket.</param>
+            <param name="HasRecursiveWildcard">Whether the pattern contains a recursive wildcard.</param>
+            <param name="HasEscapedCharacters">Whether the pattern contains escaped characters.</param>
+            <param name="HasGitIgnoreSyntax">Whether the pattern contains gitignore syntax.</param>
+            <param name="SegmentCount">The number of segments.</param>
+        </member>
+        <member name="P:Jeninnet.FileQuery.Patterns.Analysis.PatternAnalysisResult.IsEmpty">
+            <summary>Whether the pattern is empty.</summary>
+        </member>
+        <member name="P:Jeninnet.FileQuery.Patterns.Analysis.PatternAnalysisResult.IsRegex">
+            <summary>Whether the pattern is a regex.</summary>
+        </member>
+        <member name="P:Jeninnet.FileQuery.Patterns.Analysis.PatternAnalysisResult.IsNegated">
+            <summary>Whether the pattern is negated.</summary>
+        </member>
+        <member name="P:Jeninnet.FileQuery.Patterns.Analysis.PatternAnalysisResult.HasBackslash">
+            <summary>Whether the pattern contains a backslash.</summary>
+        </member>
+        <member name="P:Jeninnet.FileQuery.Patterns.Analysis.PatternAnalysisResult.HasForwardSlash">
+            <summary>Whether the pattern contains a forward slash.</summary>
+        </member>
+        <member name="P:Jeninnet.FileQuery.Patterns.Analysis.PatternAnalysisResult.HasWildcard">
+            <summary>Whether the pattern contains a wildcard.</summary>
+        </member>
+        <member name="P:Jeninnet.FileQuery.Patterns.Analysis.PatternAnalysisResult.HasSingleCharWildcard">
+            <summary>Whether the pattern contains a single char wildcard.</summary>
+        </member>
+        <member name="P:Jeninnet.FileQuery.Patterns.Analysis.PatternAnalysisResult.HasBracket">
+            <summary>Whether the pattern contains a bracket.</summary>
+        </member>
+        <member name="P:Jeninnet.FileQuery.Patterns.Analysis.PatternAnalysisResult.HasRecursiveWildcard">
+            <summary>Whether the pattern contains a recursive wildcard.</summary>
+        </member>
+        <member name="P:Jeninnet.FileQuery.Patterns.Analysis.PatternAnalysisResult.HasEscapedCharacters">
+            <summary>Whether the pattern contains escaped characters.</summary>
+        </member>
+        <member name="P:Jeninnet.FileQuery.Patterns.Analysis.PatternAnalysisResult.HasGitIgnoreSyntax">
+            <summary>Whether the pattern contains gitignore syntax.</summary>
+        </member>
+        <member name="P:Jeninnet.FileQuery.Patterns.Analysis.PatternAnalysisResult.SegmentCount">
+            <summary>The number of segments.</summary>
         </member>
         <member name="T:Jeninnet.FileQuery.Patterns.Analysis.PatternAnalyzer">
             <inheritdoc/>
@@ -2179,6 +2550,8 @@
             <remarks>
             GitIgnore negation is only valid as the very first character.
             </remarks>
+            <param name="pattern">The pattern string being analyzed.</param>
+            <param name="state">Mutable analysis state.</param>
             <returns>The index at which normal scanning should begin.</returns>
         </member>
         <member name="M:Jeninnet.FileQuery.Patterns.Analysis.PatternAnalyzer.ScanPattern(System.ReadOnlySpan{System.Char},Jeninnet.FileQuery.Patterns.Analysis.PatternAnalyzer.AnalysisState,System.Int32)">
@@ -2198,11 +2571,17 @@
             Only a leading escape (position 0) contributes to GitIgnore semantics.
             Other backslashes are simply recorded.
             </remarks>
+            <param name="pattern">The pattern string being analyzed.</param>
+            <param name="state">Mutable analysis state.</param>
+            <param name="i">The current index in the pattern.</param>
+            <param name="skipNext">Output indicating whether the next character should be skipped.</param>
         </member>
         <member name="M:Jeninnet.FileQuery.Patterns.Analysis.PatternAnalyzer.HandleSeparator(System.Char,Jeninnet.FileQuery.Patterns.Analysis.PatternAnalyzer.AnalysisState)">
             <summary>
             Handles directory separators (<c>/</c>) and increments segment count.
             </summary>
+            <param name="c">The character to check.</param>
+            <param name="state">Mutable analysis state.</param>
         </member>
         <member name="M:Jeninnet.FileQuery.Patterns.Analysis.PatternAnalyzer.HandleWildcard(System.ReadOnlySpan{System.Char},Jeninnet.FileQuery.Patterns.Analysis.PatternAnalyzer.AnalysisState,System.Int32,System.Boolean@)">
             <summary>
@@ -2211,16 +2590,25 @@
             <remarks>
             Recursive wildcards (<c>**</c>) imply GitIgnore semantics.
             </remarks>
+            <param name="pattern">The pattern span to analyze.</param>
+            <param name="state">The current analysis state.</param>
+            <param name="i">The index of the wildcard character.</param>
+            <param name="skipNext">Whether to skip the next character in analysis.</param>
         </member>
         <member name="M:Jeninnet.FileQuery.Patterns.Analysis.PatternAnalyzer.HandleBracket(System.Char,Jeninnet.FileQuery.Patterns.Analysis.PatternAnalyzer.AnalysisState)">
             <summary>
             Handles bracket characters (<c>[</c> and <c>]</c>).
             </summary>
+            <param name="c">The character to check.</param>
+            <param name="state">Mutable analysis state.</param>
         </member>
         <member name="M:Jeninnet.FileQuery.Patterns.Analysis.PatternAnalyzer.HandleComment(System.Char,System.Int32,Jeninnet.FileQuery.Patterns.Analysis.PatternAnalyzer.AnalysisState)">
             <summary>
             Handles GitIgnore comment syntax (<c>#</c> at the start of the pattern).
             </summary>
+            <param name="c">The character to check.</param>
+            <param name="index">The current index.</param>
+            <param name="state">Mutable analysis state.</param>
         </member>
         <member name="T:Jeninnet.FileQuery.Patterns.Analysis.PatternAnalyzer.AnalysisState">
             <summary>
@@ -2270,11 +2658,21 @@
             <summary>
             Represents a normalized, explicit pattern.
             </summary>
+            <param name="Text">The pattern text.</param>
+            <param name="ExplicitType">The optional explicit type of the pattern.</param>
         </member>
         <member name="M:Jeninnet.FileQuery.Patterns.Canonical.CanonicalPattern.#ctor(System.String,System.Nullable{Jeninnet.FileQuery.Enums.PatternKind})">
             <summary>
             Represents a normalized, explicit pattern.
             </summary>
+            <param name="Text">The pattern text.</param>
+            <param name="ExplicitType">The optional explicit type of the pattern.</param>
+        </member>
+        <member name="P:Jeninnet.FileQuery.Patterns.Canonical.CanonicalPattern.Text">
+            <summary>The pattern text.</summary>
+        </member>
+        <member name="P:Jeninnet.FileQuery.Patterns.Canonical.CanonicalPattern.ExplicitType">
+            <summary>The optional explicit type of the pattern.</summary>
         </member>
         <member name="T:Jeninnet.FileQuery.Patterns.Canonical.CanonicalPatternInput">
             <summary>
@@ -2308,11 +2706,26 @@
             <summary>
             Represents a pattern with fully resolved semantics.
             </summary>
+            <param name="Text">The pattern text.</param>
+            <param name="Type">The pattern kind.</param>
+            <param name="SourceIndex">The index of the pattern in the source.</param>
         </member>
-        <member name="M:Jeninnet.FileQuery.Patterns.Classification.ClassifiedPattern.#ctor(System.String,Jeninnet.FileQuery.Enums.PatternKind)">
+        <member name="M:Jeninnet.FileQuery.Patterns.Classification.ClassifiedPattern.#ctor(System.String,Jeninnet.FileQuery.Enums.PatternKind,System.Int32)">
             <summary>
             Represents a pattern with fully resolved semantics.
             </summary>
+            <param name="Text">The pattern text.</param>
+            <param name="Type">The pattern kind.</param>
+            <param name="SourceIndex">The index of the pattern in the source.</param>
+        </member>
+        <member name="P:Jeninnet.FileQuery.Patterns.Classification.ClassifiedPattern.Text">
+            <summary>The pattern text.</summary>
+        </member>
+        <member name="P:Jeninnet.FileQuery.Patterns.Classification.ClassifiedPattern.Type">
+            <summary>The pattern kind.</summary>
+        </member>
+        <member name="P:Jeninnet.FileQuery.Patterns.Classification.ClassifiedPattern.SourceIndex">
+            <summary>The index of the pattern in the source.</summary>
         </member>
         <member name="T:Jeninnet.FileQuery.Patterns.Classification.ClassifiedPatternSet">
             <summary>
@@ -2390,6 +2803,7 @@
             Configures the compilation pipeline used by this facade.
             Must be called exactly once during application startup.
             </summary>
+            <param name="pipeline">The pipeline to use for compilation.</param>
             <exception cref="T:System.InvalidOperationException">
             Thrown when the factory has already been configured.
             </exception>
@@ -2398,16 +2812,20 @@
             <summary>
             Compiles a <see cref="T:Jeninnet.FileQuery.Patterns.Classification.ClassifiedPatternSet"/> through the full pipeline.
             </summary>
+            <param name="patterns">The set of patterns to compile.</param>
         </member>
         <member name="M:Jeninnet.FileQuery.Patterns.Compilation.CompiledPatternFactory.Compile(System.String)">
             <summary>
             Compiles a single untyped pattern using <see cref="P:Jeninnet.FileQuery.Patterns.Compilation.CompiledPatternFactory.DefaultPatternType"/>.
             </summary>
+            <param name="pattern">The pattern string to compile.</param>
         </member>
         <member name="M:Jeninnet.FileQuery.Patterns.Compilation.CompiledPatternFactory.Compile(Jeninnet.FileQuery.Enums.PatternKind,System.String)">
             <summary>
             Compiles a single pattern of the specified <paramref name="type"/>.
             </summary>
+            <param name="type">The type of the pattern.</param>
+            <param name="pattern">The pattern string.</param>
             <remarks>
             Delegates to <see cref="M:Jeninnet.FileQuery.Patterns.Compilation.CompiledPatternFactory.Compile(Jeninnet.FileQuery.Enums.PatternKind,System.Collections.Generic.IEnumerable{System.String})"/>
             with a single-element span, avoiding an intermediate array allocation.
@@ -2418,6 +2836,8 @@
             Compiles a sequence of patterns all belonging to the specified
             <paramref name="type"/>.
             </summary>
+            <param name="type">The pattern kind.</param>
+            <param name="patterns">The sequence of patterns to compile.</param>
             <remarks>
             <para>
             <strong>Performance:</strong> because the <see cref="T:Jeninnet.FileQuery.Enums.PatternKind"/> is
@@ -2442,6 +2862,7 @@
             Compiles all pattern kinds in <paramref name="configuration"/> and returns
             a dictionary keyed by <see cref="T:Jeninnet.FileQuery.Enums.PatternKind"/>.
             </summary>
+            <param name="configuration">The configuration to compile.</param>
         </member>
         <member name="M:Jeninnet.FileQuery.Patterns.Compilation.CompiledPatternFactory.CompileSet(Jeninnet.FileQuery.Matching.MatchingConfiguration)">
             <summary>
@@ -2449,6 +2870,7 @@
             a single ordered <see cref="T:Jeninnet.FileQuery.Matching.ICompiledPatternSet"/> preserving the
             original evaluation order.
             </summary>
+            <param name="configuration">The configuration to compile.</param>
             <remarks>
             <para>
             <strong>Performance:</strong> the previous implementation used
@@ -2568,12 +2990,14 @@
             <summary>
             Compiles a single classified pattern through the full pipeline.
             </summary>
+            <param name="pattern">The classified pattern to compile.</param>
         </member>
         <member name="M:Jeninnet.FileQuery.Patterns.Compilation.PatternPipeline.Compile(Jeninnet.FileQuery.Patterns.Classification.ClassifiedPatternSet)">
             <summary>
             Compiles all patterns in <paramref name="set"/> and returns an ordered
             compiled set.
             </summary>
+            <param name="set">The classified pattern set.</param>
         </member>
         <member name="M:Jeninnet.FileQuery.Patterns.Compilation.PatternPipeline.CreateDefault">
             <summary>
@@ -2647,6 +3071,12 @@
         <member name="P:Jeninnet.FileQuery.Patterns.Compiled.CompiledPattern.PatternKind">
             <inheritdoc/>
         </member>
+        <member name="P:Jeninnet.FileQuery.Patterns.Compiled.CompiledPattern.SourceText">
+            <inheritdoc/>
+        </member>
+        <member name="P:Jeninnet.FileQuery.Patterns.Compiled.CompiledPattern.SourceIndex">
+            <inheritdoc/>
+        </member>
         <member name="M:Jeninnet.FileQuery.Patterns.Compiled.CompiledPattern.ToString">
             <summary>
             Returns a debug string representation of this compiled pattern.
@@ -2710,6 +3140,8 @@
             Private constructor used when building sub-sets to avoid recursive
             sub-set creation.
             </summary>
+            <param name="patterns">The ordered compiled patterns.</param>
+            <param name="createSubSets">Indicates whether to partition patterns into sub-sets.</param>
         </member>
         <member name="P:Jeninnet.FileQuery.Patterns.Compiled.CompiledPatternSet.Count">
             <inheritdoc/>
@@ -2767,12 +3199,15 @@
             Initializes a new instance of the <see cref="T:Jeninnet.FileQuery.Patterns.Exceptions.PatternException"/> class
             with a descriptive error message.
             </summary>
+            <param name="message">The error message.</param>
         </member>
         <member name="M:Jeninnet.FileQuery.Patterns.Exceptions.PatternException.#ctor(System.String,System.Exception)">
             <summary>
             Initializes a new instance of the <see cref="T:Jeninnet.FileQuery.Patterns.Exceptions.PatternException"/> class
             with a descriptive error message and an inner exception.
             </summary>
+            <param name="message">The error message.</param>
+            <param name="innerException">The inner exception.</param>
         </member>
         <member name="T:Jeninnet.FileQuery.Patterns.Exceptions.PatternSyntaxException">
             <summary>
@@ -2786,11 +3221,16 @@
             <summary>
             Initializes a new instance with the offending pattern and a message.
             </summary>
+            <param name="pattern">The offending pattern text.</param>
+            <param name="message">The error message.</param>
         </member>
         <member name="M:Jeninnet.FileQuery.Patterns.Exceptions.PatternSyntaxException.#ctor(System.String,System.String,System.Exception)">
             <summary>
             Initializes a new instance with the offending pattern, a message, and an inner exception.
             </summary>
+            <param name="pattern">The offending pattern text.</param>
+            <param name="message">The error message.</param>
+            <param name="innerException">The inner exception.</param>
         </member>
         <member name="T:Jeninnet.FileQuery.Patterns.Invariants.CharacterClassRangeInvariant">
             <summary>
@@ -2882,6 +3322,7 @@
             <summary>
             Validates the given pattern.
             </summary>
+            <param name="context">The compilation context containing the pattern to validate.</param>
         </member>
         <member name="T:Jeninnet.FileQuery.Patterns.Invariants.Definition.ITextPatternInvariant">
             <summary>
@@ -2912,11 +3353,21 @@
             <summary>
             Result of an invariant validation.
             </summary>
+            <param name="IsSuccess">Whether the validation succeeded.</param>
+            <param name="Message">Optional error message if validation failed.</param>
         </member>
         <member name="M:Jeninnet.FileQuery.Patterns.Invariants.Definition.PatternInvariantResult.#ctor(System.Boolean,System.String)">
             <summary>
             Result of an invariant validation.
             </summary>
+            <param name="IsSuccess">Whether the validation succeeded.</param>
+            <param name="Message">Optional error message if validation failed.</param>
+        </member>
+        <member name="P:Jeninnet.FileQuery.Patterns.Invariants.Definition.PatternInvariantResult.IsSuccess">
+            <summary>Whether the validation succeeded.</summary>
+        </member>
+        <member name="P:Jeninnet.FileQuery.Patterns.Invariants.Definition.PatternInvariantResult.Message">
+            <summary>Optional error message if validation failed.</summary>
         </member>
         <member name="T:Jeninnet.FileQuery.Patterns.Invariants.Dialects.GitIgnoreImplicitRecursiveInvariant">
             <summary>
@@ -2980,6 +3431,7 @@
             Returns <see langword="true"/> when <paramref name="segment"/> consists of
             exactly one <see cref="T:Jeninnet.FileQuery.Patterns.Syntax.RecursiveWildcardToken"/>.
             </summary>
+            <param name="segment">The segment to check.</param>
         </member>
         <member name="T:Jeninnet.FileQuery.Patterns.Invariants.Dialects.GitIgnorePatternInvariant">
             <summary>
@@ -3704,12 +4156,17 @@
             <summary>
             Consumes an optional negation prefix (<c>!</c> or <c>^</c>).
             </summary>
+            <param name="pattern">The pattern string to parse.</param>
+            <param name="index">The current index in the pattern.</param>
         </member>
         <member name="M:Jeninnet.FileQuery.Patterns.Tokenization.CharacterClassParser.IsClassEnd(System.ReadOnlySpan{System.Char},System.Int32,System.Boolean)">
             <summary>
             Returns <see langword="true"/> when the character at <paramref name="pos"/> is
             <c>']'</c> and it is not the very first element position.
             </summary>
+            <param name="pattern">The pattern string being parsed.</param>
+            <param name="pos">The current position to check.</param>
+            <param name="first">Whether this is the first element position.</param>
             <remarks>
             POSIX and most glob engines allow <c>']'</c> as a literal character when it
             appears as the first element (or the first element of a negated class).
@@ -3720,16 +4177,24 @@
             <summary>
             Parses the next element at <paramref name="index"/> and advances the index.
             </summary>
+            <param name="pattern">The pattern string to parse.</param>
+            <param name="index">The current index in the pattern.</param>
+            <param name="first">Whether this is the first element position.</param>
         </member>
         <member name="M:Jeninnet.FileQuery.Patterns.Tokenization.CharacterClassParser.ParseEscape(System.ReadOnlySpan{System.Char},System.Int32@)">
             <summary>
             Parses an escape sequence <c>\x</c> inside a character class.
             </summary>
+            <param name="pattern">The pattern string to parse.</param>
+            <param name="index">The current index in the pattern.</param>
         </member>
         <member name="M:Jeninnet.FileQuery.Patterns.Tokenization.CharacterClassParser.ParseRangeOrLiteral(System.ReadOnlySpan{System.Char},System.Int32@,System.Boolean)">
             <summary>
             Parses either a character range (<c>x-y</c>) or a single literal character.
             </summary>
+            <param name="pattern">The pattern string to parse.</param>
+            <param name="index">The current index in the pattern.</param>
+            <param name="first">Whether this is the first element position.</param>
             <remarks>
             <list type="bullet">
               <item><c>'-'</c> as the first element → <see cref="T:Jeninnet.FileQuery.Patterns.Syntax.CharacterClasses.CharLiteral"/></item>
@@ -3745,6 +4210,8 @@
             and <c>[index+2]</c> form a syntactically valid range expression <c>x-y</c>
             where <c>y</c> is not <c>']'</c>.
             </summary>
+            <param name="pattern">The pattern string being parsed.</param>
+            <param name="index">The starting position of the potential range.</param>
             <remarks>
             Inverted ranges (<c>z-a</c>) are syntactically valid here and are detected
             later by <see cref="T:Jeninnet.FileQuery.Patterns.Invariants.CharacterClassRangeInvariant"/>.
@@ -3755,11 +4222,15 @@
             Returns <see langword="true"/> when the position starts a POSIX class
             prefix <c>[:</c>.
             </summary>
+            <param name="pattern">The pattern string being parsed.</param>
+            <param name="index">The starting position to check.</param>
         </member>
         <member name="M:Jeninnet.FileQuery.Patterns.Tokenization.CharacterClassParser.ParsePosix(System.ReadOnlySpan{System.Char},System.Int32@)">
             <summary>
             Parses a POSIX named class <c>[: name :]</c>.
             </summary>
+            <param name="pattern">The pattern string to parse.</param>
+            <param name="index">The current index in the pattern.</param>
             <remarks>
             On success advances <paramref name="index"/> past the closing <c>:]</c>.
             On failure returns a <see cref="T:Jeninnet.FileQuery.Patterns.Syntax.CharacterClasses.CharacterClassParseError"/> sentinel.
@@ -4019,6 +4490,7 @@
             Returns <see langword="true"/> when a closing bracket appears in the pattern
             without a corresponding opening bracket.
             </summary>
+            <param name="pattern">The pattern span to check.</param>
         </member>
         <member name="M:Jeninnet.FileQuery.Patterns.Validation.PatternValidator.DetectNestedBrackets">
             <remarks>
@@ -4107,22 +4579,58 @@
             Builds a traversal plan from a <see cref="T:Jeninnet.FileQuery.FileQuery"/> descriptor.
             </summary>
         </member>
-        <member name="M:Jeninnet.FileQuery.Traversal.ITraversalPlanBuilder.Build(Jeninnet.FileQuery.FileQuery)">
+        <member name="M:Jeninnet.FileQuery.Traversal.ITraversalPlanBuilder.Build(Jeninnet.FileQuery.FileQuery,System.IProgress{Jeninnet.FileQuery.FileQueryProgress})">
             <summary>
             Builds a traversal plan that defines how directory walking should occur.
             </summary>
             <param name="query">The immutable file query descriptor.</param>
+            <param name="progress">The optional progress sink for traversal snapshots.</param>
             <returns>A traversal execution plan.</returns>
         </member>
         <member name="T:Jeninnet.FileQuery.Traversal.TraversalConfiguration">
             <summary>
             Internal immutable projection of traversal-related settings.
             </summary>
+            <param name="RecurseSubdirectories">Whether to recurse into subdirectories.</param>
+            <param name="MaxRecursionDepth">The maximum recursion depth.</param>
+            <param name="IgnoreInaccessible">Whether to ignore inaccessible directories.</param>
+            <param name="Strategy">The traversal strategy.</param>
+            <param name="SymlinkPolicy">The symlink policy.</param>
+            <param name="UseAsync">Whether to use asynchronous traversal.</param>
+            <param name="ErrorRecovery">The error recovery options.</param>
         </member>
-        <member name="M:Jeninnet.FileQuery.Traversal.TraversalConfiguration.#ctor(System.Boolean,System.Int32,System.Boolean,Jeninnet.FileQuery.Enums.TraversalStrategy,Jeninnet.FileQuery.Enums.SymlinkPolicy,System.Boolean)">
+        <member name="M:Jeninnet.FileQuery.Traversal.TraversalConfiguration.#ctor(System.Boolean,System.Int32,System.Boolean,Jeninnet.FileQuery.Enums.TraversalStrategy,Jeninnet.FileQuery.Enums.SymlinkPolicy,System.Boolean,Jeninnet.FileQuery.FileQueryErrorRecoveryOptions)">
             <summary>
             Internal immutable projection of traversal-related settings.
             </summary>
+            <param name="RecurseSubdirectories">Whether to recurse into subdirectories.</param>
+            <param name="MaxRecursionDepth">The maximum recursion depth.</param>
+            <param name="IgnoreInaccessible">Whether to ignore inaccessible directories.</param>
+            <param name="Strategy">The traversal strategy.</param>
+            <param name="SymlinkPolicy">The symlink policy.</param>
+            <param name="UseAsync">Whether to use asynchronous traversal.</param>
+            <param name="ErrorRecovery">The error recovery options.</param>
+        </member>
+        <member name="P:Jeninnet.FileQuery.Traversal.TraversalConfiguration.RecurseSubdirectories">
+            <summary>Whether to recurse into subdirectories.</summary>
+        </member>
+        <member name="P:Jeninnet.FileQuery.Traversal.TraversalConfiguration.MaxRecursionDepth">
+            <summary>The maximum recursion depth.</summary>
+        </member>
+        <member name="P:Jeninnet.FileQuery.Traversal.TraversalConfiguration.IgnoreInaccessible">
+            <summary>Whether to ignore inaccessible directories.</summary>
+        </member>
+        <member name="P:Jeninnet.FileQuery.Traversal.TraversalConfiguration.Strategy">
+            <summary>The traversal strategy.</summary>
+        </member>
+        <member name="P:Jeninnet.FileQuery.Traversal.TraversalConfiguration.SymlinkPolicy">
+            <summary>The symlink policy.</summary>
+        </member>
+        <member name="P:Jeninnet.FileQuery.Traversal.TraversalConfiguration.UseAsync">
+            <summary>Whether to use asynchronous traversal.</summary>
+        </member>
+        <member name="P:Jeninnet.FileQuery.Traversal.TraversalConfiguration.ErrorRecovery">
+            <summary>The error recovery options.</summary>
         </member>
         <member name="F:Jeninnet.FileQuery.Traversal.TraversalConfiguration.UNLIMITED">
             <summary>
@@ -4138,21 +4646,72 @@
             <summary>
             Represents the outcome of evaluating a filesystem entry from the perspective of traversal.
             </summary>
+            <param name="ShouldYield">Whether the entry should be included in the results.</param>
+            <param name="ShouldTraverse">Whether the entry should be traversed into.</param>
         </member>
         <member name="M:Jeninnet.FileQuery.Traversal.TraversalDecision.#ctor(System.Boolean,System.Boolean)">
             <summary>
             Represents the outcome of evaluating a filesystem entry from the perspective of traversal.
             </summary>
+            <param name="ShouldYield">Whether the entry should be included in the results.</param>
+            <param name="ShouldTraverse">Whether the entry should be traversed into.</param>
+        </member>
+        <member name="P:Jeninnet.FileQuery.Traversal.TraversalDecision.ShouldYield">
+            <summary>Whether the entry should be included in the results.</summary>
+        </member>
+        <member name="P:Jeninnet.FileQuery.Traversal.TraversalDecision.ShouldTraverse">
+            <summary>Whether the entry should be traversed into.</summary>
         </member>
         <member name="T:Jeninnet.FileQuery.Traversal.TraversalEvaluator">
             <summary>
             Translates matcher results and options into traversal decisions.
             </summary>
+            <param name="provider">The traversal decision provider.</param>
         </member>
         <member name="M:Jeninnet.FileQuery.Traversal.TraversalEvaluator.#ctor(Jeninnet.FileQuery.Traversal.ITraversalDecisionProvider)">
             <summary>
             Translates matcher results and options into traversal decisions.
             </summary>
+            <param name="provider">The traversal decision provider.</param>
+        </member>
+        <member name="M:Jeninnet.FileQuery.Traversal.TraversalEvaluator.Evaluate(Jeninnet.FileQuery.Enums.MatchOutcome,Jeninnet.FileQuery.Enums.PathKind,System.Int32)">
+            <summary>
+            Evaluates the match outcome to determine the traversal decision.
+            </summary>
+            <param name="matchOutcome">The outcome of the path match.</param>
+            <param name="pathKind">The kind of path being evaluated.</param>
+            <param name="depth">The current depth in the directory traversal.</param>
+        </member>
+        <member name="M:Jeninnet.FileQuery.Traversal.TraversalExecutor.Execute(Jeninnet.FileQuery.Traversal.TraversalPlan)">
+            <summary>
+            Executes the traversal plan and returns the matched file paths.
+            </summary>
+            <param name="plan">The traversal plan to execute.</param>
+        </member>
+        <member name="M:Jeninnet.FileQuery.Traversal.TraversalExecutor.ExecuteAsync(Jeninnet.FileQuery.Traversal.TraversalPlan,System.Threading.CancellationToken)">
+            <summary>
+            Executes the traversal plan asynchronously and yields the matched file paths.
+            </summary>
+            <param name="plan">The traversal plan to execute.</param>
+            <param name="cancellationToken">Token to monitor for cancellation requests.</param>
+        </member>
+        <member name="M:Jeninnet.FileQuery.Traversal.TraversalExecutor.TakeFrame(Jeninnet.FileQuery.Traversal.TraversalFrontier,Jeninnet.FileQuery.Traversal.TraversalConfiguration)">
+            <summary>
+            Takes the next frame from the traversal frontier based on the configured strategy.
+            </summary>
+            <param name="buffer">The traversal frontier buffer.</param>
+            <param name="options">The traversal configuration options.</param>
+        </member>
+        <member name="M:Jeninnet.FileQuery.Traversal.TraversalExecutor.TryProcessEntry(Jeninnet.FileQuery.Traversal.TraversalPlan,Jeninnet.FileQuery.IO.FileSystemEntry,Jeninnet.FileQuery.Traversal.TraversalFrame,Jeninnet.FileQuery.Traversal.TraversalFrontier,System.Collections.Generic.HashSet{System.String},System.Nullable{Jeninnet.FileQuery.IO.FileSystemEntry}@)">
+            <summary>
+            Processes a single filesystem entry, potentially adding it to the frontier or yielding it if it matches.
+            </summary>
+            <param name="plan">The traversal plan.</param>
+            <param name="entry">The filesystem entry to process.</param>
+            <param name="frame">The current traversal frame.</param>
+            <param name="buffer">The traversal frontier buffer.</param>
+            <param name="visited">The set of visited directory paths (for symlink cycle detection).</param>
+            <param name="yieldedFile">The resulting entry if a file was matched.</param>
         </member>
         <member name="M:Jeninnet.FileQuery.Traversal.TraversalExecutor.HasPotentialReInclusionInside(Jeninnet.FileQuery.Matching.ICompiledPatternSet,System.String,System.StringComparison)">
             <summary>
@@ -4160,6 +4719,9 @@
             potentially produce a match for a path inside <paramref name="directoryRelativePath"/>.
             Used to decide whether to traverse an otherwise-excluded directory.
             </summary>
+            <param name="patterns">The compiled patterns.</param>
+            <param name="directoryRelativePath">The directory path relative to the root.</param>
+            <param name="comparison">The string comparison mode.</param>
         </member>
         <member name="M:Jeninnet.FileQuery.Traversal.TraversalExecutor.IsPathPrefixOrEqual(System.String,System.String,System.StringComparison)">
             <summary>
@@ -4167,6 +4729,9 @@
             path-prefix of <paramref name="path"/>.
             Uses a separator check to avoid "sub" matching "subother".
             </summary>
+            <param name="prefix">The prefix path.</param>
+            <param name="path">The path to check.</param>
+            <param name="comparison">The string comparison mode.</param>
         </member>
         <member name="M:Jeninnet.FileQuery.Traversal.TraversalExecutor.GetConcretePathAnchor(Jeninnet.FileQuery.Matching.ICompiledPattern)">
             <summary>
@@ -4175,21 +4740,72 @@
             Returns an empty string for broad wildcard patterns such as <c>!**</c> or
             <c>!**/*.txt</c>.
             </summary>
+            <param name="pattern">The compiled pattern.</param>
+        </member>
+        <member name="M:Jeninnet.FileQuery.Traversal.TraversalExecutor.IsIgnoredSymlink(Jeninnet.FileQuery.IO.FileSystemEntry,Jeninnet.FileQuery.Traversal.TraversalConfiguration)">
+            <summary>
+            Determines if a filesystem entry is a symlink that should be ignored based on configuration.
+            </summary>
+            <param name="entry">The filesystem entry.</param>
+            <param name="options">The traversal configuration options.</param>
+        </member>
+        <member name="M:Jeninnet.FileQuery.Traversal.TraversalExecutor.ReportProgress(Jeninnet.FileQuery.Traversal.TraversalPlan,Jeninnet.FileQuery.Traversal.TraversalExecutor.TraversalProgressState,System.String)">
+            <summary>
+            Reports traversal progress if a progress reporter is configured.
+            </summary>
+            <param name="plan">The traversal plan.</param>
+            <param name="state">The current traversal progress state.</param>
+            <param name="currentPath">The path of the entry being reported.</param>
+        </member>
+        <member name="M:Jeninnet.FileQuery.Traversal.TraversalExecutor.ReportDiagnostic(Jeninnet.FileQuery.Traversal.TraversalPlan,Jeninnet.FileQuery.IO.FileSystemEntry,System.String,Jeninnet.FileQuery.Matching.PathMatchContext,Jeninnet.FileQuery.Enums.MatchOutcome)">
+            <summary>
+            Reports diagnostic information for the given entry, if diagnostics are enabled.
+            </summary>
+            <param name="plan">The traversal plan.</param>
+            <param name="entry">The filesystem entry.</param>
+            <param name="relativePath">The path relative to the root.</param>
+            <param name="context">The path match context.</param>
+            <param name="outcome">The match outcome.</param>
+        </member>
+        <member name="M:Jeninnet.FileQuery.Traversal.TraversalExecutor.FindResponsiblePattern(Jeninnet.FileQuery.Matching.ICompiledPatternSet,Jeninnet.FileQuery.Matching.PathMatchContext,Jeninnet.FileQuery.Enums.MatchOutcome)">
+            <summary>
+            Finds the pattern responsible for the given match outcome.
+            </summary>
+            <param name="patterns">The compiled pattern set.</param>
+            <param name="context">The path match context.</param>
+            <param name="finalOutcome">The final match outcome.</param>
+        </member>
+        <member name="M:Jeninnet.FileQuery.Traversal.TraversalExecutor.GetDefaultDiagnosticReason(Jeninnet.FileQuery.Enums.MatchOutcome)">
+            <summary>
+            Gets the default diagnostic reason for a given match outcome.
+            </summary>
+            <param name="outcome">The match outcome.</param>
         </member>
         <member name="T:Jeninnet.FileQuery.Traversal.TraversalFrame">
             <summary>
             Represents a traversal frame for iterative directory enumeration.
             </summary>
+            <param name="Directory">The directory path.</param>
+            <param name="Depth">The depth of the directory.</param>
         </member>
         <member name="M:Jeninnet.FileQuery.Traversal.TraversalFrame.#ctor(System.String,System.Int32)">
             <summary>
             Represents a traversal frame for iterative directory enumeration.
             </summary>
+            <param name="Directory">The directory path.</param>
+            <param name="Depth">The depth of the directory.</param>
+        </member>
+        <member name="P:Jeninnet.FileQuery.Traversal.TraversalFrame.Directory">
+            <summary>The directory path.</summary>
+        </member>
+        <member name="P:Jeninnet.FileQuery.Traversal.TraversalFrame.Depth">
+            <summary>The depth of the directory.</summary>
         </member>
         <member name="M:Jeninnet.FileQuery.Traversal.TraversalFrontier.Push(Jeninnet.FileQuery.Traversal.TraversalFrame)">
             <summary>
             Push a frame onto the stack (DFS).
             </summary>
+            <param name="frame">The frame to push.</param>
         </member>
         <member name="M:Jeninnet.FileQuery.Traversal.TraversalFrontier.Pop">
             <summary>
@@ -4200,6 +4816,7 @@
             <summary>
             Enqueue a frame into the queue (BFS).
             </summary>
+            <param name="frame">The frame to enqueue.</param>
         </member>
         <member name="M:Jeninnet.FileQuery.Traversal.TraversalFrontier.Dequeue">
             <summary>
@@ -4208,6 +4825,7 @@
         </member>
         <member name="M:Jeninnet.FileQuery.Traversal.TraversalFrontier.Add(Jeninnet.FileQuery.Traversal.TraversalFrame)">
             <summary> Adds a frame to the buffer according to strategy </summary>
+            <param name="frame">The frame to add.</param>
         </member>
         <member name="T:Jeninnet.FileQuery.Traversal.TraversalOptions">
             <summary>
@@ -4245,8 +4863,17 @@
             This object represents a resolved, runtime-ready execution contract.
             No public configuration objects are referenced here.
             </remarks>
+            <param name="RootDirectory">The root directory for traversal.</param>
+            <param name="FileSystem">The file system abstraction.</param>
+            <param name="Traversal">The traversal configuration.</param>
+            <param name="Matching">The matching configuration.</param>
+            <param name="Matcher">The path matcher.</param>
+            <param name="CompiledPatterns">The set of compiled patterns to evaluate.</param>
+            <param name="Evaluator">The traversal evaluator.</param>
+            <param name="Progress">Optional progress reporter.</param>
+            <param name="Diagnostics">Optional diagnostic reporter.</param>
         </member>
-        <member name="M:Jeninnet.FileQuery.Traversal.TraversalPlan.#ctor(System.String,Jeninnet.FileQuery.IO.IFileSystem,Jeninnet.FileQuery.Traversal.TraversalConfiguration,Jeninnet.FileQuery.Matching.MatchingConfiguration,Jeninnet.FileQuery.Matching.IPathMatcher,Jeninnet.FileQuery.Matching.ICompiledPatternSet,Jeninnet.FileQuery.Traversal.ITraversalEvaluator)">
+        <member name="M:Jeninnet.FileQuery.Traversal.TraversalPlan.#ctor(System.String,Jeninnet.FileQuery.IO.IFileSystem,Jeninnet.FileQuery.Traversal.TraversalConfiguration,Jeninnet.FileQuery.Matching.MatchingConfiguration,Jeninnet.FileQuery.Matching.IPathMatcher,Jeninnet.FileQuery.Matching.ICompiledPatternSet,Jeninnet.FileQuery.Traversal.ITraversalEvaluator,System.IProgress{Jeninnet.FileQuery.FileQueryProgress},System.IProgress{Jeninnet.FileQuery.FileQueryDiagnostic})">
             <summary>
             Fully prepared immutable execution plan for a file query.
             </summary>
@@ -4254,18 +4881,56 @@
             This object represents a resolved, runtime-ready execution contract.
             No public configuration objects are referenced here.
             </remarks>
+            <param name="RootDirectory">The root directory for traversal.</param>
+            <param name="FileSystem">The file system abstraction.</param>
+            <param name="Traversal">The traversal configuration.</param>
+            <param name="Matching">The matching configuration.</param>
+            <param name="Matcher">The path matcher.</param>
+            <param name="CompiledPatterns">The set of compiled patterns to evaluate.</param>
+            <param name="Evaluator">The traversal evaluator.</param>
+            <param name="Progress">Optional progress reporter.</param>
+            <param name="Diagnostics">Optional diagnostic reporter.</param>
+        </member>
+        <member name="P:Jeninnet.FileQuery.Traversal.TraversalPlan.RootDirectory">
+            <summary>The root directory for traversal.</summary>
+        </member>
+        <member name="P:Jeninnet.FileQuery.Traversal.TraversalPlan.FileSystem">
+            <summary>The file system abstraction.</summary>
+        </member>
+        <member name="P:Jeninnet.FileQuery.Traversal.TraversalPlan.Traversal">
+            <summary>The traversal configuration.</summary>
+        </member>
+        <member name="P:Jeninnet.FileQuery.Traversal.TraversalPlan.Matching">
+            <summary>The matching configuration.</summary>
+        </member>
+        <member name="P:Jeninnet.FileQuery.Traversal.TraversalPlan.Matcher">
+            <summary>The path matcher.</summary>
+        </member>
+        <member name="P:Jeninnet.FileQuery.Traversal.TraversalPlan.CompiledPatterns">
+            <summary>The set of compiled patterns to evaluate.</summary>
+        </member>
+        <member name="P:Jeninnet.FileQuery.Traversal.TraversalPlan.Evaluator">
+            <summary>The traversal evaluator.</summary>
+        </member>
+        <member name="P:Jeninnet.FileQuery.Traversal.TraversalPlan.Progress">
+            <summary>Optional progress reporter.</summary>
+        </member>
+        <member name="P:Jeninnet.FileQuery.Traversal.TraversalPlan.Diagnostics">
+            <summary>Optional diagnostic reporter.</summary>
         </member>
         <member name="T:Jeninnet.FileQuery.Traversal.TraversalPlanBuilder">
             <summary>
             Builds a <see cref="T:Jeninnet.FileQuery.Traversal.TraversalPlan"/> from a <see cref="T:Jeninnet.FileQuery.FileQuery"/> descriptor.
             </summary>
+            <param name="fileSystem">The file system abstraction.</param>
         </member>
         <member name="M:Jeninnet.FileQuery.Traversal.TraversalPlanBuilder.#ctor(Jeninnet.FileQuery.IO.IFileSystem)">
             <summary>
             Builds a <see cref="T:Jeninnet.FileQuery.Traversal.TraversalPlan"/> from a <see cref="T:Jeninnet.FileQuery.FileQuery"/> descriptor.
             </summary>
+            <param name="fileSystem">The file system abstraction.</param>
         </member>
-        <member name="M:Jeninnet.FileQuery.Traversal.TraversalPlanBuilder.Build(Jeninnet.FileQuery.FileQuery)">
+        <member name="M:Jeninnet.FileQuery.Traversal.TraversalPlanBuilder.Build(Jeninnet.FileQuery.FileQuery,System.IProgress{Jeninnet.FileQuery.FileQueryProgress})">
             <inheritdoc/>
         </member>
         <member name="T:System.Text.RegularExpressions.Generated.DetectEscapedCharacters_0">

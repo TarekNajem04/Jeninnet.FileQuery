@@ -23,19 +23,23 @@
 /// pure lexical recognizer.
 /// </para>
 /// </remarks>
-internal sealed class CharacterClassTokenizer : IPatternTokenizer {
+internal sealed class CharacterClassTokenizer : IPatternTokenizer
+{
     /// <inheritdoc/>
     public bool TryTokenize(
         ReadOnlySpan<char> input,
         ref int index,
         PatternSyntaxProfile syntax,
         List<IPatternToken> tokens
-    ) {
-        if(!syntax.SupportsCharacterClasses) {
+    )
+    {
+        if(!syntax.SupportsCharacterClasses)
+        {
             return false;
         }
 
-        if(input[index] != '[') {
+        if(input[index] != '[')
+        {
             return false;
         }
 

@@ -1,5 +1,6 @@
 ﻿namespace AdvancedUsage;
 
-public interface IFileQueryCommand {
+public interface IFileQueryCommand
+{
     Task ExecuteAsync(string root, string[] args, CancellationToken cancellationToken = default);
 }

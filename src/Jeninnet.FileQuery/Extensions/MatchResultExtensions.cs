@@ -3,7 +3,8 @@
 /// <summary>
 /// Provides extension methods for <see cref="MatchResult"/> to simplify rule evaluation.
 /// </summary>
-internal static class MatchResultExtensions {
+internal static class MatchResultExtensions
+{
     /// <summary>
     /// Determines if the <see cref="MatchResult"/> represents a successful match that should be included.
     /// </summary>

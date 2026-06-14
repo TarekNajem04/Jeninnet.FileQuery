@@ -26,7 +26,8 @@
 /// This class is pure and thread-safe after construction.
 /// </para>
 /// </remarks>
-internal sealed class HybridPathMatcher : IPathMatcher {
+internal sealed class HybridPathMatcher : IPathMatcher
+{
     private readonly MatchPrecedenceResolver _precedenceResolver = MatchPrecedenceResolver.Default;
 
     internal HybridPathMatcher() { }

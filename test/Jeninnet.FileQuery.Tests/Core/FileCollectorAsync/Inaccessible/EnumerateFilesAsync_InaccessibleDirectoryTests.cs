@@ -9,12 +9,14 @@
 ///     - continues enumeration properly
 /// </summary>
 [TestClass]
-public class EnumerateFilesAsync_InaccessibleDirectoryTests {
+public class EnumerateFilesAsync_InaccessibleDirectoryTests
+{
     /// <summary>
     /// Ensures inaccessible directories cause exceptions when IgnoreInaccessible = false.
     /// </summary>
     [TestMethod]
-    public async Task EnumerateFilesAsync_InaccessibleDir_ShouldThrowAsync() {
+    public async Task EnumerateFilesAsync_InaccessibleDir_ShouldThrowAsync()
+    {
         using var env = new TestEnvironment();
 
         env.CreateFiles("blocked/ok1.txt", "blocked/ok2.txt");
@@ -33,11 +35,14 @@ public class EnumerateFilesAsync_InaccessibleDirectoryTests {
             ignoreInaccessible: false
         );
 
-        await TestAssertEx.ThrowsAsync<Exception>(async () => {
-            try {
+        await TestAssertEx.ThrowsAsync<Exception>(async () =>
+        {
+            try
+            {
                 await foreach(var _ in fileQueryEngine.ExecuteAsync(
                     new(env.Root, options),
-                    TestContext.CancellationToken)) {
+                    TestContext.CancellationToken))
+                {
                     // Force traversal into the inaccessible directory
                 }
 
@@ -46,7 +51,8 @@ public class EnumerateFilesAsync_InaccessibleDirectoryTests {
             }
             catch(Exception ex) when(
                 ex is DirectoryNotFoundException or IOException or UnauthorizedAccessException
-            ) {
+            )
+            {
                 // Valid exception → rethrow so ThrowsAsync can catch it
                 throw;
             }
@@ -57,7 +63,8 @@ public class EnumerateFilesAsync_InaccessibleDirectoryTests {
     /// Ensures inaccessible directories are skipped when IgnoreInaccessible = true.
     /// </summary>
     [TestMethod]
-    public async Task EnumerateFilesAsync_InaccessibleDir_ShouldSkipAsync() {
+    public async Task EnumerateFilesAsync_InaccessibleDir_ShouldSkipAsync()
+    {
         using var env = new TestEnvironment();
 
         env.CreateFiles("root.txt");
@@ -85,7 +92,8 @@ public class EnumerateFilesAsync_InaccessibleDirectoryTests {
     /// Ensures async enumeration continues after skipping multiple inaccessible dirs.
     /// </summary>
     [TestMethod]
-    public async Task EnumerateFilesAsync_MultipleInaccessibleDirs_ShouldSkipAllAsync() {
+    public async Task EnumerateFilesAsync_MultipleInaccessibleDirs_ShouldSkipAllAsync()
+    {
         using var env = new TestEnvironment();
 
         env.CreateFiles("ok1.txt", "ok2.txt");

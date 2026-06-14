@@ -8,7 +8,8 @@
 /// including the normalized path, its kind (file or directory), and the case-sensitivity mode.
 /// Being a <see langword="ref struct"/> ensures zero-allocation, span-based matching.
 /// </remarks>
-internal readonly ref struct PathMatchContext {
+internal readonly ref struct PathMatchContext
+{
     /// <summary>
     /// Initializes a new <see cref="PathMatchContext"/> instance.
     /// </summary>
@@ -19,7 +20,8 @@ internal readonly ref struct PathMatchContext {
         ReadOnlySpan<char> path,
         PathKind pathKind,
         CaseSensitivity caseSensitivity = CaseSensitivity.Sensitive
-    ) {
+    )
+    {
         Path = path;
         PathKind = pathKind;
         CaseSensitivity = caseSensitivity;
@@ -52,6 +54,8 @@ internal readonly ref struct PathMatchContext {
     /// <summary>
     /// Creates a <see cref="PathMatchContext"/> for a file path.
     /// </summary>
+    /// <param name="path">The normalized absolute path of the file.</param>
+    /// <param name="caseSensitivity">Specifies how character casing should be interpreted.</param>
     public static PathMatchContext CreateFileContext(
         ReadOnlySpan<char> path,
         CaseSensitivity caseSensitivity = CaseSensitivity.Sensitive) =>
@@ -60,6 +64,8 @@ internal readonly ref struct PathMatchContext {
     /// <summary>
     /// Creates a <see cref="PathMatchContext"/> for a directory path.
     /// </summary>
+    /// <param name="path">The normalized absolute path of the directory.</param>
+    /// <param name="caseSensitivity">Specifies how character casing should be interpreted.</param>
     public static PathMatchContext CreateDirectoryContext(
         ReadOnlySpan<char> path,
         CaseSensitivity caseSensitivity = CaseSensitivity.Sensitive) =>

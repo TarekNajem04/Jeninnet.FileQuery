@@ -5,12 +5,14 @@
 /// GitIgnore rules treat dotfiles as normal files unless explicitly matched.
 /// </summary>
 [TestClass]
-public class DotfileAndHiddenFileTests {
+public class DotfileAndHiddenFileTests
+{
     /// <summary>
     /// Ensures explicit patterns match dotfiles.
     /// </summary>
     [TestMethod]
-    public void DotfilesShouldMatch_WhenIncludedExplicitly() {
+    public void DotfilesShouldMatch_WhenIncludedExplicitly()
+    {
         using var env = new TestEnvironment();
 
         env.CreateFile(".hidden");
@@ -28,7 +30,7 @@ public class DotfileAndHiddenFileTests {
 
         var result = fileQueryEngine.Execute(new(env.Root, options)).ToList();
 
-        TestAssertEx.ContainsSingle(result, x => x.EndsWith(".hidden"));
+        TestAssertEx.ContainsSingle(result, x => x.EndsWith(".hidden", StringComparison.Ordinal));
     }
 
     /// <summary>
@@ -36,7 +38,8 @@ public class DotfileAndHiddenFileTests {
     /// "*.txt" should NOT match ".gitignore".
     /// </summary>
     [TestMethod]
-    public void DotfilesShouldNotMatch_WildcardsUnlessPatternStartsWithDot() {
+    public void DotfilesShouldNotMatch_WildcardsUnlessPatternStartsWithDot()
+    {
         using var env = new TestEnvironment();
 
         env.CreateFile(".gitignore");
@@ -62,7 +65,8 @@ public class DotfileAndHiddenFileTests {
     /// "**" should match dotfiles because it is recursive and not anchored.
     /// </summary>
     [TestMethod]
-    public void RecursiveWildcard_ShouldIncludeDotfiles() {
+    public void RecursiveWildcard_ShouldIncludeDotfiles()
+    {
         using var env = new TestEnvironment();
 
         env.CreateFile(".env/envfile.txt");
@@ -81,15 +85,16 @@ public class DotfileAndHiddenFileTests {
         var result = fileQueryEngine.Execute(new(env.Root, options)).ToList();
 
         TestAssertEx.HasCount(result, 3);
-        Assert.Contains(x => x.EndsWith("envfile.txt"), result);
-        Assert.Contains(x => x.EndsWith(".secret"), result);
+        Assert.Contains(x => x.EndsWith("envfile.txt", StringComparison.Ordinal), result);
+        Assert.Contains(x => x.EndsWith(".secret", StringComparison.Ordinal), result);
     }
 
     /// <summary>
     /// ".*" should match dotfiles and folder because it is recursive and not anchored.
     /// </summary>
     [TestMethod]
-    public void RecursiveWildcard_ShouldExcludeDotfilesAndFolders() {
+    public void RecursiveWildcard_ShouldExcludeDotfilesAndFolders()
+    {
         using var env = new TestEnvironment();
 
         env.CreateFile(".env/envfile.txt");
@@ -108,16 +113,17 @@ public class DotfileAndHiddenFileTests {
         var result = fileQueryEngine.Execute(new(env.Root, options)).ToList();
 
         TestAssertEx.HasCount(result, 1);
-        Assert.DoesNotContain(x => x.StartsWith(".env"), result);
-        Assert.DoesNotContain(x => x.EndsWith(".secret"), result);
-        Assert.Contains(x => x.EndsWith("file.txt"), result);
+        Assert.DoesNotContain(x => x.StartsWith(".env", StringComparison.Ordinal), result);
+        Assert.DoesNotContain(x => x.EndsWith(".secret", StringComparison.Ordinal), result);
+        Assert.Contains(x => x.EndsWith("file.txt", StringComparison.Ordinal), result);
     }
 
     /// <summary>
     /// ".*" should match dotfiles and folder because it is recursive and not anchored.
     /// </summary>
     [TestMethod]
-    public void RecursiveWildcard_ShouldExcludeDotFolders() {
+    public void RecursiveWildcard_ShouldExcludeDotFolders()
+    {
         using var env = new TestEnvironment();
 
         env.CreateFile(".env/envfile.txt");
@@ -138,8 +144,8 @@ public class DotfileAndHiddenFileTests {
         var result = fileQueryEngine.Execute(new(env.Root, options)).ToList();
 
         TestAssertEx.HasCount(result, 2);
-        Assert.DoesNotContain(x => x.EndsWith(".env"), result);
-        Assert.Contains(x => x.EndsWith(".secret"), result);
-        Assert.Contains(x => x.EndsWith("file.txt"), result);
+        Assert.DoesNotContain(x => x.EndsWith(".env", StringComparison.Ordinal), result);
+        Assert.Contains(x => x.EndsWith(".secret", StringComparison.Ordinal), result);
+        Assert.Contains(x => x.EndsWith("file.txt", StringComparison.Ordinal), result);
     }
 }

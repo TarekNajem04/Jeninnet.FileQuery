@@ -12,7 +12,8 @@
 /// <item><description>If nothing matches, the outcome defaults to <see cref="MatchOutcome.Include"/>.</description></item>
 /// </list>
 /// </remarks>
-internal sealed class MatchPrecedenceResolver {
+internal sealed class MatchPrecedenceResolver
+{
     public static readonly GitIgnoreInstructionMatcher GitIgnoreMatcher = new();
     public static readonly GlobInstructionMatcher GlobMatcher = new();
     public static readonly RegexInstructionMatcher RegexMatcher = new();
@@ -40,32 +41,40 @@ internal sealed class MatchPrecedenceResolver {
     /// <param name="instructions">The compiled pattern set containing GitIgnoreSubSet, GlobSubSet, and RegexSubSet to evaluate.</param>
     /// <param name="context">The PathMatchContext containing the path and matching state used for evaluation.</param>
     /// <returns>A MatchOutcome indicating whether the path is included or excluded after evaluation.</returns>
-    public static MatchOutcome Resolve(ICompiledPatternSet instructions, PathMatchContext context) {
-        if(context.Path.IsEmpty) {
+    public static MatchOutcome Resolve(ICompiledPatternSet instructions, PathMatchContext context)
+    {
+        if(context.Path.IsEmpty)
+        {
             return MatchOutcome.Exclude;
         }
 
-        if(instructions.Count == 0) {
+        if(instructions.Count == 0)
+        {
             return MatchOutcome.Include;
         }
 
         var result = MatchOutcome.Include;
 
-        if(instructions.GitIgnoreSubSet is not null) {
+        if(instructions.GitIgnoreSubSet is not null)
+        {
             result = GitIgnoreMatcher.Match(instructions.GitIgnoreSubSet, context);
-            if(result is MatchOutcome.Include) {
+            if(result is MatchOutcome.Include)
+            {
                 return result;
             }
         }
 
-        if(instructions.GlobSubSet is not null) {
+        if(instructions.GlobSubSet is not null)
+        {
             result = GlobMatcher.Match(instructions.GlobSubSet, context);
-            if(result is MatchOutcome.Include) {
+            if(result is MatchOutcome.Include)
+            {
                 return result;
             }
         }
 
-        if(instructions.RegexSubSet is not null) {
+        if(instructions.RegexSubSet is not null)
+        {
             result = RegexMatcher.Match(instructions.RegexSubSet, context);
         }
 
@@ -75,9 +84,14 @@ internal sealed class MatchPrecedenceResolver {
     /// <summary>
     /// Resolves a single compiled pattern. Zero-allocation: index loop instead of LINQ.
     /// </summary>
-    public MatchOutcome Resolve(ICompiledPattern instruction, PathMatchContext context) {
-        for(var i = 0; i < _matchers.Count; i++) {
-            if(_matchers[i].Supports(instruction.PatternKind)) {
+    /// <param name="instruction">The compiled pattern instruction to resolve.</param>
+    /// <param name="context">The match context containing path and matching state.</param>
+    public MatchOutcome Resolve(ICompiledPattern instruction, PathMatchContext context)
+    {
+        for(var i = 0; i < _matchers.Count; i++)
+        {
+            if(_matchers[i].Supports(instruction.PatternKind))
+            {
                 return _matchers[i].Match(instruction, context);
             }
         }

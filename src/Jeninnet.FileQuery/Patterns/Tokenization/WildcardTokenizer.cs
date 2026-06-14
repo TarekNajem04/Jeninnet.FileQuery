@@ -18,14 +18,17 @@
 /// </list>
 /// </para>
 /// </remarks>
-internal sealed class WildcardTokenizer : IPatternTokenizer {
+internal sealed class WildcardTokenizer : IPatternTokenizer
+{
     public bool TryTokenize(
         ReadOnlySpan<char> input,
         ref int index,
         PatternSyntaxProfile syntax,
         List<IPatternToken> tokens
-    ) {
-        if(input[index] != '*') {
+    )
+    {
+        if(input[index] != '*')
+        {
             return false;
         }
 

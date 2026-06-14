@@ -38,7 +38,8 @@
 /// deterministic behavior, caching safety, and thread safety.
 /// </para>
 /// </remarks>
-public sealed record FileQueryOptions {
+public sealed record FileQueryOptions
+{
     /// <summary>
     /// Represents an unlimited value for numeric limits such as
     /// <see cref="MaxRecursionDepth"/>.
@@ -58,8 +59,12 @@ public sealed record FileQueryOptions {
         bool ignoreInaccessible = true,
         PatternMatchingMode patternMatchingMode = PatternMatchingMode.GitIgnore,
         CaseSensitivity caseSensitivity = CaseSensitivity.PlatformDefault,
-        TraversalOptions? traversal = null
-) {
+        TraversalOptions? traversal = null,
+        bool auditMatches = false,
+        IProgress<FileQueryDiagnostic>? diagnostics = null,
+        FileQueryErrorRecoveryOptions? errorRecovery = null
+)
+    {
         PatternInput = patternInput;
         RecurseSubdirectories = recurseSubdirectories;
         MaxRecursionDepth = maxRecursionDepth;
@@ -67,6 +72,11 @@ public sealed record FileQueryOptions {
         PatternMatchingMode = patternMatchingMode;
         CaseSensitivity = caseSensitivity;
         Traversal = traversal ?? new();
+        AuditMatches = auditMatches;
+        Diagnostics = diagnostics;
+        ErrorRecovery = errorRecovery ?? (ignoreInaccessible
+            ? FileQueryErrorRecoveryOptions.Skip
+            : FileQueryErrorRecoveryOptions.Abort);
     }
 
     /// <summary>
@@ -108,17 +118,36 @@ public sealed record FileQueryOptions {
     public TraversalOptions Traversal { get; }
 
     /// <summary>
+    /// Gets a value indicating whether match diagnostics are emitted during traversal.
+    /// </summary>
+    public bool AuditMatches { get; }
+
+    /// <summary>
+    /// Gets the diagnostic sink used when <see cref="AuditMatches"/> is enabled.
+    /// </summary>
+    public IProgress<FileQueryDiagnostic>? Diagnostics { get; }
+
+    /// <summary>
+    /// Gets the configured IO error recovery policy.
+    /// </summary>
+    public FileQueryErrorRecoveryOptions ErrorRecovery { get; }
+
+    /// <summary>
     /// Validates this options instance for internal consistency.
     /// </summary>
     /// <exception cref="ArgumentOutOfRangeException">
     /// Thrown when <see cref="MaxRecursionDepth"/> is less than
     /// <see cref="UNLIMITED_RECURSION_DEPTH"/>.
     /// </exception>
-    internal void Validate() {
-        if(MaxRecursionDepth < UNLIMITED) {
+    internal void Validate()
+    {
+        if(MaxRecursionDepth < UNLIMITED)
+        {
 #pragma warning disable S3928
             throw new ArgumentOutOfRangeException(nameof(MaxRecursionDepth), "Recursion depth cannot be less than -1.");
 #pragma warning restore S3928
         }
+
+        ErrorRecovery.Validate();
     }
 }

@@ -12,7 +12,8 @@ namespace Jeninnet.FileQuery.Benchmarks;
 /// patterns contain character classes.
 /// </summary>
 [MemoryDiagnoser]
-public class CharacterClassMatcherBenchmark {
+public class CharacterClassMatcherBenchmark
+{
     private GitIgnoreInstructionMatcher _matcher = default!;
     private ICompiledPatternSet _literalClass = default!;
     private ICompiledPatternSet _rangeClass = default!;
@@ -22,7 +23,8 @@ public class CharacterClassMatcherBenchmark {
     private readonly string _path = "src/file5.cs";
 
     [GlobalSetup]
-    public void Setup() {
+    public void Setup()
+    {
         _matcher = new GitIgnoreInstructionMatcher();
 
         _literalClass = Compile("!file[abc5].cs");      // CharLiteral elements

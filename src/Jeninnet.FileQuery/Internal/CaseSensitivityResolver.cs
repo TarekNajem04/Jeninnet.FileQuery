@@ -3,7 +3,8 @@
 /// <summary>
 /// Provides logic for resolving <see cref="CaseSensitivity"/> preferences into concrete execution modes.
 /// </summary>
-internal static class CaseSensitivityResolver {
+internal static class CaseSensitivityResolver
+{
     /// <summary>
     /// Determines the effective case-sensitivity mode based on the provided options.
     /// </summary>
@@ -22,7 +23,8 @@ internal static class CaseSensitivityResolver {
     /// The final <see cref="CaseSensitivity"/> value to be used by the matcher.
     /// </returns>
     public static CaseSensitivity Resolve(this CaseSensitivity caseSensitivity)
-        => caseSensitivity switch {
+        => caseSensitivity switch
+        {
             CaseSensitivity.PlatformDefault => DetectOsCaseSensitivity(),
             _ => caseSensitivity
         };
@@ -36,7 +38,8 @@ internal static class CaseSensitivityResolver {
     /// and <see cref="StringComparison.OrdinalIgnoreCase"/> for <see cref="CaseSensitivity.Insensitive"/>.
     /// </returns>
     public static StringComparison ToStringComparison(this CaseSensitivity caseSensitivity)
-        => Resolve(caseSensitivity) switch {
+        => Resolve(caseSensitivity) switch
+        {
             CaseSensitivity.Sensitive => StringComparison.Ordinal,
             CaseSensitivity.Insensitive => StringComparison.OrdinalIgnoreCase,
             _ => StringComparison.Ordinal

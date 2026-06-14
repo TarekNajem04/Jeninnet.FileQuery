@@ -1,16 +1,20 @@
 ﻿namespace Jeninnet.FileQuery.Patterns.Tokenization;
 
-internal sealed class LiteralReader : ITokenReader {
-    public bool TryRead(ReadOnlySpan<char> pattern, ref int i, out PatternToken token) {
+internal sealed class LiteralReader : ITokenReader
+{
+    public bool TryRead(ReadOnlySpan<char> pattern, ref int i, out PatternToken token)
+    {
         token = null!;
 
         var start = i;
 
-        while(i < pattern.Length && IsLiteral(pattern[i])) {
+        while(i < pattern.Length && IsLiteral(pattern[i]))
+        {
             i++;
         }
 
-        if(start == i) {
+        if(start == i)
+        {
             return false;
         }
 

@@ -8,7 +8,8 @@
 /// the actual <see cref="File"/> and <see cref="Directory"/> APIs,
 /// facilitating easier unit testing through mocking.
 /// </remarks>
-internal interface IFileSystem {
+internal interface IFileSystem
+{
     /// <summary>
     /// Enumerates all file system entries within the specified directory.
     /// </summary>
@@ -17,8 +18,13 @@ internal interface IFileSystem {
     /// <see langword="true"/> to silently skip directories that cannot be accessed due to
     /// permission constraints; otherwise, <see langword="false"/> to let the exception propagate.
     /// </param>
+    /// <param name="errorRecovery">The configured IO error recovery policy.</param>
     /// <returns>A sequence of <see cref="FileSystemEntry"/> representing the discovered files and directories.</returns>
-    IEnumerable<FileSystemEntry> Enumerate(string directory, bool ignoreInaccessible);
+    IEnumerable<FileSystemEntry> Enumerate(
+        string directory,
+        bool ignoreInaccessible,
+        FileQueryErrorRecoveryOptions errorRecovery
+    );
 
     /// <summary>
     /// Enumerates all file system entries within the specified directory asynchronously.
@@ -28,9 +34,15 @@ internal interface IFileSystem {
     /// <see langword="true"/> to silently skip directories that cannot be accessed due to
     /// permission constraints; otherwise, <see langword="false"/> to let the exception propagate.
     /// </param>
+    /// <param name="errorRecovery">The configured IO error recovery policy.</param>
     /// <param name="cancellationToken">The token to monitor for cancellation requests.</param>
     /// <returns>An asynchronous sequence of <see cref="FileSystemEntry"/> representing the discovered files and directories.</returns>
-    IAsyncEnumerable<FileSystemEntry> EnumerateAsync(string directory, bool ignoreInaccessible, CancellationToken cancellationToken = default);
+    IAsyncEnumerable<FileSystemEntry> EnumerateAsync(
+        string directory,
+        bool ignoreInaccessible,
+        FileQueryErrorRecoveryOptions errorRecovery,
+        CancellationToken cancellationToken = default
+    );
 
     /// <summary>
     /// Retrieves the file attributes for the specified path.

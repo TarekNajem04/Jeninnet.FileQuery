@@ -3,7 +3,8 @@
 // classification throughput benchmark for patterns
 
 [MemoryDiagnoser]
-public class PatternClassifierBenchmark {
+public class PatternClassifierBenchmark
+{
     private readonly string[] _patterns =
     [
         "**",
@@ -13,8 +14,10 @@ public class PatternClassifierBenchmark {
     ];
 
     [Benchmark]
-    public void ClassifyPatterns() {
-        foreach(var pattern in _patterns) {
+    public void ClassifyPatterns()
+    {
+        foreach(var pattern in _patterns)
+        {
             PatternClassifier.Classify(pattern);
         }
     }

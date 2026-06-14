@@ -11,9 +11,11 @@
 /// </para>
 /// </summary>
 [TestClass]
-public sealed class ArchitectureTests {
+public sealed class ArchitectureTests
+{
     [TestMethod]
-    public void Matching_Must_Not_Allocate() {
+    public void Matching_Must_Not_Allocate()
+    {
         const string pattern = "**/*.cs";
         PatternScanner.Scan(
             new(new(Text: pattern, Type: PatternKind.Glob)),
@@ -42,7 +44,8 @@ public sealed class ArchitectureTests {
     }
 
     [TestMethod]
-    public void Scan_Does_Not_Allocate_Per_Invocation() {
+    public void Scan_Does_Not_Allocate_Per_Invocation()
+    {
         const string pattern = "**/*.cs";
         var classified = new ClassifiedPattern(pattern, PatternKind.Glob);
         var context = new PatternCompilationContext(classified);
@@ -67,7 +70,8 @@ public sealed class ArchitectureTests {
     }
 
     [TestMethod]
-    public void No_Public_Method_Performs_Blocking_IO() {
+    public void No_Public_Method_Performs_Blocking_IO()
+    {
         var engineMethods =
             typeof(Engine.FileQueryEngine)
                 .GetMethods()
@@ -81,23 +85,25 @@ public sealed class ArchitectureTests {
     // ---------------------------------------------------------------------
 
     [TestMethod]
-    public void EngineLayer_Must_Not_Reference_Patterns_Namespace() {
+    public void EngineLayer_Must_Not_Reference_Patterns_Namespace()
+    {
         var engineAssembly = typeof(FileQueryRuntime).Assembly;
 
         // Select only types in the Engine layer
         var engineTypes = engineAssembly.GetTypes()
-                                        .Where(t => t.Namespace?.StartsWith("Jeninnet.FileQuery.Engine") == true)
+                                        .Where(t => t.Namespace?.StartsWith("Jeninnet.FileQuery.Engine", StringComparison.Ordinal) == true)
                                         .ToList();
 
         // Collect all referenced types for each Engine type
         var forbiddenReferences = engineTypes
-            .Select(t => new {
+            .Select(t => new
+            {
                 EngineType = t,
                 ReferencedTypes = GetAllReferencedTypes(t) // Get referenced types for each Engine type
             })
             .Where(x => x.ReferencedTypes.Any(rt =>
-                rt.Namespace?.StartsWith("Jeninnet.FileQuery.Patterns") == true
-            //&& !rt.Namespace.StartsWith("System") // Filter out system types like String, Void, etc.
+                rt.Namespace?.StartsWith("Jeninnet.FileQuery.Patterns", StringComparison.Ordinal) == true
+            //&& !rt.Namespace.StartsWith("System", StringComparison.Ordinal) // Filter out system types like String, Void, etc.
             ))
             .ToList();
 
@@ -109,7 +115,7 @@ public sealed class ArchitectureTests {
             Violating classes:
             {string.Join(Environment.NewLine, forbiddenReferences.Select(x =>
                     $"{x.EngineType.FullName} references: {string.Join(", ", x.ReferencedTypes
-                        .Where(rt => rt.Namespace?.StartsWith("Jeninnet.FileQuery.Patterns") == true) // Only show references to the Patterns namespace
+                        .Where(rt => rt.Namespace?.StartsWith("Jeninnet.FileQuery.Patterns", StringComparison.Ordinal) == true) // Only show references to the Patterns namespace
                         .Select(rt => rt.FullName))}")
             )}
             """
@@ -117,7 +123,8 @@ public sealed class ArchitectureTests {
     }
 
     [TestMethod]
-    public void CoreProject_Must_Not_Reference_Optional_Integration_Packages() {
+    public void CoreProject_Must_Not_Reference_Optional_Integration_Packages()
+    {
         var coreAssembly = typeof(FileQueryRuntime).Assembly;
         var optionalAssemblyNames = new[]
         {
@@ -152,7 +159,8 @@ public sealed class ArchitectureTests {
     }
 
     [TestMethod]
-    public void OptionalPackages_Must_Not_Expose_Core_Internal_Types_Through_Public_Api() {
+    public void OptionalPackages_Must_Not_Expose_Core_Internal_Types_Through_Public_Api()
+    {
         var coreAssembly = typeof(FileQueryRuntime).Assembly;
         var optionalAssemblies = new[]
         {
@@ -179,7 +187,8 @@ public sealed class ArchitectureTests {
     }
 
     [TestMethod]
-    public void ProductionCode_Must_Not_Construct_FileInfo_Or_DirectoryInfo() {
+    public void ProductionCode_Must_Not_Construct_FileInfo_Or_DirectoryInfo()
+    {
         var sourceRoot = Path.Combine(FindRepositoryRoot(), "src");
         var forbiddenPatterns = new[]
         {
@@ -205,18 +214,20 @@ public sealed class ArchitectureTests {
     }
 
     [TestMethod]
-    public void ProductionCode_Must_Not_Use_Path_GetFullPath() {
+    public void ProductionCode_Must_Not_Use_Path_GetFullPath()
+    {
         var sourceRoot = Path.Combine(FindRepositoryRoot(), "src", "Jeninnet.FileQuery");
         const string forbiddenPattern = "Path.GetFullPath(";
 
         var violations = Directory
             .EnumerateFiles(sourceRoot, "*.cs", SearchOption.AllDirectories)
-            .Where(path => !path.Contains(Path.Combine("Jeninnet.FileQuery", "IO"))) // Exclude IO implementation
-            .SelectMany(path => {
+            .Where(path => !path.Contains(Path.Combine("Jeninnet.FileQuery", "IO"), StringComparison.Ordinal)) // Exclude IO implementation
+            .SelectMany<string, string>(path =>
+            {
                 var content = File.ReadAllText(path);
                 return content.Contains(forbiddenPattern, StringComparison.Ordinal)
-                    ? new[] { $"{Path.GetRelativePath(sourceRoot, path)} contains '{forbiddenPattern}'" }
-                    : Array.Empty<string>();
+                    ? [$"{Path.GetRelativePath(sourceRoot, path)} contains '{forbiddenPattern}'"]
+                    : [];
             })
             .ToArray();
 
@@ -231,7 +242,8 @@ public sealed class ArchitectureTests {
     }
 
     [TestMethod]
-    public void ProductionFileSystem_Must_Not_Use_PerEntry_TaskRun() {
+    public void ProductionFileSystem_Must_Not_Use_PerEntry_TaskRun()
+    {
         var sourceRoot = Path.Combine(FindRepositoryRoot(), "src");
         var fileSystemPath = Path.Combine(sourceRoot, "Jeninnet.FileQuery", "IO", "FileSystem.cs");
         var source = File.ReadAllText(fileSystemPath);
@@ -243,7 +255,8 @@ public sealed class ArchitectureTests {
     }
 
     [TestMethod]
-    public void CompiledPattern_Constructors_Must_Not_Be_Public() {
+    public void CompiledPattern_Constructors_Must_Not_Be_Public()
+    {
         var type = typeof(CompiledPattern);
         var publicCtors = type.GetConstructors(BindingFlags.Public | BindingFlags.Instance);
 
@@ -254,7 +267,8 @@ public sealed class ArchitectureTests {
     }
 
     [TestMethod]
-    public void Matchers_Must_Not_Have_Public_Constructors() {
+    public void Matchers_Must_Not_Have_Public_Constructors()
+    {
         var matcherTypes = new[]
         {
             typeof(GlobInstructionMatcher),
@@ -262,7 +276,8 @@ public sealed class ArchitectureTests {
             typeof(HybridPathMatcher)
         };
 
-        foreach(var type in matcherTypes) {
+        foreach(var type in matcherTypes)
+        {
             var publicCtors = type.GetConstructors(BindingFlags.Public | BindingFlags.Instance);
 
             Assert.IsEmpty(
@@ -273,7 +288,8 @@ public sealed class ArchitectureTests {
     }
 
     [TestMethod]
-    public void IPathMatcher_Implementations_Must_Not_Expose_Public_Constructors() {
+    public void IPathMatcher_Implementations_Must_Not_Expose_Public_Constructors()
+    {
         var matcherInterface = typeof(IPathMatcher);
         var assembly = matcherInterface.Assembly;
         var implementations =
@@ -283,7 +299,8 @@ public sealed class ArchitectureTests {
                         t.IsClass &&
                         !t.IsAbstract
                     );
-        foreach(var impl in implementations) {
+        foreach(var impl in implementations)
+        {
             var publicCtors =
                 impl.GetConstructors(BindingFlags.Public | BindingFlags.Instance);
 
@@ -296,7 +313,8 @@ public sealed class ArchitectureTests {
     }
 
     [TestMethod]
-    public void PatternScanner_Must_Not_Be_Public() {
+    public void PatternScanner_Must_Not_Be_Public()
+    {
         var scannerType =
             typeof(PatternCompilerBase)
                 .Assembly
@@ -320,65 +338,84 @@ public sealed class ArchitectureTests {
                     .Select(p => p.ParameterType)
             );
 
-    private static IEnumerable<(string ApiOwner, Type ReferencedType)> GetPublicApiReferences(Assembly assembly) {
-        foreach(var type in assembly.GetExportedTypes()) {
-            foreach(var reference in GetExportedTypeReferences(type)) {
+    private static IEnumerable<(string ApiOwner, Type ReferencedType)> GetPublicApiReferences(Assembly assembly)
+    {
+        foreach(var type in assembly.GetExportedTypes())
+        {
+            foreach(var reference in GetExportedTypeReferences(type))
+            {
                 yield return reference;
             }
         }
     }
 
-    private static IEnumerable<(string ApiOwner, Type ReferencedType)> GetExportedTypeReferences(Type type) {
+    private static IEnumerable<(string ApiOwner, Type ReferencedType)> GetExportedTypeReferences(Type type)
+    {
         yield return (type.FullName ?? type.Name, type);
 
-        if(type.BaseType is not null) {
+        if(type.BaseType is not null)
+        {
             yield return ($"{type.FullName}: base type", type.BaseType);
         }
 
-        foreach(var interfaceType in type.GetInterfaces()) {
+        foreach(var interfaceType in type.GetInterfaces())
+        {
             yield return ($"{type.FullName}: interface", interfaceType);
         }
 
-        foreach(var reference in GetMemberApiReferences(type)) {
+        foreach(var reference in GetMemberApiReferences(type))
+        {
             yield return reference;
         }
     }
 
-    private static IEnumerable<(string ApiOwner, Type ReferencedType)> GetMemberApiReferences(Type type) {
-        foreach(var constructor in type.GetConstructors(BindingFlags.Public | BindingFlags.Instance)) {
-            foreach(var parameter in constructor.GetParameters()) {
+    private static IEnumerable<(string ApiOwner, Type ReferencedType)> GetMemberApiReferences(Type type)
+    {
+        foreach(var constructor in type.GetConstructors(BindingFlags.Public | BindingFlags.Instance))
+        {
+            foreach(var parameter in constructor.GetParameters())
+            {
                 yield return ($"{type.FullName}.{constructor.Name} parameter {parameter.Name}", parameter.ParameterType);
             }
         }
 
-        foreach(var property in type.GetProperties(BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static)) {
+        foreach(var property in type.GetProperties(BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static))
+        {
             yield return ($"{type.FullName}.{property.Name}", property.PropertyType);
         }
 
-        foreach(var field in type.GetFields(BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static)) {
+        foreach(var field in type.GetFields(BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static))
+        {
             yield return ($"{type.FullName}.{field.Name}", field.FieldType);
         }
 
-        foreach(var eventInfo in type.GetEvents(BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static)) {
+        foreach(var eventInfo in type.GetEvents(BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static))
+        {
             yield return ($"{type.FullName}.{eventInfo.Name}", eventInfo.EventHandlerType!);
         }
 
-        foreach(var method in type.GetMethods(BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static)) {
-            if(method.IsSpecialName) {
+        foreach(var method in type.GetMethods(BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static))
+        {
+            if(method.IsSpecialName)
+            {
                 continue;
             }
 
             yield return ($"{type.FullName}.{method.Name} return type", method.ReturnType);
 
-            foreach(var parameter in method.GetParameters()) {
+            foreach(var parameter in method.GetParameters())
+            {
                 yield return ($"{type.FullName}.{method.Name} parameter {parameter.Name}", parameter.ParameterType);
             }
         }
     }
 
-    private static bool IsCoreInternalType(Type type, Assembly coreAssembly) {
-        foreach(var candidate in FlattenType(type)) {
-            if(candidate.Assembly == coreAssembly && !IsPublicApiType(candidate)) {
+    private static bool IsCoreInternalType(Type type, Assembly coreAssembly)
+    {
+        foreach(var candidate in FlattenType(type))
+        {
+            if(candidate.Assembly == coreAssembly && !IsPublicApiType(candidate))
+            {
                 return true;
             }
         }
@@ -386,11 +423,15 @@ public sealed class ArchitectureTests {
         return false;
     }
 
-    private static IEnumerable<Type> FlattenType(Type type) {
-        if(type.IsByRef || type.IsPointer || type.IsArray) {
+    private static IEnumerable<Type> FlattenType(Type type)
+    {
+        if(type.IsByRef || type.IsPointer || type.IsArray)
+        {
             var elementType = type.GetElementType();
-            if(elementType is not null) {
-                foreach(var nestedType in FlattenType(elementType)) {
+            if(elementType is not null)
+            {
+                foreach(var nestedType in FlattenType(elementType))
+                {
                     yield return nestedType;
                 }
             }
@@ -400,9 +441,12 @@ public sealed class ArchitectureTests {
 
         yield return type;
 
-        if(type.IsGenericType) {
-            foreach(var argument in type.GetGenericArguments()) {
-                foreach(var nestedType in FlattenType(argument)) {
+        if(type.IsGenericType)
+        {
+            foreach(var argument in type.GetGenericArguments())
+            {
+                foreach(var nestedType in FlattenType(argument))
+                {
                     yield return nestedType;
                 }
             }
@@ -413,11 +457,14 @@ public sealed class ArchitectureTests {
         type.IsPublic ||
         type.IsNestedPublic;
 
-    private static string FindRepositoryRoot() {
+    private static string FindRepositoryRoot()
+    {
         var directory = new DirectoryInfo(AppContext.BaseDirectory);
 
-        while(directory is not null) {
-            if(File.Exists(Path.Combine(directory.FullName, "Jeninnet.FileQuery.slnx"))) {
+        while(directory is not null)
+        {
+            if(File.Exists(Path.Combine(directory.FullName, "Jeninnet.FileQuery.slnx")))
+            {
                 return directory.FullName;
             }
 

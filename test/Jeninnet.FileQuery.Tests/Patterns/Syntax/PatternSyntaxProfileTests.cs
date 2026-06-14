@@ -1,9 +1,11 @@
 ﻿namespace Jeninnet.FileQuery.Tests.Patterns.Syntax;
 
 [TestClass]
-public sealed class PatternSyntaxProfileTests {
+public sealed class PatternSyntaxProfileTests
+{
     [TestMethod]
-    public void GetProfileForPatternType_ShouldReturnCorrectProfile() {
+    public void GetProfileForPatternType_ShouldReturnCorrectProfile()
+    {
         Assert.AreEqual(PatternSyntaxProfile.GitIgnore, PatternSyntaxProfile.GetProfileForPatternType(PatternKind.GitIgnore));
         Assert.AreEqual(PatternSyntaxProfile.Glob, PatternSyntaxProfile.GetProfileForPatternType(PatternKind.Glob));
         Assert.AreEqual(PatternSyntaxProfile.Regex, PatternSyntaxProfile.GetProfileForPatternType(PatternKind.Regex));

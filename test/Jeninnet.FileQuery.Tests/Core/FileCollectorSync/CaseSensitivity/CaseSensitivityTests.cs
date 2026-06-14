@@ -4,12 +4,14 @@
 /// Tests handling of IgnoreCase and OS defaults.
 /// </summary>
 [TestClass]
-public class CaseSensitivityTests {
+public class CaseSensitivityTests
+{
     /// <summary>
     /// Ensures IgnoreCase=true matches regardless of filename case.
     /// </summary>
     [TestMethod]
-    public void IgnoreCaseTrue_ShouldMatchFilesRegardlessOfCase() {
+    public void IgnoreCaseTrue_ShouldMatchFilesRegardlessOfCase()
+    {
         using var env = new TestEnvironment();
         env.CreateFiles("FILE.TXT", "file.txt", "FiLe.TxT");
 
@@ -33,7 +35,8 @@ public class CaseSensitivityTests {
     /// Ensures IgnoreCase=false respects filename case.
     /// </summary>
     [TestMethod]
-    public void IgnoreCaseFalse_ShouldMatchOnlyExactCase() {
+    public void IgnoreCaseFalse_ShouldMatchOnlyExactCase()
+    {
         using var env = new TestEnvironment();
         env.CreateFiles("FILE.TXT", "file.txt", "FiLe.TxT");
 
@@ -60,7 +63,8 @@ public class CaseSensitivityTests {
     /// OS-specific behavior: Windows/macOS → case-insensitive, Linux → case-sensitive.
     /// </summary>
     [TestMethod]
-    public void DefaultCaseSensitivity_ShouldMatchOSRules() {
+    public void DefaultCaseSensitivity_ShouldMatchOSRules()
+    {
         using var env = new TestEnvironment();
         env.CreateFiles("Sample.TXT", "sample.txt");
 
@@ -76,9 +80,11 @@ public class CaseSensitivityTests {
 
         var result = fileQueryEngine.Execute(new(env.Root, options)).ToList();
 
-        if(RuntimeInformation.IsOSPlatform(OSPlatform.Linux)) {
+        if(RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+        {
             TestAssertEx.ContainsSingle(result, x => x.EndsWith("sample.txt", StringComparison.Ordinal));
-        } else {
+        } else
+        {
             // The Windows operating system is not case-sensitive, so both files are identical, and the second operation is to replace the first file.
             TestAssertEx.ContainsSingle(result, x => x.EndsWith("sample.txt", StringComparison.OrdinalIgnoreCase));
         }

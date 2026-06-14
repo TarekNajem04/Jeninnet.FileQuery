@@ -8,12 +8,14 @@
 ///  - ** inside complex rule sets
 /// </summary>
 [TestClass]
-public class EnumerateFilesAsync_RecursiveWildcardTests {
+public class EnumerateFilesAsync_RecursiveWildcardTests
+{
     /// <summary>
     /// Tests that ** matches files at any depth.
     /// </summary>
     [TestMethod]
-    public async Task EnumerateFilesAsync_DoubleStar_ShouldMatchAnyDepthAsync() {
+    public async Task EnumerateFilesAsync_DoubleStar_ShouldMatchAnyDepthAsync()
+    {
         using var env = new TestEnvironment();
 
         env.CreateFiles(
@@ -43,7 +45,8 @@ public class EnumerateFilesAsync_RecursiveWildcardTests {
     /// Tests that ** can appear in the middle of a pattern.
     /// </summary>
     [TestMethod]
-    public async Task EnumerateFilesAsync_DoubleStarInMiddle_ShouldWorkAsync() {
+    public async Task EnumerateFilesAsync_DoubleStarInMiddle_ShouldWorkAsync()
+    {
         using var env = new TestEnvironment();
 
         env.CreateFiles(

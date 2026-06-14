@@ -1,14 +1,16 @@
 ﻿namespace Jeninnet.FileQuery.Tests.Matchers;
 
 [TestClass]
-public class GlobMatcherTests {
+public class GlobMatcherTests
+{
     private static GlobInstructionMatcher CreateMatcher() => new();
     private static ICompiledPatternSet Compile(IEnumerable<string> patterns) => CompiledPatternFactory.Compile(PatternKind.Glob, patterns);
     private static PathMatchContext CreateFileContext(ReadOnlySpan<char> path, CaseSensitivity caseSensitivity = CaseSensitivity.Sensitive) =>
         new(path, PathKind.File, caseSensitivity);
 
     [TestMethod]
-    public void AnchoredMatch_ShouldNotBeUnanchored() {
+    public void AnchoredMatch_ShouldNotBeUnanchored()
+    {
         // Glob is implicitly anchored to the root unless '**/'' is used.
         var matcher = CreateMatcher();
         var patterns = Compile(patterns: ["src/*.cs"]);
@@ -20,7 +22,8 @@ public class GlobMatcherTests {
     }
 
     [TestMethod]
-    public void RecursiveWildcard_ShouldMatchDeeply_WhenAnchoredToRoot() {
+    public void RecursiveWildcard_ShouldMatchDeeply_WhenAnchoredToRoot()
+    {
         // Pattern `**/` at the start provides the unanchored-like behavior
         var matcher = CreateMatcher();
         var patterns = Compile(patterns: ["**/config.json"]);
@@ -31,7 +34,8 @@ public class GlobMatcherTests {
     }
 
     [TestMethod]
-    public void ComplexGlobbing() {
+    public void ComplexGlobbing()
+    {
         var matcher = CreateMatcher();
         var patterns = Compile(patterns: ["data/??.log"]);
 
@@ -41,7 +45,8 @@ public class GlobMatcherTests {
     }
 
     [TestMethod]
-    public void Wildcard_CharacterSet_Digits() {
+    public void Wildcard_CharacterSet_Digits()
+    {
         var matcher = CreateMatcher();
         var patterns = Compile(patterns: ["example.[0-9]"]);
 
@@ -51,7 +56,8 @@ public class GlobMatcherTests {
     }
 
     [TestMethod]
-    public void Wildcard_CharacterSet_Characters() {
+    public void Wildcard_CharacterSet_Characters()
+    {
         var matcher = CreateMatcher();
         var patterns = Compile(patterns: ["example.[abc]"]);
 
@@ -62,7 +68,8 @@ public class GlobMatcherTests {
     }
 
     [TestMethod]
-    public void Wildcard_CharacterSet_Complex_2() {
+    public void Wildcard_CharacterSet_Complex_2()
+    {
         var matcher = CreateMatcher();
         var patterns = Compile(patterns: ["example.[CB]at"]);
 
@@ -73,7 +80,8 @@ public class GlobMatcherTests {
     }
 
     [TestMethod]
-    public void Wildcard_CharacterSet_Negate() {
+    public void Wildcard_CharacterSet_Negate()
+    {
         var matcher = CreateMatcher();
         var patterns = Compile(patterns: ["example.[!0-9]"]);
 
@@ -83,7 +91,8 @@ public class GlobMatcherTests {
     }
 
     [TestMethod]
-    public void Wildcard_CharacterSet_Asterix() {
+    public void Wildcard_CharacterSet_Asterix()
+    {
         var matcher = CreateMatcher();
         var patterns = Compile(patterns: ["example.Law*"]);
 
@@ -101,7 +110,8 @@ public class GlobMatcherTests {
     }
 
     [TestMethod]
-    public void MultiPattern_SecondPatternShouldMatch() {
+    public void MultiPattern_SecondPatternShouldMatch()
+    {
         var matcher = CreateMatcher();
         var patterns = Compile(["src/*.cs", "test/*.cs"]);
         var ctx = CreateFileContext(path: "test/helpers.cs");

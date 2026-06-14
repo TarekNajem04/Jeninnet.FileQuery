@@ -26,10 +26,11 @@
         <File Path="LICENSE" />
         <File Path="README.md" />
         <File Path="SECURITY.md" />
-        <File Path="SUPPORT.md" />
     </Folder>
     <Folder Name="/Solution Items/.github/">
+        <File Path=".github/COMMUNITY_GUIDELINES.md" />
         <File Path=".github/PULL_REQUEST_TEMPLATE.md" />
+        <File Path=".github/SUPPORT.md" />
         <File Path="ROADMAP.md" />
     </Folder>
     <Folder Name="/Solution Items/.github/ISSUE_TEMPLATE/">

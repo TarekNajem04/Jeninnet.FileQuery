@@ -1,9 +1,11 @@
 ﻿namespace Jeninnet.FileQuery.Tests.CommandLine;
 
 [TestClass]
-public sealed class PatternBuilderTests {
+public sealed class PatternBuilderTests
+{
     [TestMethod]
-    public void Build_ShouldReturnDefaultPattern_WhenInputIsEmpty() {
+    public void Build_ShouldReturnDefaultPattern_WhenInputIsEmpty()
+    {
         var result = PatternBuilder.Build();
 
         Assert.HasCount(1, result);
@@ -12,7 +14,8 @@ public sealed class PatternBuilderTests {
     }
 
     [TestMethod]
-    public void Build_ShouldCategorizePatternsCorrectly() {
+    public void Build_ShouldCategorizePatternsCorrectly()
+    {
         const string patterns = "r:.*\\.txt;*.log";
         var result = PatternBuilder.Build(patterns);
 
@@ -21,7 +24,8 @@ public sealed class PatternBuilderTests {
     }
 
     [TestMethod]
-    public void Build_ShouldMergeSameTypePatterns() {
+    public void Build_ShouldMergeSameTypePatterns()
+    {
         var result = PatternBuilder.Build("a.txt;b.txt");
 
         Assert.IsTrue(result.ContainsKey(PatternKind.GitIgnore));
@@ -29,7 +33,8 @@ public sealed class PatternBuilderTests {
     }
 
     [TestMethod]
-    public void Build_ShouldHandleSpecificInputs() {
+    public void Build_ShouldHandleSpecificInputs()
+    {
         var result = PatternBuilder.Build(
             patterns: "a.txt",
             gitignore: "b.txt",
@@ -47,7 +52,8 @@ public sealed class PatternBuilderTests {
     }
 
     [TestMethod]
-    public void Build_ParseResult_ShouldCallParser() {
+    public void Build_ParseResult_ShouldCallParser()
+    {
         var options = new TestOptions();
         var rootCommand = new RootCommand {
             options.Patterns
@@ -60,7 +66,8 @@ public sealed class PatternBuilderTests {
         Assert.AreEqual("p1", parsed[PatternKind.GitIgnore][0]);
     }
 
-    private sealed class TestOptions : CommandLinePatternOptions {
+    private sealed class TestOptions : CommandLinePatternOptions
+    {
         public TestOptions() : base() { }
     }
 }

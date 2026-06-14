@@ -32,7 +32,8 @@
 /// Multiple <c>**</c> within one segment token list are caught here.
 /// </para>
 /// </remarks>
-internal sealed class RecursiveWildcardIsolationInvariant : IPatternInvariant {
+internal sealed class RecursiveWildcardIsolationInvariant : IPatternInvariant
+{
     /// <inheritdoc/>
     public PatternInvariantPhase Phase => PatternInvariantPhase.Semantic;
 
@@ -40,11 +41,14 @@ internal sealed class RecursiveWildcardIsolationInvariant : IPatternInvariant {
     public PatternKind? AppliesTo => null; // applies to all pattern kinds
 
     /// <inheritdoc/>
-    public PatternInvariantResult Validate(PatternCompilationContext context) {
-        foreach(var segment in context.Tokens!) {
+    public PatternInvariantResult Validate(PatternCompilationContext context)
+    {
+        foreach(var segment in context.Tokens!)
+        {
             var recursiveCount = segment.Count(static t => t is RecursiveWildcardToken);
 
-            if(recursiveCount > 1) {
+            if(recursiveCount > 1)
+            {
                 return PatternInvariantResult.Fail(
                     "A single pattern segment must not contain more than one " +
                     "recursive wildcard ('**').");

@@ -12,7 +12,8 @@ namespace Jeninnet.FileQuery.Benchmarks;
 /// for single-kind vs mixed-kind pattern sets.
 /// </summary>
 [MemoryDiagnoser]
-public class PatternPipelineAllocationBenchmark {
+public class PatternPipelineAllocationBenchmark
+{
     private static readonly string[] _gitIgnorePatterns = [
         "**",
         "!*.log",
@@ -40,8 +41,10 @@ public class PatternPipelineAllocationBenchmark {
     /// Mixed set—all three sub-lists are legitimately needed.
     /// </summary>
     [Benchmark]
-    public void Compile_MixedKinds() {
-        var classified = new ClassifiedPatternSet {
+    public void Compile_MixedKinds()
+    {
+        var classified = new ClassifiedPatternSet
+        {
             Patterns = _mixedPatterns.Select(p => new ClassifiedPattern(p, PatternClassifier.Classify(p)))
                                      .ToArray()
         };

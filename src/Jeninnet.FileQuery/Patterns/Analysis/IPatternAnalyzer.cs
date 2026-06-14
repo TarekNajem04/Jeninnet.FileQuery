@@ -13,7 +13,8 @@
 /// It supports GitIgnore‑style syntax, wildcard detection, escaping rules,
 /// and a lightweight check for regex-prefixed patterns (<c>r:</c>).
 /// </remarks>
-internal interface IPatternAnalyzer {
+internal interface IPatternAnalyzer
+{
     /// <summary>
     /// Performs structural analysis of the provided pattern.
     /// </summary>

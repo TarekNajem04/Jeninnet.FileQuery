@@ -23,7 +23,8 @@
 /// never added again, preserving the first occurrence.
 /// </para>
 /// </remarks>
-internal static class PatternsMerger {
+internal static class PatternsMerger
+{
     /// <summary>
     /// Merges the pattern configuration from a <see cref="PatternInput"/> into a
     /// dictionary keyed by <see cref="PatternKind"/>, classifying any untyped patterns.
@@ -60,31 +61,38 @@ internal static class PatternsMerger {
     public static Dictionary<PatternKind, ImmutableArray<string>> Merge(
         IEnumerable<string> patterns,
         IReadOnlyDictionary<PatternKind, IEnumerable<string>> typedPatterns
-    ) {
+    )
+    {
         var mergedPatterns = new Dictionary<PatternKind, List<string>>();
 
         // Seed the dictionary with explicitly typed patterns first.
-        if(typedPatterns is not null) {
-            foreach(var (kind, values) in typedPatterns) {
+        if(typedPatterns is not null)
+        {
+            foreach(var (kind, values) in typedPatterns)
+            {
                 // We copy to a new list to avoid mutating the caller's collection.
-                mergedPatterns[kind] = new List<string>(values);
+                mergedPatterns[kind] = [.. values];
             }
         }
 
-        if(patterns is null) {
+        if(patterns is null)
+        {
             return ToImmutableResult(mergedPatterns);
         }
 
         // Classify and append each untyped pattern.
-        foreach(var rawPattern in patterns) {
+        foreach(var rawPattern in patterns)
+        {
             var kind = PatternClassifier.Classify(rawPattern);
 
-            if(!mergedPatterns.TryGetValue(kind, out var bucket)) {
-                bucket = new List<string>();
+            if(!mergedPatterns.TryGetValue(kind, out var bucket))
+            {
+                bucket = [];
                 mergedPatterns[kind] = bucket;
             }
 
-            if(!bucket.Contains(rawPattern)) {
+            if(!bucket.Contains(rawPattern))
+            {
                 bucket.Add(rawPattern);
             }
         }

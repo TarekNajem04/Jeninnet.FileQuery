@@ -15,7 +15,8 @@
 ///   </item>
 /// </list>
 /// </remarks>
-internal sealed class GitIgnorePatternInvariant : IPatternInvariant {
+internal sealed class GitIgnorePatternInvariant : IPatternInvariant
+{
     /// <inheritdoc/>
     public PatternInvariantPhase Phase => PatternInvariantPhase.Semantic;
 
@@ -23,13 +24,16 @@ internal sealed class GitIgnorePatternInvariant : IPatternInvariant {
     public PatternKind? AppliesTo => PatternKind.GitIgnore;
 
     /// <inheritdoc/>
-    public PatternInvariantResult Validate(PatternCompilationContext context) {
-        if(context.Tokens is null) {
+    public PatternInvariantResult Validate(PatternCompilationContext context)
+    {
+        if(context.Tokens is null)
+        {
             return PatternInvariantResult.Fail("Tokens not initialized.");
         }
 
         // A directory-only pattern (ending with '/') with no segments is invalid.
-        if(context.State.IsDirectoryOnly && context.Tokens.Count == 0) {
+        if(context.State.IsDirectoryOnly && context.Tokens.Count == 0)
+        {
             return PatternInvariantResult.Fail(
                 "Directory-only GitIgnore patterns must contain at least one segment.");
         }
@@ -39,7 +43,8 @@ internal sealed class GitIgnorePatternInvariant : IPatternInvariant {
         // this case produces an empty token list — which is meaningless to match.
         if(context.State.IsRootAnchored &&
             context.Tokens.Count == 1 &&
-            context.Tokens[0].Count == 0) {
+            context.Tokens[0].Count == 0)
+        {
             return PatternInvariantResult.Fail(
                 "A root-anchored GitIgnore pattern must contain at least one segment " +
                 "after the leading '/'. A bare '/' is not a valid pattern.");

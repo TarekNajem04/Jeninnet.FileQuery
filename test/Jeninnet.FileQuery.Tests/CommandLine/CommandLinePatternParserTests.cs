@@ -1,13 +1,16 @@
 ﻿namespace Jeninnet.FileQuery.Tests.CommandLine;
 
 [TestClass]
-public sealed class CommandLinePatternParserTests {
-    private sealed class TestOptions : CommandLinePatternOptions {
+public sealed class CommandLinePatternParserTests
+{
+    private sealed class TestOptions : CommandLinePatternOptions
+    {
         public TestOptions() : base() { }
     }
 
     [TestMethod]
-    public void Parse_ShouldExtractOptionsCorrectly() {
+    public void Parse_ShouldExtractOptionsCorrectly()
+    {
         var options = new TestOptions();
         var rootCommand = new RootCommand {
             options.Patterns,

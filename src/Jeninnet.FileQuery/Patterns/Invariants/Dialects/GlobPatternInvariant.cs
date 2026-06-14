@@ -3,15 +3,19 @@
 /// <summary>
 /// Glob-specific invariants.
 /// </summary>
-internal sealed class GlobPatternInvariant : IPatternInvariant {
+internal sealed class GlobPatternInvariant : IPatternInvariant
+{
     public PatternInvariantPhase Phase => PatternInvariantPhase.Semantic;
     public PatternKind? AppliesTo => PatternKind.Glob;
 
-    public PatternInvariantResult Validate(PatternCompilationContext context) {
+    public PatternInvariantResult Validate(PatternCompilationContext context)
+    {
         // Example: recursive wildcard must be standalone segment.
-        foreach(var segment in context.Tokens ?? []) {
+        foreach(var segment in context.Tokens ?? [])
+        {
             var recursive = segment.Where(token => token is RecursiveWildcardToken).ToList();
-            if(recursive.Count > 0 && segment.Count > 1) {
+            if(recursive.Count > 0 && segment.Count > 1)
+            {
                 return PatternInvariantResult.Fail("In Glob patterns, '**' must appear as a standalone segment.");
             }
         }

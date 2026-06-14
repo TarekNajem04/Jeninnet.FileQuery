@@ -11,7 +11,8 @@
 /// <summary>
 /// Specifies the traversal order for directory enumeration.
 /// </summary>
-public enum TraversalStrategy : byte {
+public enum TraversalStrategy : byte
+{
     /// <summary>
     /// Depth-first traversal (stack-based).
     /// </summary>

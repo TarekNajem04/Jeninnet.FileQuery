@@ -10,7 +10,8 @@
  * - token generation
  */
 [MemoryDiagnoser]
-public class PatternTokenizerBenchmark {
+public class PatternTokenizerBenchmark
+{
     private readonly string[] _patterns =
     [
         "**",
@@ -22,8 +23,10 @@ public class PatternTokenizerBenchmark {
     ];
 
     [Benchmark]
-    public void TokenizePatterns() {
-        foreach(var pattern in _patterns) {
+    public void TokenizePatterns()
+    {
+        foreach(var pattern in _patterns)
+        {
             _ = CompiledPatternFactory.Compile(pattern);
 
             // var compiledPatternSets = CompiledPatternFactory.Compile(pattern)

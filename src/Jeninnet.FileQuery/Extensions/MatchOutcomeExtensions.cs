@@ -4,8 +4,10 @@ namespace Jeninnet.FileQuery.Extensions;
 /// <summary>
 /// Provides extension methods for <see cref="MatchOutcome"/> to simplify rule evaluation.
 /// </summary>
-internal static class MatchOutcomeExtensions {
-    extension(MatchOutcome result) {
+internal static class MatchOutcomeExtensions
+{
+    extension(MatchOutcome result)
+    {
         /// <summary>
         /// Determines if the <see cref="MatchOutcome"/> represents a successful match that should be included.
         /// </summary>

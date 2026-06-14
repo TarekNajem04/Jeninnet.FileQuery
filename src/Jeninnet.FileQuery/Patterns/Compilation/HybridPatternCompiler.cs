@@ -8,7 +8,8 @@
 /// It is intended for scenarios where patterns may use different syntaxes or conventions, and supports CLI-style semicolon-separated pattern lists.
 /// This type is internal and not intended for direct use outside of pattern matching infrastructure.
 /// </remarks>
-internal sealed class HybridPatternCompiler {
+internal sealed class HybridPatternCompiler
+{
     private readonly IPatternCompiler _git;
     private readonly IPatternCompiler _glob;
     private readonly IPatternCompiler _regex;
@@ -17,14 +18,16 @@ internal sealed class HybridPatternCompiler {
         IPatternCompiler git,
         IPatternCompiler glob,
         IPatternCompiler regex
-    ) {
+    )
+    {
         _git = git;
         _glob = glob;
         _regex = regex;
     }
 
     public IPatternCompiler Select(ClassifiedPattern pattern) =>
-        pattern.Type switch {
+        pattern.Type switch
+        {
             PatternKind.Glob => _glob,
             PatternKind.Regex => _regex,
             _ => _git

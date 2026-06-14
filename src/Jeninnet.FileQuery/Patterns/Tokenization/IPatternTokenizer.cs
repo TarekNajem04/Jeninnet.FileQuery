@@ -14,7 +14,8 @@
 /// without modifying the central scanner logic.
 /// </para>
 /// </remarks>
-internal interface IPatternTokenizer {
+internal interface IPatternTokenizer
+{
     /// <summary>
     /// Attempts to tokenize input starting at <paramref name="index"/>.
     /// </summary>

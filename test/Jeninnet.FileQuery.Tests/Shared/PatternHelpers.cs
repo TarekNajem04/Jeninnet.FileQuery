@@ -8,7 +8,8 @@
 /// such as configuration or pattern matching operations.
 /// All members are static and thread-safe.
 /// </remarks>
-public static class PatternHelpers {
+public static class PatternHelpers
+{
     /// <summary>
     /// Creates a read-only dictionary that maps the specified pattern type to a read-only list of pattern strings.
     /// </summary>
@@ -19,7 +20,8 @@ public static class PatternHelpers {
     public static IReadOnlyDictionary<PatternKind, IEnumerable<string>> Create(
         PatternKind patternKind,
         params string[] patterns
-    ) => new Dictionary<PatternKind, IEnumerable<string>> {
+    ) => new Dictionary<PatternKind, IEnumerable<string>>
+    {
         [patternKind] = patterns.Where(p => !string.IsNullOrWhiteSpace(p))
     };
 }

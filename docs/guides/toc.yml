@@ -2,3 +2,5 @@
   href: cli-usage.md
 - name: Dependency Injection
   href: dependency-injection.md
+- name: Observability and Diagnostics
+  href: observability-and-diagnostics.md

@@ -5,7 +5,8 @@
 /// on the async file enumeration process.
 /// </summary>
 [TestClass]
-public class FileQueryEngineOptionTests {
+public class FileQueryEngineOptionTests
+{
     // The TestContext is necessary for CancellationToken access and required by MSTest.
     public TestContext TestContext { get; set; } = null!;
 
@@ -15,7 +16,8 @@ public class FileQueryEngineOptionTests {
     /// Ensures enumeration stops at the root directory when RecurseSubdirectories is false.
     /// </summary>
     [TestMethod]
-    public async Task EnumerateFilesAsync_HonorsRecurseSubdirectoriesFalseAsync() {
+    public async Task EnumerateFilesAsync_HonorsRecurseSubdirectoriesFalseAsync()
+    {
         // ARRANGE: Setup isolated environment with depth 2
         using var env = new TestEnvironment();
         env.CreateFile("file_root.txt");
@@ -53,7 +55,8 @@ public class FileQueryEngineOptionTests {
     /// Depth 0 = only root files. Depth 1 = root files and files in direct subdirectories.
     /// </summary>
     [TestMethod]
-    public async Task EnumerateFilesAsync_HonorsMaxRecursionDepthAsync() {
+    public async Task EnumerateFilesAsync_HonorsMaxRecursionDepthAsync()
+    {
         // ARRANGE: Setup isolated environment with files at depth 0, 1, and 2
         using var env = new TestEnvironment();
         env.CreateFile("file_depth0.txt");
@@ -90,7 +93,8 @@ public class FileQueryEngineOptionTests {
     /// Ensures pattern matching honors case sensitivity when IgnoreCase is explicitly set to false.
     /// </summary>
     [TestMethod]
-    public async Task EnumerateFilesAsync_HonorsIgnoreCaseFalseAsync() {
+    public async Task EnumerateFilesAsync_HonorsIgnoreCaseFalseAsync()
+    {
         // ARRANGE: Setup isolated environment with mixed-case files
         using var env = new TestEnvironment();
         env.CreateFile("TeStFiLe.tXt");

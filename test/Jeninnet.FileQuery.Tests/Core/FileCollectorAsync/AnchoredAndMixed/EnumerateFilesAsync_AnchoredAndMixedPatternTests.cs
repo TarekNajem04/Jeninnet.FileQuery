@@ -7,12 +7,14 @@
 ///   - Multi-token directory/file name patterns
 /// </summary>
 [TestClass]
-public class EnumerateFilesAsync_AnchoredAndMixedPatternTests {
+public class EnumerateFilesAsync_AnchoredAndMixedPatternTests
+{
     /// <summary>
     /// Checks anchored patterns — those starting with '/' should only match from root.
     /// </summary>
     [TestMethod]
-    public async Task EnumerateFilesAsync_AnchoredPattern_ShouldOnlyMatchAtRootAsync() {
+    public async Task EnumerateFilesAsync_AnchoredPattern_ShouldOnlyMatchAtRootAsync()
+    {
         using var env = new TestEnvironment();
         env.CreateFiles(
             "root.txt",
@@ -34,15 +36,16 @@ public class EnumerateFilesAsync_AnchoredAndMixedPatternTests {
                                            .ToListAsync(TestContext.CancellationToken);
 
         // Must include only root.txt at top-level
-        TestAssertEx.ContainsSingle(results, x => x.EndsWith("root.txt"));
-        TestAssertEx.DoesNotContain(results, x => x.Contains("sub/root.txt"));
+        TestAssertEx.ContainsSingle(results, x => x.EndsWith("root.txt", StringComparison.Ordinal));
+        TestAssertEx.DoesNotContain(results, x => x.Contains("sub/root.txt", StringComparison.Ordinal));
     }
 
     /// <summary>
     /// Tests a complex mixed-token pattern.
     /// </summary>
     [TestMethod]
-    public async Task EnumerateFilesAsync_MixedTokens_ShouldMatchCorrectlyAsync() {
+    public async Task EnumerateFilesAsync_MixedTokens_ShouldMatchCorrectlyAsync()
+    {
         using var env = new TestEnvironment();
 
         env.CreateFiles(
@@ -67,18 +70,19 @@ public class EnumerateFilesAsync_AnchoredAndMixedPatternTests {
         var results = await fileQueryEngine.ExecuteAsync(new(env.Root, options), TestContext.CancellationToken)
                                            .ToListAsync(TestContext.CancellationToken);
         TestAssertEx.HasCount(results, 3);
-        TestAssertEx.Contains(results, x => x.Contains("abc1"));
-        TestAssertEx.Contains(results, x => x.Contains("abc9"));
-        TestAssertEx.Contains(results, x => x.Contains("axcZZ"));
-        TestAssertEx.DoesNotContain(results, x => x.Contains("axxc12"));
-        TestAssertEx.DoesNotContain(results, x => x.EndsWith("not.txt"));
+        TestAssertEx.Contains(results, x => x.Contains("abc1", StringComparison.Ordinal));
+        TestAssertEx.Contains(results, x => x.Contains("abc9", StringComparison.Ordinal));
+        TestAssertEx.Contains(results, x => x.Contains("axcZZ", StringComparison.Ordinal));
+        TestAssertEx.DoesNotContain(results, x => x.Contains("axxc12", StringComparison.Ordinal));
+        TestAssertEx.DoesNotContain(results, x => x.EndsWith("not.txt", StringComparison.Ordinal));
     }
 
     /// <summary>
     /// Ensures anchored + wildcard paths behave correctly.
     /// </summary>
     [TestMethod]
-    public async Task EnumerateFilesAsync_AnchoredWildcard_ShouldBehaveAsync() {
+    public async Task EnumerateFilesAsync_AnchoredWildcard_ShouldBehaveAsync()
+    {
         using var env = new TestEnvironment();
 
         env.CreateFiles(
@@ -99,7 +103,7 @@ public class EnumerateFilesAsync_AnchoredAndMixedPatternTests {
         var results = await fileQueryEngine.ExecuteAsync(new(env.Root, options), TestContext.CancellationToken)
                                            .ToListAsync(TestContext.CancellationToken);
         var expected = Path.Combine("top", "file.txt");
-        TestAssertEx.ContainsSingle(results, x => x.EndsWith(expected));
+        TestAssertEx.ContainsSingle(results, x => x.EndsWith(expected, StringComparison.Ordinal));
     }
 
     public TestContext TestContext { get; set; } = null!;

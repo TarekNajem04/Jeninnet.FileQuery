@@ -3,6 +3,9 @@
 /// <summary>
 /// Internal immutable projection of pattern and matching-related settings.
 /// </summary>
+/// <param name="TypedPatterns">The typed patterns collection.</param>
+/// <param name="MatchingMode">The matching mode.</param>
+/// <param name="CaseSensitivity">The case sensitivity setting.</param>
 /// <remarks>
 /// <para>
 /// <strong>TypedPatterns key type change (v1.0):</strong>

@@ -1,9 +1,11 @@
 ﻿namespace Jeninnet.FileQuery.Tests.Patterns;
 
 [TestClass]
-public sealed class PatternClassifierTests {
+public sealed class PatternClassifierTests
+{
     [TestMethod]
-    public void Classify_ShouldHandleAllBranches() {
+    public void Classify_ShouldHandleAllBranches()
+    {
         // Unknown (Malformed)
         Assert.AreEqual(PatternKind.Unknown, PatternClassifier.Classify("[a-z"));
 

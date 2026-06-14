@@ -16,10 +16,12 @@
 /// pipeline, and all invariants are applied through <see cref="PatternCompilerBase"/>.
 /// </para>
 /// </remarks>
-internal sealed class GlobPatternCompiler : PatternCompilerBase {
+internal sealed class GlobPatternCompiler : PatternCompilerBase
+{
     public override PatternKind PatternKind => PatternKind.Glob;
 
-    protected override ICompiledPattern CompileCore(PatternCompilationContext context) {
+    protected override ICompiledPattern CompileCore(PatternCompilationContext context)
+    {
         var state = context.State!;
         var tokens = context.Tokens!;
 
@@ -29,7 +31,9 @@ internal sealed class GlobPatternCompiler : PatternCompilerBase {
             anchoredToRoot: state.IsRootAnchored,
             segments: tokens,
             patternKind: PatternKind.Glob,
-            CompiledMatchIntent.FromNegation(state.IsNegated)
+            CompiledMatchIntent.FromNegation(state.IsNegated),
+            context.Pattern.Text,
+            context.Pattern.SourceIndex
         );
     }
 }

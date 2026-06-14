@@ -16,7 +16,8 @@
 /// Empty entries are removed automatically.
 /// </para>
 /// </summary>
-public static class PatternSplitter {
+public static class PatternSplitter
+{
     /// <summary>
     /// The default character used to separate multiple patterns in a string.
     /// </summary>
@@ -36,7 +37,8 @@ public static class PatternSplitter {
     public static IEnumerable<string> Split(
         string input,
         char separator = DEFAULT_PATTERN_SEPARATOR
-    ) {
+    )
+    {
         ArgumentException.ThrowIfNullOrEmpty(input);
 
         return input.Split(separator, StringSplitOptions.RemoveEmptyEntries)
@@ -59,7 +61,8 @@ public static class PatternSplitter {
     public static IEnumerable<string> Split(
         string input,
         params char[] separators
-    ) {
+    )
+    {
         ArgumentException.ThrowIfNullOrEmpty(input);
         ArgumentNullException.ThrowIfNull(separators);
 

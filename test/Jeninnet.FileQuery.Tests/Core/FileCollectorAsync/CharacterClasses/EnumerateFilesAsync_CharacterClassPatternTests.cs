@@ -1,4 +1,5 @@
-﻿namespace Jeninnet.FileQuery.Tests.Core.FileCollectorAsync.CharacterClasses;
+﻿using System;
+namespace Jeninnet.FileQuery.Tests.Core.FileCollectorAsync.CharacterClasses;
 
 /// <summary>
 /// Async tests covering character-class patterns such as:
@@ -8,12 +9,14 @@
 /// These are important because glob engines vary widely in how they handle brackets.
 /// </summary>
 [TestClass]
-public class EnumerateFilesAsync_CharacterClassPatternTests {
+public class EnumerateFilesAsync_CharacterClassPatternTests
+{
     /// <summary>
     /// Validates simple character class matching.
     /// </summary>
     [TestMethod]
-    public async Task EnumerateFilesAsync_CharacterClass_ShouldMatchSpecificLettersAsync() {
+    public async Task EnumerateFilesAsync_CharacterClass_ShouldMatchSpecificLettersAsync()
+    {
         using var env = new TestEnvironment();
         env.CreateFiles("a.txt", "b.txt", "c.txt", "d.txt");
 
@@ -31,17 +34,18 @@ public class EnumerateFilesAsync_CharacterClassPatternTests {
                                            .ToListAsync(TestContext.CancellationToken);
 
         TestAssertEx.HasCount(results, 3);
-        TestAssertEx.Contains(results, x => x.EndsWith("a.txt"));
-        TestAssertEx.Contains(results, x => x.EndsWith("b.txt"));
-        TestAssertEx.Contains(results, x => x.EndsWith("c.txt"));
-        TestAssertEx.DoesNotContain(results, x => x.EndsWith("d.txt"));
+        TestAssertEx.Contains(results, x => x.EndsWith("a.txt", StringComparison.Ordinal));
+        TestAssertEx.Contains(results, x => x.EndsWith("b.txt", StringComparison.Ordinal));
+        TestAssertEx.Contains(results, x => x.EndsWith("c.txt", StringComparison.Ordinal));
+        TestAssertEx.DoesNotContain(results, x => x.EndsWith("d.txt", StringComparison.Ordinal));
     }
 
     /// <summary>
     /// Tests range classes such as [a-c].
     /// </summary>
     [TestMethod]
-    public async Task EnumerateFilesAsync_CharacterRange_ShouldMatchRangeAsync() {
+    public async Task EnumerateFilesAsync_CharacterRange_ShouldMatchRangeAsync()
+    {
         using var env = new TestEnvironment();
         env.CreateFiles("a.log", "b.log", "c.log", "d.log");
 
@@ -65,7 +69,8 @@ public class EnumerateFilesAsync_CharacterClassPatternTests {
     /// Ensures vowel-prefixed .txt files are excluded using GitIgnore negation.
     /// </summary>
     [TestMethod]
-    public async Task EnumerateFilesAsync_NegatedClass_ShouldExcludeAsync() {
+    public async Task EnumerateFilesAsync_NegatedClass_ShouldExcludeAsync()
+    {
         using var env = new TestEnvironment();
         env.CreateFiles("apple.txt", "banana.txt", "cherry.txt");
 
@@ -82,9 +87,9 @@ public class EnumerateFilesAsync_CharacterClassPatternTests {
         var results = await fileQueryEngine.ExecuteAsync(new(env.Root, options), TestContext.CancellationToken)
                                            .ToListAsync(TestContext.CancellationToken);
 
-        TestAssertEx.DoesNotContain(results, x => x.EndsWith("apple.txt"));
-        TestAssertEx.Contains(results, x => x.EndsWith("banana.txt"));
-        TestAssertEx.Contains(results, x => x.EndsWith("cherry.txt"));
+        TestAssertEx.DoesNotContain(results, x => x.EndsWith("apple.txt", StringComparison.Ordinal));
+        TestAssertEx.Contains(results, x => x.EndsWith("banana.txt", StringComparison.Ordinal));
+        TestAssertEx.Contains(results, x => x.EndsWith("cherry.txt", StringComparison.Ordinal));
     }
 
     public TestContext TestContext { get; set; } = null!;

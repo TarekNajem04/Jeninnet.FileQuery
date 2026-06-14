@@ -7,7 +7,8 @@
 /// This is a value object, not a flag set.
 /// Invalid combinations are unrepresentable.
 /// </remarks>
-public sealed record PatternSyntaxProfile {
+public sealed record PatternSyntaxProfile
+{
     public bool SupportsRecursiveWildcard { get; init; }
     public bool ImplicitRecursiveWildcard { get; init; }
     public bool SupportsCharacterClasses { get; init; }
@@ -19,7 +20,8 @@ public sealed record PatternSyntaxProfile {
 
     public bool IsRegularExpression { get; init; }
 
-    public static PatternSyntaxProfile GitIgnore { get; } = new() {
+    public static PatternSyntaxProfile GitIgnore { get; } = new()
+    {
         SupportsRecursiveWildcard = true,
         ImplicitRecursiveWildcard = true,
         SupportsCharacterClasses = true,
@@ -31,7 +33,8 @@ public sealed record PatternSyntaxProfile {
         IsRegularExpression = false
     };
 
-    public static PatternSyntaxProfile Glob { get; } = new() {
+    public static PatternSyntaxProfile Glob { get; } = new()
+    {
         SupportsRecursiveWildcard = true,
         ImplicitRecursiveWildcard = false,
         SupportsCharacterClasses = true,
@@ -43,7 +46,8 @@ public sealed record PatternSyntaxProfile {
         IsRegularExpression = false
     };
 
-    public static PatternSyntaxProfile Regex { get; } = new() {
+    public static PatternSyntaxProfile Regex { get; } = new()
+    {
         SupportsRecursiveWildcard = false,
         ImplicitRecursiveWildcard = false,
         SupportsCharacterClasses = false,
@@ -55,7 +59,8 @@ public sealed record PatternSyntaxProfile {
         IsRegularExpression = true
     };
 
-    public static PatternSyntaxProfile Default { get; } = new() {
+    public static PatternSyntaxProfile Default { get; } = new()
+    {
         SupportsRecursiveWildcard = true,
         ImplicitRecursiveWildcard = true,
         SupportsCharacterClasses = true,
@@ -68,7 +73,8 @@ public sealed record PatternSyntaxProfile {
     };
 
     public static PatternSyntaxProfile GetProfileForPatternType(PatternKind type) =>
-        type switch {
+        type switch
+        {
             PatternKind.GitIgnore => GitIgnore,
             PatternKind.Glob => Glob,
             PatternKind.Regex => Regex,

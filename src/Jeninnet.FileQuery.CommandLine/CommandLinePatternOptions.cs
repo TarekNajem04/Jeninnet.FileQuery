@@ -3,7 +3,8 @@
 /// <summary>
 /// Defines the command-line options used to specify file matching patterns.
 /// </summary>
-public class CommandLinePatternOptions {
+public class CommandLinePatternOptions
+{
     private const string OPTION_NAME_PATTERNS = "--patterns";
     private const string OPTION_NAME_GITIGNORE_PATTERNS = "--gitignore";
     private const string OPTION_NAME_GLOB_PATTERNS = "--glob";
@@ -32,8 +33,10 @@ public class CommandLinePatternOptions {
     /// <summary>
     /// Initializes a new instance of the <see cref="CommandLinePatternOptions"/> class.
     /// </summary>
-    protected CommandLinePatternOptions() {
-        Patterns = new Option<string?>(OPTION_NAME_PATTERNS, "-p") {
+    protected CommandLinePatternOptions()
+    {
+        Patterns = new Option<string?>(OPTION_NAME_PATTERNS, "-p")
+        {
             Required = false,
             Description =
             """
@@ -46,21 +49,24 @@ public class CommandLinePatternOptions {
             Arity = ArgumentArity.ZeroOrOne
         };
 
-        Gitignore = new Option<string?>(OPTION_NAME_GITIGNORE_PATTERNS) {
+        Gitignore = new Option<string?>(OPTION_NAME_GITIGNORE_PATTERNS)
+        {
             Required = false,
             Description = "Exclude patterns written in GitIgnore syntax.",
             DefaultValueFactory = _ => default,
             Arity = ArgumentArity.ZeroOrOne
         };
 
-        Glob = new Option<string?>(OPTION_NAME_GLOB_PATTERNS) {
+        Glob = new Option<string?>(OPTION_NAME_GLOB_PATTERNS)
+        {
             Required = false,
             Description = "Exclude patterns written in glob syntax.",
             DefaultValueFactory = _ => default,
             Arity = ArgumentArity.ZeroOrOne
         };
 
-        RegularExpression = new Option<string?>(OPTION_NAME_FLAT_PATTERNS) {
+        RegularExpression = new Option<string?>(OPTION_NAME_FLAT_PATTERNS)
+        {
             Required = false,
             Description = "Exclude patterns written as regular expressions.",
             DefaultValueFactory = _ => default,

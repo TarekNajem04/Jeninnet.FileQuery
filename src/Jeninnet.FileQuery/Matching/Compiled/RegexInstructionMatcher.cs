@@ -28,10 +28,13 @@
 /// <see cref="Regex"/>.
 /// </para>
 /// </remarks>
-internal sealed class RegexInstructionMatcher : PathMatcher {
+internal sealed class RegexInstructionMatcher : PathMatcher
+{
     /// <summary>
     /// Composite key used to cache compiled <see cref="Regex"/> instances.
     /// </summary>
+    /// <param name="Pattern">The regex pattern text.</param>
+    /// <param name="CaseSensitivity">The case sensitivity setting.</param>
     private readonly record struct RegexCacheKey(
         string Pattern,
         CaseSensitivity CaseSensitivity
@@ -56,26 +59,33 @@ internal sealed class RegexInstructionMatcher : PathMatcher {
         patternKind is PatternKind.Regex;
 
     /// <inheritdoc/>
+    /// <param name="patterns">The set of compiled patterns to match.</param>
+    /// <param name="context">The path context containing path information and options.</param>
     protected override MatchResult MatchCore(
         ICompiledPatternSet patterns,
         PathMatchContext context
-    ) {
-        if(context.Path.IsEmpty) {
+    )
+    {
+        if(context.Path.IsEmpty)
+        {
             return MatchResult.Fail();
         }
 
-        if(patterns.Count == 0) {
+        if(patterns.Count == 0)
+        {
             return MatchResult.Success();
         }
 
         // INDEX-BASED LOOP — avoids boxing a heap-allocated IEnumerator<ICompiledPattern>
         // that a foreach over the ICompiledPatternSet interface would create (~40 B per call).
         // Benchmarks confirmed 40 B allocated before this fix; target is 0 B.
-        for(var i = 0; i < patterns.Count; i++) {
+        for(var i = 0; i < patterns.Count; i++)
+        {
             var pattern = patterns[i];
             var regexText = GetRegularExpressionText(pattern);
 
-            if(regexText is null) {
+            if(regexText is null)
+            {
                 // Pattern did not contain a valid RegularExpressionToken — skip.
                 return MatchResult.Fail();
             }
@@ -83,7 +93,8 @@ internal sealed class RegexInstructionMatcher : PathMatcher {
             var regex = GetOrCreateRegex(regexText, context.CaseSensitivity);
 
             // Full-path match: the entire normalized path must satisfy the expression.
-            if(regex.IsMatch(context.Path)) {
+            if(regex.IsMatch(context.Path))
+            {
                 return MatchResult.Success();
             }
         }
@@ -101,13 +112,16 @@ internal sealed class RegexInstructionMatcher : PathMatcher {
     /// <param name="caseSensitivity">
     /// Determines whether <see cref="RegexOptions.IgnoreCase"/> is applied.
     /// </param>
-    private Regex GetOrCreateRegex(string patternText, CaseSensitivity caseSensitivity) {
+    private Regex GetOrCreateRegex(string patternText, CaseSensitivity caseSensitivity)
+    {
         var key = new RegexCacheKey(patternText, caseSensitivity);
 
-        return _regexCache.GetOrAdd(key, static k => {
+        return _regexCache.GetOrAdd(key, static k =>
+        {
             var options = RegexOptions.Compiled | RegexOptions.CultureInvariant;
 
-            if(k.CaseSensitivity is CaseSensitivity.Insensitive) {
+            if(k.CaseSensitivity is CaseSensitivity.Insensitive)
+            {
                 options |= RegexOptions.IgnoreCase;
             }
 
@@ -121,12 +135,15 @@ internal sealed class RegexInstructionMatcher : PathMatcher {
     /// Extracts the raw regular expression text from the first token of the
     /// first segment of <paramref name="pattern"/>.
     /// </summary>
+    /// <param name="pattern">The compiled pattern to extract the regex from.</param>
     /// <returns>
     /// The expression string, or <see langword="null"/> when the pattern does
     /// not contain a <see cref="RegularExpressionToken"/>.
     /// </returns>
-    private static string? GetRegularExpressionText(ICompiledPattern pattern) {
-        if(pattern.Segments is not [var firstSegment, ..]) {
+    private static string? GetRegularExpressionText(ICompiledPattern pattern)
+    {
+        if(pattern.Segments is not [var firstSegment, ..])
+        {
             return null;
         }
 

@@ -52,7 +52,8 @@
 /// );
 /// </code>
 /// </example>
-public sealed record PatternInput {
+public sealed record PatternInput
+{
     // ------------------------------------------------------------------
     // Shared empty instances — avoid repeated allocation of empty
     // collections when the default constructor is used.
@@ -114,7 +115,8 @@ public sealed record PatternInput {
         IEnumerable<string>? patterns = null,
         IReadOnlyDictionary<PatternKind, IEnumerable<string>>? typedPatterns = null,
         PatternInterpretationMode interpretationMode = PatternInterpretationMode.Hybrid
-    ) {
+    )
+    {
         Patterns = patterns is null
             ? _emptyPatterns
             : patterns.Where(static p => p is not null).ToList().AsReadOnly();
@@ -132,17 +134,21 @@ public sealed record PatternInput {
     /// </summary>
     /// <param name="source">The source dictionary of typed patterns.</param>
     /// <returns>A dictionary containing processed, read-only lists of patterns.</returns>
-    private static Dictionary<PatternKind, IReadOnlyList<string>> BuildTypedPatterns(IReadOnlyDictionary<PatternKind, IEnumerable<string>> source) {
+    private static Dictionary<PatternKind, IReadOnlyList<string>> BuildTypedPatterns(IReadOnlyDictionary<PatternKind, IEnumerable<string>> source)
+    {
         var result = new Dictionary<PatternKind, IReadOnlyList<string>>(source.Count);
 
-        foreach(var (kind, values) in source) {
-            if(values is null) {
+        foreach(var (kind, values) in source)
+        {
+            if(values is null)
+            {
                 continue;
             }
 
             var list = values.Where(static p => p is not null).ToList();
 
-            if(list.Count > 0) {
+            if(list.Count > 0)
+            {
                 result[kind] = list.AsReadOnly();
             }
         }

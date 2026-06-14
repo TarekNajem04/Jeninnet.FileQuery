@@ -1,11 +1,8 @@
-﻿# Jeninnet.FileQuery
+# Jeninnet.FileQuery
 
 ![GitHub Actions CI Workflow Status](https://img.shields.io/github/actions/workflow/status/TarekNajem04/Jeninnet.FileQuery/ci.yml)
-![GitHub Tag](https://img.shields.io/github/v/tag/TarekNajem04/Jeninnet.FileQuery)
+![GitHub release](https://img.shields.io/github/v/release/TarekNajem04/Jeninnet.FileQuery)
 ![GitHub contributors](https://img.shields.io/github/contributors/TarekNajem04/Jeninnet.FileQuery)
-![GitHub forks](https://img.shields.io/github/forks/TarekNajem04/Jeninnet.FileQuery)
-![GitHub last commit](https://img.shields.io/github/last-commit/TarekNajem04/Jeninnet.FileQuery)
-![GitHub Issues or Pull Requests](https://img.shields.io/github/issues-closed/tareknajem04/Jeninnet.FileQuery)
 [![GitHub stars](https://img.shields.io/github/stars/TarekNajem04/Jeninnet.FileQuery)](https://github.com/TarekNajem04/Jeninnet.FileQuery/stargazers)
 [![GitHub license](https://img.shields.io/github/license/TarekNajem04/Jeninnet.FileQuery)](https://github.com/TarekNajem04/Jeninnet.FileQuery/blob/main/LICENSE)
 

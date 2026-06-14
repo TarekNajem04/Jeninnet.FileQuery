@@ -5,13 +5,15 @@
  *  Evaluate performance of Regex rule evaluation.
  */
 [MemoryDiagnoser]
-public class RegexMatcherBenchmark {
+public class RegexMatcherBenchmark
+{
     private RegexInstructionMatcher _matcher = default!;
     private ICompiledPatternSet _patterns = default!;
     private readonly string _path = "test_file_123.log";
 
     [GlobalSetup]
-    public void Setup() {
+    public void Setup()
+    {
         _matcher = CreateMatcher();
         _patterns = Compile(
             patterns: [
@@ -21,7 +23,8 @@ public class RegexMatcherBenchmark {
     }
 
     [Benchmark]
-    public bool Match() {
+    public bool Match()
+    {
         var matchOutcome = _matcher.Match(_patterns, CreateFileContext(path: _path));
 
         return matchOutcome is MatchOutcome.Include;

@@ -1,9 +1,11 @@
 ﻿namespace Jeninnet.FileQuery.Tests;
 
 [TestClass]
-public sealed class DefaultEngineBuilderTests {
+public sealed class DefaultEngineBuilderTests
+{
     [TestMethod]
-    public void Create_ShouldReturnWorkingEngine() {
+    public void Create_ShouldReturnWorkingEngine()
+    {
         using var env = new TestEnvironment();
 
         env.CreateFiles("a.txt", "b.txt", "c.log", "sub/d.txt");

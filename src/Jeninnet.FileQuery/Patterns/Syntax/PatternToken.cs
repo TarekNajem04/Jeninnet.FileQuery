@@ -26,7 +26,8 @@ internal abstract record PatternToken : IPatternToken;
 /// and escape-resolved by the time they reach the matcher.
 /// </remarks>
 /// <param name="Text">The literal text. Compared using the active <see cref="StringComparison"/> mode.</param>
-internal sealed record LiteralToken(string Text) : PatternToken {
+internal sealed record LiteralToken(string Text) : PatternToken
+{
     /// <inheritdoc/>
     public override string ToString() => $"Literal({Text})";
 }
@@ -43,7 +44,8 @@ internal sealed record LiteralToken(string Text) : PatternToken {
 /// directory separator <c>'/'</c>. Does not match zero characters when
 /// bounded by other tokens (standard backtracking applies).
 /// </remarks>
-internal sealed record WildcardToken : PatternToken {
+internal sealed record WildcardToken : PatternToken
+{
     /// <inheritdoc/>
     public override string ToString() => "*";
 }
@@ -61,7 +63,8 @@ internal sealed record WildcardToken : PatternToken {
 /// such as <c>foo**</c> are rejected by
 /// <see cref="GlobPatternInvariant"/>.
 /// </remarks>
-internal sealed record RecursiveWildcardToken : PatternToken {
+internal sealed record RecursiveWildcardToken : PatternToken
+{
     /// <inheritdoc/>
     public override string ToString() => "**";
 }
@@ -77,7 +80,8 @@ internal sealed record RecursiveWildcardToken : PatternToken {
 /// Matches exactly one character that is <strong>not</strong> the directory
 /// separator <c>'/'</c>.
 /// </remarks>
-internal sealed record SingleCharToken : PatternToken {
+internal sealed record SingleCharToken : PatternToken
+{
     /// <inheritdoc/>
     public override string ToString() => "?";
 }
@@ -107,9 +111,11 @@ internal sealed record SingleCharToken : PatternToken {
 /// </para>
 /// </remarks>
 /// <param name="Value">The parsed character class AST.</param>
-internal sealed record CharacterClassToken(CharacterClass Value) : PatternToken {
+internal sealed record CharacterClassToken(CharacterClass Value) : PatternToken
+{
     /// <inheritdoc/>
-    public override string ToString() {
+    public override string ToString()
+    {
         var neg = Value.IsNegated ? "!" : "";
         return $"[{neg}…]";
     }
@@ -123,7 +129,8 @@ internal sealed record CharacterClassToken(CharacterClass Value) : PatternToken 
 /// Represents a regular expression pattern (prefixed with <c>r:</c>).
 /// </summary>
 /// <param name="Pattern">The raw regular expression string without the <c>r:</c> prefix.</param>
-internal sealed record RegularExpressionToken(string Pattern) : PatternToken {
+internal sealed record RegularExpressionToken(string Pattern) : PatternToken
+{
     /// <inheritdoc/>
     public override string ToString() => Pattern;
 }
@@ -140,7 +147,8 @@ internal sealed record RegularExpressionToken(string Pattern) : PatternToken {
 /// <c>'*'</c>, <c>'?'</c>, <c>'!'</c>, <c>'#'</c>, <c>'['</c>, <c>']'</c>, <c>'\'</c>.
 /// </remarks>
 /// <param name="Escaped">The character whose special meaning has been suppressed.</param>
-internal sealed record EscapeToken(char Escaped) : PatternToken {
+internal sealed record EscapeToken(char Escaped) : PatternToken
+{
     /// <inheritdoc/>
     public override string ToString() => Escaped.ToString();
 }

@@ -3,6 +3,8 @@
 /// <summary>
 /// Immutable descriptor representing a file query definition.
 /// </summary>
+/// <param name="rootPath">The root directory of the query.</param>
+/// <param name="options">The configuration options.</param>
 /// <remarks>
 /// <para>
 /// A <see cref="FileQuery"/> describes WHAT should be queried:
@@ -15,7 +17,8 @@
 /// Execution is delegated to <see cref="IFileQueryEngine"/>.
 /// </para>
 /// </remarks>
-public sealed class FileQuery(string rootPath, FileQueryOptions options) {
+public sealed class FileQuery(string rootPath, FileQueryOptions options)
+{
     /// <summary>
     /// Gets the root directory from which the file query begins.
     /// </summary>
@@ -37,5 +40,7 @@ public sealed class FileQuery(string rootPath, FileQueryOptions options) {
     /// Creates a <see cref="FileQuery"/> without validating that the root path exists.
     /// Intended for unit tests only.
     /// </summary>
+    /// <param name="rootPath">The root directory path.</param>
+    /// <param name="options">The query configuration options.</param>
     internal static FileQuery CreateUnsafe(string rootPath, FileQueryOptions options) => new(rootPath, options);
 }

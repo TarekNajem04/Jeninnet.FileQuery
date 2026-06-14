@@ -1,25 +1,31 @@
 ﻿namespace Jeninnet.FileQuery.Tests.Core.FileCollectorSync;
 
 [TestClass]
-public class FileQueryEngineSyncTests_Additional {
+public class FileQueryEngineSyncTests_Additional
+{
 
     /// <summary>
     /// Creates a temporary directory with the given subpaths and returns its path.
     /// Used to simplify test setup.
     /// </summary>
-    private static string CreateTree(Dictionary<string, string?> files) {
+    /// <param name="files">A dictionary mapping file paths to their content, or null for directories.</param>
+    private static string CreateTree(Dictionary<string, string?> files)
+    {
         var root = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
         Directory.CreateDirectory(root);
 
-        foreach(var pair in files) {
+        foreach(var pair in files)
+        {
             var full = Path.Combine(root, pair.Key);
 
             var dir = Path.GetDirectoryName(full)!;
             Directory.CreateDirectory(dir);
 
-            if(pair.Value is not null) {
+            if(pair.Value is not null)
+            {
                 File.WriteAllText(full, pair.Value);
-            } else {
+            } else
+            {
                 Directory.CreateDirectory(full);
             }
         }
@@ -32,8 +38,10 @@ public class FileQueryEngineSyncTests_Additional {
     /// FileQueryEngine must allow files *inside* matched directories to pass through.
     /// </summary>
     [TestMethod]
-    public void DirectoryPattern_ShouldMatchDirectoriesOnly() {
-        var root = CreateTree(new() {
+    public void DirectoryPattern_ShouldMatchDirectoriesOnly()
+    {
+        var root = CreateTree(new()
+        {
             ["logs/file1.txt"] = "x",
             ["logs2/file2.txt"] = "x"
         });
@@ -60,8 +68,10 @@ public class FileQueryEngineSyncTests_Additional {
     /// Negation should restore a previously-excluded directory.
     /// </summary>
     [TestMethod]
-    public void DirectoryNegation_ShouldRestoreFiles() {
-        var root = CreateTree(new() {
+    public void DirectoryNegation_ShouldRestoreFiles()
+    {
+        var root = CreateTree(new()
+        {
             ["logs/a.txt"] = "x",
             ["logs/b.txt"] = "x"
         });
@@ -87,8 +97,10 @@ public class FileQueryEngineSyncTests_Additional {
     /// Leading slash means "match only at root".
     /// </summary>
     [TestMethod]
-    public void AnchoredPattern_ShouldMatchOnlyAtRoot() {
-        var root = CreateTree(new() {
+    public void AnchoredPattern_ShouldMatchOnlyAtRoot()
+    {
+        var root = CreateTree(new()
+        {
             ["a.txt"] = "x",
             ["sub/a.txt"] = "x"
         });
@@ -114,8 +126,10 @@ public class FileQueryEngineSyncTests_Additional {
     /// Unanchored patterns match anywhere.
     /// </summary>
     [TestMethod]
-    public void UnanchoredPattern_ShouldMatchAnywhere() {
-        var root = CreateTree(new() {
+    public void UnanchoredPattern_ShouldMatchAnywhere()
+    {
+        var root = CreateTree(new()
+        {
             ["a.txt"] = "x",
             ["deep/a.txt"] = "x"
         });
@@ -137,8 +151,10 @@ public class FileQueryEngineSyncTests_Additional {
     }
 
     [TestMethod]
-    public void Negation_ShouldOverridePrevious() {
-        var root = CreateTree(new() {
+    public void Negation_ShouldOverridePrevious()
+    {
+        var root = CreateTree(new()
+        {
             ["important.log"] = "x",
             ["other.log"] = "x"
         });
@@ -163,8 +179,10 @@ public class FileQueryEngineSyncTests_Additional {
     /// GitIgnore semantics allow restoring files inside an ignored parent directory.
     /// </summary>
     [TestMethod]
-    public void NegationInsideIgnoredDirectory_ShouldBeIncluded() {
-        var root = CreateTree(new() {
+    public void NegationInsideIgnoredDirectory_ShouldBeIncluded()
+    {
+        var root = CreateTree(new()
+        {
             ["logs/hidden/a.txt"] = "x",
             ["logs/hidden/keep.txt"] = "x"
         });
@@ -186,8 +204,10 @@ public class FileQueryEngineSyncTests_Additional {
     }
 
     [TestMethod]
-    public void CharacterClass_ShouldMatchCorrectly() {
-        var root = CreateTree(new() {
+    public void CharacterClass_ShouldMatchCorrectly()
+    {
+        var root = CreateTree(new()
+        {
             ["file0.txt"] = "x",
             ["file1.txt"] = "x",
             ["file9.txt"] = "x"
@@ -207,8 +227,10 @@ public class FileQueryEngineSyncTests_Additional {
     }
 
     [TestMethod]
-    public void NegatedCharacterClass_ShouldMatchCorrectly() {
-        var root = CreateTree(new() {
+    public void NegatedCharacterClass_ShouldMatchCorrectly()
+    {
+        var root = CreateTree(new()
+        {
             ["file1.txt"] = "x",
             ["file7.txt"] = "x"
         });
@@ -228,8 +250,10 @@ public class FileQueryEngineSyncTests_Additional {
     }
 
     [TestMethod]
-    public void MultiWildcard_ShouldMatchComplexLayout() {
-        var root = CreateTree(new() {
+    public void MultiWildcard_ShouldMatchComplexLayout()
+    {
+        var root = CreateTree(new()
+        {
             ["foo/a/bar/x.json"] = "x",
             ["foo/b/c/bar/x.json"] = "x",
             ["foo/b/bar/x.json"] = "x",
@@ -250,8 +274,10 @@ public class FileQueryEngineSyncTests_Additional {
     }
 
     [TestMethod]
-    public void Dotfile_ShouldNotMatchWithStar() {
-        var root = CreateTree(new() {
+    public void Dotfile_ShouldNotMatchWithStar()
+    {
+        var root = CreateTree(new()
+        {
             [".env"] = "x"
         });
 
@@ -268,8 +294,10 @@ public class FileQueryEngineSyncTests_Additional {
     }
 
     [TestMethod]
-    public void Dotfile_ShouldMatchWhenExplicit() {
-        var root = CreateTree(new() {
+    public void Dotfile_ShouldMatchWhenExplicit()
+    {
+        var root = CreateTree(new()
+        {
             [".env"] = "x"
         });
 
@@ -287,8 +315,10 @@ public class FileQueryEngineSyncTests_Additional {
     }
 
     [TestMethod]
-    public void MaxDepth_ShouldLimitTraversal() {
-        var root = CreateTree(new() {
+    public void MaxDepth_ShouldLimitTraversal()
+    {
+        var root = CreateTree(new()
+        {
             ["a/b/c/d/e/f.txt"] = "x"
         });
 
@@ -308,8 +338,10 @@ public class FileQueryEngineSyncTests_Additional {
     }
 
     [TestMethod]
-    public void ReturnedPath_ShouldUseOSSeparator() {
-        var root = CreateTree(new() {
+    public void ReturnedPath_ShouldUseOSSeparator()
+    {
+        var root = CreateTree(new()
+        {
             ["sub/file.txt"] = "x"
         });
 

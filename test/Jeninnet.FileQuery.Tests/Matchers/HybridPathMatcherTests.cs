@@ -1,12 +1,14 @@
 ﻿namespace Jeninnet.FileQuery.Tests.Matchers;
 
 [TestClass]
-public class HybridPathMatcherTests {
+public class HybridPathMatcherTests
+{
     private static HybridPathMatcher CreateMatcher() => new();
     private static ICompiledPatternSet Compile(ClassifiedPatternSet patterns) => CompiledPatternFactory.Compile(patterns);
     private static ICompiledPatternSet Compile(IEnumerable<string> patterns) =>
         Compile(
-            new ClassifiedPatternSet() {
+            new ClassifiedPatternSet()
+            {
                 Patterns = patterns.Select(pattern => new ClassifiedPattern(Text: pattern, Type: PatternClassifier.Classify(pattern)))
                                        .ToArray()
             }
@@ -17,7 +19,8 @@ public class HybridPathMatcherTests {
         new(path, PathKind.Directory, caseSensitivity);
 
     [TestMethod]
-    public void ShouldMatchSingleLiteral() {
+    public void ShouldMatchSingleLiteral()
+    {
         var matcher = CreateMatcher();
         var patterns = Compile(patterns: ["**", "!foo.txt"]);
 
@@ -26,7 +29,8 @@ public class HybridPathMatcherTests {
     }
 
     [TestMethod]
-    public void ShouldSupportNegation() {
+    public void ShouldSupportNegation()
+    {
         var matcher = CreateMatcher();
         var patterns = Compile(patterns: ["!*.cs", "Program.cs"]);
 
@@ -35,7 +39,8 @@ public class HybridPathMatcherTests {
     }
 
     [TestMethod]
-    public void ShouldSupportDirectoryOnlyRules() {
+    public void ShouldSupportDirectoryOnlyRules()
+    {
         var matcher = CreateMatcher();
         var patterns = Compile(patterns: ["**", "!obj/"]);
 
@@ -44,7 +49,8 @@ public class HybridPathMatcherTests {
     }
 
     [TestMethod]
-    public void ShouldMatchWildcardPatterns() {
+    public void ShouldMatchWildcardPatterns()
+    {
         var matcher = CreateMatcher();
         var patterns = Compile(patterns: ["*.txt", "!*.cs"]);
 
@@ -53,7 +59,8 @@ public class HybridPathMatcherTests {
     }
 
     [TestMethod]
-    public void ShouldMatchRecursiveWildcardPatterns() {
+    public void ShouldMatchRecursiveWildcardPatterns()
+    {
         var matcher = CreateMatcher();
         var patterns = Compile(patterns: ["*.txt", "!src/**/*.cs"]);
 
@@ -63,7 +70,8 @@ public class HybridPathMatcherTests {
     }
 
     [TestMethod]
-    public void ShouldHandleMultiPatternCliInput() {
+    public void ShouldHandleMultiPatternCliInput()
+    {
         // Simulate CLI input: "*.cs;!/bin/**;src/**/*.txt"
         var matcher = CreateMatcher();
         var patterns = Compile(patterns: [
@@ -81,7 +89,8 @@ public class HybridPathMatcherTests {
     }
 
     [TestMethod]
-    public void ShouldSupportIgnoreCase() {
+    public void ShouldSupportIgnoreCase()
+    {
         var matcher = CreateMatcher();
         var patterns = Compile(patterns: ["*.txt", "!Foo.TXT"]);
 
@@ -91,7 +100,8 @@ public class HybridPathMatcherTests {
     }
 
     [TestMethod]
-    public void ShouldReturnFalseForEmptyOrNullPath() {
+    public void ShouldReturnFalseForEmptyOrNullPath()
+    {
         var matcher = CreateMatcher();
         var patterns = Compile(patterns: ["!**"]);
 
@@ -105,7 +115,8 @@ public class HybridPathMatcherTests {
     /// are correctly handled by the HybridPathMatcher.
     /// </summary>
     [TestMethod]
-    public void HybridPathMatcher_DirectoryOnly_RestoreSubDir() {
+    public void HybridPathMatcher_DirectoryOnly_RestoreSubDir()
+    {
         // ARRANGE
         var matcher = CreateMatcher();
         var patterns = Compile(patterns: [
@@ -149,7 +160,8 @@ public class HybridPathMatcherTests {
     }
 
     [TestMethod]
-    public void HybridPathMatcher_SimpleNegated() {
+    public void HybridPathMatcher_SimpleNegated()
+    {
         var files = new[] {
                         "xxx.bin",
                         "file.txt",
@@ -167,14 +179,15 @@ public class HybridPathMatcherTests {
                           .ToList()
                           ;
         TestAssertEx.HasCount(result, 2);
-        TestAssertEx.Contains(result, x => x.EndsWith(".bin"));
-        TestAssertEx.Contains(result, x => x.EndsWith("file.txt"));
-        TestAssertEx.DoesNotContain(result, x => x.EndsWith("file1.txt"));
-        TestAssertEx.DoesNotContain(result, x => x.EndsWith("file2.txt"));
+        TestAssertEx.Contains(result, x => x.EndsWith(".bin", StringComparison.Ordinal));
+        TestAssertEx.Contains(result, x => x.EndsWith("file.txt", StringComparison.Ordinal));
+        TestAssertEx.DoesNotContain(result, x => x.EndsWith("file1.txt", StringComparison.Ordinal));
+        TestAssertEx.DoesNotContain(result, x => x.EndsWith("file2.txt", StringComparison.Ordinal));
     }
 
     [TestMethod]
-    public void DirectoryOnly_Inclusion_ShouldReturnFilesInsideSubdirectories() {
+    public void DirectoryOnly_Inclusion_ShouldReturnFilesInsideSubdirectories()
+    {
         var matcher = CreateMatcher();
         var patterns = Compile(patterns: ["**", "!*/"]);
 
@@ -192,7 +205,8 @@ public class HybridPathMatcherTests {
     /// Goal: Test the strict anchoring of an exclusion rule (`/temp/`) and ensure it only excludes paths at the root.
     /// </summary>
     [TestMethod]
-    public void AnchoredExclusion_DescendantsShouldBeExcluded() {
+    public void AnchoredExclusion_DescendantsShouldBeExcluded()
+    {
         // Pattern: "/temp/" excludes the 'temp' directory and everything inside it, ONLY at the root.
         var matcher = CreateMatcher();
         var patterns = Compile(patterns: ["/temp/"]);

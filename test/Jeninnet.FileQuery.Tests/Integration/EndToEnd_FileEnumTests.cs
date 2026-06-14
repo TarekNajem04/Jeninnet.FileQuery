@@ -1,9 +1,11 @@
 ﻿namespace Jeninnet.FileQuery.Tests.Integration;
 
 [TestClass]
-public class EndToEnd_FileEnumTests {
+public class EndToEnd_FileEnumTests
+{
     [TestMethod]
-    public void ShouldEnumerate_AllCsFiles() {
+    public void ShouldEnumerate_AllCsFiles()
+    {
         using var env = new TestEnvironment();
         env.CreateFiles(
             "a.txt",
@@ -30,7 +32,8 @@ public class EndToEnd_FileEnumTests {
     }
 
     [TestMethod]
-    public void ShouldRespect_IgnoreDirectories() {
+    public void ShouldRespect_IgnoreDirectories()
+    {
         using var env = new TestEnvironment();
         env.CreateFiles(
             "a.txt",
@@ -56,12 +59,13 @@ public class EndToEnd_FileEnumTests {
             PathUtilities.Normalize(env.Abs("src", "main.cs")),
             PathUtilities.Normalize(env.Abs("src", "util", "helpers.cs"))
         ]);
-        TestAssertEx.DoesNotContain(result, x => x.Contains("/bin/"));
-        TestAssertEx.DoesNotContain(result, x => x.Contains("/obj/"));
+        TestAssertEx.DoesNotContain(result, x => x.Contains("/bin/", StringComparison.Ordinal));
+        TestAssertEx.DoesNotContain(result, x => x.Contains("/obj/", StringComparison.Ordinal));
     }
 
     [TestMethod]
-    public void Complex_GitIgnoreScenario() {
+    public void Complex_GitIgnoreScenario()
+    {
         using var env = new TestEnvironment();
         env.CreateFiles(
             "a.txt",
@@ -85,14 +89,15 @@ public class EndToEnd_FileEnumTests {
 
         TestAssertEx.Contains(result, env.Abs("b.cs"));
         TestAssertEx.Contains(result, env.Abs("src", "main.cs"));
-        TestAssertEx.DoesNotContain(result, x => x.EndsWith("helpers.cs"));
-        TestAssertEx.DoesNotContain(result, x => x.Contains($"{Path.DirectorySeparatorChar}bin{Path.DirectorySeparatorChar}"));
-        TestAssertEx.DoesNotContain(result, x => x.Contains($"{Path.DirectorySeparatorChar}obj{Path.DirectorySeparatorChar}"));
+        TestAssertEx.DoesNotContain(result, x => x.EndsWith("helpers.cs", StringComparison.Ordinal));
+        TestAssertEx.DoesNotContain(result, x => x.Contains($"{Path.DirectorySeparatorChar}bin{Path.DirectorySeparatorChar}", StringComparison.Ordinal));
+        TestAssertEx.DoesNotContain(result, x => x.Contains($"{Path.DirectorySeparatorChar}obj{Path.DirectorySeparatorChar}", StringComparison.Ordinal));
         TestAssertEx.HasCount(result, 2);
     }
 
     [TestMethod]
-    public void ShouldLimit_Depth() {
+    public void ShouldLimit_Depth()
+    {
         using var env = new TestEnvironment();
         env.CreateFiles(
             "a.txt",
@@ -118,7 +123,8 @@ public class EndToEnd_FileEnumTests {
     }
 
     [TestMethod]
-    public void DoubleStar_ShouldMatchNested() {
+    public void DoubleStar_ShouldMatchNested()
+    {
         using var env = new TestEnvironment();
         env.CreateFiles(
             "a.txt",
@@ -143,7 +149,8 @@ public class EndToEnd_FileEnumTests {
     }
 
     [TestMethod]
-    public void DirectoryOnlyPattern_ShouldExcludeFilesCorrectly() {
+    public void DirectoryOnlyPattern_ShouldExcludeFilesCorrectly()
+    {
         using var env = new TestEnvironment();
         env.CreateFiles(
             "a.txt",
@@ -161,12 +168,13 @@ public class EndToEnd_FileEnumTests {
 
         var result = FileQueryRuntime.Create().Execute(new(env.Root, options)).ToList();
 
-        TestAssertEx.DoesNotContain(result, x => x.Contains($"{Path.DirectorySeparatorChar}src{Path.DirectorySeparatorChar}util{Path.DirectorySeparatorChar}"));
+        TestAssertEx.DoesNotContain(result, x => x.Contains($"{Path.DirectorySeparatorChar}src{Path.DirectorySeparatorChar}util{Path.DirectorySeparatorChar}", StringComparison.Ordinal));
         TestAssertEx.Contains(result, env.Abs("src", "main.cs"));
     }
 
     [TestMethod]
-    public void CaseSensitivity_ShouldFollow_Options() {
+    public void CaseSensitivity_ShouldFollow_Options()
+    {
         using var env = new TestEnvironment();
         env.CreateFiles(
             "a.txt",

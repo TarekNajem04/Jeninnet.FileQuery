@@ -12,14 +12,16 @@ namespace Jeninnet.FileQuery.Benchmarks;
 /// Measures the warm-cache vs cold-cache cost for regex pattern matching.
 /// </summary>
 [MemoryDiagnoser]
-public class RegexMatcherCacheBenchmark {
+public class RegexMatcherCacheBenchmark
+{
     private RegexInstructionMatcher _matcher = default!;
     private ICompiledPatternSet _patterns = default!;
 
     private readonly string _path = "data_archive_2024.log";
 
     [GlobalSetup]
-    public void Setup() {
+    public void Setup()
+    {
         _matcher = new RegexInstructionMatcher();
         _patterns = CompiledPatternFactory.Compile(
             PatternKind.Regex,

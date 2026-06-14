@@ -1,11 +1,12 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
-<PropertyGroup>
-    <OutputType>Exe</OutputType>
-</PropertyGroup>
+    <PropertyGroup>
+        <OutputType>Exe</OutputType>
+        <Version>1.0.0</Version>
+    </PropertyGroup>
 
-<ItemGroup>
-    <ProjectReference Include="..\..\src\Jeninnet.FileQuery\Jeninnet.FileQuery.csproj" />
-</ItemGroup>
+    <ItemGroup>
+        <ProjectReference Include="..\..\src\Jeninnet.FileQuery\Jeninnet.FileQuery.csproj" />
+    </ItemGroup>
 
 </Project>

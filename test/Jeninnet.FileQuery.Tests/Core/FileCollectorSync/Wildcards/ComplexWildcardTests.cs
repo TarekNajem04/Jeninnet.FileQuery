@@ -5,12 +5,14 @@
 /// Ensures correct segment-based GitIgnore-style behavior.
 /// </summary>
 [TestClass]
-public class ComplexWildcardTests {
+public class ComplexWildcardTests
+{
     /// <summary>
     /// Single-segment wildcard "*" matches files in the same directory only.
     /// </summary>
     [TestMethod]
-    public void SingleStar_ShouldNotCrossDirectoryBoundaries() {
+    public void SingleStar_ShouldNotCrossDirectoryBoundaries()
+    {
         using var env = new TestEnvironment();
 
         env.CreateFiles("a.txt", "b.txt");
@@ -29,16 +31,17 @@ public class ComplexWildcardTests {
         var results = fileQueryEngine.Execute(new(env.Root, options)).ToList();
 
         TestAssertEx.HasCount(results, 3);
-        Assert.Contains(x => x.EndsWith(Path.Combine(env.Root, "a.txt")), results);
-        Assert.Contains(x => x.EndsWith(Path.Combine(env.Root, "b.txt")), results);
-        Assert.Contains(x => x.EndsWith(Path.Combine("sub", "c.txt")), results);
+        Assert.Contains(x => x.EndsWith(Path.Combine(env.Root, "a.txt"), StringComparison.Ordinal), results);
+        Assert.Contains(x => x.EndsWith(Path.Combine(env.Root, "b.txt"), StringComparison.Ordinal), results);
+        Assert.Contains(x => x.EndsWith(Path.Combine("sub", "c.txt"), StringComparison.Ordinal), results);
     }
 
     /// <summary>
     /// Double-star "**" should match anywhere recursively.
     /// </summary>
     [TestMethod]
-    public void DoubleStar_ShouldMatchAtAnyDepth() {
+    public void DoubleStar_ShouldMatchAtAnyDepth()
+    {
         using var env = new TestEnvironment();
 
         env.CreateFile("a.txt");
@@ -64,7 +67,8 @@ public class ComplexWildcardTests {
     /// Mixed "*" and "?" wildcards in same segment.
     /// </summary>
     [TestMethod]
-    public void MixedWildcards_ShouldMatchCorrectly() {
+    public void MixedWildcards_ShouldMatchCorrectly()
+    {
         using var env = new TestEnvironment();
 
         env.CreateFile("a1.txt");
