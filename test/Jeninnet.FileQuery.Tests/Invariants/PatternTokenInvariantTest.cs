@@ -1,6 +1,7 @@
 ﻿namespace Jeninnet.FileQuery.Tests.Invariants;
 
-internal static class PatternInvariantTestCases {
+internal static class PatternInvariantTestCases
+{
     // Patterns that fail **during scanning/tokenization**
     public static IEnumerable<object[]> InvalidScanPatterns =>
     [
@@ -36,7 +37,8 @@ internal static class PatternInvariantTestCases {
 }
 
 [TestClass]
-public sealed class PatternInvariantTests {
+public sealed class PatternInvariantTests
+{
     private readonly PatternInvariantRegistry _invariants = new([
         // Lexical
         new LiteralNormalizationInvariant(),
@@ -61,14 +63,17 @@ public sealed class PatternInvariantTests {
         nameof(PatternInvariantTestCases.InvalidScanPatterns),
         typeof(PatternInvariantTestCases)
     )]
-    public void Invalid_ScanPatterns_Must_Throw(string pattern, PatternSyntaxProfile syntax) {
+    public void Invalid_ScanPatterns_Must_Throw(string pattern, PatternSyntaxProfile syntax)
+    {
         var context = new PatternCompilationContext(new(Text: pattern, Type: PatternKind.Glob));
 
-        try {
+        try
+        {
             PatternScanner.Scan(context, syntax);
             _invariants.ValidateStructural(context);
         }
-        catch(PatternException) {
+        catch(PatternException)
+        {
             // CharacterClassParser / Semantic validation / invariants should throw
             // If we catch a PatternException here, it means the scan or structural validation correctly identified an issue → test passes
         }
@@ -79,7 +84,8 @@ public sealed class PatternInvariantTests {
         nameof(PatternInvariantTestCases.InvalidInvariantPatterns),
         typeof(PatternInvariantTestCases)
     )]
-    public void Invalid_InvariantPatterns_Must_Throw(string pattern, PatternSyntaxProfile syntax) {
+    public void Invalid_InvariantPatterns_Must_Throw(string pattern, PatternSyntaxProfile syntax)
+    {
         var context = new PatternCompilationContext(new(Text: pattern, Type: PatternKind.Glob));
 
         // Scan succeeds
@@ -96,7 +102,8 @@ public sealed class PatternInvariantTests {
         nameof(PatternInvariantTestCases.ValidPatterns),
         typeof(PatternInvariantTestCases)
     )]
-    public void Valid_Patterns_Must_Compile(string pattern) {
+    public void Valid_Patterns_Must_Compile(string pattern)
+    {
         var context = new PatternCompilationContext(new(Text: pattern, Type: PatternKind.Glob));
 
         // Scan pattern

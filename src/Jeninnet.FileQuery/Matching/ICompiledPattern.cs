@@ -1,6 +1,7 @@
 ﻿namespace Jeninnet.FileQuery.Matching;
 
-internal interface ICompiledPattern {
+internal interface ICompiledPattern
+{
     /// <summary>
     /// True if the pattern begins with <c>!</c>, negating matches.
     /// </summary>
@@ -27,4 +28,14 @@ internal interface ICompiledPattern {
     PatternKind PatternKind { get; }
 
     CompiledMatchIntent Intent { get; }
+
+    /// <summary>
+    /// Gets the original source pattern text.
+    /// </summary>
+    string SourceText { get; }
+
+    /// <summary>
+    /// Gets the zero-based source pattern index, or -1 when unknown.
+    /// </summary>
+    int SourceIndex { get; }
 }

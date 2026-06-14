@@ -3,6 +3,14 @@
     <PropertyGroup>
         <OutputType>Exe</OutputType>
         <IsPackable>false</IsPackable>
+        <!--
+        Package Version Strategy
+        1.0.0  initial release
+        1.1.0  new features
+        1.1.1  bug fix
+        2.0.0  breaking change        
+        -->
+        <Version>1.0.0</Version>
     </PropertyGroup>
 
     <ItemGroup>
@@ -14,10 +22,10 @@
     </ItemGroup>
 
     <ItemGroup>
-      <None Update="README.md">
-        <PackagePath>\</PackagePath>
-        <Pack>true</Pack>
-      </None>
+        <None Update="README.md">
+            <PackagePath>\</PackagePath>
+            <Pack>true</Pack>
+        </None>
     </ItemGroup>
 
 </Project>

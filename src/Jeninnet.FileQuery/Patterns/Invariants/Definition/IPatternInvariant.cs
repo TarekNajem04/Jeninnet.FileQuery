@@ -3,7 +3,8 @@
 /// <summary>
 /// Represents a single pattern invariant that can validate a pattern.
 /// </summary>
-internal interface IPatternInvariant {
+internal interface IPatternInvariant
+{
     /// <summary>
     /// The execution phase of this invariant.
     /// </summary>
@@ -17,5 +18,6 @@ internal interface IPatternInvariant {
     /// <summary>
     /// Validates the given pattern.
     /// </summary>
+    /// <param name="context">The compilation context containing the pattern to validate.</param>
     PatternInvariantResult Validate(PatternCompilationContext context);
 }

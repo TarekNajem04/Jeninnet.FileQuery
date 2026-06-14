@@ -1,4 +1,4 @@
-# Project Roadmap: Jeninnet.FileQuery
+﻿# Project Roadmap: Jeninnet.FileQuery
 
 This roadmap outlines the strategic direction for **Jeninnet.FileQuery**, focusing on performance, observability, and ecosystem integration.
 
@@ -18,10 +18,10 @@ To be the fastest, most predictable, and most flexible file discovery engine for
 ## Phase 2: The "Observability" Release (v1.1 - v1.x)
 *Goal: Provide deep insights into the enumeration and matching process.*
 
-- [ ] **Progress Reporting**: Support `IProgress<T>` in `EnumerateFilesAsync` for real-time scan statistics.
-- [ ] **Match Diagnostics**: Introduce an optional audit mode to explain *why* a file was included or excluded (e.g., "Matched by Glob line 42 in .gitignore").
-- [ ] **Deep Cancellation**: Ensure `CancellationToken` propagation is verified across all hot paths.
-- [ ] **Enhanced Error Recovery**: Provide configurable strategies for handling IO errors (e.g., `Skip`, `Retry`, `Abort`).
+- [x] **Progress Reporting**: Support `IProgress<T>` in `EnumerateFilesAsync` for real-time scan statistics.
+- [x] **Match Diagnostics**: Introduce an optional audit mode to explain *why* a file was included or excluded (e.g., "Matched by Glob line 42 in .gitignore").
+- [x] **Deep Cancellation**: Ensure `CancellationToken` propagation is verified across all hot paths.
+- [x] **Enhanced Error Recovery**: Provide configurable strategies for handling IO errors (e.g., `Skip`, `Retry`, `Abort`).
 
 ## Phase 3: The "Scalability" Release (v2.0)
 *Goal: Maximize hardware utilization for massive directory trees.*

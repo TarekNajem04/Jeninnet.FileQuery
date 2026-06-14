@@ -7,7 +7,8 @@
 /// This interface represents the sole entry point into the traversal subsystem.
 /// The engine must not depend on traversal internals.
 /// </remarks>
-internal interface ITraversalExecutor {
+internal interface ITraversalExecutor
+{
     IEnumerable<string> Execute(TraversalPlan plan);
 
     IAsyncEnumerable<string> ExecuteAsync(TraversalPlan plan, CancellationToken cancellationToken);

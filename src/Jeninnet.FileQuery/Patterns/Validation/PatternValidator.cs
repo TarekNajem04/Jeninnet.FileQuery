@@ -10,7 +10,8 @@
 /// the classifier can route the pattern to <see cref="PatternKind.Unknown"/>
 /// without propagating an exception.
 /// </remarks>
-internal static partial class PatternValidator {
+internal static partial class PatternValidator
+{
     /// <summary>
     /// Determines whether a pattern is structurally invalid.
     /// </summary>
@@ -34,42 +35,52 @@ internal static partial class PatternValidator {
     ///   <item>Nonsense double-dash <c>"[--"</c>.</item>
     /// </list>
     /// </remarks>
-    public static (bool IsMalformed, string? Error) Validate(ReadOnlySpan<char> pattern) {
-        if(pattern.IsEmpty) {
+    public static (bool IsMalformed, string? Error) Validate(ReadOnlySpan<char> pattern)
+    {
+        if(pattern.IsEmpty)
+        {
             return (false, null);
         }
 
-        if(EndsWithEscape(pattern)) {
+        if(EndsWithEscape(pattern))
+        {
             return (true, "Pattern ends with an unescaped backslash.");
         }
 
-        if(!pattern.Contains('[')) {
+        if(!pattern.Contains('['))
+        {
             return (false, null);
         }
 
-        if(!pattern.Contains(']')) {
+        if(!pattern.Contains(']'))
+        {
             return (true, "Missing closing bracket ']' for an opening bracket '['.");
         }
 
-        if(ContainsEmptyBracket(pattern)) {
+        if(ContainsEmptyBracket(pattern))
+        {
             return (true, "Empty bracket expression '[]' is not allowed.");
         }
 
         var str = pattern.ToString();
 
-        if(DetectNestedBrackets().IsMatch(str)) {
+        if(DetectNestedBrackets().IsMatch(str))
+        {
             return (true, "Nested brackets are not supported (e.g. '[[a-z]]').");
         }
 
-        if(InvalidRange().IsMatch(str)) {
+        if(InvalidRange().IsMatch(str))
+        {
             return (true, "Invalid range syntax detected (e.g. '[a-]').");
         }
 
-        if(InvalidRangeWithMissingLeftOperand().IsMatch(str)) {
+        if(InvalidRangeWithMissingLeftOperand().IsMatch(str))
+        {
             return (true, "Range missing left operand (e.g. '[-z]').");
         }
 
-        if(DetectNonsenseLike().IsMatch(str)) {
+        if(DetectNonsenseLike().IsMatch(str))
+        {
             return (true, "Nonsensical double-dash sequence detected (e.g. '[--]').");
         }
 
@@ -82,6 +93,7 @@ internal static partial class PatternValidator {
     /// Returns <see langword="true"/> when a closing bracket appears in the pattern
     /// without a corresponding opening bracket.
     /// </summary>
+    /// <param name="pattern">The pattern span to check.</param>
     public static bool HasStrayClosingBracket(ReadOnlySpan<char> pattern) =>
         pattern.Contains(']') && !pattern.Contains('[');
 

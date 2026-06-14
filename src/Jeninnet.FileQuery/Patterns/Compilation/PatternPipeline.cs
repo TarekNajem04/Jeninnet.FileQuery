@@ -24,14 +24,16 @@
 /// </list>
 /// </para>
 /// </remarks>
-internal sealed class PatternPipeline {
+internal sealed class PatternPipeline
+{
     private readonly PatternInvariantRegistry _invariants;
     private readonly IPatternCompilerRegistry _compilers;
 
     internal PatternPipeline(
         PatternInvariantRegistry invariants,
         IPatternCompilerRegistry compilers
-    ) {
+    )
+    {
         _invariants = invariants ?? throw new ArgumentNullException(nameof(invariants));
         _compilers = compilers ?? throw new ArgumentNullException(nameof(compilers));
     }
@@ -43,7 +45,9 @@ internal sealed class PatternPipeline {
     /// <summary>
     /// Compiles a single classified pattern through the full pipeline.
     /// </summary>
-    public ICompiledPattern Compile(ClassifiedPattern pattern) {
+    /// <param name="pattern">The classified pattern to compile.</param>
+    public ICompiledPattern Compile(ClassifiedPattern pattern)
+    {
         ArgumentNullException.ThrowIfNull(pattern);
 
         var context = new PatternCompilationContext(pattern);
@@ -74,16 +78,20 @@ internal sealed class PatternPipeline {
     /// Compiles all patterns in <paramref name="set"/> and returns an ordered
     /// compiled set.
     /// </summary>
-    public ICompiledPatternSet Compile(ClassifiedPatternSet set) {
+    /// <param name="set">The classified pattern set.</param>
+    public ICompiledPatternSet Compile(ClassifiedPatternSet set)
+    {
         ArgumentNullException.ThrowIfNull(set);
 
-        if(set.Patterns.Count == 0) {
+        if(set.Patterns.Count == 0)
+        {
             return CompiledPatternSet.Empty;
         }
 
         var compiled = new List<ICompiledPattern>(set.Patterns.Count);
 
-        foreach(var pattern in set.Patterns) {
+        foreach(var pattern in set.Patterns)
+        {
             compiled.Add(Compile(pattern));
         }
 
@@ -125,7 +133,8 @@ internal sealed class PatternPipeline {
     /// </list>
     /// </para>
     /// </remarks>
-    public static PatternPipeline CreateDefault() {
+    public static PatternPipeline CreateDefault()
+    {
         var invariants = new PatternInvariantRegistry([
 
             // ---- Lexical phase ----

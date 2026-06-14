@@ -1,7 +1,8 @@
 ﻿namespace Jeninnet.FileQuery.Tests.Core;
 
 [TestClass]
-public class PathUtilitiesTests {
+public class PathUtilitiesTests
+{
     [TestMethod]
     public void Normalize_ShouldConvertBackslashes() =>
         Assert.AreEqual("C:/foo/bar", PathUtilities.Normalize(@"C:\foo\bar"));
@@ -14,7 +15,8 @@ public class PathUtilitiesTests {
     public void Normalize_ShouldPreserveRoot() =>
         Assert.AreEqual("C:/", PathUtilities.Normalize("C:/"));
     [TestMethod]
-    public void BuildRelativePath_ShouldHandleDirectoryTrailingSlash() {
+    public void BuildRelativePath_ShouldHandleDirectoryTrailingSlash()
+    {
         const string root = "C:/root";
         var entry = new FileSystemEntry("C:/root/subdir", FileAttributes.Directory);
         var actual = PathUtilities.BuildRelativePath(root, entry);
@@ -29,11 +31,12 @@ public class PathUtilitiesTests {
     }
 
     [TestMethod]
-    public void SplitNormalizedPath_ShouldHandleRootOnly() {
+    public void SplitNormalizedPath_ShouldHandleRootOnly()
+    {
         var result = PathUtilities.SplitNormalizedPath("/", true);
         Assert.IsEmpty(result);
     }
 
     [TestMethod]
-    public void CountSegments_ShouldReturnZeroForEmptyPath() => Assert.AreEqual(0, PathUtilities.CountSegments(ReadOnlySpan<char>.Empty, false));
+    public void CountSegments_ShouldReturnZeroForEmptyPath() => Assert.AreEqual(0, PathUtilities.CountSegments([], false));
 }

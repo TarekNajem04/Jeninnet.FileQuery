@@ -6,7 +6,8 @@
 /// is then tested against its own constraints.
 /// </summary>
 [TestClass]
-public class GitIgnoreMatcherTests {
+public class GitIgnoreMatcherTests
+{
     private static GitIgnoreInstructionMatcher CreateMatcher() => new();
     private static ICompiledPatternSet Compile(IEnumerable<string> patterns) => CompiledPatternFactory.Compile(PatternKind.GitIgnore, patterns);
     private static PathMatchContext CreateFileContext(ReadOnlySpan<char> path, CaseSensitivity caseSensitivity = CaseSensitivity.Sensitive) =>
@@ -15,7 +16,8 @@ public class GitIgnoreMatcherTests {
         new(path, PathKind.Directory, caseSensitivity);
 
     [TestMethod]
-    public void Negation_ShouldOverridePreviousMatch() {
+    public void Negation_ShouldOverridePreviousMatch()
+    {
         var matcher = CreateMatcher();
         var patterns = Compile(patterns: ["!*.cs", "Program.cs"]);
 
@@ -24,7 +26,8 @@ public class GitIgnoreMatcherTests {
     }
 
     [TestMethod]
-    public void DirectoryOnlyRule_ShouldApplyCorrectly() {
+    public void DirectoryOnlyRule_ShouldApplyCorrectly()
+    {
         var matcher = CreateMatcher();
         var patterns = Compile(patterns: ["**", "!bin/"]);
 
@@ -33,7 +36,8 @@ public class GitIgnoreMatcherTests {
     }
 
     [TestMethod]
-    public void RecursiveWildcard_ShouldMatchDeepPaths() {
+    public void RecursiveWildcard_ShouldMatchDeepPaths()
+    {
         var matcher = CreateMatcher();
         var patterns = Compile(patterns: ["!**/temp/*.txt"]);
 
@@ -41,7 +45,8 @@ public class GitIgnoreMatcherTests {
     }
 
     [TestMethod]
-    public void BasicExclusion_ShouldMatchUnanchored() {
+    public void BasicExclusion_ShouldMatchUnanchored()
+    {
         // Unanchored pattern (matches anywhere)
         var matcher = CreateMatcher();
         var patterns = Compile(patterns: ["!*.log", "*.md"]);
@@ -52,7 +57,8 @@ public class GitIgnoreMatcherTests {
     }
 
     [TestMethod]
-    public void AnchoredExclusion_ShouldMatchOnlyFromRoot() {
+    public void AnchoredExclusion_ShouldMatchOnlyFromRoot()
+    {
         // Pattern anchored to root by '/'
         var matcher = CreateMatcher();
         var patterns = Compile(patterns: ["!/temp", "!/src/*.txt"]);
@@ -66,7 +72,8 @@ public class GitIgnoreMatcherTests {
     }
 
     [TestMethod]
-    public void DirectoryOnlyExclusion_ShouldMatchDirectory() {
+    public void DirectoryOnlyExclusion_ShouldMatchDirectory()
+    {
         // Directory-only pattern "logs/"
         var matcher = CreateMatcher();
         var patterns = Compile(patterns: ["!logs/"]);
@@ -89,7 +96,8 @@ public class GitIgnoreMatcherTests {
     }
 
     [TestMethod]
-    public void DirectoryReInclusionSemantics() {
+    public void DirectoryReInclusionSemantics()
+    {
         // Standard GitIgnore pattern set for re-inclusion: exclude folder, include file inside.
         var matcher = CreateMatcher();
         var patterns = Compile(
@@ -108,7 +116,8 @@ public class GitIgnoreMatcherTests {
     }
 
     [TestMethod]
-    public void RecursiveWildcard_ShouldMatchDeeply() {
+    public void RecursiveWildcard_ShouldMatchDeeply()
+    {
         var matcher = CreateMatcher();
         var patterns = Compile(patterns: ["!**/a.txt"]);
 
@@ -118,7 +127,8 @@ public class GitIgnoreMatcherTests {
     }
 
     [TestMethod]
-    public void Negation_LastRuleWins() {
+    public void Negation_LastRuleWins()
+    {
         // *.tmp is exclusion. !important.tmp is inclusion.
         var matcher = CreateMatcher();
         var patterns = Compile(patterns: ["**", "!*.tmp"]);
@@ -143,7 +153,8 @@ public class GitIgnoreMatcherTests {
     /// Mitigates: Runtime errors from null/empty path segment lists in SplitNormalizedPath and MatchPathSegments.
     /// </summary>
     [TestMethod]
-    public void EdgeCase_EmptyPathShouldDefaultToExclude() {
+    public void EdgeCase_EmptyPathShouldDefaultToExclude()
+    {
         // An empty path ("") or a single root slash ("/") represents the project root.
         // GitIgnore typically does not match the root itself unless explicitly excluded.
         // The default is `isIncluded = false`.
@@ -158,7 +169,8 @@ public class GitIgnoreMatcherTests {
     }
 
     [TestMethod]
-    public void EdgeCase_EmptyPathShouldThrowForBareRootPattern() {
+    public void EdgeCase_EmptyPathShouldThrowForBareRootPattern()
+    {
         // Arrange
 
         // Act
@@ -170,7 +182,8 @@ public class GitIgnoreMatcherTests {
     }
 
     [TestMethod]
-    public void EmptyPathShouldBeExcludedByDefault() {
+    public void EmptyPathShouldBeExcludedByDefault()
+    {
         var matcher = CreateMatcher();
         // Empty pattern set, so no rules to match, should default to exclude (IsIncluded=false).
         var patterns = Compile(patterns: []);
@@ -184,7 +197,8 @@ public class GitIgnoreMatcherTests {
     /// Mitigates: Off-by-one errors in the recursive MatchPathSegments loop, particularly when checking the base case (patternIndex == patternTokens.Count - 1).
     /// </summary>
     [TestMethod]
-    public void RecursiveWildcard_AtEndShouldMatchSubtree() {
+    public void RecursiveWildcard_AtEndShouldMatchSubtree()
+    {
         // Pattern: "docs/**" should match "docs" itself, and everything inside it.
         var matcher = CreateMatcher();
         var patterns = Compile(patterns: ["!docs/**"]);
@@ -204,7 +218,8 @@ public class GitIgnoreMatcherTests {
     /// leaving nested paths in the default Included state.
     /// </summary>
     [TestMethod]
-    public void AnchoredExclusion_DescendantsShouldBeExcluded() {
+    public void AnchoredExclusion_DescendantsShouldBeExcluded()
+    {
         // Pattern: "/temp/" is an EXCLUSION rule (IsNegated=false) for the 'temp' directory ONLY at the root.
         var matcher = CreateMatcher();
         var patterns = Compile(patterns: ["/temp/"]);
@@ -239,7 +254,8 @@ public class GitIgnoreMatcherTests {
     /// Mitigates: Failures in the "Last Rule Wins" loop and the recursive MatchPathSegments logic when matching the deep path twice.
     /// </summary>
     [TestMethod]
-    public void ComplexNegation_DeepReInclusion() {
+    public void ComplexNegation_DeepReInclusion()
+    {
         // 1. Exclude all log files in all subfolders
         // 2. Re-include only one specific, deeply nested file
         var matcher = CreateMatcher();
@@ -262,7 +278,8 @@ public class GitIgnoreMatcherTests {
     /// to INCLUDE (True) for all paths, including the root and its descendants.
     /// </summary>
     [TestMethod]
-    public void ReInclusion_GlobalInclusion_MatchesEverything() {
+    public void ReInclusion_GlobalInclusion_MatchesEverything()
+    {
         // The pattern ["!"] globally includes all files and directories.
         var matcher = CreateMatcher();
         var patterns = Compile(patterns: ["!"]);
@@ -280,7 +297,8 @@ public class GitIgnoreMatcherTests {
     /// to INCLUDE (True) for all paths, including the root and its descendants.
     /// </summary>
     [TestMethod]
-    public void ReInclusion_GlobalInclusion_SubfolderMustTest() {
+    public void ReInclusion_GlobalInclusion_SubfolderMustTest()
+    {
         // The pattern ["!"] globally includes all files and directories.
         var matcher = CreateMatcher();
         var patterns = Compile(patterns: ["!**/*.txt"]);

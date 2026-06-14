@@ -1,7 +1,8 @@
 ﻿namespace Jeninnet.FileQuery.Tests.Architecture;
 
 [TestClass]
-public sealed class PatternScannerArchitectureTests {
+public sealed class PatternScannerArchitectureTests
+{
     private static readonly PatternSyntaxProfile[] _profiles =
     [
         PatternSyntaxProfile.GitIgnore,
@@ -28,17 +29,22 @@ public sealed class PatternScannerArchitectureTests {
     ];
 
     [TestMethod]
-    public void PatternScanner_MustNotThrow_PatternException() {
-        foreach(var syntax in _profiles) {
-            foreach(var pattern in _invalidPatterns) {
+    public void PatternScanner_MustNotThrow_PatternException()
+    {
+        foreach(var syntax in _profiles)
+        {
+            foreach(var pattern in _invalidPatterns)
+            {
                 var context = new PatternCompilationContext(
                     pattern: new(Text: pattern, Type: PatternKind.GitIgnore)
                 );
 
-                try {
+                try
+                {
                     PatternScanner.Scan(context, syntax);
                 }
-                catch(PatternException ex) {
+                catch(PatternException ex)
+                {
                     throw new AssertFailedException(
                         $"""
                         PatternScanner threw PatternException.

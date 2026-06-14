@@ -4,7 +4,8 @@
 /// Regression tests for the four invariant gaps identified during the v1.0 freeze audit.
 /// </summary>
 [TestClass]
-public sealed class InvariantTests {
+public sealed class InvariantTests
+{
 
     // ======================================================================
     // 1 — RecursiveWildcardIsolationInvariant was text-based, missing **a
@@ -38,7 +39,8 @@ public sealed class InvariantTests {
             "A mixed segment 'a**b' must be rejected.");
 
     [TestMethod]
-    public void GitIgnore_StandaloneDoubleStar_IsAccepted() {
+    public void GitIgnore_StandaloneDoubleStar_IsAccepted()
+    {
         // A standalone ** in its own segment must still be valid.
         var compiled = CompiledPatternFactory.Compile(PatternKind.GitIgnore, "**/src");
         Assert.IsNotEmpty(compiled, "'**/src' must compile successfully.");
@@ -60,14 +62,16 @@ public sealed class InvariantTests {
             "An invalid regex pattern must be rejected.");
 
     [TestMethod]
-    public void RegexSyntaxInvariant_ValidRegex_IsAccepted() {
+    public void RegexSyntaxInvariant_ValidRegex_IsAccepted()
+    {
         // "r:^src/.*\.cs$" is a valid .NET regex expression.
         var compiled = CompiledPatternFactory.Compile(PatternKind.Regex, @"r:^src/.*\.cs$");
         Assert.IsNotEmpty(compiled, "A valid regex pattern must compile successfully.");
     }
 
     [TestMethod]
-    public void RegexSyntaxInvariant_ErrorMessageShowsExpressionNotPrefix() {
+    public void RegexSyntaxInvariant_ErrorMessageShowsExpressionNotPrefix()
+    {
         // The error message must reference the expression ("[invalid"),
         // not the full raw string ("r:[invalid").
         var ex = Assert.ThrowsExactly<PatternException>(() =>
@@ -105,7 +109,8 @@ public sealed class InvariantTests {
             "A pattern of only '/' separators must be rejected.");
 
     [TestMethod]
-    public void GitIgnore_RootAnchoredWithBody_IsAccepted() {
+    public void GitIgnore_RootAnchoredWithBody_IsAccepted()
+    {
         // "/src" is a valid root-anchored GitIgnore pattern.
         var compiled = CompiledPatternFactory.Compile(PatternKind.GitIgnore, "/src");
         Assert.IsNotEmpty(compiled, "'/src' must compile successfully.");
@@ -118,7 +123,8 @@ public sealed class InvariantTests {
     // ======================================================================
 
     [TestMethod]
-    public void GitIgnoreImplicitRecursive_UnanchoredNonNegated_ReceivesImplicitDoubleStar() {
+    public void GitIgnoreImplicitRecursive_UnanchoredNonNegated_ReceivesImplicitDoubleStar()
+    {
         // "*.txt" should compile to [**, *.txt] — the matcher must slide across depths.
         var compiled = CompiledPatternFactory
             .Compile(PatternKind.GitIgnore, "*.txt")
@@ -137,7 +143,8 @@ public sealed class InvariantTests {
     }
 
     [TestMethod]
-    public void GitIgnoreImplicitRecursive_RootAnchored_DoesNotReceiveImplicitDoubleStar() {
+    public void GitIgnoreImplicitRecursive_RootAnchored_DoesNotReceiveImplicitDoubleStar()
+    {
         // "/src/*.cs" is root-anchored — no implicit ** must be prepended.
         var compiled = CompiledPatternFactory
             .Compile(PatternKind.GitIgnore, "/src/*.cs")
@@ -154,7 +161,8 @@ public sealed class InvariantTests {
     }
 
     [TestMethod]
-    public void GitIgnoreImplicitRecursive_AlreadyStartsWithDoubleStar_NotDuplicated() {
+    public void GitIgnoreImplicitRecursive_AlreadyStartsWithDoubleStar_NotDuplicated()
+    {
         // "**/*.cs" already begins with ** — must not have another ** inserted.
         var compiled = CompiledPatternFactory
             .Compile(PatternKind.GitIgnore, "**/*.cs")

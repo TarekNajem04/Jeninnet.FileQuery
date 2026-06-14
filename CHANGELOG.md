@@ -1,7 +1,5 @@
 # Changelog
 
-## 1.0.0 - Unreleased
-
 All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
@@ -9,7 +7,29 @@ Versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ---
 
-## [1.0.0](https://github.com/TarekNajem04/Jeninnet.FileQuery/releases/tag/v1.0.0) - 2026-04-17
+## [1.1.0](https://github.com/TarekNajem04/Jeninnet.FileQuery/releases/tag/v1.1.0) - 2026-06-10
+
+### Added
+    
+- Async traversal progress reporting through `IProgress<FileQueryProgress>` overloads on `IFileQueryEngine.ExecuteAsync` and the fluent builder.
+- Optional match audit diagnostics through `FileQueryOptions.AuditMatches`, `FileQueryOptions.Diagnostics`, and `FileQueryBuilder.WithDiagnostics`.
+- Diagnostic source metadata on compiled patterns, including source text and source order index for responsible-pattern reporting.
+- Configurable IO recovery with `FileQueryErrorRecoveryOptions` and `FileQueryErrorAction` strategies: `Skip`, `Retry`, and `Abort`.
+- Regression coverage for progress reporting, match diagnostics, cancellation propagation, and recovery strategies.
+- Revised all README.md files across the repository to include new observability features and updated usage examples.
+- Updated feature descriptions and improved documentation clarity for all existing features in the README files.
+- Standardized formatting and ensured consistency across all documentation files.
+- Improved navigation structure and cross‑references between sections in the README files for better readability.
+- Added status badges to all project README files indicating build status, test coverage, and latest release version.
+
+### Changed
+
+- Traversal planning now carries optional observability sinks and recovery policy without changing default query behavior.
+- `IgnoreInaccessible` remains supported and maps to the default skip-or-abort recovery behavior for compatibility.
+
+---
+
+## [1.0.0](https://github.com/TarekNajem04/Jeninnet.FileQuery/releases/tag/v1.0.0) - 2026-06-02
 
 ### Added
 

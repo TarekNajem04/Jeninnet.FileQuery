@@ -8,12 +8,14 @@
 ///  - directories at disallowed levels are not visited
 /// </summary>
 [TestClass]
-public class EnumerateFilesAsync_RecursionDepthTests {
+public class EnumerateFilesAsync_RecursionDepthTests
+{
     /// <summary>
     /// Ensures async enumeration stops at depth 0 (only root files).
     /// </summary>
     [TestMethod]
-    public async Task EnumerateFilesAsync_Depth0_ShouldOnlyReturnRootFilesAsync() {
+    public async Task EnumerateFilesAsync_Depth0_ShouldOnlyReturnRootFilesAsync()
+    {
         using var env = new TestEnvironment();
 
         env.CreateFiles(
@@ -36,7 +38,7 @@ public class EnumerateFilesAsync_RecursionDepthTests {
         var results = await fileQueryEngine.ExecuteAsync(new(env.Root, options), TestContext.CancellationToken)
                                            .ToListAsync(TestContext.CancellationToken);
 
-        TestAssertEx.ContainsSingle(results, x => x.EndsWith("root.txt"));
+        TestAssertEx.ContainsSingle(results, x => x.EndsWith("root.txt", StringComparison.Ordinal));
         TestAssertEx.HasCount(results, 1);
     }
 
@@ -44,7 +46,8 @@ public class EnumerateFilesAsync_RecursionDepthTests {
     /// Ensures async enumeration stops after 1 level of recursion.
     /// </summary>
     [TestMethod]
-    public async Task EnumerateFilesAsync_Depth1_ShouldIncludeSubdirectoriesButNotDeepOnesAsync() {
+    public async Task EnumerateFilesAsync_Depth1_ShouldIncludeSubdirectoriesButNotDeepOnesAsync()
+    {
         using var env = new TestEnvironment();
 
         env.CreateFiles(
@@ -69,16 +72,17 @@ public class EnumerateFilesAsync_RecursionDepthTests {
                                            .ToListAsync(TestContext.CancellationToken);
 
         TestAssertEx.HasCount(results, 2);
-        TestAssertEx.Contains(results, x => x.EndsWith("a.txt"));
-        TestAssertEx.Contains(results, x => x.EndsWith(Path.Combine("sub", "b.txt")));
-        Assert.DoesNotContain(x => x.EndsWith(Path.Combine("deeper", "c.txt")), results);
+        TestAssertEx.Contains(results, x => x.EndsWith("a.txt", StringComparison.Ordinal));
+        TestAssertEx.Contains(results, x => x.EndsWith(Path.Combine("sub", "b.txt"), StringComparison.Ordinal));
+        Assert.DoesNotContain(x => x.EndsWith(Path.Combine("deeper", "c.txt"), StringComparison.Ordinal), results);
     }
 
     /// <summary>
     /// Ensures async enumeration honors depth limit even with many sibling folders.
     /// </summary>
     [TestMethod]
-    public async Task EnumerateFilesAsync_ShouldRespectDepthLimitWithWideTreeAsync() {
+    public async Task EnumerateFilesAsync_ShouldRespectDepthLimitWithWideTreeAsync()
+    {
         using var env = new TestEnvironment();
 
         // root files
@@ -106,8 +110,8 @@ public class EnumerateFilesAsync_RecursionDepthTests {
                                            .ToListAsync(TestContext.CancellationToken);
 
         TestAssertEx.HasCount(results, 4); // 2 root + 2 at depth 1
-        Assert.DoesNotContain(x => x.Contains("A2"), results);
-        Assert.DoesNotContain(x => x.Contains("B2"), results);
+        Assert.DoesNotContain(x => x.Contains("A2", StringComparison.Ordinal), results);
+        Assert.DoesNotContain(x => x.Contains("B2", StringComparison.Ordinal), results);
     }
 
     public TestContext TestContext { get; set; } = null!;

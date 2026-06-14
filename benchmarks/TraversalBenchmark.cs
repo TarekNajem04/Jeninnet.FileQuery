@@ -7,18 +7,21 @@
  * - Pattern evaluation
  */
 [MemoryDiagnoser]
-public class TraversalBenchmark {
+public class TraversalBenchmark
+{
     private IFileQueryEngine _engine = default!;
     private string _root = default!;
 
     [GlobalSetup]
-    public void Setup() {
+    public void Setup()
+    {
         _root = Directory.GetCurrentDirectory();
         _engine = FileQueryRuntime.Create();
     }
 
     [Benchmark]
-    public void QueryFiles() {
+    public void QueryFiles()
+    {
         var options = new FileQueryOptions(
             patternInput: new(
                 patterns: [

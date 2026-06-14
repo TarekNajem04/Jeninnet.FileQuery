@@ -1,6 +1,7 @@
 ﻿namespace Jeninnet.FileQuery.Traversal;
 
-internal sealed class TraversalFrontier(int initialCapacity = 64) : IDisposable {
+internal sealed class TraversalFrontier(int initialCapacity = 64) : IDisposable
+{
     private TraversalFrame[] _buffer = ArrayPool<TraversalFrame>.Shared.Rent(initialCapacity);
     private int _head;
     private int _tail;
@@ -10,13 +11,16 @@ internal sealed class TraversalFrontier(int initialCapacity = 64) : IDisposable 
     /// <summary>
     /// Push a frame onto the stack (DFS).
     /// </summary>
+    /// <param name="frame">The frame to push.</param>
     public void Push(TraversalFrame frame) => Add(frame);
 
     /// <summary>
     /// Pop a frame from the stack (DFS).
     /// </summary>
-    public TraversalFrame Pop() {
-        if(IsEmpty) {
+    public TraversalFrame Pop()
+    {
+        if(IsEmpty)
+        {
             throw new InvalidOperationException("Buffer is empty.");
         }
 
@@ -26,13 +30,16 @@ internal sealed class TraversalFrontier(int initialCapacity = 64) : IDisposable 
     /// <summary>
     /// Enqueue a frame into the queue (BFS).
     /// </summary>
+    /// <param name="frame">The frame to enqueue.</param>
     public void Enqueue(TraversalFrame frame) => Add(frame);
 
     /// <summary>
     /// Dequeue a frame from the queue (BFS).
     /// </summary>
-    public TraversalFrame Dequeue() {
-        if(IsEmpty) {
+    public TraversalFrame Dequeue()
+    {
+        if(IsEmpty)
+        {
             throw new InvalidOperationException("Buffer is empty.");
         }
 
@@ -40,14 +47,18 @@ internal sealed class TraversalFrontier(int initialCapacity = 64) : IDisposable 
     }
 
     /// <summary> Adds a frame to the buffer according to strategy </summary>
-    public void Add(TraversalFrame frame) {
+    /// <param name="frame">The frame to add.</param>
+    public void Add(TraversalFrame frame)
+    {
         EnsureCapacity();
 
         _buffer[_tail++] = frame;
     }
 
-    private void EnsureCapacity() {
-        if(_tail < _buffer.Length) {
+    private void EnsureCapacity()
+    {
+        if(_tail < _buffer.Length)
+        {
             return;
         }
 

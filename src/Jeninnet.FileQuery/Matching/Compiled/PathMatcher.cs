@@ -8,7 +8,8 @@
 /// This abstract class enforces the standard <see cref="IPathMatcher"/> contract while providing boilerplate
 /// methods for single and set pattern matching.
 /// </remarks>
-internal abstract class PathMatcher : IPathMatcher {
+internal abstract class PathMatcher : IPathMatcher
+{
     /// <inheritdoc/>
     public abstract bool Supports(PatternKind patternKind);
 

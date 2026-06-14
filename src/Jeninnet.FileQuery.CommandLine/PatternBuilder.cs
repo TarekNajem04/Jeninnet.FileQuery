@@ -7,7 +7,8 @@
 /// Consolidates --patterns, and --gitignore into a single GitIgnore list
 /// following the "last rule wins" principle.
 /// </remarks>
-public static class PatternBuilder {
+public static class PatternBuilder
+{
     /// <summary>
     /// Builds pattern dictionary from a parsed command-line result.
     /// </summary>
@@ -22,7 +23,8 @@ public static class PatternBuilder {
     /// </summary>
     /// <param name="options">Parsed pattern options.</param>
     /// <returns>Dictionary mapping <see cref="PatternKind"/> to lists of patterns.</returns>
-    public static Dictionary<PatternKind, List<string>> Build(PatternOptions options) {
+    public static Dictionary<PatternKind, List<string>> Build(PatternOptions options)
+    {
         ArgumentNullException.ThrowIfNull(options);
         return Build(options.Patterns, options.Gitignore, options.Glob, options.RegularExpression);
     }
@@ -40,12 +42,14 @@ public static class PatternBuilder {
         string? gitignore = default,
         string? glob = default,
         string? regex = default
-    ) {
+    )
+    {
         const string FALLBACK_PATTERN = "!**";
         var typedPatterns = new Dictionary<PatternKind, List<string>>();
 
         var splitedPatterns = GetSplitPatterns(patterns);
-        foreach(var rawPattern in splitedPatterns) {
+        foreach(var rawPattern in splitedPatterns)
+        {
             var type = Patterns.Classification.PatternClassifier.Classify(rawPattern);
             AddToBucket(typedPatterns, type, rawPattern);
         }
@@ -55,23 +59,29 @@ public static class PatternBuilder {
         AddToBucket(typedPatterns, PatternKind.Regex, GetSplitPatterns(regex));
 
         // 4. Default: Include everything if nothing was defined
-        if(typedPatterns.Count == 0) {
+        if(typedPatterns.Count == 0)
+        {
             typedPatterns[PatternKind.GitIgnore] = [FALLBACK_PATTERN];
         }
 
         return typedPatterns;
     }
 
-    private static void AddToBucket(Dictionary<PatternKind, List<string>> typedPatterns, PatternKind kind, string pattern) {
-        if(typedPatterns.TryGetValue(kind, out var list)) {
+    private static void AddToBucket(Dictionary<PatternKind, List<string>> typedPatterns, PatternKind kind, string pattern)
+    {
+        if(typedPatterns.TryGetValue(kind, out var list))
+        {
             list.Add(pattern);
-        } else {
+        } else
+        {
             typedPatterns[kind] = [pattern];
         }
     }
 
-    private static void AddToBucket(Dictionary<PatternKind, List<string>> typedPatterns, PatternKind kind, IEnumerable<string> patterns) {
-        foreach(var pattern in patterns) {
+    private static void AddToBucket(Dictionary<PatternKind, List<string>> typedPatterns, PatternKind kind, IEnumerable<string> patterns)
+    {
+        foreach(var pattern in patterns)
+        {
             AddToBucket(typedPatterns, kind, pattern);
         }
     }
@@ -79,6 +89,6 @@ public static class PatternBuilder {
     // Helper: split by ';' and trim entries.
     private static IEnumerable<string> GetSplitPatterns(string? value) =>
         string.IsNullOrWhiteSpace(value)
-            ? Enumerable.Empty<string>()
+            ? []
             : PatternSplitter.Split(value);
 }

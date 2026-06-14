@@ -120,7 +120,8 @@ jobs:
             /d:sonar.cs.vstest.reportsPaths="TestResults/**/*.trx" \
             /d:sonar.cs.opencover.reportsPaths="**/coverage.opencover.xml" \
             /d:sonar.scm.provider=git \
-            /d:sonar.scm.forceReloadAll=true
+            /d:sonar.scm.forceReloadAll=true \
+            /d:sonar.exclusions="samples/**,benchmarks/**"
 
       # ---------------------------------------------------------
       # 9) Restore dependencies
@@ -140,8 +141,13 @@ jobs:
       - name: Run tests with coverage
         run: |
           dotnet test -c Release --no-build \
+            --settings test/Jeninnet.FileQuery.Tests/.runsettings \
             --collect:"XPlat Code Coverage" \
+            --logger "trx;LogFileName=results.trx" \
             --results-directory TestResults
+
+      - name: List test results (debug)
+        run: ls -R TestResults
 
       # ---------------------------------------------------------
       # 12) End SonarCloud analysis

@@ -12,7 +12,8 @@ namespace Jeninnet.FileQuery.Benchmarks;
 /// Measures the cold-start compilation cost for a realistic mixed pattern set.
 /// </summary>
 [MemoryDiagnoser]
-public class PatternCompilationColdStartBenchmark {
+public class PatternCompilationColdStartBenchmark
+{
 
     // Realistic pattern set: a mix of GitIgnore, Regex, and typed patterns.
     private static readonly string[] _hybridPatterns = [
@@ -38,7 +39,8 @@ public class PatternCompilationColdStartBenchmark {
     [Benchmark(Baseline = true)]
     public void CompileHybrid()
         => CompiledPatternFactory.Compile(
-            new ClassifiedPatternSet {
+            new ClassifiedPatternSet
+            {
                 Patterns = _hybridPatterns
                     .Select(p => new ClassifiedPattern(p, PatternClassifier.Classify(p)))
                     .ToArray()
@@ -58,7 +60,8 @@ public class PatternCompilationColdStartBenchmark {
     /// Full FileQuery.From(...).Where(...).Build() path — the real public API cost.
     /// </summary>
     [Benchmark]
-    public FileQuery BuildViaFluentApi() {
+    public FileQuery BuildViaFluentApi()
+    {
         var root = Directory.GetCurrentDirectory();
 
         return FileQuery.From(root)

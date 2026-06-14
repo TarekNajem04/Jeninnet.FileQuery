@@ -1,7 +1,8 @@
 ﻿namespace Jeninnet.FileQuery.Tests.Matchers;
 
 [TestClass]
-public class RegexPathMatcherTests {
+public class RegexPathMatcherTests
+{
     private static RegexInstructionMatcher CreateMatcher() => new();
     private static ICompiledPatternSet Compile(IEnumerable<string> patterns) => CompiledPatternFactory.Compile(PatternKind.Regex, patterns);
     private static PathMatchContext CreateFileContext(ReadOnlySpan<char> path, CaseSensitivity caseSensitivity = CaseSensitivity.Sensitive) =>
@@ -10,7 +11,8 @@ public class RegexPathMatcherTests {
         new(path, PathKind.Directory, caseSensitivity);
 
     [TestMethod]
-    public void IsMatch_ShouldMatchBasicRegexPattern() {
+    public void IsMatch_ShouldMatchBasicRegexPattern()
+    {
         // Arrange: Matches paths starting with 'src/' and ending with '.cs'
         var matcher = CreateMatcher();
         var patterns = Compile(patterns: [@"r:^src\/.*\.cs$"]);
@@ -23,7 +25,8 @@ public class RegexPathMatcherTests {
     }
 
     [TestMethod]
-    public void IsMatch_ShouldReturnFailForNoMatch() {
+    public void IsMatch_ShouldReturnFailForNoMatch()
+    {
         // Arrange
         var matcher = CreateMatcher();
         var patterns = Compile(patterns: [@"r:^a-non-existent-file\.txt$"]);
@@ -33,7 +36,8 @@ public class RegexPathMatcherTests {
     }
 
     [TestMethod]
-    public void IsMatch_ShouldHandleRegexSyntaxCorrectly() {
+    public void IsMatch_ShouldHandleRegexSyntaxCorrectly()
+    {
         // Arrange: Regex matches any path containing 'data' followed by 1 or more digits.
         var matcher = CreateMatcher();
         var patterns = Compile(patterns: [@"r:.*data\d+$"]);
@@ -45,7 +49,8 @@ public class RegexPathMatcherTests {
     }
 
     [TestMethod]
-    public void IsMatch_ShouldBeCaseSensitiveByDefault() {
+    public void IsMatch_ShouldBeCaseSensitiveByDefault()
+    {
         // Arrange
         var matcher = CreateMatcher();
         var patterns = Compile(patterns: [@"r:^FILE\.TXT$"]);
@@ -56,7 +61,8 @@ public class RegexPathMatcherTests {
     }
 
     [TestMethod]
-    public void IsMatch_ShouldBeCaseInsensitiveWhenRequested() {
+    public void IsMatch_ShouldBeCaseInsensitiveWhenRequested()
+    {
         // Arrange
         var matcher = CreateMatcher();
         var patterns = Compile(patterns: [@"r:^FILE\.TXT$"]);
@@ -67,7 +73,8 @@ public class RegexPathMatcherTests {
     }
 
     [TestMethod]
-    public void IsMatch_ShouldMatchFirstMatchingPatternInList() {
+    public void IsMatch_ShouldMatchFirstMatchingPatternInList()
+    {
         // Arrange
         var matcher = CreateMatcher();
         var patterns = Compile(patterns: [
@@ -82,7 +89,8 @@ public class RegexPathMatcherTests {
     }
 
     [TestMethod]
-    public void IsMatch_ShouldIgnoreDirectoryStatus() {
+    public void IsMatch_ShouldIgnoreDirectoryStatus()
+    {
         // Arrange: Flat matchers are designed to match the full string, ignoring file system type.
         var matcher = CreateMatcher();
         var patterns = Compile(patterns: [@"r:^project\/data$"]);
@@ -94,7 +102,8 @@ public class RegexPathMatcherTests {
     }
 
     [TestMethod]
-    public void IsMatch_ShouldAlwaysReturnIsIncludedTrue_IgnoringNegation() {
+    public void IsMatch_ShouldAlwaysReturnIsIncludedTrue_IgnoringNegation()
+    {
         // Arrange
         // Create a pattern that is logically 'negated' in its structure (if it were GitIgnore)
         const string patternString = "r:data\\.secret";

@@ -1,23 +1,19 @@
-# Remove the line below if you want to inherit .editorconfig settings from higher directories
+# Jeninnet.FileQuery .editorconfig - Production Grade
 root = true
 
 #### Core EditorConfig Options ####
-# Don't use tabs for indentation.
+
 [*]
 # Indentation and spacing
 tab_width = 4
+indent_size = 4
 indent_style = space
-
-# (Please don't specify an indent_size here; that has too many unintended consequences.)
 trim_trailing_whitespace = true
+insert_final_newline = true
+charset = utf-8
 spelling_exclusion_path = SpellingExclusions.dic
 
 csharp_prefer_system_threading_lock = true:suggestion
-
-# Code files
-[*.{cs,csx,vb,vbx,razor}]
-indent_size = 4
-charset = utf-8-bom
 
 # Xml project files
 [*.{csproj,vbproj,vcxproj,vcxproj.filters,proj,projitems,shproj}]
@@ -32,67 +28,83 @@ indent_size = 4
 indent_size = 4
 
 # C# files
-[*.{cs,vb,razor}]
-# ===== CAxxxx =====
+[*.{cs,csx,vb,vbx,razor}]
+indent_size = 4
+charset = utf-8-bom
+
+# ===== CAxxxx: Design & Performance =====
 # CA1000: Do not declare static members on generic types
 dotnet_diagnostic.CA1000.severity = suggestion
 # CA1001: Types that own disposable fields should be disposable
-dotnet_diagnostic.CA1001.severity = suggestion
-# CA1002: CA1010: Collections should implement generic interface
+dotnet_diagnostic.CA1001.severity = warning
+# CA1010: Collections should implement generic interface
 dotnet_diagnostic.CA1010.severity = suggestion
 # CA1036: Override methods on comparable types
 dotnet_diagnostic.CA1036.severity = suggestion
 # CA1051: Do not declare visible instance fields
-dotnet_diagnostic.CA1051.severity = suggestion
+dotnet_diagnostic.CA1051.severity = warning
+# CA1062: Validate arguments of public methods
+dotnet_diagnostic.CA1062.severity = warning
+
+# ===== CA13xx: Globalization (Critical for Library Correctness) =====
 # CA1304: Specify CultureInfo
-dotnet_diagnostic.CA1304.severity = none
-#CA1862: Use 'CompositeFormat' instead of 'String.Format'
-dotnet_diagnostic.CA1862.severity = none
+dotnet_diagnostic.CA1304.severity = warning
 # CA1305: Specify IFormatProvider
-dotnet_diagnostic.CA1305.severity = none
+dotnet_diagnostic.CA1305.severity = warning
+# CA1309: Use ordinal string comparison
+dotnet_diagnostic.CA1309.severity = warning
 # CA1310: Specify StringComparison for correctness
-dotnet_diagnostic.CA1310.severity = none
+dotnet_diagnostic.CA1310.severity = warning
+# CA1311: Specify a culture or use an invariant version
+dotnet_diagnostic.CA1311.severity = suggestion
+
+# ===== CA18xx: Performance =====
+# CA1806: Do not ignore method results
+dotnet_diagnostic.CA1806.severity = warning
+# CA1822: Mark members as static
+dotnet_diagnostic.CA1822.severity = warning
+# CA1862: Use 'CompositeFormat' instead of 'String.Format'
+dotnet_diagnostic.CA1862.severity = suggestion
+# CA1863: Use 'CompositeFormat'
+dotnet_diagnostic.CA1863.severity = suggestion
+
+# ===== Other CA/IDE Rules =====
 # CA1200: Avoid using cref tags with a prefix
 dotnet_diagnostic.CA1200.severity = suggestion
-# CA1309: Use ordinal string comparison
-dotnet_diagnostic.CA1309.severity = suggestion
-# CA1311: Specify a culture or use an invariant version
-dotnet_diagnostic.CA1311.severity = none
 # CA1707: Identifiers should not contain underscores
 dotnet_diagnostic.CA1707.severity = none
-# CA1863: Use 'CompositeFormat'
-dotnet_diagnostic.CA1863.severity = none
 # CA1716: Identifiers should not match keywords
 dotnet_diagnostic.CA1716.severity = none
-# ===== Sxxxx =====
+
+# ===== Sxxxx: SonarCloud Rules =====
 # S3358: Ternary operators should not be nested
-dotnet_diagnostic.S3358.severity = none
+dotnet_diagnostic.S3358.severity = warning
 # S125: Sections of code should not be commented out
-dotnet_diagnostic.S125.severity = none
+dotnet_diagnostic.S125.severity = warning
 # S2114: Collections should not be passed as arguments to their own methods
-dotnet_diagnostic.S2114.severity = none
+dotnet_diagnostic.S2114.severity = warning
 # S4136: Method overloads should be grouped together
-dotnet_diagnostic.S4136.severity = none
+dotnet_diagnostic.S4136.severity = suggestion
 # S1694: An abstract class should have both abstract and concrete methods
-dotnet_diagnostic.S1694.severity = none
+dotnet_diagnostic.S1694.severity = suggestion
 # S2326: Unused type parameters should be removed
-dotnet_diagnostic.S2326.severity = none
+dotnet_diagnostic.S2326.severity = warning
 
-# ===== RCSxxxx =====
+# ===== RCSxxxx: Roslynator Rules =====
 # RCS1238: Avoid nested ?: operators
-dotnet_diagnostic.RCS1238.severity = none
+dotnet_diagnostic.RCS1238.severity = warning
 # RCS1141: Add 'param' element to documentation comment
-dotnet_diagnostic.RCS1141.severity = none
+dotnet_diagnostic.RCS1141.severity = suggestion
 # RCS1175: Unused 'this' parameter
-dotnet_diagnostic.RCS1175.severity = none
+dotnet_diagnostic.RCS1175.severity = warning
 
-# ===== IDExxxx =====
+# ===== IDExxxx: IDE Preferences =====
 # IDE0051: Remove unused private members
-dotnet_diagnostic.IDE0051.severity = none
+dotnet_diagnostic.IDE0051.severity = warning
 # IDE0060: Remove unused parameter
-dotnet_diagnostic.IDE0060.severity = none
+dotnet_diagnostic.IDE0060.severity = warning
 # IDE0305: Use collection expression for fluent
-dotnet_diagnostic.IDE0305.severity = none
+dotnet_diagnostic.IDE0305.severity = suggestion
 
 #### .NET Coding Conventions ####
 
@@ -129,7 +141,7 @@ dotnet_style_null_propagation = true:suggestion
 dotnet_style_object_initializer = true:suggestion
 dotnet_style_operator_placement_when_wrapping = beginning_of_line
 dotnet_style_prefer_auto_properties = true:suggestion
-dotnet_style_prefer_collection_expression = never:suggestion
+dotnet_style_prefer_collection_expression = true:suggestion
 dotnet_style_prefer_compound_assignment = true:suggestion
 dotnet_style_prefer_conditional_expression_over_assignment = true:suggestion
 dotnet_style_prefer_conditional_expression_over_return = true:none
@@ -222,7 +234,7 @@ csharp_style_allow_blank_line_after_token_in_arrow_expression_clause_experimenta
 csharp_style_allow_blank_line_after_token_in_conditional_expression_experimental = false:suggestion
 csharp_style_allow_blank_lines_between_consecutive_braces_experimental = false:suggestion
 csharp_style_allow_embedded_statements_on_same_line_experimental = true:suggestion
-csharp_new_line_before_open_brace = none
+csharp_new_line_before_open_brace = all
 csharp_new_line_before_catch = true:suggestion
 csharp_new_line_before_finally = true:suggestion
 csharp_new_line_before_else = false
@@ -275,7 +287,6 @@ csharp_preserve_single_line_statements = true
 #### Naming styles ####
 
 # Naming rules
-
 dotnet_naming_rule.non_field_members_should_be_pascal_case.severity = suggestion
 dotnet_naming_rule.non_field_members_should_be_pascal_case.symbols = non_field_members
 dotnet_naming_rule.non_field_members_should_be_pascal_case.style = pascal_case
@@ -288,9 +299,9 @@ dotnet_naming_rule.types_should_be_pascal_case.severity = suggestion
 dotnet_naming_rule.types_should_be_pascal_case.symbols = types
 dotnet_naming_rule.types_should_be_pascal_case.style = pascal_case
 
-dotnet_naming_rule.async_method_should_be_async_methode.severity = suggestion
-dotnet_naming_rule.async_method_should_be_async_methode.symbols = async_method
-dotnet_naming_rule.async_method_should_be_async_methode.style = async_methode
+dotnet_naming_rule.async_method_should_be_async_method.severity = suggestion
+dotnet_naming_rule.async_method_should_be_async_method.symbols = async_method
+dotnet_naming_rule.async_method_should_be_async_method.style = async_method
 
 dotnet_naming_rule.constant_should_be_constant_all_upper.severity = suggestion
 dotnet_naming_rule.constant_should_be_constant_all_upper.symbols = constant
@@ -301,7 +312,6 @@ dotnet_naming_rule.private_field_should_be_begins_with__.symbols = private_field
 dotnet_naming_rule.private_field_should_be_begins_with__.style = begins_with__
 
 # Symbol specifications
-
 dotnet_naming_symbols.private_field.applicable_kinds = field
 dotnet_naming_symbols.private_field.applicable_accessibilities = private
 dotnet_naming_symbols.private_field.required_modifiers = 
@@ -327,7 +337,6 @@ dotnet_naming_symbols.non_field_members.applicable_accessibilities = public, int
 dotnet_naming_symbols.non_field_members.required_modifiers = 
 
 # Naming styles
-
 dotnet_naming_style.pascal_case.required_prefix = 
 dotnet_naming_style.pascal_case.required_suffix = 
 dotnet_naming_style.pascal_case.word_separator = 
@@ -343,14 +352,15 @@ dotnet_naming_style.begins_with__.required_suffix =
 dotnet_naming_style.begins_with__.word_separator = 
 dotnet_naming_style.begins_with__.capitalization = camel_case
 
-dotnet_naming_style.async_methode.required_prefix = 
-dotnet_naming_style.async_methode.required_suffix = Async
-dotnet_naming_style.async_methode.word_separator = 
-dotnet_naming_style.async_methode.capitalization = pascal_case
+dotnet_naming_style.async_method.required_prefix = 
+dotnet_naming_style.async_method.required_suffix = Async
+dotnet_naming_style.async_method.word_separator = 
+dotnet_naming_style.async_method.capitalization = pascal_case
 
 dotnet_naming_style.constant_all_upper.required_prefix = 
 dotnet_naming_style.constant_all_upper.required_suffix = 
 dotnet_naming_style.constant_all_upper.word_separator = _
 dotnet_naming_style.constant_all_upper.capitalization = all_upper
-csharp_prefer_static_anonymous_function = true:suggestion
 
+csharp_prefer_static_anonymous_function = true:suggestion
+csharp_prefer_static_local_function = true:suggestion

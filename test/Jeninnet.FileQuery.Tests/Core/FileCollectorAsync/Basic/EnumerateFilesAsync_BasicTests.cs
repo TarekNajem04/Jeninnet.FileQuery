@@ -7,12 +7,14 @@
 /// - matching sync behavior
 /// </summary>
 [TestClass]
-public class EnumerateFilesAsync_BasicTests {
+public class EnumerateFilesAsync_BasicTests
+{
     /// <summary>
     /// Ensures basic async enumeration returns expected .txt files.
     /// </summary>
     [TestMethod]
-    public async Task EnumerateFilesAsync_ShouldReturnTxtFilesAsync() {
+    public async Task EnumerateFilesAsync_ShouldReturnTxtFilesAsync()
+    {
         using var env = new TestEnvironment();
 
         env.CreateFiles("a.txt", "b.txt", "c.log", "sub/d.txt");
@@ -32,16 +34,17 @@ public class EnumerateFilesAsync_BasicTests {
                                            .ToListAsync(TestContext.CancellationToken);
 
         TestAssertEx.HasCount(results, 3);
-        Assert.Contains(x => x.EndsWith("a.txt"), results);
-        Assert.Contains(x => x.EndsWith("b.txt"), results);
-        Assert.Contains(x => x.EndsWith(Path.Combine("sub", "d.txt")), results);
+        Assert.Contains(x => x.EndsWith("a.txt", StringComparison.Ordinal), results);
+        Assert.Contains(x => x.EndsWith("b.txt", StringComparison.Ordinal), results);
+        Assert.Contains(x => x.EndsWith(Path.Combine("sub", "d.txt"), StringComparison.Ordinal), results);
     }
 
     /// <summary>
     /// Ensures async enumeration matches sync enumeration for the same options.
     /// </summary>
     [TestMethod]
-    public async Task EnumerateFilesAsync_ShouldMatchSyncResultsAsync() {
+    public async Task EnumerateFilesAsync_ShouldMatchSyncResultsAsync()
+    {
         using var env = new TestEnvironment();
         env.CreateFiles("x.txt", "y.log", "sub/z.txt");
 
@@ -69,7 +72,8 @@ public class EnumerateFilesAsync_BasicTests {
     /// Ensures async enumeration works fine on empty directory.
     /// </summary>
     [TestMethod]
-    public async Task EnumerateFilesAsync_EmptyDirectory_ShouldReturnEmptyAsync() {
+    public async Task EnumerateFilesAsync_EmptyDirectory_ShouldReturnEmptyAsync()
+    {
         using var env = new TestEnvironment();
         env.CreateDirectory("empty");
 

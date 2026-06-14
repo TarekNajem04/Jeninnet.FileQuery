@@ -13,7 +13,8 @@
 /// </list>
 /// </remarks>
 [DebuggerDisplay($"{{{nameof(GetDebuggerDisplay)}(),nq}}")]
-internal sealed record CompiledPattern : ICompiledPattern {
+internal sealed record CompiledPattern : ICompiledPattern
+{
     /// <summary>
     /// True if the pattern begins with <c>!</c>, negating matches.
     /// </summary>
@@ -35,20 +36,31 @@ internal sealed record CompiledPattern : ICompiledPattern {
 
     public CompiledMatchIntent Intent { get; init; }
 
+    /// <inheritdoc/>
+    public string SourceText { get; init; }
+
+    /// <inheritdoc/>
+    public int SourceIndex { get; init; }
+
     internal CompiledPattern(
         bool isNegated,
         bool directoryOnly,
         bool anchoredToRoot,
         IReadOnlyList<IReadOnlyList<IPatternToken>> segments,
         PatternKind patternKind,
-        CompiledMatchIntent intent
-    ) {
+        CompiledMatchIntent intent,
+        string sourceText = "",
+        int sourceIndex = -1
+    )
+    {
         IsNegated = isNegated;
         DirectoryOnly = directoryOnly;
         AnchoredToRoot = anchoredToRoot;
         Segments = segments ?? throw new ArgumentNullException(nameof(segments));
         PatternKind = patternKind;
         Intent = intent;
+        SourceText = sourceText;
+        SourceIndex = sourceIndex;
     }
 
     /// <summary>

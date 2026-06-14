@@ -4,10 +4,13 @@
 /// Represents a filesystem entry without exposing <see cref="System.IO"/> types directly.
 /// Provides convenient boolean properties for checking common <see cref="FileAttributes"/> flags.
 /// </summary>
+/// <param name="FullPath">The full absolute path of the filesystem entry.</param>
+/// <param name="Attributes">The raw file attribute flags associated with this entry.</param>
 internal readonly record struct FileSystemEntry(
     string FullPath,
     FileAttributes Attributes
-) {
+)
+{
     /// <summary>
     /// Gets the full absolute path of the filesystem entry.
     /// </summary>
@@ -85,8 +88,10 @@ internal readonly record struct FileSystemEntry(
     /// Returns all active attribute flags for this entry.
     /// Useful for debugging or UI display.
     /// </summary>
-    public IEnumerable<FileAttributes> ActiveAttributes {
-        get {
+    public IEnumerable<FileAttributes> ActiveAttributes
+    {
+        get
+        {
             var entry = this;
 
             return Enum.GetValues<FileAttributes>()

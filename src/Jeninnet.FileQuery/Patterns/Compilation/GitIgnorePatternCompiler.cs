@@ -16,10 +16,12 @@
 /// Invariants are enforced via <see cref="PatternCompilerBase"/>.
 /// </para>
 /// </remarks>
-internal sealed class GitIgnorePatternCompiler : PatternCompilerBase {
+internal sealed class GitIgnorePatternCompiler : PatternCompilerBase
+{
     public override PatternKind PatternKind => PatternKind.GitIgnore;
 
-    protected override ICompiledPattern CompileCore(PatternCompilationContext context) {
+    protected override ICompiledPattern CompileCore(PatternCompilationContext context)
+    {
         var state = context.State;
         var tokens = context.Tokens!;
 
@@ -29,7 +31,9 @@ internal sealed class GitIgnorePatternCompiler : PatternCompilerBase {
             anchoredToRoot: state.IsRootAnchored,
             segments: tokens,
             patternKind: PatternKind.GitIgnore,
-            CompiledMatchIntent.FromNegation(state.IsNegated)
+            CompiledMatchIntent.FromNegation(state.IsNegated),
+            context.Pattern.Text,
+            context.Pattern.SourceIndex
         );
     }
 }

@@ -5,13 +5,15 @@
  *  Measure the combined matcher pipeline performance when processing a mix of GitIgnore, Glob, and Regex patterns.
  */
 [MemoryDiagnoser]
-public class HybridMatcherBenchmark {
+public class HybridMatcherBenchmark
+{
     private HybridPathMatcher _matcher = default!;
     private ICompiledPatternSet _patterns = default!;
     private readonly string _path = "src/application/service.cs";
 
     [GlobalSetup]
-    public void Setup() {
+    public void Setup()
+    {
         _matcher = CreateMatcher();
         string[] gitignore = [
             "**",
@@ -36,7 +38,8 @@ public class HybridMatcherBenchmark {
     }
 
     [Benchmark]
-    public bool Match() {
+    public bool Match()
+    {
         var matchOutcome = _matcher.Match(_patterns, CreateFileContext(path: _path));
 
         return matchOutcome is MatchOutcome.Include;
@@ -46,7 +49,8 @@ public class HybridMatcherBenchmark {
     private static ICompiledPatternSet Compile(ClassifiedPatternSet patterns) => CompiledPatternFactory.Compile(patterns);
     private static ICompiledPatternSet Compile(IEnumerable<string> patterns) =>
         Compile(
-            new ClassifiedPatternSet() {
+            new ClassifiedPatternSet()
+            {
                 Patterns = patterns.Select(pattern => new ClassifiedPattern(Text: pattern, Type: PatternClassifier.Classify(pattern)))
                                    .ToArray()
             }

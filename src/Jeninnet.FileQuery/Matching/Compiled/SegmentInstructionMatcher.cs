@@ -8,7 +8,8 @@
 /// <remarks>
 /// All methods are static and thread-safe.
 /// </remarks>
-internal static class SegmentInstructionMatcher {
+internal static class SegmentInstructionMatcher
+{
     /// <summary>
     /// Matches a single path segment (e.g., <c>"helpers.cs"</c>) against a
     /// tokenized pattern segment.
@@ -24,7 +25,8 @@ internal static class SegmentInstructionMatcher {
         ReadOnlySpan<char> segment,
         IReadOnlyList<IPatternToken> tokens,
         StringComparison cmp
-    ) {
+    )
+    {
         var result = MatchSequence(tokens, 0, segment, 0, cmp);
         return result == segment.Length;
     }
@@ -32,6 +34,11 @@ internal static class SegmentInstructionMatcher {
     /// <summary>
     /// Matches a sequence of pattern tokens against a path segment slice.
     /// </summary>
+    /// <param name="tokens">The list of tokens to match.</param>
+    /// <param name="tokenIndex">The index of the current token.</param>
+    /// <param name="text">The text to match against.</param>
+    /// <param name="pos">The current position in the text.</param>
+    /// <param name="cmp">The string comparison mode.</param>
     /// <returns>
     /// The position in <paramref name="text"/> where the match stopped,
     /// or <see langword="null"/> if no match was found.
@@ -42,18 +49,22 @@ internal static class SegmentInstructionMatcher {
         ReadOnlySpan<char> text,
         int pos,
         StringComparison cmp
-    ) {
-        if(IsPatternComplete(tokens, tokenIndex)) {
+    )
+    {
+        if(IsPatternComplete(tokens, tokenIndex))
+        {
             return MatchIfTextComplete(text, pos);
         }
 
         var token = tokens[tokenIndex];
 
-        if(IsTextExhausted(text, pos)) {
+        if(IsTextExhausted(text, pos))
+        {
             return TryMatchTrailingWildcard(tokens, tokenIndex, token, text, pos, cmp);
         }
 
-        return token switch {
+        return token switch
+        {
             WildcardToken => HandleWildcard(tokens, tokenIndex, text, pos, cmp),
             LiteralToken literal => MatchLiteral(tokens, tokenIndex, literal, text, pos, cmp),
             SingleCharToken => MatchSingleCharacter(tokens, tokenIndex, text, pos, cmp),
@@ -94,9 +105,11 @@ internal static class SegmentInstructionMatcher {
         ReadOnlySpan<char> text,
         int pos,
         StringComparison cmp
-    ) {
+    )
+    {
         if(pos + literal.Text.Length > text.Length ||
-            !text[pos..].StartsWith(literal.Text.AsSpan(), cmp)) {
+            !text[pos..].StartsWith(literal.Text.AsSpan(), cmp))
+        {
             return null;
         }
 
@@ -116,6 +129,12 @@ internal static class SegmentInstructionMatcher {
     /// Matches one character from <paramref name="text"/> against the compiled
     /// <see cref="CharacterClassToken"/>.
     /// </summary>
+    /// <param name="tokens">The list of tokens to match.</param>
+    /// <param name="tokenIndex">The index of the current token.</param>
+    /// <param name="cls">The character class to match against.</param>
+    /// <param name="text">The text to match against.</param>
+    /// <param name="pos">The current position in the text.</param>
+    /// <param name="cmp">The string comparison mode.</param>
     private static int? MatchCharacterClass(
         IReadOnlyList<IPatternToken> tokens,
         int tokenIndex,
@@ -123,14 +142,17 @@ internal static class SegmentInstructionMatcher {
         ReadOnlySpan<char> text,
         int pos,
         StringComparison cmp
-    ) {
+    )
+    {
         var c = text[pos];
 
-        if(IsSegmentSeparator(c)) {
+        if(IsSegmentSeparator(c))
+        {
             return null;
         }
 
-        if(!CharacterClassMatches(cls.Value, c)) {
+        if(!CharacterClassMatches(cls.Value, c))
+        {
             return null;
         }
 
@@ -141,6 +163,8 @@ internal static class SegmentInstructionMatcher {
     /// Returns <see langword="true"/> when character <paramref name="c"/>
     /// satisfies the <see cref="CharacterClass"/> definition.
     /// </summary>
+    /// <param name="cls">The character class definition.</param>
+    /// <param name="c">The character to test.</param>
     /// <remarks>
     /// <para>
     /// <strong>Allocation fix:</strong> The previous implementation used
@@ -153,14 +177,17 @@ internal static class SegmentInstructionMatcher {
     /// and an early <c>break</c> as soon as a matching element is found.
     /// </para>
     /// </remarks>
-    private static bool CharacterClassMatches(CharacterClass cls, char c) {
+    private static bool CharacterClassMatches(CharacterClass cls, char c)
+    {
         var elements = cls.Elements;
         var inSet = false;
 
         // MANUAL LOOP — eliminates the display-class allocation that
         // Any(element => MatchesElement(element, c)) would create per call.
-        for(var i = 0; i < elements.Count; i++) {
-            if(MatchesElement(elements[i], c)) {
+        for(var i = 0; i < elements.Count; i++)
+        {
+            if(MatchesElement(elements[i], c))
+            {
                 inSet = true;
                 break; // short-circuit: no need to evaluate remaining elements
             }
@@ -173,8 +200,11 @@ internal static class SegmentInstructionMatcher {
     /// Pattern-matches a single <see cref="ICharacterClassElement"/> against
     /// character <paramref name="c"/>.
     /// </summary>
+    /// <param name="element">The character class element.</param>
+    /// <param name="c">The character to test.</param>
     private static bool MatchesElement(ICharacterClassElement element, char c) =>
-        element switch {
+        element switch
+        {
             CharLiteral literal => literal.Value == c,
             CharRange range => c >= range.Start && c <= range.End,
             PosixClass posix => MatchesPosixClass(posix.Name, c),
@@ -186,11 +216,14 @@ internal static class SegmentInstructionMatcher {
     /// Evaluates whether <paramref name="c"/> belongs to the POSIX named class
     /// <paramref name="name"/>.
     /// </summary>
+    /// <param name="name">The name of the POSIX class.</param>
+    /// <param name="c">The character to test.</param>
     /// <remarks>
     /// Unknown POSIX class names return <see langword="false"/> (safe default).
     /// </remarks>
     private static bool MatchesPosixClass(string name, char c) =>
-        name switch {
+        name switch
+        {
             "digit" => char.IsDigit(c),
             "alpha" => char.IsLetter(c),
             "alnum" => char.IsLetterOrDigit(c),
@@ -209,20 +242,29 @@ internal static class SegmentInstructionMatcher {
     /// <summary>
     /// Handles the single wildcard <c>*</c> using canonical backtracking.
     /// </summary>
+    /// <param name="tokens">The list of tokens to match.</param>
+    /// <param name="wildcardIndex">The index of the wildcard token.</param>
+    /// <param name="text">The text to match against.</param>
+    /// <param name="pos">The current position in the text.</param>
+    /// <param name="cmp">The string comparison mode.</param>
     private static int? HandleWildcard(
         IReadOnlyList<IPatternToken> tokens,
         int wildcardIndex,
         ReadOnlySpan<char> text,
         int pos,
         StringComparison cmp
-    ) {
-        if(wildcardIndex == tokens.Count - 1) {
+    )
+    {
+        if(wildcardIndex == tokens.Count - 1)
+        {
             return text.Length; // trailing '*' consumes everything in the segment
         }
 
-        for(var skip = pos; skip <= text.Length; skip++) {
+        for(var skip = pos; skip <= text.Length; skip++)
+        {
             var next = MatchSequence(tokens, wildcardIndex + 1, text, skip, cmp);
-            if(next.HasValue) {
+            if(next.HasValue)
+            {
                 return next.Value;
             }
         }

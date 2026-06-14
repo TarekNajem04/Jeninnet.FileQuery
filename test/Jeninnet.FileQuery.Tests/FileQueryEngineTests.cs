@@ -1,7 +1,8 @@
 ﻿namespace Jeninnet.FileQuery.Tests;
 
 [TestClass]
-public class FileQueryEngineTests {
+public class FileQueryEngineTests
+{
     private static GitIgnoreInstructionMatcher CreateMatcher() => new();
     private static ICompiledPatternSet Compile(IEnumerable<string> patterns) => CompiledPatternFactory.Compile(PatternKind.GitIgnore, patterns);
     private static PathMatchContext CreateFileContext(ReadOnlySpan<char> path, CaseSensitivity caseSensitivity = CaseSensitivity.Sensitive) =>
@@ -10,9 +11,11 @@ public class FileQueryEngineTests {
         new(path, PathKind.Directory, caseSensitivity);
 
     [TestClass]
-    public sealed class EngineConstructionTests {
+    public sealed class EngineConstructionTests
+    {
         [TestMethod]
-        public void Engine_Rejects_Null_Query() {
+        public void Engine_Rejects_Null_Query()
+        {
             var engine = DefaultEngineBuilder.Create();
 
             Assert.ThrowsExactly<ArgumentNullException>(() => engine.Execute(null!));
@@ -20,34 +23,39 @@ public class FileQueryEngineTests {
     }
 
     [TestMethod]
-    public void Normalize_ShouldConvertBackslashesToForward() {
+    public void Normalize_ShouldConvertBackslashesToForward()
+    {
         var input = Path.Combine("C:", "Users", "Test", "Folder", "File.txt");
         var normalized = PathUtilities.Normalize(input);
         Assert.AreEqual("C:/Users/Test/Folder/File.txt", normalized.Replace('\\', '/'));
     }
 
     [TestMethod]
-    public void Normalize_ShouldRemoveDuplicateSlashes() {
+    public void Normalize_ShouldRemoveDuplicateSlashes()
+    {
         const string input = @"C:\\Users//Test\\Folder/File.txt";
         var normalized = PathUtilities.Normalize(input);
         Assert.AreEqual("C:/Users/Test/Folder/File.txt", normalized);
     }
 
     [TestMethod]
-    public void TrimTrailingSlash_ShouldPreserveRoot() {
+    public void TrimTrailingSlash_ShouldPreserveRoot()
+    {
         const string root = "C:/";
         var normalized = PathUtilities.Normalize(root);
         Assert.AreEqual("C:/", normalized);
     }
 
     [TestMethod]
-    public void Normalize_ShouldThrowOnNullOrEmpty() {
+    public void Normalize_ShouldThrowOnNullOrEmpty()
+    {
         TestAssertEx.Throws<ArgumentException>(() => PathUtilities.Normalize(null));
         TestAssertEx.Throws<ArgumentException>(() => PathUtilities.Normalize(""));
     }
 
     [TestMethod]
-    public void GitIgnorePatternCompiler_ShouldCompileNegatedPattern() {
+    public void GitIgnorePatternCompiler_ShouldCompileNegatedPattern()
+    {
         var compiled = CompiledPatternFactory
             .Compile(PatternKind.GitIgnore, "!bin/")
             .Patterns
@@ -63,7 +71,8 @@ public class FileQueryEngineTests {
     }
 
     [TestMethod]
-    public void GitIgnorePatternCompiler_ShouldCompileAnchoredPattern() {
+    public void GitIgnorePatternCompiler_ShouldCompileAnchoredPattern()
+    {
         var compiled = CompiledPatternFactory
             .Compile(PatternKind.GitIgnore, "/obj/**/*.tmp")
             .Patterns
@@ -80,7 +89,8 @@ public class FileQueryEngineTests {
     }
 
     [TestMethod]
-    public void GlobPatternCompiler_ShouldCompileSingleStar() {
+    public void GlobPatternCompiler_ShouldCompileSingleStar()
+    {
         var compiled = CompiledPatternFactory
             .Compile(PatternKind.Glob, "*.cs")
             .Patterns
@@ -91,7 +101,8 @@ public class FileQueryEngineTests {
     }
 
     [TestMethod]
-    public void GlobPatternCompiler_ShouldCompileRecursiveStar() {
+    public void GlobPatternCompiler_ShouldCompileRecursiveStar()
+    {
         var compiled = CompiledPatternFactory
             .Compile(PatternKind.Glob, "**/*.cs")
             .Patterns
@@ -102,7 +113,8 @@ public class FileQueryEngineTests {
     }
 
     [TestMethod]
-    public void GitIgnoreMatcher_ShouldIncludeAndExcludeCorrectly() {
+    public void GitIgnoreMatcher_ShouldIncludeAndExcludeCorrectly()
+    {
         var matcher = CreateMatcher();
         var patterns = Compile(["*.cs", "!Program.cs"]);
 
@@ -111,7 +123,8 @@ public class FileQueryEngineTests {
     }
 
     [TestMethod]
-    public void GitIgnoreMatcher_ShouldSkipDirectoriesIfRuleIsFileOnly() {
+    public void GitIgnoreMatcher_ShouldSkipDirectoriesIfRuleIsFileOnly()
+    {
         var matcher = CreateMatcher();
         var patterns = Compile(["obj/"]);
 
@@ -120,7 +133,8 @@ public class FileQueryEngineTests {
     }
 
     [TestMethod]
-    public void PatternToken_ShouldSupportCharacterClass() {
+    public void PatternToken_ShouldSupportCharacterClass()
+    {
         var cls = new CharacterClass(
             IsNegated: true,
             Elements: new List<ICharacterClassElement> {

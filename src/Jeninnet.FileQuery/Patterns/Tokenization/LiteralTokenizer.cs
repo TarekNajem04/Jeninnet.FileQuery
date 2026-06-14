@@ -18,20 +18,24 @@
 /// </list>
 /// </para>
 /// </remarks>
-internal sealed class LiteralTokenizer : IPatternTokenizer {
+internal sealed class LiteralTokenizer : IPatternTokenizer
+{
     /// <inheritdoc />
     public bool TryTokenize(
         ReadOnlySpan<char> input,
         ref int index,
         PatternSyntaxProfile syntax,
         List<IPatternToken> tokens
-    ) {
+    )
+    {
         var start = index;
 
-        while(index < input.Length) {
+        while(index < input.Length)
+        {
             var c = input[index];
 
-            if(IsTokenBoundary(c, syntax)) {
+            if(IsTokenBoundary(c, syntax))
+            {
                 break;
             }
 
@@ -39,7 +43,8 @@ internal sealed class LiteralTokenizer : IPatternTokenizer {
         }
 
         // Safety net: always consume at least one character
-        if(index == start) {
+        if(index == start)
+        {
             index++;
         }
 
@@ -49,7 +54,8 @@ internal sealed class LiteralTokenizer : IPatternTokenizer {
     }
 
     private static bool IsTokenBoundary(char c, PatternSyntaxProfile syntax) =>
-        c switch {
+        c switch
+        {
             '\\' when syntax.SupportsEscaping => true,
             '*' => true,
             '?' when syntax.SupportsSingleCharWildcard => true,

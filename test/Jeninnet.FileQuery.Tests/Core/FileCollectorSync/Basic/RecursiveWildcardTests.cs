@@ -1,12 +1,14 @@
 ﻿namespace Jeninnet.FileQuery.Tests.Core.FileCollectorSync.Basic;
 
 [TestClass]
-public class RecursiveWildcardTests {
+public class RecursiveWildcardTests
+{
     /// <summary>
     /// Ensures ** recurses into subdirectories.
     /// </summary>
     [TestMethod]
-    public void DoubleStar_ShouldMatchFilesInAllSubfolders() {
+    public void DoubleStar_ShouldMatchFilesInAllSubfolders()
+    {
         using var env = new TestEnvironment();
 
         env.CreateFile("file1.txt");
@@ -35,7 +37,8 @@ public class RecursiveWildcardTests {
     /// Ensures ** combined with prefix works.
     /// </summary>
     [TestMethod]
-    public void DoubleStar_WithPrefix() {
+    public void DoubleStar_WithPrefix()
+    {
         using var env = new TestEnvironment();
 
         env.CreateFile("logs/a.txt");
@@ -64,7 +67,8 @@ public class RecursiveWildcardTests {
     /// Ensures ** behaves like * in a simple, single-segment directory.
     /// </summary>
     [TestMethod]
-    public void DoubleStar_AppliesLikeStar_WhenNoSubfolders() {
+    public void DoubleStar_AppliesLikeStar_WhenNoSubfolders()
+    {
         using var env = new TestEnvironment();
 
         env.CreateFiles("a.txt", "b.log", "c.txt");
@@ -83,8 +87,8 @@ public class RecursiveWildcardTests {
         var result = fileQueryEngine.Execute(new(env.Root, options))
                                     .ToList();
 
-        TestAssertEx.Contains(result, x => x.EndsWith("a.txt"));
-        TestAssertEx.Contains(result, x => x.EndsWith("c.txt"));
-        TestAssertEx.DoesNotContain(result, x => x.EndsWith("b.log"));
+        TestAssertEx.Contains(result, x => x.EndsWith("a.txt", StringComparison.Ordinal));
+        TestAssertEx.Contains(result, x => x.EndsWith("c.txt", StringComparison.Ordinal));
+        TestAssertEx.DoesNotContain(result, x => x.EndsWith("b.log", StringComparison.Ordinal));
     }
 }

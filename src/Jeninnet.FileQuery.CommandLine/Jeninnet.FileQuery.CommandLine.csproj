@@ -22,14 +22,14 @@
 
     <ItemGroup>
         <PackageReference Include="Microsoft.CodeAnalysis.NetAnalyzers">
-          <PrivateAssets>all</PrivateAssets>
-          <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+            <PrivateAssets>all</PrivateAssets>
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
         <PackageReference Include="System.CommandLine" />
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\Jeninnet.FileQuery\Jeninnet.FileQuery.csproj" />
+        <ProjectReference Include="..\Jeninnet.FileQuery\Jeninnet.FileQuery.csproj" />
     </ItemGroup>
 
     <ItemGroup>

@@ -1,4 +1,5 @@
-﻿namespace Jeninnet.FileQuery.Tests.Core.FileCollectorAsync.NegationAndPrecedence;
+﻿using System;
+namespace Jeninnet.FileQuery.Tests.Core.FileCollectorAsync.NegationAndPrecedence;
 
 /// <summary>
 /// Async tests that validate hybrid GitIgnore-style precedence rules:
@@ -8,12 +9,14 @@
 /// These are the most critical tests for correctness.
 /// </summary>
 [TestClass]
-public class EnumerateFilesAsync_NegationAndPrecedenceTests {
+public class EnumerateFilesAsync_NegationAndPrecedenceTests
+{
     /// <summary>
     /// Validates that a negated pattern re-includes a file that was previously excluded.
     /// </summary>
     [TestMethod]
-    public async Task EnumerateFilesAsync_Negation_ShouldReIncludeFilesAsync() {
+    public async Task EnumerateFilesAsync_Negation_ShouldReIncludeFilesAsync()
+    {
         using var env = new TestEnvironment();
 
         env.CreateFiles("a.txt", "b.txt", "c.log");
@@ -32,16 +35,17 @@ public class EnumerateFilesAsync_NegationAndPrecedenceTests {
         var results = await fileQueryEngine.ExecuteAsync(new(env.Root, options), TestContext.CancellationToken)
                                            .ToListAsync(TestContext.CancellationToken);
 
-        TestAssertEx.DoesNotContain(results, x => x.EndsWith("a.txt"));
-        TestAssertEx.Contains(results, x => x.EndsWith("b.txt"));
-        TestAssertEx.DoesNotContain(results, x => x.EndsWith("c.log"));
+        TestAssertEx.DoesNotContain(results, x => x.EndsWith("a.txt", StringComparison.Ordinal));
+        TestAssertEx.Contains(results, x => x.EndsWith("b.txt", StringComparison.Ordinal));
+        TestAssertEx.DoesNotContain(results, x => x.EndsWith("c.log", StringComparison.Ordinal));
     }
 
     /// <summary>
     /// Tests "last rule wins" behavior across async traversal.
     /// </summary>
     [TestMethod]
-    public async Task EnumerateFilesAsync_LastRuleWins_ShouldApplyAsync() {
+    public async Task EnumerateFilesAsync_LastRuleWins_ShouldApplyAsync()
+    {
         using var env = new TestEnvironment();
 
         env.CreateFiles("file.tmp", "file.txt");
@@ -61,14 +65,15 @@ public class EnumerateFilesAsync_NegationAndPrecedenceTests {
                                            .ToListAsync(TestContext.CancellationToken);
 
         // Because last rule wins, file.txt *must* be included
-        TestAssertEx.ContainsSingle(results, x => x.EndsWith("file.txt"));
+        TestAssertEx.ContainsSingle(results, x => x.EndsWith("file.txt", StringComparison.Ordinal));
     }
 
     /// <summary>
     /// Complex case mixing exclusion, inclusion, and wildcard paths.
     /// </summary>
     [TestMethod]
-    public async Task EnumerateFilesAsync_ComplexNegationOrdering_ShouldBehaveCorrectlyAsync() {
+    public async Task EnumerateFilesAsync_ComplexNegationOrdering_ShouldBehaveCorrectlyAsync()
+    {
         using var env = new TestEnvironment();
 
         env.CreateFiles(
@@ -94,10 +99,10 @@ public class EnumerateFilesAsync_NegationAndPrecedenceTests {
         var results = await fileQueryEngine.ExecuteAsync(new(env.Root, options), TestContext.CancellationToken)
                                            .ToListAsync(TestContext.CancellationToken);
 
-        TestAssertEx.Contains(results, x => x.EndsWith(Path.Combine("x", "a.txt")));
-        TestAssertEx.Contains(results, x => x.EndsWith(Path.Combine("x", "b.txt")));  // re-included
-        TestAssertEx.DoesNotContain(results, x => x.EndsWith(Path.Combine("y", "b.txt")));
-        TestAssertEx.DoesNotContain(results, x => x.EndsWith(Path.Combine("x", "c.tmp")));
+        TestAssertEx.Contains(results, x => x.EndsWith(Path.Combine("x", "a.txt"), StringComparison.Ordinal));
+        TestAssertEx.Contains(results, x => x.EndsWith(Path.Combine("x", "b.txt"), StringComparison.Ordinal));  // re-included
+        TestAssertEx.DoesNotContain(results, x => x.EndsWith(Path.Combine("y", "b.txt"), StringComparison.Ordinal));
+        TestAssertEx.DoesNotContain(results, x => x.EndsWith(Path.Combine("x", "c.tmp"), StringComparison.Ordinal));
     }
 
     public TestContext TestContext { get; set; } = null!;

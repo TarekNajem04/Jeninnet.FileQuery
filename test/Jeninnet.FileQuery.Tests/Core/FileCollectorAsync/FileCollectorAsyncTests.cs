@@ -5,7 +5,8 @@
 /// Validates recursive enumeration, pattern matching, and cancellation.
 /// </summary>
 [TestClass]
-public class FileQueryEngineAsyncTests {
+public class FileQueryEngineAsyncTests
+{
     // Remove _tempDir field, Setup, and Cleanup methods.
 
     // The TestContext is retained as it is necessary for CancellationToken access.
@@ -18,7 +19,8 @@ public class FileQueryEngineAsyncTests {
     /// Only top-level files should be returned when max depth is 0.
     /// </summary>
     [TestMethod]
-    public async Task EnumerateFilesAsync_RespectsMaxDepthAsync() {
+    public async Task EnumerateFilesAsync_RespectsMaxDepthAsync()
+    {
         // ARRANGE: Setup isolated environment using TestEnvironment
         using var env = new TestEnvironment();
         env.CreateFiles(
@@ -64,7 +66,8 @@ public class FileQueryEngineAsyncTests {
     /// Tests recursive matching with a wildcard.
     /// </summary>
     [TestMethod]
-    public async Task EnumerateFilesAsync_ShouldReturnMatchingFilesAsync() {
+    public async Task EnumerateFilesAsync_ShouldReturnMatchingFilesAsync()
+    {
         // ARRANGE: Setup isolated environment
         using var env = new TestEnvironment();
         env.CreateFiles(
@@ -109,7 +112,8 @@ public class FileQueryEngineAsyncTests {
     /// Verifies that cancellation token correctly interrupts async enumeration.
     /// </summary>
     [TestMethod]
-    public async Task EnumerateFilesAsync_CanBeCancelledAsync() {
+    public async Task EnumerateFilesAsync_CanBeCancelledAsync()
+    {
         // ARRANGE: Setup isolated environment
         using var env = new TestEnvironment();
         env.CreateFiles(
@@ -135,8 +139,10 @@ public class FileQueryEngineAsyncTests {
 
         // ACT & ASSERT
         // Cancellation should throw OperationCanceledException
-        await Assert.ThrowsAsync<OperationCanceledException>(async () => {
-            await foreach(var file in fileQueryEngine.ExecuteAsync(new(env.Root, options), cts.Token)) {
+        await Assert.ThrowsAsync<OperationCanceledException>(async () =>
+        {
+            await foreach(var file in fileQueryEngine.ExecuteAsync(new(env.Root, options), cts.Token))
+            {
                 // Should never reach here
             }
         });
@@ -147,7 +153,8 @@ public class FileQueryEngineAsyncTests {
     /// Uses standard GitIgnore pruning semantics (un-negated directory-only rules exclude the subtree).
     /// </summary>
     [TestMethod]
-    public async Task EnumerateFilesAsync_HandlesComplexPatternsAsync() {
+    public async Task EnumerateFilesAsync_HandlesComplexPatternsAsync()
+    {
         // ARRANGE: Setup isolated environment
         using var env = new TestEnvironment();
         env.CreateFiles(

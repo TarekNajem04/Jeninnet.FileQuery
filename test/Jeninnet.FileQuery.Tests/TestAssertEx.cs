@@ -1,11 +1,15 @@
 ﻿namespace Jeninnet.FileQuery.Tests;
 
-internal static class TestAssertEx {
-    public static T Throws<T>(Action action) where T : Exception {
-        try {
+internal static class TestAssertEx
+{
+    public static T Throws<T>(Action action) where T : Exception
+    {
+        try
+        {
             action();
         }
-        catch(T exception) {
+        catch(T exception)
+        {
             return exception;
         }
 
@@ -13,11 +17,14 @@ internal static class TestAssertEx {
         return null!;
     }
 
-    public static async Task<T> ThrowsAsync<T>(Func<Task> action) where T : Exception {
-        try {
+    public static async Task<T> ThrowsAsync<T>(Func<Task> action) where T : Exception
+    {
+        try
+        {
             await action();
         }
-        catch(T exception) {
+        catch(T exception)
+        {
             return exception;
         }
 
@@ -43,8 +50,9 @@ internal static class TestAssertEx {
 
     public static void ContainsSubset<T>(IEnumerable<T> actual, IEnumerable<T> expectedSubset, string? message = null) => CollectionAssert.IsSubsetOf(expectedSubset.ToList(), actual.ToList(), message);
 
-    public static T ContainsSingle<T>(IEnumerable<T> actual, Func<T, bool>? predicate = null, string? message = null) {
-        var matches = predicate is null ? actual.ToList() : actual.Where(predicate).ToList();
+    public static T ContainsSingle<T>(IEnumerable<T> actual, Func<T, bool>? predicate = null, string? message = null)
+    {
+        List<T> matches = predicate is null ? [.. actual] : [.. actual.Where(predicate)];
         Assert.HasCount(1, matches, message);
         return matches[0];
     }

@@ -7,7 +7,8 @@
 /// Wraps standard <see cref="System.IO"/> APIs. This class is implemented as a singleton
 /// to avoid overhead and provide a consistent access point for the engine.
 /// </remarks>
-internal sealed class FileSystem : IFileSystem {
+internal sealed class FileSystem : IFileSystem
+{
     /// <summary>
     /// Gets the singleton instance of the <see cref="FileSystem"/>.
     /// </summary>
@@ -19,13 +20,23 @@ internal sealed class FileSystem : IFileSystem {
     /// <inheritdoc/>
     public IEnumerable<FileSystemEntry> Enumerate(
         string directory,
-        bool ignoreInaccessible
-    ) {
-        foreach(var path in FileSystemGuards.EnumerateEntries(directory, ignoreInaccessible)) {
-            var attributes = File.GetAttributes(path);
+        bool ignoreInaccessible,
+        FileQueryErrorRecoveryOptions errorRecovery
+    )
+    {
+        foreach(var path in FileSystemGuards.EnumerateEntries(directory, ignoreInaccessible, errorRecovery))
+        {
+            if(!TryGetAttributes(path, ignoreInaccessible, errorRecovery, out var attributes))
+            {
+                continue;
+            }
 
-            if(attributes.HasFlag(FileAttributes.Directory)) {
-                FileSystemGuards.EnsureAccessible(path, ignoreInaccessible);
+            if(attributes.HasFlag(FileAttributes.Directory))
+            {
+                if(!TryEnsureAccessible(path, ignoreInaccessible, errorRecovery))
+                {
+                    continue;
+                }
             }
 
             yield return new FileSystemEntry(path, attributes);
@@ -36,17 +47,30 @@ internal sealed class FileSystem : IFileSystem {
     public async IAsyncEnumerable<FileSystemEntry> EnumerateAsync(
         string directory,
         bool ignoreInaccessible,
+        FileQueryErrorRecoveryOptions errorRecovery,
         [EnumeratorCancellation] CancellationToken cancellationToken = default
-    ) {
-        FileSystemGuards.EnsureAccessible(directory, ignoreInaccessible);
+    )
+    {
+        if(!TryEnsureAccessible(directory, ignoreInaccessible, errorRecovery))
+        {
+            yield break;
+        }
 
-        foreach(var path in FileSystemGuards.EnumerateEntries(directory, ignoreInaccessible)) {
+        foreach(var path in FileSystemGuards.EnumerateEntries(directory, ignoreInaccessible, errorRecovery))
+        {
             cancellationToken.ThrowIfCancellationRequested();
 
-            var attributes = File.GetAttributes(path);
+            if(!TryGetAttributes(path, ignoreInaccessible, errorRecovery, out var attributes))
+            {
+                continue;
+            }
 
-            if(attributes.HasFlag(FileAttributes.Directory)) {
-                FileSystemGuards.EnsureAccessible(path, ignoreInaccessible);
+            if(attributes.HasFlag(FileAttributes.Directory))
+            {
+                if(!TryEnsureAccessible(path, ignoreInaccessible, errorRecovery))
+                {
+                    continue;
+                }
             }
 
             yield return new FileSystemEntry(path, attributes);
@@ -69,11 +93,14 @@ internal sealed class FileSystem : IFileSystem {
         => File.GetAttributes(path);
 
     /// <inheritdoc/>
-    public string ResolveRealPath(string path) {
-        try {
+    public string ResolveRealPath(string path)
+    {
+        try
+        {
             var attributes = File.GetAttributes(path);
 
-            if(attributes.HasFlag(FileAttributes.ReparsePoint)) {
+            if(attributes.HasFlag(FileAttributes.ReparsePoint))
+            {
                 var target = attributes.HasFlag(FileAttributes.Directory)
                     ? Directory.ResolveLinkTarget(path, returnFinalTarget: true)
                     : File.ResolveLinkTarget(path, returnFinalTarget: true);
@@ -81,7 +108,8 @@ internal sealed class FileSystem : IFileSystem {
                 return target?.FullName ?? path;
             }
         }
-        catch {
+        catch
+        {
             // If we cannot resolve (e.g. permission error), return the original path.
             // The engine will handle the access error during enumeration.
         }
@@ -93,4 +121,78 @@ internal sealed class FileSystem : IFileSystem {
     public string GetFullPath(string path) => Path.GetFullPath(path);
     /// <inheritdoc/>
     public string GetFullPath(string path, string basePath) => Path.GetFullPath(path, basePath);
+
+    private static bool TryGetAttributes(
+        string path,
+        bool ignoreInaccessible,
+        FileQueryErrorRecoveryOptions errorRecovery,
+        out FileAttributes attributes
+    )
+    {
+        attributes = default;
+        var attempts = errorRecovery.Action is FileQueryErrorAction.Retry
+            ? errorRecovery.MaxRetryAttempts + 1
+            : 1;
+
+        for(var attempt = 0; attempt < attempts; attempt++)
+        {
+            try
+            {
+                attributes = File.GetAttributes(path);
+                return true;
+            }
+            catch(Exception ex) when(FileSystemGuards.IsRecoverable(ex))
+            {
+                if(FileSystemGuards.ShouldSkip(ignoreInaccessible, errorRecovery, attempt, attempts))
+                {
+                    return false;
+                }
+
+                if(errorRecovery.Action is FileQueryErrorAction.Retry && attempt < attempts - 1)
+                {
+                    continue;
+                }
+
+                throw;
+            }
+        }
+
+        return false;
+    }
+
+    private static bool TryEnsureAccessible(
+        string directory,
+        bool ignoreInaccessible,
+        FileQueryErrorRecoveryOptions errorRecovery
+    )
+    {
+        var attempts = errorRecovery.Action is FileQueryErrorAction.Retry
+            ? errorRecovery.MaxRetryAttempts + 1
+            : 1;
+
+        for(var attempt = 0; attempt < attempts; attempt++)
+        {
+            try
+            {
+                FileSystemGuards.EnsureAccessible(directory, ignoreInaccessible);
+                return true;
+            }
+            catch(Exception ex) when(FileSystemGuards.IsRecoverable(ex))
+            {
+                if(FileSystemGuards.ShouldSkip(ignoreInaccessible, errorRecovery, attempt, attempts))
+                {
+                    return false;
+                }
+
+                if(errorRecovery.Action is FileQueryErrorAction.Retry && attempt < attempts - 1)
+                {
+                    continue;
+                }
+
+                throw;
+            }
+        }
+
+        return false;
+    }
 }

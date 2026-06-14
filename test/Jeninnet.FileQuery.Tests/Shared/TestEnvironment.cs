@@ -7,7 +7,8 @@
 /// - Supports creating inaccessible directories for test purposes.
 /// - Cleans up everything on Dispose without polluting disk.
 /// </summary>
-public sealed class TestEnvironment : IDisposable {
+public sealed class TestEnvironment : IDisposable
+{
     /// <summary>
     /// Root temporary directory for this test environment.
     /// </summary>
@@ -19,7 +20,8 @@ public sealed class TestEnvironment : IDisposable {
     /// <summary>
     /// Initializes a new test environment with a unique temporary root.
     /// </summary>
-    public TestEnvironment() {
+    public TestEnvironment()
+    {
         Root = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString("n"));
         Directory.CreateDirectory(Root);
         _createdDirs.Add(Root);
@@ -29,7 +31,9 @@ public sealed class TestEnvironment : IDisposable {
     /// Creates a directory under the temporary root.
     /// Returns the absolute path.
     /// </summary>
-    public string CreateDirectory(string relative) {
+    /// <param name="relative">The relative path to create.</param>
+    public string CreateDirectory(string relative)
+    {
         var full = Path.Combine(Root, relative);
         Directory.CreateDirectory(full);
         _createdDirs.Add(full);
@@ -43,7 +47,10 @@ public sealed class TestEnvironment : IDisposable {
     /// </summary>
     /// <param name="relativePath">Relative path of the file to create.</param>
     /// <param name="contents">Optional contents (defaults to empty string).</param>
-    public string CreateFile(string relativePath, string? contents = "") {
+    public string CreateFile(string relativePath, string? contents = "")
+    {
+        ArgumentNullException.ThrowIfNull(relativePath);
+
         var fullPath = Path.Combine(Root, relativePath.Replace('/', Path.DirectorySeparatorChar));
         Directory.CreateDirectory(Path.GetDirectoryName(fullPath)!);
         File.WriteAllText(fullPath, contents ?? "");
@@ -54,8 +61,13 @@ public sealed class TestEnvironment : IDisposable {
     /// <summary>
     /// Creates multiple empty files at once under the temporary root.
     /// </summary>
-    public void CreateFiles(params string[] relativePaths) {
-        foreach(var p in relativePaths) {
+    /// <param name="relativePaths">The relative paths of the files to create.</param>
+    public void CreateFiles(params string[] relativePaths)
+    {
+        ArgumentNullException.ThrowIfNull(relativePaths);
+
+        foreach(var p in relativePaths)
+        {
             CreateFile(p);
         }
     }
@@ -63,12 +75,15 @@ public sealed class TestEnvironment : IDisposable {
     /// <summary>
     /// Resolves a relative path to an absolute path inside the root.
     /// </summary>
+    /// <param name="relative">The relative path segments.</param>
     public string Abs(params string[] relative) => Path.Combine([Root, .. relative]);
 
     /// <summary>
     /// Creates a directory and immediately marks it as inaccessible.
     /// </summary>
-    public string CreateInaccessibleDirectory(string relativePath) {
+    /// <param name="relativePath">Relative directory path to restrict.</param>
+    public string CreateInaccessibleDirectory(string relativePath)
+    {
         var path = CreateDirectory(relativePath);
         SetInaccessibleDirectory(relativePath);
         return path;
@@ -88,18 +103,24 @@ public sealed class TestEnvironment : IDisposable {
     /// </para>
     /// </summary>
     /// <param name="relativePath">Relative directory path to restrict.</param>
-    public void SetInaccessible(string relativePath) {
+    public void SetInaccessible(string relativePath)
+    {
+        ArgumentNullException.ThrowIfNull(relativePath);
+
         var target = Path.Combine(Root, relativePath.Replace('/', Path.DirectorySeparatorChar));
 
-        if(!Directory.Exists(target)) {
+        if(!Directory.Exists(target))
+        {
             Directory.CreateDirectory(target);
         }
 
-        try {
+        try
+        {
             var di = new DirectoryInfo(target);
             di.Attributes |= FileAttributes.ReadOnly | FileAttributes.System;
         }
-        catch {
+        catch
+        {
             // Ignore attribute failures; tests are expected to handle fallback behavior.
         }
     }
@@ -114,19 +135,25 @@ public sealed class TestEnvironment : IDisposable {
     /// Fallback: if symlink creation fails, sets ReadOnly + System attributes (best-effort).
     /// </para>
     /// </summary>
-    public void SetInaccessibleDirectory(string relativePath) {
+    /// <param name="relativePath">Relative directory path to restrict.</param>
+    public void SetInaccessibleDirectory(string relativePath)
+    {
         var targetPath = Abs(relativePath);
 
-        if(!Directory.Exists(targetPath)) {
+        if(!Directory.Exists(targetPath))
+        {
             Directory.CreateDirectory(targetPath);
         }
 
         // Try chmod 000 on Linux/macOS
-        if(!RuntimeInformation.IsOSPlatform(OSPlatform.Windows)) {
-            try {
+        if(!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+        {
+            try
+            {
                 var process = Process.Start("chmod", $"000 \"{targetPath}\"");
                 process?.WaitForExit();
-                if(process?.ExitCode == 0) {
+                if(process?.ExitCode == 0)
+                {
                     return; // Success
                 }
             }
@@ -134,18 +161,24 @@ public sealed class TestEnvironment : IDisposable {
         }
 
         // Fallback: symlink or attribute-based restriction
-        try {
+        try
+        {
             Directory.Delete(targetPath, recursive: true);
-            if(RuntimeInformation.IsOSPlatform(OSPlatform.Windows)) {
+            if(RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            {
                 Directory.CreateSymbolicLink(targetPath, @"C:\this-path-does-not-exist-xyz");
-            } else {
+            } else
+            {
                 Directory.CreateSymbolicLink(targetPath, "/nonexistent/path/xyz");
             }
         }
-        catch {
+        catch
+        {
             // Fallback: attribute-based restriction
-            try {
-                if(!Directory.Exists(targetPath)) {
+            try
+            {
+                if(!Directory.Exists(targetPath))
+                {
                     Directory.CreateDirectory(targetPath);
                 }
 
@@ -163,7 +196,10 @@ public sealed class TestEnvironment : IDisposable {
     /// <param name="relativePath">Relative path of the file to lock.</param>
     /// <param name="contents">Optional contents to write before locking.</param>
     /// <returns>The <see cref="FileStream"/> holding the lock. Dispose it to release.</returns>
-    public FileStream CreateLockedFile(string relativePath, string? contents = "") {
+    public FileStream CreateLockedFile(string relativePath, string? contents = "")
+    {
+        ArgumentNullException.ThrowIfNull(relativePath);
+
         var fullPath = Path.Combine(Root, relativePath.Replace('/', Path.DirectorySeparatorChar));
         Directory.CreateDirectory(Path.GetDirectoryName(fullPath)!);
 
@@ -187,15 +223,22 @@ public sealed class TestEnvironment : IDisposable {
     /// Directories = value null; files = value string content.
     /// Returns the absolute path of the root.
     /// </summary>
-    public string CreateTree(Dictionary<string, string?> files) {
-        foreach(var pair in files) {
+    /// <param name="files">Dictionary mapping relative paths to content (null for directory).</param>
+    public string CreateTree(Dictionary<string, string?> files)
+    {
+        ArgumentNullException.ThrowIfNull(files);
+
+        foreach(var pair in files)
+        {
             var full = Path.Combine(Root, pair.Key);
             var dir = Path.GetDirectoryName(full)!;
             Directory.CreateDirectory(dir);
 
-            if(pair.Value is not null) {
+            if(pair.Value is not null)
+            {
                 File.WriteAllText(full, pair.Value);
-            } else {
+            } else
+            {
                 Directory.CreateDirectory(full);
             }
         }
@@ -208,33 +251,47 @@ public sealed class TestEnvironment : IDisposable {
     /// Handles broken symlinks and works cross-platform.
     /// All exceptions are swallowed to ensure tests never fail during teardown.
     /// </summary>
-    public void Dispose() {
-        try {
-            if(!Directory.Exists(Root)) {
+    public void Dispose()
+    {
+        try
+        {
+            if(!Directory.Exists(Root))
+            {
                 return;
             }
 
             // Use a more robust approach: delete the root directory directly.
             // If it fails due to attributes, we handle it in a targeted way.
-            try {
+            try
+            {
                 Directory.Delete(Root, recursive: true);
             }
-            catch(IOException) {
+            catch(IOException)
+            {
                 // Handle attribute-locked files/dirs if needed by brute-force resetting attributes
                 // but only for the items that actually blocked the delete.
                 ResetAttributesRecursive(Root);
                 Directory.Delete(Root, recursive: true);
             }
         }
-        catch {
+        catch
+        {
             // Swallow all exceptions; tests should never fail due to cleanup
         }
     }
 
-    private static void ResetAttributesRecursive(string path) {
-        foreach(var entry in Directory.EnumerateFileSystemEntries(path, "*", SearchOption.AllDirectories)) {
-            try {
-                if(!RuntimeInformation.IsOSPlatform(OSPlatform.Windows)) {
+    /// <summary>
+    /// Resets file/directory attributes recursively.
+    /// </summary>
+    /// <param name="path">The root path to start resetting.</param>
+    private static void ResetAttributesRecursive(string path)
+    {
+        foreach(var entry in Directory.EnumerateFileSystemEntries(path, "*", SearchOption.AllDirectories))
+        {
+            try
+            {
+                if(!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                {
                     var process = Process.Start("chmod", $"755 \"{entry}\"");
                     process?.WaitForExit();
                 }
@@ -244,8 +301,10 @@ public sealed class TestEnvironment : IDisposable {
             catch { /* ignore */ }
         }
 
-        try {
-            if(!RuntimeInformation.IsOSPlatform(OSPlatform.Windows)) {
+        try
+        {
+            if(!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            {
                 var process = Process.Start("chmod", $"755 \"{path}\"");
                 process?.WaitForExit();
             }
@@ -259,20 +318,25 @@ public sealed class TestEnvironment : IDisposable {
     /// Verifies that a directory is truly inaccessible by attempting to enumerate it.
     /// Throws an InvalidOperationException if enumeration succeeds.
     /// </summary>
-    public void AssertDirectoryInaccessible(string relativePath) {
+    /// <param name="relativePath">The relative path of the directory.</param>
+    public void AssertDirectoryInaccessible(string relativePath)
+    {
         var target = Abs(relativePath);
 
-        try {
+        try
+        {
             // Try to enumerate entries
             _ = Directory.EnumerateFileSystemEntries(target).FirstOrDefault();
 
             // If we got here, enumeration succeeded → not truly inaccessible
             throw new InvalidOperationException($"Directory '{target}' is still accessible; test setup failed.");
         }
-        catch(IOException) {
+        catch(IOException)
+        {
             // Expected: inaccessible directory
         }
-        catch(UnauthorizedAccessException) {
+        catch(UnauthorizedAccessException)
+        {
             // Expected: permission denied
         }
     }

@@ -3,7 +3,8 @@
 /// <summary>
 /// Helper factory for building path match contexts.
 /// </summary>
-internal static class TestPath {
+internal static class TestPath
+{
     public static PathMatchContext File(string path)
         => new(path, pathKind: PathKind.File, caseSensitivity: CaseSensitivity.Sensitive);
 

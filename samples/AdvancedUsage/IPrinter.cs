@@ -1,5 +1,6 @@
 ﻿namespace AdvancedUsage;
 
-public interface IPrinter {
+public interface IPrinter
+{
     void Print(string path);
 }

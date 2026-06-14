@@ -18,7 +18,8 @@
 /// anchoring, negation, or unanchored recursive scanning.
 /// </para>
 /// </remarks>
-internal sealed class GlobInstructionMatcher : SegmentMatchEngine {
+internal sealed class GlobInstructionMatcher : SegmentMatchEngine
+{
     /// <summary>
     /// Initializes a new instance of the <see cref="GlobInstructionMatcher"/>.
     /// </summary>
@@ -42,12 +43,15 @@ internal sealed class GlobInstructionMatcher : SegmentMatchEngine {
     protected override MatchResult MatchCore(
         ICompiledPatternSet patterns,
         PathMatchContext context
-    ) {
-        if(context.Path.IsEmpty) {
+    )
+    {
+        if(context.Path.IsEmpty)
+        {
             return MatchResult.Fail();
         }
 
-        if(patterns.Count == 0) {
+        if(patterns.Count == 0)
+        {
             return MatchResult.Success();
         }
 
@@ -55,13 +59,16 @@ internal sealed class GlobInstructionMatcher : SegmentMatchEngine {
         var comparison = context.CaseSensitivity.GetStringComparison();
         var pathView = new PathView(context.Path, isDirectory);
 
-        for(var patternIndex = 0; patternIndex < patterns.Count; patternIndex++) {
-            if(patterns[patternIndex].DirectoryOnly && !isDirectory) {
+        for(var patternIndex = 0; patternIndex < patterns.Count; patternIndex++)
+        {
+            if(patterns[patternIndex].DirectoryOnly && !isDirectory)
+            {
                 continue;
             }
 
             var enumerator = pathView.EnumerateSegments();
-            if(MatchExact(patterns[patternIndex].Segments, patternIndex: 0, comparison, ref enumerator)) {
+            if(MatchExact(patterns[patternIndex].Segments, patternIndex: 0, comparison, ref enumerator))
+            {
                 return MatchResult.Success();
             }
         }

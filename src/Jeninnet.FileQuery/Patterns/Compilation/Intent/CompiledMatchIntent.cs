@@ -1,6 +1,7 @@
 ﻿namespace Jeninnet.FileQuery.Patterns.Compilation.Intent;
 
-internal readonly struct CompiledMatchIntent {
+internal readonly struct CompiledMatchIntent
+{
     private CompiledMatchIntent(MatchOutcome outcome) => Outcome = outcome;
 
     public MatchOutcome Outcome { get; }

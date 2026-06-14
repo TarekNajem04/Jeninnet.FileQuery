@@ -46,7 +46,8 @@
 /// </list>
 /// </para>
 /// </remarks>
-internal sealed class GitIgnoreImplicitRecursiveInvariant : IPatternInvariant {
+internal sealed class GitIgnoreImplicitRecursiveInvariant : IPatternInvariant
+{
     /// <inheritdoc/>
     public PatternInvariantPhase Phase => PatternInvariantPhase.Semantic;
 
@@ -54,24 +55,28 @@ internal sealed class GitIgnoreImplicitRecursiveInvariant : IPatternInvariant {
     public PatternKind? AppliesTo => PatternKind.GitIgnore;
 
     /// <inheritdoc/>
-    public PatternInvariantResult Validate(PatternCompilationContext context) {
+    public PatternInvariantResult Validate(PatternCompilationContext context)
+    {
         ArgumentNullException.ThrowIfNull(context);
         ArgumentNullException.ThrowIfNull(context.Tokens);
 
         // Root-anchored patterns match only from the root — no implicit ** needed.
-        if(context.State.IsRootAnchored) {
+        if(context.State.IsRootAnchored)
+        {
             return PatternInvariantResult.Success;
         }
 
         // Nothing to prepend to an empty token list.
         // (GitIgnorePatternInvariant will report the empty-segment error separately.)
-        if(context.Tokens.Count == 0) {
+        if(context.Tokens.Count == 0)
+        {
             return PatternInvariantResult.Success;
         }
 
         // If the first segment is already a standalone **, the pattern is already
         // recursive — do not add a duplicate.
-        if(IsRecursiveWildcardSegment(context.Tokens[0])) {
+        if(IsRecursiveWildcardSegment(context.Tokens[0]))
+        {
             return PatternInvariantResult.Success;
         }
 
@@ -85,6 +90,7 @@ internal sealed class GitIgnoreImplicitRecursiveInvariant : IPatternInvariant {
     /// Returns <see langword="true"/> when <paramref name="segment"/> consists of
     /// exactly one <see cref="RecursiveWildcardToken"/>.
     /// </summary>
+    /// <param name="segment">The segment to check.</param>
     private static bool IsRecursiveWildcardSegment(List<IPatternToken> segment) =>
         segment is [RecursiveWildcardToken];
 }

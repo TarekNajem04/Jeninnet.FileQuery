@@ -1,16 +1,19 @@
 ﻿namespace Jeninnet.FileQuery.Tests.Core;
 
 [TestClass]
-public class PatternMergingTests {
+public class PatternMergingTests
+{
     [TestMethod]
-    public void Debug_Classifier_Output() {
+    public void Debug_Classifier_Output()
+    {
         var result = PatternClassifier.Classify(@"src\**\*.cs");
 
         Assert.AreEqual(PatternKind.Glob, result);
     }
 
     [TestMethod]
-    public void MergePatterns_WithOnlyRawPatterns_ClassifiesAndGroupsCorrectly() {
+    public void MergePatterns_WithOnlyRawPatterns_ClassifiesAndGroupsCorrectly()
+    {
         // Arrange
         var options = new FileQueryOptions(
             patternInput: new(
@@ -37,7 +40,8 @@ public class PatternMergingTests {
     }
 
     [TestMethod]
-    public void MergePatterns_WithOnlyTypedPatterns_PreservesStructure() {
+    public void MergePatterns_WithOnlyTypedPatterns_PreservesStructure()
+    {
         // Arrange
         var options = new FileQueryOptions(
             patternInput: new(
@@ -55,7 +59,8 @@ public class PatternMergingTests {
     }
 
     [TestMethod]
-    public void MergePatterns_WithOverlappingTypes_MergesListsSafely() {
+    public void MergePatterns_WithOverlappingTypes_MergesListsSafely()
+    {
         // Arrange
         var options = new FileQueryOptions(
             // Raw pattern that will be classified as GitIgnore
@@ -80,7 +85,8 @@ public class PatternMergingTests {
     }
 
     [TestMethod]
-    public void MergePatterns_WithNullCollections_ReturnsEmptyDictionary() {
+    public void MergePatterns_WithNullCollections_ReturnsEmptyDictionary()
+    {
         // Arrange
         var options = new FileQueryOptions(patternInput: new());
 
@@ -93,12 +99,14 @@ public class PatternMergingTests {
     }
 
     [TestMethod]
-    public void MergePatterns_DoesNotMutateOriginalOptions() {
+    public void MergePatterns_DoesNotMutateOriginalOptions()
+    {
         // Arrange
         var originalList = new List<string> { "original" };
         var options = new FileQueryOptions(
             patternInput: new(
-                typedPatterns: new Dictionary<PatternKind, IEnumerable<string>> {
+                typedPatterns: new Dictionary<PatternKind, IEnumerable<string>>
+                {
                     [PatternKind.Glob] = originalList
                 }
             )

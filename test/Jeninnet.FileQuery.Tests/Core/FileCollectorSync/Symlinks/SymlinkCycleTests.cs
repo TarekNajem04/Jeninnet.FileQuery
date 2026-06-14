@@ -1,10 +1,13 @@
 ﻿namespace Jeninnet.FileQuery.Tests.Core.FileCollectorSync.Symlinks;
 
 [TestClass]
-public class SymlinkCycleTests {
+public class SymlinkCycleTests
+{
     [TestMethod]
-    public void ShouldDetectCycle_AndStop_WhenFollowWithCycleDetectionEnabled() {
-        if(!RuntimeInformation.IsOSPlatform(OSPlatform.Windows)) {
+    public void ShouldDetectCycle_AndStop_WhenFollowWithCycleDetectionEnabled()
+    {
+        if(!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+        {
             // Test uses Windows path patterns for simplicity, but cycle detection is cross-platform.
         }
 
@@ -38,7 +41,8 @@ public class SymlinkCycleTests {
     }
 
     [TestMethod]
-    public async Task ShouldDetectCycle_AndStop_WhenFollowWithCycleDetectionEnabledAsync() {
+    public async Task ShouldDetectCycle_AndStop_WhenFollowWithCycleDetectionEnabledAsync()
+    {
         using var env = new TestEnvironment();
 
         var dirA = env.CreateDirectory("a");

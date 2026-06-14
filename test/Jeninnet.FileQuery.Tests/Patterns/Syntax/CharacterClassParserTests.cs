@@ -5,9 +5,11 @@
 /// Covers the parser, the AST discriminated union, the invariants, and end-to-end matching.
 /// </summary>
 [TestClass]
-public sealed class CharacterClassParserTests {
+public sealed class CharacterClassParserTests
+{
     [TestMethod]
-    public void CharacterClassParser_ShouldSuccess() {
+    public void CharacterClassParser_ShouldSuccess()
+    {
         string[] _patterns =
         [
             "[a-z]",
@@ -20,7 +22,8 @@ public sealed class CharacterClassParserTests {
                 "[![:alpha:]_.-]"
         ];
 
-        foreach(var pattern in _patterns) {
+        foreach(var pattern in _patterns)
+        {
             var index = 0;
             var result = CharacterClassParser.Parse(pattern, ref index);
 
@@ -29,7 +32,8 @@ public sealed class CharacterClassParserTests {
     }
 
     [TestMethod]
-    public void Parse_LiteralSet_ProducesCharLiterals() {
+    public void Parse_LiteralSet_ProducesCharLiterals()
+    {
         var input = "[abc]".AsSpan();
         var i = 0;
 
@@ -45,7 +49,8 @@ public sealed class CharacterClassParserTests {
     }
 
     [TestMethod]
-    public void Parse_Range_ProducesCharRange() {
+    public void Parse_Range_ProducesCharRange()
+    {
         var input = "[a-z]".AsSpan();
         var i = 0;
 
@@ -58,7 +63,8 @@ public sealed class CharacterClassParserTests {
     }
 
     [TestMethod]
-    public void Parse_NegatedClass_SetsIsNegated() {
+    public void Parse_NegatedClass_SetsIsNegated()
+    {
         var input = "[!abc]".AsSpan();
         var i = 0;
 
@@ -70,7 +76,8 @@ public sealed class CharacterClassParserTests {
     }
 
     [TestMethod]
-    public void Parse_CaretNegation_SetsIsNegated() {
+    public void Parse_CaretNegation_SetsIsNegated()
+    {
         var input = "[^abc]".AsSpan();
         var i = 0;
 
@@ -81,7 +88,8 @@ public sealed class CharacterClassParserTests {
     }
 
     [TestMethod]
-    public void Parse_DashAsFirstElement_IsLiteral() {
+    public void Parse_DashAsFirstElement_IsLiteral()
+    {
         // "-" as the first element is a literal, not a range delimiter.
         var input = "[-abc]".AsSpan();
         var i = 0;
@@ -94,7 +102,8 @@ public sealed class CharacterClassParserTests {
     }
 
     [TestMethod]
-    public void Parse_ClosingBracketAsFirstElement_IsLiteral() {
+    public void Parse_ClosingBracketAsFirstElement_IsLiteral()
+    {
         // ']' as the first element is a literal, not the class terminator.
         // "[]]" = a class containing ']', then the outer class closes.
         var input = "[]abc]".AsSpan();
@@ -110,7 +119,8 @@ public sealed class CharacterClassParserTests {
     }
 
     [TestMethod]
-    public void Parse_DashBeforeClosingBracket_IsLiteral() {
+    public void Parse_DashBeforeClosingBracket_IsLiteral()
+    {
         // "[a-]" → 'a' literal, '-' literal (not a range delimiter before ']').
         var input = "[a-]".AsSpan();
         var i = 0;
@@ -125,7 +135,8 @@ public sealed class CharacterClassParserTests {
     }
 
     [TestMethod]
-    public void Parse_MixedElements_LiteralsAndRange() {
+    public void Parse_MixedElements_LiteralsAndRange()
+    {
         var input = "[a-z0-9_]".AsSpan();
         var i = 0;
 
@@ -138,7 +149,8 @@ public sealed class CharacterClassParserTests {
     }
 
     [TestMethod]
-    public void Parse_PosixDigit_ProducesPosixClass() {
+    public void Parse_PosixDigit_ProducesPosixClass()
+    {
         var input = "[[:digit:]]".AsSpan();
         var i = 0;
 
@@ -151,7 +163,8 @@ public sealed class CharacterClassParserTests {
     }
 
     [TestMethod]
-    public void Parse_PosixAlpha_ProducesPosixClass() {
+    public void Parse_PosixAlpha_ProducesPosixClass()
+    {
         var input = "[[:alpha:]]".AsSpan();
         var i = 0;
 
@@ -162,7 +175,8 @@ public sealed class CharacterClassParserTests {
     }
 
     [TestMethod]
-    public void Parse_PosixMixedWithLiteral_ProducesCorrectElements() {
+    public void Parse_PosixMixedWithLiteral_ProducesCorrectElements()
+    {
         // [[:digit:]_] → PosixClass("digit") + CharLiteral('_')
         var input = "[[:digit:]_]".AsSpan();
         var i = 0;
@@ -176,7 +190,8 @@ public sealed class CharacterClassParserTests {
     }
 
     [TestMethod]
-    public void Parse_Unterminated_ProducesErrorSentinel_DoesNotThrow() {
+    public void Parse_Unterminated_ProducesErrorSentinel_DoesNotThrow()
+    {
         // "[abc" — no closing bracket
         var input = "[abc".AsSpan();
         var i = 0;
@@ -192,7 +207,8 @@ public sealed class CharacterClassParserTests {
     }
 
     [TestMethod]
-    public void Parse_EmptyBrackets_TreatsClosingBracketAsLiteral() {
+    public void Parse_EmptyBrackets_TreatsClosingBracketAsLiteral()
+    {
         // "[]" — the ']' at position 0 is a literal, then no closing ']' → unterminated
         var input = "[]".AsSpan();
         var i = 0;
@@ -206,7 +222,8 @@ public sealed class CharacterClassParserTests {
     }
 
     [TestMethod]
-    public void Parse_UnterminatedPosix_ProducesErrorSentinel() {
+    public void Parse_UnterminatedPosix_ProducesErrorSentinel()
+    {
         var input = "[[:digit]".AsSpan(); // missing ':' before the second ']'
         var i = 0;
 
@@ -218,7 +235,8 @@ public sealed class CharacterClassParserTests {
     }
 
     [TestMethod]
-    public void Parse_TrailingEscape_ProducesErrorSentinel() {
+    public void Parse_TrailingEscape_ProducesErrorSentinel()
+    {
         var input = @"[a\".AsSpan(); // backslash at end of input
         var i = 0;
 
@@ -230,7 +248,8 @@ public sealed class CharacterClassParserTests {
     }
 
     [TestMethod]
-    public void Parse_InMiddleOfSegment_AdvancesIndexCorrectly() {
+    public void Parse_InMiddleOfSegment_AdvancesIndexCorrectly()
+    {
         // The class is embedded in a larger segment; the index must advance
         // exactly past the closing ']'.
         var input = "foo[a-z]bar".AsSpan();
@@ -243,21 +262,24 @@ public sealed class CharacterClassParserTests {
     }
 
     [TestMethod]
-    public void Invariant_UnterminatedClass_ReportsFailure() {
+    public void Invariant_UnterminatedClass_ReportsFailure()
+    {
         var (HasException, _) = TryCompile("[abc");
 
         Assert.IsTrue(HasException, "Unterminated class must fail invariant.");
     }
 
     [TestMethod]
-    public void Invariant_ValidClass_Passes() {
+    public void Invariant_ValidClass_Passes()
+    {
         var (HasException, ExceptionMessage) = TryCompile("[c-z]");
 
         Assert.IsFalse(HasException, ExceptionMessage);
     }
 
     [TestMethod]
-    public void Invariant_InvertedRange_ReportsFailure() {
+    public void Invariant_InvertedRange_ReportsFailure()
+    {
         var (HasException, _) = TryCompile("[z-a]");
 
         Assert.IsTrue(HasException,
@@ -265,7 +287,8 @@ public sealed class CharacterClassParserTests {
     }
 
     [TestMethod]
-    public void Invariant_ValidRange_Passes() {
+    public void Invariant_ValidRange_Passes()
+    {
         // "a-z" is a valid range, so it should pass the invariant.
         var (HasException, ExceptionMessage) = TryCompile("[a-z]");
 
@@ -273,7 +296,8 @@ public sealed class CharacterClassParserTests {
     }
 
     [TestMethod]
-    public void EndToEnd_LiteralSet_MatchesCorrectly() {
+    public void EndToEnd_LiteralSet_MatchesCorrectly()
+    {
         var engine = FileQueryRuntime.Create();
         using var env = new TestEnvironment();
         env.CreateFiles("a.txt", "b.txt", "c.txt", "d.txt");
@@ -285,14 +309,15 @@ public sealed class CharacterClassParserTests {
         var results = engine.Execute(new(env.Root, options)).ToList();
 
         Assert.HasCount(3, results);
-        Assert.Contains(p => p.EndsWith("a.txt"), results);
-        Assert.Contains(p => p.EndsWith("b.txt"), results);
-        Assert.Contains(p => p.EndsWith("c.txt"), results);
-        Assert.DoesNotContain(p => p.EndsWith("d.txt"), results);
+        Assert.Contains(p => p.EndsWith("a.txt", StringComparison.Ordinal), results);
+        Assert.Contains(p => p.EndsWith("b.txt", StringComparison.Ordinal), results);
+        Assert.Contains(p => p.EndsWith("c.txt", StringComparison.Ordinal), results);
+        Assert.DoesNotContain(p => p.EndsWith("d.txt", StringComparison.Ordinal), results);
     }
 
     [TestMethod]
-    public void EndToEnd_CharacterRange_MatchesCorrectly() {
+    public void EndToEnd_CharacterRange_MatchesCorrectly()
+    {
         var engine = FileQueryRuntime.Create();
         using var env = new TestEnvironment();
         env.CreateFiles("file0.txt", "file5.txt", "file9.txt", "fileX.txt");
@@ -304,11 +329,12 @@ public sealed class CharacterClassParserTests {
         var results = engine.Execute(new(env.Root, options)).ToList();
 
         Assert.HasCount(3, results);
-        Assert.DoesNotContain(p => p.EndsWith("fileX.txt"), results);
+        Assert.DoesNotContain(p => p.EndsWith("fileX.txt", StringComparison.Ordinal), results);
     }
 
     [TestMethod]
-    public void EndToEnd_NegatedClass_MatchesCorrectly() {
+    public void EndToEnd_NegatedClass_MatchesCorrectly()
+    {
         var engine = FileQueryRuntime.Create();
         using var env = new TestEnvironment();
         env.CreateFiles("a.txt", "b.txt", "c.txt", "d.txt", "e.txt");
@@ -321,12 +347,13 @@ public sealed class CharacterClassParserTests {
         var results = engine.Execute(new(env.Root, options)).ToList();
 
         Assert.HasCount(2, results);
-        Assert.Contains(p => p.EndsWith("d.txt"), results);
-        Assert.Contains(p => p.EndsWith("e.txt"), results);
+        Assert.Contains(p => p.EndsWith("d.txt", StringComparison.Ordinal), results);
+        Assert.Contains(p => p.EndsWith("e.txt", StringComparison.Ordinal), results);
     }
 
     [TestMethod]
-    public void EndToEnd_PosixDigitClass_MatchesCorrectly() {
+    public void EndToEnd_PosixDigitClass_MatchesCorrectly()
+    {
         var engine = FileQueryRuntime.Create();
         using var env = new TestEnvironment();
         env.CreateFiles("file1.txt", "file2.txt", "fileA.txt");
@@ -339,17 +366,20 @@ public sealed class CharacterClassParserTests {
         var results = engine.Execute(new(env.Root, options)).ToList();
 
         Assert.HasCount(2, results);
-        Assert.Contains(p => p.EndsWith("file1.txt"), results);
-        Assert.Contains(p => p.EndsWith("file2.txt"), results);
-        Assert.DoesNotContain(p => p.EndsWith("fileA.txt"), results);
+        Assert.Contains(p => p.EndsWith("file1.txt", StringComparison.Ordinal), results);
+        Assert.Contains(p => p.EndsWith("file2.txt", StringComparison.Ordinal), results);
+        Assert.DoesNotContain(p => p.EndsWith("fileA.txt", StringComparison.Ordinal), results);
     }
 
-    private static (bool HasException, string ExceptionMessage) TryCompile(string pattern) {
-        try {
+    private static (bool HasException, string ExceptionMessage) TryCompile(string pattern)
+    {
+        try
+        {
             CompiledPatternFactory.Compile(PatternKind.Glob, pattern);
             return (false, string.Empty);
         }
-        catch(PatternException ex) {
+        catch(PatternException ex)
+        {
             return (true, ex.Message);
         }
     }

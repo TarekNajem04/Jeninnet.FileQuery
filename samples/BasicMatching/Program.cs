@@ -7,12 +7,14 @@ using Jeninnet.FileQuery;
 
 var root = @"C:\repo";
 
-if(!Directory.Exists(root)) {
+if(!Directory.Exists(root))
+{
     Console.WriteLine($"Directory '{root}' does not exist. We will use the directory of the executing assembly as the root for our query.");
     root = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
 }
 
-if(string.IsNullOrEmpty(root)) {
+if(string.IsNullOrEmpty(root))
+{
     Console.WriteLine("Unable to determine a valid root directory for the query.");
     return;
 }
@@ -26,11 +28,13 @@ var query = FileQuery.From(root)
 
 var results = engine.Execute(query).ToList();
 
-if(results.Count == 0) {
+if(results.Count == 0)
+{
     Console.WriteLine("No files matched the query.");
     return;
 }
 
-foreach(var file in results) {
+foreach(var file in results)
+{
     Console.WriteLine(file);
 }

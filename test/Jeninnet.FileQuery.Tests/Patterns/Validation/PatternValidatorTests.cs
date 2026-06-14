@@ -6,7 +6,8 @@
 /// and "POSIX class syntax" (valid).
 /// </summary>
 [TestClass]
-public sealed class PatternValidatorTests {
+public sealed class PatternValidatorTests
+{
     /// <summary>
     /// A simple POSIX class <c>[[:digit:]]</c> must not be malformed.
     /// This was the root cause of the EndToEnd_PosixDigitClass_MatchesCorrectly failure:
@@ -99,7 +100,8 @@ public sealed class PatternValidatorTests {
     /// at runtime.
     /// </summary>
     [TestMethod]
-    public void Classifier_PatternWithPosixClass_DoesNotReturnUnknown() {
+    public void Classifier_PatternWithPosixClass_DoesNotReturnUnknown()
+    {
         var kind = Jeninnet.FileQuery.Patterns.Classification.PatternClassifier
             .Classify("!file[[:digit:]].txt");
 
@@ -112,7 +114,8 @@ public sealed class PatternValidatorTests {
     }
 
     [TestMethod]
-    public void Classifier_PurePosixClass_DoesNotReturnUnknown() {
+    public void Classifier_PurePosixClass_DoesNotReturnUnknown()
+    {
         var kind = Jeninnet.FileQuery.Patterns.Classification.PatternClassifier
             .Classify("[[:alpha:]]");
 

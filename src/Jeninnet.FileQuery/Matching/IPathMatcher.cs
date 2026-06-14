@@ -9,7 +9,8 @@
 /// <see cref="ICompiledPatternSet"/> and <see cref="PathMatchContext"/>. This contract
 /// is key to the overall system determinism.
 /// </remarks>
-internal interface IPathMatcher {
+internal interface IPathMatcher
+{
     /// <summary>
     /// Checks if this matcher implementation is designed to handle patterns of the specified <see cref="PatternKind"/>.
     /// </summary>

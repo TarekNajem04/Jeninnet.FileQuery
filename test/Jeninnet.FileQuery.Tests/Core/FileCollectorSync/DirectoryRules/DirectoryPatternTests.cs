@@ -6,7 +6,8 @@
 /// during traversal (Efficiency check).
 /// </summary>
 [TestClass]
-public class DirectoryPatternTests {
+public class DirectoryPatternTests
+{
     // --- Setup Helpers ---
 
     private static void CreateStandardStructure(TestEnvironment env) =>
@@ -23,7 +24,8 @@ public class DirectoryPatternTests {
     // --- Test Methods ---
 
     [TestMethod]
-    public void DirectoryOnlyPattern_ShouldExcludeFilesCorrectly() {
+    public void DirectoryOnlyPattern_ShouldExcludeFilesCorrectly()
+    {
         // ARRANGE
         using var env = new TestEnvironment();
         CreateStandardStructure(env);
@@ -55,7 +57,8 @@ public class DirectoryPatternTests {
     }
 
     [TestMethod]
-    public void DirectoryPattern_ShouldMatchMultipleLevels() {
+    public void DirectoryPattern_ShouldMatchMultipleLevels()
+    {
         // ARRANGE
         using var env = new TestEnvironment();
         CreateStandardStructure(env);
@@ -87,7 +90,8 @@ public class DirectoryPatternTests {
     }
 
     [TestMethod]
-    public void MultipleDirectoryPatterns_ShouldStack() {
+    public void MultipleDirectoryPatterns_ShouldStack()
+    {
         // ARRANGE
         using var env = new TestEnvironment();
         CreateStandardStructure(env);

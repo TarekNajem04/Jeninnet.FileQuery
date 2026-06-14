@@ -1,4 +1,5 @@
-﻿namespace Jeninnet.FileQuery.Tests.Core.FileCollectorAsync.DirectoryOnly;
+﻿using System;
+namespace Jeninnet.FileQuery.Tests.Core.FileCollectorAsync.DirectoryOnly;
 
 /// <summary>
 /// Async tests validating patterns that apply *only to directories*.
@@ -8,12 +9,14 @@
 ///   - recursive directory ignore matching
 /// </summary>
 [TestClass]
-public class EnumerateFilesAsync_DirectoryOnlyPatternTests {
+public class EnumerateFilesAsync_DirectoryOnlyPatternTests
+{
     /// <summary>
     /// Ensures directory-only pattern excludes an entire folder.
     /// </summary>
     [TestMethod]
-    public async Task EnumerateFilesAsync_DirectoryOnlyPattern_ShouldExcludeFolderAsync() {
+    public async Task EnumerateFilesAsync_DirectoryOnlyPattern_ShouldExcludeFolderAsync()
+    {
         using var env = new TestEnvironment();
 
         env.CreateFiles(
@@ -35,8 +38,8 @@ public class EnumerateFilesAsync_DirectoryOnlyPatternTests {
         var results = await fileQueryEngine.ExecuteAsync(new(env.Root, options), TestContext.CancellationToken)
                                            .ToListAsync(TestContext.CancellationToken);
 
-        TestAssertEx.ContainsSingle(results, x => x.EndsWith("visible.txt"));
-        TestAssertEx.DoesNotContain(results, x => x.Contains("secret"));
+        TestAssertEx.ContainsSingle(results, x => x.EndsWith("visible.txt", StringComparison.Ordinal));
+        TestAssertEx.DoesNotContain(results, x => x.Contains("secret", StringComparison.Ordinal));
     }
 
     /// <summary>
@@ -44,7 +47,8 @@ public class EnumerateFilesAsync_DirectoryOnlyPatternTests {
     /// This test proves files inside a directory-excluded path can be re-included.
     /// </summary>
     [TestMethod]
-    public async Task EnumerateFilesAsync_DirectoryOnly_RestoreSubDirAsync() {
+    public async Task EnumerateFilesAsync_DirectoryOnly_RestoreSubDirAsync()
+    {
         using var env = new TestEnvironment();
 
         env.CreateFiles(
@@ -71,14 +75,15 @@ public class EnumerateFilesAsync_DirectoryOnlyPatternTests {
                                            .ToListAsync(TestContext.CancellationToken);
 
         // Only the recovered file is expected to be present.
-        TestAssertEx.ContainsSingle(results, x => x.EndsWith(Path.Combine("recover", "file.txt")));
+        TestAssertEx.ContainsSingle(results, x => x.EndsWith(Path.Combine("recover", "file.txt"), StringComparison.Ordinal));
     }
 
     /// <summary>
     /// Tests directory-only patterns combined with ** recursion.
     /// </summary>
     [TestMethod]
-    public async Task EnumerateFilesAsync_DirectoryOnlyWithRecursiveWildcardAsync() {
+    public async Task EnumerateFilesAsync_DirectoryOnlyWithRecursiveWildcardAsync()
+    {
         using var env = new TestEnvironment();
 
         env.CreateFiles(

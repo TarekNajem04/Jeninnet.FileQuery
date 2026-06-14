@@ -607,6 +607,7 @@
             Creates a temporary directory with the given subpaths and returns its path.
             Used to simplify test setup.
             </summary>
+            <param name="files">A dictionary mapping file paths to their content, or null for directories.</param>
         </member>
         <member name="M:Jeninnet.FileQuery.Tests.Core.FileCollectorSync.FileQueryEngineSyncTests_Additional.DirectoryPattern_ShouldMatchDirectoriesOnly">
             <summary>
@@ -639,6 +640,7 @@
             Creates a temporary test directory and allows population.
             Cleans up after use.
             </summary>
+            <param name="populate">An action to populate the temporary directory.</param>
         </member>
         <member name="T:Jeninnet.FileQuery.Tests.Core.FileCollectorSync.Inaccessible.InaccessibleDirectoryTests">
             <summary>
@@ -936,12 +938,17 @@
             Makes a directory "inaccessible" by creating a *file* where a directory
             would normally be expected. Attempting to enumerate into it will throw.
             </summary>
+            <param name="env">The test environment.</param>
+            <param name="name">The name of the pseudo-directory.</param>
         </member>
         <member name="M:Jeninnet.FileQuery.Tests.Shared.InaccessibleDirectorySimulator.CreateLockedDir(Jeninnet.FileQuery.Tests.Shared.TestEnvironment,System.String,System.IO.FileStream@)">
             <summary>
             Forces a directory enumerator to throw UnauthorizedAccessException
             by creating a directory and opening it with a lock.
             </summary>
+            <param name="env">The test environment.</param>
+            <param name="name">The name of the locked directory.</param>
+            <param name="lockHandle">The handle to the locked file.</param>
         </member>
         <member name="T:Jeninnet.FileQuery.Tests.Shared.PatternHelpers">
             <summary>
@@ -986,6 +993,7 @@
             Creates a directory under the temporary root.
             Returns the absolute path.
             </summary>
+            <param name="relative">The relative path to create.</param>
         </member>
         <member name="M:Jeninnet.FileQuery.Tests.Shared.TestEnvironment.CreateFile(System.String,System.String)">
             <summary>
@@ -1000,16 +1008,19 @@
             <summary>
             Creates multiple empty files at once under the temporary root.
             </summary>
+            <param name="relativePaths">The relative paths of the files to create.</param>
         </member>
         <member name="M:Jeninnet.FileQuery.Tests.Shared.TestEnvironment.Abs(System.String[])">
             <summary>
             Resolves a relative path to an absolute path inside the root.
             </summary>
+            <param name="relative">The relative path segments.</param>
         </member>
         <member name="M:Jeninnet.FileQuery.Tests.Shared.TestEnvironment.CreateInaccessibleDirectory(System.String)">
             <summary>
             Creates a directory and immediately marks it as inaccessible.
             </summary>
+            <param name="relativePath">Relative directory path to restrict.</param>
         </member>
         <member name="M:Jeninnet.FileQuery.Tests.Shared.TestEnvironment.SetInaccessible(System.String)">
             <summary>
@@ -1038,6 +1049,7 @@
             Fallback: if symlink creation fails, sets ReadOnly + System attributes (best-effort).
             </para>
             </summary>
+            <param name="relativePath">Relative directory path to restrict.</param>
         </member>
         <member name="M:Jeninnet.FileQuery.Tests.Shared.TestEnvironment.CreateLockedFile(System.String,System.String)">
             <summary>
@@ -1054,6 +1066,7 @@
             Directories = value null; files = value string content.
             Returns the absolute path of the root.
             </summary>
+            <param name="files">Dictionary mapping relative paths to content (null for directory).</param>
         </member>
         <member name="M:Jeninnet.FileQuery.Tests.Shared.TestEnvironment.Dispose">
             <summary>
@@ -1062,16 +1075,28 @@
             All exceptions are swallowed to ensure tests never fail during teardown.
             </summary>
         </member>
+        <member name="M:Jeninnet.FileQuery.Tests.Shared.TestEnvironment.ResetAttributesRecursive(System.String)">
+            <summary>
+            Resets file/directory attributes recursively.
+            </summary>
+            <param name="path">The root path to start resetting.</param>
+        </member>
         <member name="M:Jeninnet.FileQuery.Tests.Shared.TestEnvironment.AssertDirectoryInaccessible(System.String)">
             <summary>
             Verifies that a directory is truly inaccessible by attempting to enumerate it.
             Throws an InvalidOperationException if enumeration succeeds.
             </summary>
+            <param name="relativePath">The relative path of the directory.</param>
         </member>
         <member name="M:Jeninnet.FileQuery.Tests.Shared.TestEnvironmentExtensions.CreateDeepDirectoryTree(Jeninnet.FileQuery.Tests.Shared.TestEnvironment,System.Int32,System.String,System.String,System.Int32)">
             <summary>
             Creates a nested directory structure like a/b/c/d/... up to the specified number of levels.
             </summary>
+            <param name="env">The test environment.</param>
+            <param name="levels">The number of directory levels to create.</param>
+            <param name="fileName">The base file name.</param>
+            <param name="fileExt">The file extension.</param>
+            <param name="fileCount">The number of files to create in each directory.</param>
         </member>
         <member name="T:Jeninnet.FileQuery.Tests.Shared.TestPathUtils">
             <summary>
@@ -1085,17 +1110,21 @@
             Windows:   "a\b\c.txt"
             Linux/mac: "a/b/c.txt"
             </summary>
+            <param name="segments">The path segments to join.</param>
         </member>
         <member name="M:Jeninnet.FileQuery.Tests.Shared.TestPathUtils.Normalize(System.String)">
             <summary>
             Normalizes slashes in absolute paths returned by FileQueryEngine.
             </summary>
+            <param name="p">The path to normalize.</param>
         </member>
         <member name="M:Jeninnet.FileQuery.Tests.Shared.TestPathUtils.Equivalent(System.String,System.String)">
             <summary>
             Asserts that two paths match regardless of slash direction.
             Helpful when FileQueryEngine returns normalized paths.
             </summary>
+            <param name="a">First path to compare.</param>
+            <param name="b">Second path to compare.</param>
         </member>
     </members>
 </doc>

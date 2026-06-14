@@ -5,24 +5,28 @@
 /// Each test is named after the bug it guards against.
 /// </summary>
 [TestClass]
-public sealed class RegressionTests {
+public sealed class RegressionTests
+{
     /// <summary>
     /// When two separate <c>Where(Dictionary)</c> calls are chained and the second
     /// call contains a key already present from the first call, all patterns from
     /// the second call must still be merged — not just the first key.
     /// </summary>
     [TestMethod]
-    public void Where_Dictionary_MustMergeAllKeys_WhenSomeAlreadyExist() {
+    public void Where_Dictionary_MustMergeAllKeys_WhenSomeAlreadyExist()
+    {
         // Arrange: first call establishes GitIgnore and Glob buckets.
         var builder = FileQuery.From(Directory.GetCurrentDirectory())
-                               .Where(new Dictionary<PatternKind, List<string>> {
+                               .Where(new Dictionary<PatternKind, List<string>>
+                               {
                                    [PatternKind.GitIgnore] = ["**"],
                                    [PatternKind.Glob] = ["*.cs"]
                                });
 
         // Act: second call provides an additional GitIgnore pattern (key already exists)
         // AND a new Regex pattern (key is new).
-        builder.Where(new Dictionary<PatternKind, List<string>> {
+        builder.Where(new Dictionary<PatternKind, List<string>>
+        {
             [PatternKind.GitIgnore] = ["!*.log"],   // merge into existing bucket
             [PatternKind.Regex] = ["r:^data.*"] // add new bucket
         });
@@ -68,12 +72,14 @@ public sealed class RegressionTests {
     /// all of them even when none exists yet.
     /// </summary>
     [TestMethod]
-    public void Where_Dictionary_MustAddAllKeys_InSingleCall() {
+    public void Where_Dictionary_MustAddAllKeys_InSingleCall()
+    {
         // Arrange
         var builder = FileQuery.From(Directory.GetCurrentDirectory());
 
         // Act: single call with three distinct keys.
-        builder.Where(new Dictionary<PatternKind, List<string>> {
+        builder.Where(new Dictionary<PatternKind, List<string>>
+        {
             [PatternKind.GitIgnore] = ["**", "!*.cs"],
             [PatternKind.Glob] = ["src/**/*.ts"],
             [PatternKind.Regex] = ["r:^temp_.*\\.txt$"]
@@ -103,15 +109,18 @@ public sealed class RegressionTests {
     /// when the same pattern is provided again through a second <c>Where</c> call.
     /// </summary>
     [TestMethod]
-    public void Where_Dictionary_MustNotDuplicate_ExistingPatterns() {
+    public void Where_Dictionary_MustNotDuplicate_ExistingPatterns()
+    {
         // Arrange
         var builder = FileQuery.From(Directory.GetCurrentDirectory())
-                               .Where(new Dictionary<PatternKind, List<string>> {
+                               .Where(new Dictionary<PatternKind, List<string>>
+                               {
                                    [PatternKind.GitIgnore] = ["**", "!*.log"]
                                });
 
         // Act: same patterns provided again.
-        builder.Where(new Dictionary<PatternKind, List<string>> {
+        builder.Where(new Dictionary<PatternKind, List<string>>
+        {
             [PatternKind.GitIgnore] = ["**", "!*.log", "!*.tmp"] // two duplicates + one new
         });
 
@@ -138,7 +147,8 @@ public sealed class RegressionTests {
     /// return the cached case-sensitive regex for the case-insensitive call.
     /// </summary>
     [TestMethod]
-    public void RegexMatcher_CaseSensitiveAndInsensitive_MustNotShareCachedRegex() {
+    public void RegexMatcher_CaseSensitiveAndInsensitive_MustNotShareCachedRegex()
+    {
         const string pattern = "r:^README\\.md$";
         var matcher = CreateRegexMatcher();
         var patterns = CompileRegex(pattern);
@@ -160,7 +170,8 @@ public sealed class RegressionTests {
     /// due to a stale cache entry from the first.
     /// </summary>
     [TestMethod]
-    public void RegexMatcher_TwoIndependentCompiledSets_MustBothMatch() {
+    public void RegexMatcher_TwoIndependentCompiledSets_MustBothMatch()
+    {
         const string pattern = "r:^src/.*\\.cs$";
         var matcher = CreateRegexMatcher();
 
@@ -189,7 +200,8 @@ public sealed class RegressionTests {
     /// uses the correct <see cref="Regex"/> from the cache for each call.
     /// </summary>
     [TestMethod]
-    public void RegexMatcher_AlternatingCaseSensitivity_UsesCorrectRegexEachTime() {
+    public void RegexMatcher_AlternatingCaseSensitivity_UsesCorrectRegexEachTime()
+    {
         const string pattern = "r:^DATA_.*\\.log$";
         var matcher = CreateRegexMatcher();
         var patterns = CompileRegex(pattern);

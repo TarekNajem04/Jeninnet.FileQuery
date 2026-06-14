@@ -5,15 +5,18 @@
 /// Validates interface stability, argument validation, and basic execution guarantees.
 /// </summary>
 [TestClass]
-public class IFileQueryEngineContractTests {
+public class IFileQueryEngineContractTests
+{
     private readonly IFileQueryEngine _engine = FileQueryRuntime.Create();
 
     [TestMethod]
     public void Execute_NullQuery_ShouldThrow() => TestAssertEx.Throws<ArgumentNullException>(() => _engine.Execute(null!));
 
     [TestMethod]
-    public async Task ExecuteAsync_NullQuery_ShouldThrowAsync() => await TestAssertEx.ThrowsAsync<ArgumentNullException>(async () => {
-        await foreach(var _ in _engine.ExecuteAsync(null!, TestContext.CancellationToken)) {
+    public async Task ExecuteAsync_NullQuery_ShouldThrowAsync() => await TestAssertEx.ThrowsAsync<ArgumentNullException>(async () =>
+    {
+        await foreach(var _ in _engine.ExecuteAsync(null!, TestContext.CancellationToken))
+        {
             /*
              * Empty loop body; the exception should be thrown before any iteration occurs.
              */
@@ -21,7 +24,8 @@ public class IFileQueryEngineContractTests {
     });
 
     [TestMethod]
-    public void Execute_NonExistentDirectory_ShouldThrowDirectoryNotFoundException() {
+    public void Execute_NonExistentDirectory_ShouldThrowDirectoryNotFoundException()
+    {
         var query = new FileQuery(Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString("n")), new(new([])));
 
         void Act() => _ = _engine.Execute(query).ToList();
@@ -30,11 +34,14 @@ public class IFileQueryEngineContractTests {
     }
 
     [TestMethod]
-    public async Task ExecuteAsync_NonExistentDirectory_ShouldThrowDirectoryNotFoundExceptionAsync() {
+    public async Task ExecuteAsync_NonExistentDirectory_ShouldThrowDirectoryNotFoundExceptionAsync()
+    {
         var query = new FileQuery(Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString("n")), new(new([])));
 
-        async Task ActAsync() {
-            await foreach(var _ in _engine.ExecuteAsync(query, TestContext.CancellationToken)) {
+        async Task ActAsync()
+        {
+            await foreach(var _ in _engine.ExecuteAsync(query, TestContext.CancellationToken))
+            {
                 /*
                  * Empty loop body; the exception should be thrown before any iteration occurs.
                  */
@@ -45,7 +52,8 @@ public class IFileQueryEngineContractTests {
     }
 
     [TestMethod]
-    public async Task ExecuteAsync_ShouldRespectCancellationTokenAsync() {
+    public async Task ExecuteAsync_ShouldRespectCancellationTokenAsync()
+    {
         using var env = new TestEnvironment();
         env.CreateFiles("a.txt", "b.txt", "c.txt");
 
@@ -55,8 +63,10 @@ public class IFileQueryEngineContractTests {
         // Pre-cancel
         await cts.CancelAsync();
 
-        await TestAssertEx.ThrowsAsync<OperationCanceledException>(async () => {
-            await foreach(var _ in _engine.ExecuteAsync(query, cts.Token)) {
+        await TestAssertEx.ThrowsAsync<OperationCanceledException>(async () =>
+        {
+            await foreach(var _ in _engine.ExecuteAsync(query, cts.Token))
+            {
                 /*
                  * Empty loop body; the exception should be thrown before any iteration occurs.
                  */
@@ -65,7 +75,8 @@ public class IFileQueryEngineContractTests {
     }
 
     [TestMethod]
-    public void Execute_ShouldReturnEmpty_WhenExcludeAllPatternIsUsed() {
+    public void Execute_ShouldReturnEmpty_WhenExcludeAllPatternIsUsed()
+    {
         using var env = new TestEnvironment();
         env.CreateFiles("a.txt", "b.txt");
 

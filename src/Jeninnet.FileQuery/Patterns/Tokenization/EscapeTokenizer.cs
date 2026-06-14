@@ -14,18 +14,22 @@
 /// it is treated as a literal backslash.
 /// </para>
 /// </remarks>
-internal sealed class EscapeTokenizer : IPatternTokenizer {
+internal sealed class EscapeTokenizer : IPatternTokenizer
+{
     public bool TryTokenize(
         ReadOnlySpan<char> input,
         ref int index,
         PatternSyntaxProfile syntax,
         List<IPatternToken> tokens
-    ) {
-        if(!syntax.SupportsEscaping) {
+    )
+    {
+        if(!syntax.SupportsEscaping)
+        {
             return false;
         }
 
-        if(input[index] != '\\' || index + 1 >= input.Length) {
+        if(input[index] != '\\' || index + 1 >= input.Length)
+        {
             return false;
         }
 

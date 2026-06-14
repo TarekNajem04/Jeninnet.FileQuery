@@ -5,13 +5,15 @@
  *  Evaluate performance of GitIgnore rule evaluation.
  */
 [MemoryDiagnoser]
-public class GitIgnoreMatcherBenchmark {
+public class GitIgnoreMatcherBenchmark
+{
     private GitIgnoreInstructionMatcher _matcher = default!;
     private ICompiledPatternSet _patterns = default!;
     private readonly string _path = "src/engine/matcher.cs";
 
     [GlobalSetup]
-    public void Setup() {
+    public void Setup()
+    {
         _matcher = CreateMatcher();
         _patterns = Compile(
             patterns: [
@@ -25,7 +27,8 @@ public class GitIgnoreMatcherBenchmark {
     }
 
     [Benchmark]
-    public bool Match() {
+    public bool Match()
+    {
         var matchOutcome = _matcher.Match(_patterns, CreateFileContext(path: _path));
 
         return matchOutcome is MatchOutcome.Include;

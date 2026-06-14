@@ -3,22 +3,26 @@
 /// <summary>
 /// Ensures recursive wildcards (**) are not redundantly specified.
 /// </summary>
-internal sealed class RecursiveWildcardRedundancyInvariant : IPatternInvariant {
+internal sealed class RecursiveWildcardRedundancyInvariant : IPatternInvariant
+{
     public PatternInvariantPhase Phase => PatternInvariantPhase.Semantic;
     public PatternKind? AppliesTo => null;
 
-    public PatternInvariantResult Validate(PatternCompilationContext context) {
+    public PatternInvariantResult Validate(PatternCompilationContext context)
+    {
         ArgumentNullException.ThrowIfNull(context);
         ArgumentNullException.ThrowIfNull(context.Tokens);
 
         var segments = context.Tokens;
         var previousWasRecursive = false;
 
-        for(var i = 0; i < segments.Count; i++) {
+        for(var i = 0; i < segments.Count; i++)
+        {
             var segment = segments[i];
 
             // Rule 1: multiple ** in same segment
-            if(segment.Count(t => t is RecursiveWildcardToken) > 1) {
+            if(segment.Count(t => t is RecursiveWildcardToken) > 1)
+            {
                 return PatternInvariantResult.Fail("Recursive wildcard (**) must not appear more than once in the same segment.");
             }
 
@@ -27,7 +31,8 @@ internal sealed class RecursiveWildcardRedundancyInvariant : IPatternInvariant {
                 segment[0] is RecursiveWildcardToken;
 
             // Rule 2: adjacent ** segments
-            if(previousWasRecursive && currentIsRecursive) {
+            if(previousWasRecursive && currentIsRecursive)
+            {
                 return PatternInvariantResult.Fail("Redundant recursive wildcard (**/**) detected.");
             }
 

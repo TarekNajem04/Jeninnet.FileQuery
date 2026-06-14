@@ -3,9 +3,10 @@
 /// <summary>
 /// Represents the canonical, normalized input to the pattern engine.
 /// </summary>
-internal sealed record CanonicalPatternInput {
+internal sealed record CanonicalPatternInput
+{
     private static readonly ImmutableDictionary<PatternKind, ImmutableArray<string>>
-        _emptyTypedPatterns = ImmutableDictionary<PatternKind, ImmutableArray<string>>.Empty;
+        _emptyTypedPatterns = [];
 
     /// <summary>
     /// Gets the normalized immutable list of patterns.
@@ -25,20 +26,24 @@ internal sealed record CanonicalPatternInput {
     public CanonicalPatternInput(
         IEnumerable<string>? patterns = null,
         IReadOnlyDictionary<PatternKind, IEnumerable<string>>? typedPatterns = null,
-        PatternInterpretationMode interpretationMode = PatternInterpretationMode.Hybrid) {
+        PatternInterpretationMode interpretationMode = PatternInterpretationMode.Hybrid)
+    {
         Patterns = patterns is null
-            ? ImmutableArray<string>.Empty
-            : patterns.ToImmutableArray();
+            ? []
+            : [.. patterns];
 
-        if(typedPatterns is null || typedPatterns.Count == 0) {
+        if(typedPatterns is null || typedPatterns.Count == 0)
+        {
             TypedPatterns = _emptyTypedPatterns;
-        } else {
+        } else
+        {
             var builder = ImmutableDictionary.CreateBuilder<PatternKind, ImmutableArray<string>>();
 
-            foreach(var (type, list) in typedPatterns) {
+            foreach(var (type, list) in typedPatterns)
+            {
                 builder[type] = list is null
-                    ? ImmutableArray<string>.Empty
-                    : list.ToImmutableArray();
+                    ? []
+                    : [.. list];
             }
 
             TypedPatterns = builder.ToImmutable();

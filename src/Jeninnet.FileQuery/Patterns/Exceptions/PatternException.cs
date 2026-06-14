@@ -16,12 +16,14 @@
 /// domain-level failure rather than a programming error.
 /// </para>
 /// </summary>
-public class PatternException : Exception {
+public class PatternException : Exception
+{
     public PatternException() : base() { }
     /// <summary>
     /// Initializes a new instance of the <see cref="PatternException"/> class
     /// with a descriptive error message.
     /// </summary>
+    /// <param name="message">The error message.</param>
     public PatternException(string message)
             : base(message) { }
 
@@ -29,6 +31,8 @@ public class PatternException : Exception {
     /// Initializes a new instance of the <see cref="PatternException"/> class
     /// with a descriptive error message and an inner exception.
     /// </summary>
+    /// <param name="message">The error message.</param>
+    /// <param name="innerException">The inner exception.</param>
     public PatternException(string message, Exception innerException)
         : base(message, innerException) { }
 }

@@ -23,7 +23,8 @@
 /// </list>
 /// </para>
 /// </remarks>
-internal static class PatternScanner {
+internal static class PatternScanner
+{
     private static readonly IWholePatternTokenizer[] _wholePatternTokenizers = [
         new RegexPatternTokenizer()
     ];
@@ -53,10 +54,12 @@ internal static class PatternScanner {
     /// Thrown when <see cref="PatternCompilationContext.Tokens"/> is already populated,
     /// indicating that <see cref="Scan"/> has been called more than once on the same context.
     /// </exception>
-    public static void Scan(PatternCompilationContext context, PatternSyntaxProfile syntax) {
+    public static void Scan(PatternCompilationContext context, PatternSyntaxProfile syntax)
+    {
         ArgumentNullException.ThrowIfNull(context);
 
-        if(context.Tokens is not null) {
+        if(context.Tokens is not null)
+        {
             throw new InvalidOperationException(
                 "PatternScanner.Scan must only be called once per compilation context.");
         }
@@ -64,8 +67,10 @@ internal static class PatternScanner {
         var span = context.Pattern.Text.AsSpan().Trim();
 
         // 1. Whole-pattern tokenizers (e.g., "r:" regex prefix).
-        foreach(var wholeTokenizer in _wholePatternTokenizers) {
-            if(wholeTokenizer.TryTokenize(span, syntax, out var tokens, out var state)) {
+        foreach(var wholeTokenizer in _wholePatternTokenizers)
+        {
+            if(wholeTokenizer.TryTokenize(span, syntax, out var tokens, out var state))
+            {
                 context.State = state;
                 context.Tokens = tokens;
                 return;
@@ -89,7 +94,8 @@ internal static class PatternScanner {
         // produces only the final List<List<IPatternToken>>.
         var tokenSegments = new List<List<IPatternToken>>(segments.Count);
 
-        foreach(var (start, length) in segments) {
+        foreach(var (start, length) in segments)
+        {
             tokenSegments.Add(TokenizeSegment(span, start, length, syntax));
         }
 
@@ -100,12 +106,14 @@ internal static class PatternScanner {
     private static PatternContext AnalyzeStructure(
         ReadOnlySpan<char> span,
         PatternSyntaxProfile syntax
-    ) {
+    )
+    {
         var start = 0;
         var end = span.Length;
 
         // Escaped leading '!' or '#' — consume the backslash.
-        if(span.Length > 1 && span[0] == '\\' && span[1] is '!' or '#') {
+        if(span.Length > 1 && span[0] == '\\' && span[1] is '!' or '#')
+        {
             start++;
         }
 
@@ -125,13 +133,17 @@ internal static class PatternScanner {
     private static List<(int Start, int Length)> SplitSegments(
         ReadOnlySpan<char> span,
         PatternContext context
-    ) {
+    )
+    {
         var segments = new List<(int, int)>();
         var start = context.Start;
 
-        for(var i = context.Start; i < context.End; i++) {
-            if(span[i] == '/') {
-                if(i > start) {
+        for(var i = context.Start; i < context.End; i++)
+        {
+            if(span[i] == '/')
+            {
+                if(i > start)
+                {
                     segments.Add((start, i - start));
                 }
 
@@ -139,13 +151,15 @@ internal static class PatternScanner {
             }
         }
 
-        if(start < context.End) {
+        if(start < context.End)
+        {
             segments.Add((start, context.End - start));
         }
 
         // Bare root anchor with no body (e.g., "/") produces a zero-length sentinel.
         // GitIgnorePatternInvariant rejects this case during the structural phase.
-        if(context.IsRootAnchored && context.End == context.Start) {
+        if(context.IsRootAnchored && context.End == context.Start)
+        {
             segments.Add((0, 0));
         }
 
@@ -157,14 +171,18 @@ internal static class PatternScanner {
         int start,
         int length,
         PatternSyntaxProfile syntax
-    ) {
+    )
+    {
         var tokens = new List<IPatternToken>(SEGMENT_INITIAL_TOKEN_CAPACITY);
         var segment = pattern.Slice(start, length);
         var index = 0;
 
-        while(index < segment.Length) {
-            foreach(var tokenizer in _tokenizers) {
-                if(tokenizer.TryTokenize(segment, ref index, syntax, tokens)) {
+        while(index < segment.Length)
+        {
+            foreach(var tokenizer in _tokenizers)
+            {
+                if(tokenizer.TryTokenize(segment, ref index, syntax, tokens))
+                {
                     break;
                 }
             }

@@ -1,9 +1,11 @@
 ﻿namespace Jeninnet.FileQuery.Tests.PatternEngine;
 
 [TestClass]
-public class PatternTokenTests {
+public class PatternTokenTests
+{
     [TestMethod]
-    public void CharacterClass_ShouldCreateProperToken() {
+    public void CharacterClass_ShouldCreateProperToken()
+    {
         var cls = new CharacterClass
                     (
                         IsNegated: true,
@@ -21,13 +23,15 @@ public class PatternTokenTests {
     }
 
     [TestMethod]
-    public void LiteralToken_ShouldStoreValue() {
+    public void LiteralToken_ShouldStoreValue()
+    {
         var token = new LiteralToken("hello");
         Assert.AreEqual("hello", token.Text);
     }
 
     [TestMethod]
-    public void Wildcard_ShouldMatchEverything_ForSingleSegment() {
+    public void Wildcard_ShouldMatchEverything_ForSingleSegment()
+    {
         var token = new WildcardToken();
         Assert.IsNotNull(token);
     }
