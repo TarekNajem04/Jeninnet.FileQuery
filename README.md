@@ -13,7 +13,7 @@
 
 ---
 
-## ✨ Repo Stats
+## 📊 Repo Stats
 
 ![Repobeats analytics image](https://repobeats.axiom.co/api/embed/57d92552dfb25309185f7457c01037a504b5fa24.svg "Repobeats analytics image")
 
@@ -35,12 +35,6 @@ This repository contains the core library and its companion packages:
 *   **[Documentation Suite (docs/)](./docs/README.md)**: Deep technical specifications, guides, and architectural whitepapers.
 *   **[Benchmark Suite (benchmarks/)](./benchmarks/README.md)**: Performance measurements and allocation verification.
 *   **[Samples (samples/)](./samples/AdvancedUsage/README.md)**: Practical examples showing basic to advanced usage.
-
----
-
-## 📊 Repo Stats
-
-![Repobeats analytics image](https://repobeats.axiom.co/api/embed/57d92552dfb25309185f7457c01037a504b5fa24.svg "Repobeats analytics image")
 
 ---
 
