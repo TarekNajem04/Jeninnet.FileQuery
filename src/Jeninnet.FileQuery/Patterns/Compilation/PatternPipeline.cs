@@ -1,4 +1,4 @@
-namespace Jeninnet.FileQuery.Patterns.Compilation;
+﻿namespace Jeninnet.FileQuery.Patterns.Compilation;
 
 /// <summary>
 /// Dependency-injectable, phase-driven pattern compilation pipeline.

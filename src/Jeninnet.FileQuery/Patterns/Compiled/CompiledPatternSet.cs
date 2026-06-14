@@ -1,4 +1,4 @@
-namespace Jeninnet.FileQuery.Patterns.Compiled;
+﻿namespace Jeninnet.FileQuery.Patterns.Compiled;
 
 /// <summary>
 /// Represents an ordered, immutable set of compiled patterns produced by an <see cref="IPatternCompiler"/>.

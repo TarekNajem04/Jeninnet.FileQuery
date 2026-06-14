@@ -1,4 +1,4 @@
-namespace Jeninnet.FileQuery.Patterns.Compilation;
+﻿namespace Jeninnet.FileQuery.Patterns.Compilation;
 
 /// <summary>
 /// Static facade for compiling patterns using a shared <see cref="PatternPipeline"/>.
