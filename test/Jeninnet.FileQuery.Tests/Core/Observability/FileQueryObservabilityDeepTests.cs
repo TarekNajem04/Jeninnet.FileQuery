@@ -1,17 +1,17 @@
-namespace Jeninnet.FileQuery.Tests.Core.Observability;
+﻿namespace Jeninnet.FileQuery.Tests.Core.Observability;
 
 [TestClass]
 public sealed class FileQueryObservabilityDeepTests
 {
     [TestMethod]
-    public void FileQueryErrorRecoveryOptions_Validation_ShouldThrowWhenNegativeRetryAttempts()
-    {
-        TestAssertEx.Throws<ArgumentOutOfRangeException>(() =>
-        {
-            var options = new FileQueryErrorRecoveryOptions(FileQueryErrorAction.Retry, -1);
-            options.Validate();
-        });
-    }
+    public void FileQueryErrorRecoveryOptions_Validation_ShouldThrowWhenNegativeRetryAttempts() =>
+        TestAssertEx.Throws<ArgumentOutOfRangeException>(
+            () =>
+            {
+                var options = new FileQueryErrorRecoveryOptions(FileQueryErrorAction.Retry, -1);
+                options.Validate();
+            }
+        );
 
     [TestMethod]
     public void FileQueryErrorRecoveryOptions_Validation_ShouldSucceedWhenZeroOrPositiveRetryAttempts()
@@ -28,7 +28,7 @@ public sealed class FileQueryObservabilityDeepTests
             errorRecovery: new FileQueryErrorRecoveryOptions(FileQueryErrorAction.Retry, -1)
         );
 
-        TestAssertEx.Throws<ArgumentOutOfRangeException>(() => options.Validate());
+        TestAssertEx.Throws<ArgumentOutOfRangeException>(options.Validate);
     }
 
     [TestMethod]

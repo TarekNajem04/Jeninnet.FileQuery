@@ -25,6 +25,7 @@
         <File Path="global.json" />
         <File Path="LICENSE" />
         <File Path="README.md" />
+        <File Path="run-coverage.ps1" />
         <File Path="SECURITY.md" />
     </Folder>
     <Folder Name="/Solution Items/.github/">

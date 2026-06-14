@@ -1,7 +1,4 @@
-namespace Jeninnet.FileQuery.Tests.Core;
-
-using Jeninnet.FileQuery.Extensions;
-using Jeninnet.FileQuery.Matching;
+﻿namespace Jeninnet.FileQuery.Tests.Core;
 
 [TestClass]
 public sealed class ExtensionTests
