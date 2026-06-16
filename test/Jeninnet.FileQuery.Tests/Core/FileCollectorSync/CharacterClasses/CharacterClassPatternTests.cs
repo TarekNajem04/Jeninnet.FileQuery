@@ -18,11 +18,13 @@ public class CharacterClassPatternTests
 
         var fileQueryEngine = FileQueryRuntime.Create();
         var options = new FileQueryOptions(
-            patternInput: new(
-                patterns: [
-                    "**",
-                    "![abc].txt"
-                ]
+            new FileQueryOptionsConfig(
+                PatternInput: new(
+                    Patterns: [
+                        "**",
+                        "![abc].txt"
+                    ]
+                )
             )
         );
 
@@ -43,11 +45,13 @@ public class CharacterClassPatternTests
 
         var fileQueryEngine = FileQueryRuntime.Create();
         var options = new FileQueryOptions(
-            patternInput: new(
-                patterns: [
-                    "**",
-                    "!file[0-9].txt"
-                ]
+            new FileQueryOptionsConfig(
+                PatternInput: new(
+                    Patterns: [
+                        "**",
+                        "!file[0-9].txt"
+                    ]
+                )
             )
         );
 
@@ -68,11 +72,13 @@ public class CharacterClassPatternTests
 
         var fileQueryEngine = FileQueryRuntime.Create();
         var options = new FileQueryOptions(
-            patternInput: new(
-                patterns: [
-                    "**",
-                    "![!abc].txt"
-                ]
+            new FileQueryOptionsConfig(
+                PatternInput: new(
+                    Patterns: [
+                        "**",
+                        "![!abc].txt"
+                    ]
+                )
             )
         );
 
@@ -84,3 +90,4 @@ public class CharacterClassPatternTests
         Assert.DoesNotContain(x => x.EndsWith("c.txt", StringComparison.Ordinal), results);
     }
 }
+

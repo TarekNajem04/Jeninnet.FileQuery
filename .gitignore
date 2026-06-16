@@ -363,12 +363,23 @@ MigrationBackup/
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
 
-# Coverage Reports
-TestCoverageReport/
-coverage/
-CoverageResults/
-TestResults/
+# ==========================================
+# Coverage Reports & Test Results
+# ==========================================
+**/TestCoverageReport/
+**/[Cc]overage/
+**/CoverageResults/
+**/TestResults/
 
-coverage*.xml
+**/[Cc]overage*.xml
+**/[Cc]overage*.json
 *.coverage
 *.coveragexml
+
+# ==========================================
+# SonarQube & SonarLint
+# ==========================================
+.sonarlint/
+.sonar/
+.sonarcloud/
+.sonarqube/

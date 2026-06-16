@@ -25,10 +25,12 @@ public class DirectoryOnlyPatternTests
 
         var fileQueryEngine = FileQueryRuntime.Create();
         var options = new FileQueryOptions(
-            patternInput: new(
-                patterns: [
-                    "sub/"
-                ]
+            new FileQueryOptionsConfig(
+                PatternInput: new(
+                    Patterns: [
+                        "sub/"
+                    ]
+                )
             )
         );
 
@@ -52,11 +54,13 @@ public class DirectoryOnlyPatternTests
 
         var fileQueryEngine = FileQueryRuntime.Create();
         var options = new FileQueryOptions(
-            patternInput: new(
-                patterns: [
-                    "sub/",
-                    "!sub/*.txt"
-                ]
+            new FileQueryOptionsConfig(
+                PatternInput: new(
+                    Patterns: [
+                        "sub/",
+                        "!sub/*.txt"
+                    ]
+                )
             )
         );
 
@@ -80,11 +84,13 @@ public class DirectoryOnlyPatternTests
 
         var fileQueryEngine = FileQueryRuntime.Create();
         var options = new FileQueryOptions(
-            patternInput: new(
-                patterns: [
-                    "sub/*",       // exclude folder
-                    "!sub/a.txt"    // re-include one file
-                ]
+            new FileQueryOptionsConfig(
+                PatternInput: new(
+                    Patterns: [
+                        "sub/*",       // exclude folder
+                        "!sub/a.txt"    // re-include one file
+                    ]
+                )
             )
         );
 
@@ -112,10 +118,12 @@ public class DirectoryOnlyPatternTests
 
         var fileQueryEngine = FileQueryRuntime.Create();
         var options = new FileQueryOptions(
-            patternInput: new(
-                patterns: [
-                    "/temp/"
-                ]
+            new FileQueryOptionsConfig(
+                PatternInput: new(
+                    Patterns: [
+                        "/temp/"
+                    ]
+                )
             )
         );
 
@@ -148,12 +156,14 @@ public class DirectoryOnlyPatternTests
 
         var fileQueryEngine = FileQueryRuntime.Create();
         var options = new FileQueryOptions(
-            patternInput: new(
-                patterns: [
-                    "/*",   // Exclude all files in root directory
-                    "!*/",  // Re-include all directories (prevents pruning)
-                    "!*/*" // Include all fila in subdirectories
-                ]
+            new FileQueryOptionsConfig(
+                PatternInput: new(
+                    Patterns: [
+                        "/*",   // Exclude all files in root directory
+                        "!*/",  // Re-include all directories (prevents pruning)
+                        "!*/*" // Include all files in subdirectories
+                    ]
+                )
             )
         );
 
@@ -186,12 +196,14 @@ public class DirectoryOnlyPatternTests
 
         var fileQueryEngine = FileQueryRuntime.Create();
         var options = new FileQueryOptions(
-            patternInput: new(
-                patterns: [
-                    "sub/*",        // Ignores all files within the `sub` folder located at the root
-                    "!sub/x.txt",   // Excludes the `x.txt` file located within the `sub` folder at the root only
-                    "*/sub/*",      // Ignores all files within any subfolder named `sub` (such as `tmp/sub/b.txt`)
-                ]
+            new FileQueryOptionsConfig(
+                PatternInput: new(
+                    Patterns: [
+                        "sub/*",        // Ignores all files within the `sub` folder located at the root
+                        "!sub/x.txt",   // Excludes the `x.txt` file located within the `sub` folder at the root only
+                        "*/sub/*",      // Ignores all files within any subfolder named `sub` (such as `tmp/sub/b.txt`)
+                    ]
+                )
             )
         );
 

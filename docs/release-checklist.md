@@ -19,5 +19,5 @@ Use this checklist before tagging a release.
 
 1. Confirm all CI, docs, security, and package validation jobs are green.
 2. Run the full benchmark suite locally in Release mode.
-3. Create a SemVer tag such as `v1.0.0`.
+3. Create a SemVer tag such as `v1.2.0`.
 4. Review the draft GitHub release before publishing it.

@@ -1,5 +1,4 @@
-﻿using System;
-namespace Jeninnet.FileQuery.Tests.Core.FileCollectorAsync.DirectoryOnly;
+﻿namespace Jeninnet.FileQuery.Tests.Core.FileCollectorAsync.DirectoryOnly;
 
 /// <summary>
 /// Async tests validating patterns that apply *only to directories*.
@@ -26,11 +25,13 @@ public class EnumerateFilesAsync_DirectoryOnlyPatternTests
         );
 
         var options = new FileQueryOptions(
-            patternInput: new(
-                patterns: [
-                     "secret/"     // directory-only
-                    //"secret/**"   // directory-only ignore
-                ]
+            new FileQueryOptionsConfig(
+                PatternInput: new(
+                    Patterns: [
+                         "secret/"     // directory-only
+                        //"secret/**"   // directory-only ignore
+                    ]
+                )
             )
         );
 
@@ -63,11 +64,13 @@ public class EnumerateFilesAsync_DirectoryOnlyPatternTests
         // 3. Re-inclusion of the TARGET SUBDIRECTORY ITSELF (to prevent its own pruning)
         // 4. Re-inclusion of the files inside the target subdirectory
         var options = new FileQueryOptions(
-            patternInput: new(
-                patterns: [
-                    "ignore_me/**",             // Exclude ALL contents (files/subdirs) under 'ignore_me'
-                    "!ignore_me/recover/**",    // Re-include the DIRECTORY 'recover/' itself (allows traversal)
-                ]
+            new FileQueryOptionsConfig(
+                PatternInput: new(
+                    Patterns: [
+                        "ignore_me/**",             // Exclude ALL contents (files/subdirs) under 'ignore_me'
+                        "!ignore_me/recover/**",    // Re-include the DIRECTORY 'recover/' itself (allows traversal)
+                    ]
+                )
             )
         );
         var fileQueryEngine = FileQueryRuntime.Create();
@@ -95,10 +98,12 @@ public class EnumerateFilesAsync_DirectoryOnlyPatternTests
         );
 
         var options = new FileQueryOptions(
-            patternInput: new(
-                patterns: [
-                    "**/[b]*/",    // ignore any folder named starting with 'b' at ANY level
-                ]
+            new FileQueryOptionsConfig(
+                PatternInput: new(
+                    Patterns: [
+                        "**/[b]*/",    // ignore any folder named starting with 'b' at ANY level
+                    ]
+                )
             )
         );
 
@@ -112,3 +117,4 @@ public class EnumerateFilesAsync_DirectoryOnlyPatternTests
 
     public TestContext TestContext { get; set; } = null!;
 }
+

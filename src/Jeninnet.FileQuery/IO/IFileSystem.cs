@@ -68,6 +68,11 @@ internal interface IFileSystem
     string ResolveRealPath(string path);
 
     /// <summary>
+    /// Gets the platform-specific directory separator character.
+    /// </summary>
+    char DirectorySeparator { get; }
+
+    /// <summary>
     /// Returns the absolute path for the specified path string.
     /// </summary>
     /// <param name="path">The file or directory for which to obtain absolute path information.</param>

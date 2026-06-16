@@ -6,11 +6,11 @@
         <!--
         Package Version Strategy
         1.0.0  initial release
-        1.1.0  new features
+        1.2.0  new features
         1.1.1  bug fix
         2.0.0  breaking change        
         -->
-        <Version>1.1.0</Version>
+        <Version>1.2.0</Version>
     </PropertyGroup>
 
     <ItemGroup>

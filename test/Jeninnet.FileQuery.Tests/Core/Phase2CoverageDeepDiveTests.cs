@@ -260,6 +260,8 @@ public sealed class Phase2CoverageDeepDiveTests
         public CompiledMatchIntent Intent => CompiledMatchIntent.FromNegation(isNegated);
         public string SourceText => string.Empty;
         public int SourceIndex => -1;
+        public string ConcretePathAnchor => string.Empty;
+        public string? RegexText => null;
     }
 
     public TestContext? TestContext { get; set; }

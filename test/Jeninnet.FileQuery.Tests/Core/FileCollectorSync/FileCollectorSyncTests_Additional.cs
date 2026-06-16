@@ -47,19 +47,21 @@ public class FileQueryEngineSyncTests_Additional
         });
 
         var opts = new FileQueryOptions(
-            patternInput: new(
-                patterns: [
-                    "**",
-                    "!logs/**"
-                ]
-            ),
-            recurseSubdirectories: true
+            new FileQueryOptionsConfig(
+                PatternInput: new(
+                    Patterns: [
+                        "**",
+                        "!logs/**"
+                    ]
+                ),
+                RecurseSubdirectories: true
+            )
         );
 
         var fc = FileQueryRuntime.Create();
         var result = fc.Execute(new(root, opts)).ToList();
 
-        // only logs directory included → includes file inside it
+        // only logs directory included ? includes file inside it
         var onlyResult = TestAssertEx.ContainsSingle(result);
         TestAssertEx.EndsWith(onlyResult, Path.Combine("logs", "file1.txt"));
     }
@@ -77,13 +79,15 @@ public class FileQueryEngineSyncTests_Additional
         });
 
         var opts = new FileQueryOptions(
-            patternInput: new(
-                patterns: [
-                    "logs/*",
-                    "!logs/b.txt"
-                ]
-            ),
-            recurseSubdirectories: true
+            new FileQueryOptionsConfig(
+                PatternInput: new(
+                    Patterns: [
+                        "logs/*",
+                        "!logs/b.txt"
+                    ]
+                ),
+                RecurseSubdirectories: true
+            )
         );
 
         var fc = FileQueryRuntime.Create();
@@ -106,13 +110,15 @@ public class FileQueryEngineSyncTests_Additional
         });
 
         var opts = new FileQueryOptions(
-            patternInput: new(
-                patterns: [
-                    "**",
-                    "!/a.txt"
-                ]
-            ),
-            recurseSubdirectories: true
+            new FileQueryOptionsConfig(
+                PatternInput: new(
+                    Patterns: [
+                        "**",
+                        "!/a.txt"
+                    ]
+                ),
+                RecurseSubdirectories: true
+            )
         );
 
         var fc = FileQueryRuntime.Create();
@@ -135,13 +141,15 @@ public class FileQueryEngineSyncTests_Additional
         });
 
         var opts = new FileQueryOptions(
-            patternInput: new(
-                patterns: [
-                    "**",
-                    "!a.txt"
-                ]
-            ),
-            recurseSubdirectories: true
+            new FileQueryOptionsConfig(
+                PatternInput: new(
+                    Patterns: [
+                        "**",
+                        "!a.txt"
+                    ]
+                ),
+                RecurseSubdirectories: true
+            )
         );
 
         var fc = FileQueryRuntime.Create();
@@ -160,12 +168,14 @@ public class FileQueryEngineSyncTests_Additional
         });
 
         var opts = new FileQueryOptions(
-            patternInput: new(
-                patterns: [
-                    "**",
-                    "!*.log",
-                    "important.log"
-                ]
+            new FileQueryOptionsConfig(
+                PatternInput: new(
+                    Patterns: [
+                        "**",
+                        "!*.log",
+                        "important.log"
+                    ]
+                )
             )
         );
 
@@ -188,13 +198,15 @@ public class FileQueryEngineSyncTests_Additional
         });
 
         var opts = new FileQueryOptions(
-            patternInput: new(
-                patterns: [
-                    "**",
-                    "!logs/hidden/keep.txt"
-                ]
-            ),
-            recurseSubdirectories: true
+            new FileQueryOptionsConfig(
+                PatternInput: new(
+                    Patterns: [
+                        "**",
+                        "!logs/hidden/keep.txt"
+                    ]
+                ),
+                RecurseSubdirectories: true
+            )
         );
 
         var result = FileQueryRuntime.Create().Execute(new(root, opts)).ToList();
@@ -214,11 +226,13 @@ public class FileQueryEngineSyncTests_Additional
         });
 
         var opts = new FileQueryOptions(
-            patternInput: new(
-                patterns: [
-                    "**",
-                    "!file[0-2].txt"
-                ]
+            new FileQueryOptionsConfig(
+                PatternInput: new(
+                    Patterns: [
+                        "**",
+                        "!file[0-2].txt"
+                    ]
+                )
             )
         );
 
@@ -236,11 +250,13 @@ public class FileQueryEngineSyncTests_Additional
         });
 
         var opts = new FileQueryOptions(
-            patternInput: new(
-                patterns: [
-                    "**",
-                    "!file[!5-9].txt"
-                ]
+            new FileQueryOptionsConfig(
+                PatternInput: new(
+                    Patterns: [
+                        "**",
+                        "!file[!5-9].txt"
+                    ]
+                )
             )
         );
 
@@ -260,13 +276,15 @@ public class FileQueryEngineSyncTests_Additional
         });
 
         var opts = new FileQueryOptions(
-            patternInput: new(
-                patterns: [
-                    "**",
-                    "!**/foo/**/bar/*.json"
-                ]
-            ),
-            recurseSubdirectories: true
+            new FileQueryOptionsConfig(
+                PatternInput: new(
+                    Patterns: [
+                        "**",
+                        "!**/foo/**/bar/*.json"
+                    ]
+                ),
+                RecurseSubdirectories: true
+            )
         );
 
         var result = FileQueryRuntime.Create().Execute(new(root, opts)).ToList();
@@ -282,10 +300,12 @@ public class FileQueryEngineSyncTests_Additional
         });
 
         var opts = new FileQueryOptions(
-            patternInput: new(
-                patterns: [
-                    "!**"
-                ]
+            new FileQueryOptionsConfig(
+                PatternInput: new(
+                    Patterns: [
+                        "!**"
+                    ]
+                )
             )
         );
 
@@ -302,11 +322,13 @@ public class FileQueryEngineSyncTests_Additional
         });
 
         var opts = new FileQueryOptions(
-            patternInput: new(
-                patterns: [
-                    "**",
-                    "!.env"
-                ]
+            new FileQueryOptionsConfig(
+                PatternInput: new(
+                    Patterns: [
+                        "**",
+                        "!.env"
+                    ]
+                )
             )
         );
 
@@ -323,14 +345,16 @@ public class FileQueryEngineSyncTests_Additional
         });
 
         var opts = new FileQueryOptions(
-            patternInput: new(
-                patterns: [
-                    "**",
-                    "!**/*.txt"
-                ]
-            ),
-            recurseSubdirectories: true,
-            maxRecursionDepth: 2
+            new FileQueryOptionsConfig(
+                PatternInput: new(
+                    Patterns: [
+                        "**",
+                        "!**/*.txt"
+                    ]
+                ),
+                RecurseSubdirectories: true,
+                MaxRecursionDepth: 2
+            )
         );
 
         var result = FileQueryRuntime.Create().Execute(new(root, opts)).ToList();
@@ -350,13 +374,15 @@ public class FileQueryEngineSyncTests_Additional
                                                new(
                                                    root,
                                                    new FileQueryOptions(
-                                                       patternInput: new(
-                                                           patterns: [
-                                                               "**",
-                                                               "!**/*.txt"
-                                                            ]
-                                                       ),
-                                                       recurseSubdirectories: true
+                                                       new FileQueryOptionsConfig(
+                                                           PatternInput: new(
+                                                               Patterns: [
+                                                                   "**",
+                                                                   "!**/*.txt"
+                                                                ]
+                                                           ),
+                                                           RecurseSubdirectories: true
+                                                       )
                                                    )
                                                )
                                            )

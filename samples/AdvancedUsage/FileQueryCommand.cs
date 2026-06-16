@@ -1,10 +1,21 @@
 ﻿namespace AdvancedUsage;
 
+/// <summary>
+/// Implements the file query command for the advanced usage sample.
+/// </summary>
+/// <param name="engine">The query engine.</param>
+/// <param name="printer">The output printer.</param>
 public sealed class FileQueryCommand(
     IFileQueryEngine engine,
     IPrinter printer
 ) : IFileQueryCommand
 {
+    /// <summary>
+    /// Executes the query command asynchronously.
+    /// </summary>
+    /// <param name="root">The root directory.</param>
+    /// <param name="args">The command arguments.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
     public async Task ExecuteAsync(string root, string[] args, CancellationToken cancellationToken = default)
     {
         var options = new CliOptions();

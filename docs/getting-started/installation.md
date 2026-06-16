@@ -51,10 +51,10 @@ Install-Package Jeninnet.FileQuery.DependencyInjection # optional
 
 ```xml
 <ItemGroup>
-  <PackageReference Include="Jeninnet.FileQuery" Version="1.0.0" />
+  <PackageReference Include="Jeninnet.FileQuery" Version="1.2.0" />
   <!-- Optional: -->
-  <PackageReference Include="Jeninnet.FileQuery.CommandLine" Version="1.0.0" />
-  <PackageReference Include="Jeninnet.FileQuery.DependencyInjection" Version="1.0.0" />
+  <PackageReference Include="Jeninnet.FileQuery.CommandLine" Version="1.2.0" />
+  <PackageReference Include="Jeninnet.FileQuery.DependencyInjection" Version="1.2.0" />
 </ItemGroup>
 ```
 

@@ -14,8 +14,10 @@ public sealed class FileQueryObservabilityTests
         var query = new FileQuery(
             env.Root,
             new FileQueryOptions(
-                patternInput: new(patterns: ["**", "!**/*.txt"]),
-                recurseSubdirectories: true
+                new FileQueryOptionsConfig(
+                    PatternInput: new(Patterns: ["**", "!**/*.txt"]),
+                    RecurseSubdirectories: true
+                )
             )
         );
 
@@ -39,9 +41,11 @@ public sealed class FileQueryObservabilityTests
         var query = new FileQuery(
             env.Root,
             new FileQueryOptions(
-                patternInput: new(patterns: ["**", "!**/*.txt"]),
-                auditMatches: true,
-                diagnostics: diagnostics
+                new FileQueryOptionsConfig(
+                    PatternInput: new(Patterns: ["**", "!**/*.txt"]),
+                    AuditMatches: true,
+                    Diagnostics: diagnostics
+                )
             )
         );
 
@@ -69,7 +73,7 @@ public sealed class FileQueryObservabilityTests
         );
         var query = new FileQuery(
             fileSystem.Root,
-            new FileQueryOptions(patternInput: new(patterns: ["!**"]))
+            new FileQueryOptions(new FileQueryOptionsConfig(PatternInput: new(Patterns: ["!**"])))
         );
 
         using var cts = new CancellationTokenSource();
@@ -140,10 +144,12 @@ public sealed class FileQueryObservabilityTests
         new(
             fileSystem.Root,
             new FileQueryOptions(
-                patternInput: new(patterns: ["!**"]),
-                recurseSubdirectories: true,
-                ignoreInaccessible: errorRecovery.Action is FileQueryErrorAction.Skip,
-                errorRecovery: errorRecovery
+                new FileQueryOptionsConfig(
+                    PatternInput: new(Patterns: ["!**"]),
+                    RecurseSubdirectories: true,
+                    IgnoreInaccessible: errorRecovery.Action is FileQueryErrorAction.Skip,
+                    ErrorRecovery: errorRecovery
+                )
             )
         );
 
@@ -182,6 +188,7 @@ public sealed class FileQueryObservabilityTests
         public FileAttributes GetAttributes(string path) => FileAttributes.Normal;
         public bool DirectoryExists(string path) => path == Root;
         public string ResolveRealPath(string path) => path;
+        public char DirectorySeparator => Path.DirectorySeparatorChar;
         public string GetFullPath(string path) => path;
         public string GetFullPath(string path, string basePath) => Path.Combine(basePath, path);
     }
@@ -252,7 +259,9 @@ public sealed class FileQueryObservabilityTests
 
         public bool DirectoryExists(string path) => path == Root;
         public string ResolveRealPath(string path) => path;
+        public char DirectorySeparator => Path.DirectorySeparatorChar;
         public string GetFullPath(string path) => path;
         public string GetFullPath(string path, string basePath) => Path.Combine(basePath, path);
     }
 }
+

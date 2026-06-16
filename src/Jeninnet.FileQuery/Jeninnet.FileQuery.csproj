@@ -7,11 +7,11 @@
         Package Version Strategy
         1.0.0  initial release
         1.0.1  bug fix
-        1.1.0  new features
+        1.2.0  new features
         1.1.1  bug fix
         2.0.0  breaking change        
         -->
-        <Version>1.1.0</Version>
+        <Version>1.2.0</Version>
 
         <Description>
             A high-performance, deterministic file discovery and filtering engine for .NET, combining GitIgnore, Glob, and Regex pattern languages into a unified matcher architecture.

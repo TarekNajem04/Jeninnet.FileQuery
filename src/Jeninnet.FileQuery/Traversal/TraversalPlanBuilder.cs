@@ -41,7 +41,7 @@ internal sealed class TraversalPlanBuilder(IFileSystem fileSystem) : ITraversalP
         var evaluator = new TraversalEvaluator(new TraversalDecisionProvider(traversalConfig));
 
         return new TraversalPlan(
-            RootDirectory: fileSystem.GetFullPath(query.RootPath).TrimEnd(Path.DirectorySeparatorChar),
+            RootDirectory: fileSystem.GetFullPath(query.RootPath).TrimEnd(fileSystem.DirectorySeparator),
             FileSystem: fileSystem,
             Traversal: traversalConfig,
             Matching: matchingConfig,

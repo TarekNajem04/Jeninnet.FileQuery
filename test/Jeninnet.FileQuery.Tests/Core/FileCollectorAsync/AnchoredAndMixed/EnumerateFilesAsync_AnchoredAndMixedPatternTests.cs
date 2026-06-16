@@ -22,11 +22,13 @@ public class EnumerateFilesAsync_AnchoredAndMixedPatternTests
         );
 
         var options = new FileQueryOptions(
-            patternInput: new(
-                patterns: [
-                    "*.txt",   // Exclude all .txt files"
-                    "!/root.txt" // Anchored to root only
-                ]
+            new FileQueryOptionsConfig(
+                PatternInput: new(
+                    Patterns: [
+                        "*.txt",   // Exclude all .txt files"
+                        "!/root.txt" // Anchored to root only
+                    ]
+                )
             )
         );
 
@@ -56,13 +58,15 @@ public class EnumerateFilesAsync_AnchoredAndMixedPatternTests
         );
 
         var options = new FileQueryOptions(
-            patternInput: new(
-                // a?c* matches: abc1, abc9, axcZZ
-                // a?c* FAILS to match: axxc12 (because the third char is 'x', not 'c')
-                patterns: [
-                    "**",               // Exclude everything first
-                    "!a?c*/data/*.txt"  // Include matching patterns
-                ]
+            new FileQueryOptionsConfig(
+                PatternInput: new(
+                    // a?c* matches: abc1, abc9, axcZZ
+                    // a?c* FAILS to match: axxc12 (because the third char is 'x', not 'c')
+                    Patterns: [
+                        "**",               // Exclude everything first
+                        "!a?c*/data/*.txt"  // Include matching patterns
+                    ]
+                )
             )
         );
 
@@ -91,11 +95,13 @@ public class EnumerateFilesAsync_AnchoredAndMixedPatternTests
         );
 
         var options = new FileQueryOptions(
-            patternInput: new(
-                patterns: [
-                    "**",              // Exclude everything
-                    "!/top/*.txt"    // should not match nested top/
-                ]
+            new FileQueryOptionsConfig(
+                PatternInput: new(
+                    Patterns: [
+                        "**",              // Exclude everything
+                        "!/top/*.txt"    // should not match nested top/
+                    ]
+                )
             )
         );
 

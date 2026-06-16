@@ -59,54 +59,45 @@ internal static class PatternsMerger
     /// A dictionary mapping each <see cref="PatternKind"/> to an immutable array of merged pattern strings.
     /// </returns>
     public static Dictionary<PatternKind, ImmutableArray<string>> Merge(
-        IEnumerable<string> patterns,
-        IReadOnlyDictionary<PatternKind, IEnumerable<string>> typedPatterns
+        IEnumerable<string>? patterns,
+        IReadOnlyDictionary<PatternKind, IEnumerable<string>>? typedPatterns
     )
     {
-        var mergedPatterns = new Dictionary<PatternKind, List<string>>();
+        var buckets = new Dictionary<PatternKind, HashSet<string>>();
+
+        HashSet<string> GetBucket(PatternKind kind)
+        {
+            if(!buckets.TryGetValue(kind, out var set))
+            {
+                set = new HashSet<string>(StringComparer.Ordinal);
+                buckets[kind] = set;
+            }
+
+            return set;
+        }
 
         // Seed the dictionary with explicitly typed patterns first.
         if(typedPatterns is not null)
         {
             foreach(var (kind, values) in typedPatterns)
             {
-                // We copy to a new list to avoid mutating the caller's collection.
-                mergedPatterns[kind] = [.. values];
+                var bucket = GetBucket(kind);
+                foreach(var val in (values ?? []).Where(v => v is not null))
+                {
+                    bucket.Add(val);
+                }
             }
-        }
-
-        if(patterns is null)
-        {
-            return ToImmutableResult(mergedPatterns);
         }
 
         // Classify and append each untyped pattern.
-        foreach(var rawPattern in patterns)
+        foreach(var rawPattern in (patterns ?? []).Where(p => p is not null))
         {
-            var kind = PatternClassifier.Classify(rawPattern);
-
-            if(!mergedPatterns.TryGetValue(kind, out var bucket))
-            {
-                bucket = [];
-                mergedPatterns[kind] = bucket;
-            }
-
-            if(!bucket.Contains(rawPattern))
-            {
-                bucket.Add(rawPattern);
-            }
+            GetBucket(PatternClassifier.Classify(rawPattern)).Add(rawPattern);
         }
 
-        return ToImmutableResult(mergedPatterns);
-    }
-
-    /// <summary>
-    /// Converts the mutable working dictionary into the immutable result form.
-    /// </summary>
-    /// <param name="source">The source dictionary of merged patterns.</param>
-    private static Dictionary<PatternKind, ImmutableArray<string>> ToImmutableResult(Dictionary<PatternKind, List<string>> source)
-        => source.ToDictionary(
+        return buckets.ToDictionary(
             static kvp => kvp.Key,
             static kvp => kvp.Value.ToImmutableArray()
         );
+    }
 }

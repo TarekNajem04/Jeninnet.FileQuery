@@ -33,15 +33,18 @@ public class FileQueryEngineAsyncTests
 
         var fileQueryEngine = FileQueryRuntime.Create();
         var options = new FileQueryOptions(
-            patternInput: new(
-                patterns: [
-                    "**",       //Exclude everything
-                    "*.log",    // Exclude log files
-                    "!*.txt"    // Include txt files
-                ]
-            ),
-            recurseSubdirectories: true, // Only top-level files
-            maxRecursionDepth: 0);
+            new FileQueryOptionsConfig(
+                PatternInput: new(
+                    Patterns: [
+                        "**",       //Exclude everything
+                        "*.log",    // Exclude log files
+                        "!*.txt"    // Include txt files
+                    ]
+                ),
+                RecurseSubdirectories: true, // Only top-level files
+                MaxRecursionDepth: 0
+            )
+        );
 
         // ACT
         var results = await fileQueryEngine.ExecuteAsync(new(env.Root, options), TestContext.CancellationToken)
@@ -80,14 +83,16 @@ public class FileQueryEngineAsyncTests
 
         var fileQueryEngine = FileQueryRuntime.Create();
         var options = new FileQueryOptions(
-            patternInput: new(
-                patterns: [
-                    "**",       //Exclude everything
-                    "*.log" ,   // Exclude log files
-                    "!**/*.txt" // [Recursive wildcard] Include all .txt files recursively
-                ]
-            ),
-            recurseSubdirectories: true
+            new FileQueryOptionsConfig(
+                PatternInput: new(
+                    Patterns: [
+                        "**",       //Exclude everything
+                        "*.log" ,   // Exclude log files
+                        "!**/*.txt" // [Recursive wildcard] Include all .txt files recursively
+                    ]
+                ),
+                RecurseSubdirectories: true
+            )
         );
 
         // ACT
@@ -126,12 +131,14 @@ public class FileQueryEngineAsyncTests
 
         var fileQueryEngine = FileQueryRuntime.Create();
         var options = new FileQueryOptions(
-            patternInput: new(
-                patterns: [
-                    "**/*"
-                ]
-            ),
-            recurseSubdirectories: true
+            new FileQueryOptionsConfig(
+                PatternInput: new(
+                    Patterns: [
+                        "**/*"
+                    ]
+                ),
+                RecurseSubdirectories: true
+            )
         );
 
         using var cts = new CancellationTokenSource();
@@ -167,17 +174,19 @@ public class FileQueryEngineAsyncTests
 
         var fileQueryEngine = FileQueryRuntime.Create();
         var options = new FileQueryOptions(
-            patternInput: new(
-                patterns: [
-                    "*.txt",            // exclude txt files
-                    "*.log",            // exclude log files
-                    "!file1.txt",       // include file1.txt
-                    "![fF]ile3.txt",    // include file3.txt everywhere
-                    "subdir/**"         // directory-only rule (prunes/excludes subdir/ and its contents)
-                ]
-            ),
-            recurseSubdirectories: true,
-            caseSensitivity: CaseSensitivity.Insensitive
+            new FileQueryOptionsConfig(
+                PatternInput: new(
+                    Patterns: [
+                        "*.txt",            // exclude txt files
+                        "*.log",            // exclude log files
+                        "!file1.txt",       // include file1.txt
+                        "![fF]ile3.txt",    // include file3.txt everywhere
+                        "subdir/**"         // directory-only rule (prunes/excludes subdir/ and its contents)
+                    ]
+                ),
+                RecurseSubdirectories: true,
+                CaseSensitivity: CaseSensitivity.Insensitive
+            )
         );
 
         // ACT
@@ -199,3 +208,4 @@ public class FileQueryEngineAsyncTests
         Assert.HasCount(3, results, "Should return file1.txt, file3.txt (root) and bin/file3.txt after exclusions/pruning.");
     }
 }
+

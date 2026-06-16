@@ -31,14 +31,16 @@ public class FileQueryEngineSyncTests
         try
         {
             var options = new FileQueryOptions(
-                patternInput: new(
-                    patterns: [
-                        "**",
-                        "!*.txt"
-                    ]
-                ),
-                recurseSubdirectories: false,
-                caseSensitivity: Enums.CaseSensitivity.Insensitive
+                new FileQueryOptionsConfig(
+                    PatternInput: new(
+                        Patterns: [
+                            "**",
+                            "!*.txt"
+                        ]
+                    ),
+                    RecurseSubdirectories: false,
+                    CaseSensitivity: Enums.CaseSensitivity.Insensitive
+                )
             );
             var files = _fileQueryEngine.Execute(new(tempDir, options))
                                         .ToList()
@@ -66,14 +68,16 @@ public class FileQueryEngineSyncTests
         try
         {
             var options = new FileQueryOptions(
-                patternInput: new(
-                    patterns: [
-                        "**",
-                        "!*.txt"
-                    ]
-                ),
-                recurseSubdirectories: false,
-                ignoreInaccessible: false
+                new FileQueryOptionsConfig(
+                    PatternInput: new(
+                        Patterns: [
+                            "**",
+                            "!*.txt"
+                        ]
+                    ),
+                    RecurseSubdirectories: false,
+                    IgnoreInaccessible: false
+                )
             );
 
             var files = _fileQueryEngine.Execute(new(tempDir, options)).ToList();
@@ -101,15 +105,17 @@ public class FileQueryEngineSyncTests
         try
         {
             var options = new FileQueryOptions(
-                patternInput: new(
-                    patterns: [
-                        "**",
-                        "!*.txt"
-                    ]
-                ),
-                recurseSubdirectories: true,
-                maxRecursionDepth: 0, // only include root files
-                caseSensitivity: Enums.CaseSensitivity.Insensitive
+                new FileQueryOptionsConfig(
+                    PatternInput: new(
+                        Patterns: [
+                            "**",
+                            "!*.txt"
+                        ]
+                    ),
+                    RecurseSubdirectories: true,
+                    MaxRecursionDepth: 0, // only include root files
+                    CaseSensitivity: Enums.CaseSensitivity.Insensitive
+                )
             );
 
             var files = _fileQueryEngine.Execute(new(tempDir, options))
@@ -125,3 +131,4 @@ public class FileQueryEngineSyncTests
         }
     }
 }
+

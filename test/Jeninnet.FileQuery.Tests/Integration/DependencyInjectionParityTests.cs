@@ -68,17 +68,20 @@ public sealed class DependencyInjectionParityTests
     private static FileQuery CreateParityQuery(string root)
     {
         var options = new FileQueryOptions(
-            patternInput: new(
-                patterns: [
-                    "**",
-                    "!keep/**/*.txt",
-                    "!keep/**/*.cs"
-                ]
-            ),
-            recurseSubdirectories: true,
-            caseSensitivity: CaseSensitivity.Insensitive
+            new FileQueryOptionsConfig(
+                PatternInput: new(
+                    Patterns: [
+                        "**",
+                        "!keep/**/*.txt",
+                        "!keep/**/*.cs"
+                    ]
+                ),
+                RecurseSubdirectories: true,
+                CaseSensitivity: CaseSensitivity.Insensitive
+            )
         );
 
         return new(root, options);
     }
 }
+

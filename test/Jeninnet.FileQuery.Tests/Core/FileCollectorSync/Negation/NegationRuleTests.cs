@@ -19,12 +19,14 @@ public class NegationRuleTests
 
         var fileQueryEngine = FileQueryRuntime.Create();
         var options = new FileQueryOptions(
-            patternInput: new(
-                patterns: [
-                    "**",
-                    "!*.txt",
-                    "b.txt"
-                ]
+            new FileQueryOptionsConfig(
+                PatternInput: new(
+                    Patterns: [
+                        "**",
+                        "!*.txt",
+                        "b.txt"
+                    ]
+                )
             )
         );
 
@@ -46,12 +48,14 @@ public class NegationRuleTests
 
         var fileQueryEngine = FileQueryRuntime.Create();
         var options = new FileQueryOptions(
-            patternInput: new(
-                patterns: [
-                    "**",           // exclude all
-                    "!*.txt",       // re-include all .txt files
-                    "ignore.txt"    // explicitly exclude ignore.txt
-                ]
+            new FileQueryOptionsConfig(
+            PatternInput: new(
+                    Patterns: [
+                        "**",           // exclude all
+                        "!*.txt",       // re-include all .txt files
+                        "ignore.txt"    // explicitly exclude ignore.txt
+                    ]
+                )
             )
         );
 
@@ -73,13 +77,15 @@ public class NegationRuleTests
 
         var fileQueryEngine = FileQueryRuntime.Create();
         var options = new FileQueryOptions(
-            patternInput: new(
-                patterns: [
-                    "**",           // exclude all
-                    "!**/*.txt",    // include all txt
-                    "sub/**",        // exclude directory "sub"
-                    "!sub/revive.txt" // but re-include file revive.txt
-                ]
+            new FileQueryOptionsConfig(
+                PatternInput: new(
+                    Patterns: [
+                        "**",           // exclude all
+                        "!**/*.txt",    // include all txt
+                        "sub/**",        // exclude directory "sub"
+                        "!sub/revive.txt" // but re-include file revive.txt
+                    ]
+                )
             )
         );
 
@@ -88,3 +94,4 @@ public class NegationRuleTests
         TestAssertEx.ContainsSingle(result, x => x.EndsWith("revive.txt", StringComparison.Ordinal));
     }
 }
+

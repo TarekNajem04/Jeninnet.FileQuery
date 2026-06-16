@@ -13,13 +13,13 @@ public sealed class CharacterClassParserTests
         string[] _patterns =
         [
             "[a-z]",
-                "[a-z0-9_]",
-                "[-abc]",
-                "[abc-]",
-                "[]abc]",
-                "[!a-z]",
-                "[[:digit:]]",
-                "[![:alpha:]_.-]"
+            "[a-z0-9_]",
+            "[-abc]",
+            "[abc-]",
+            "[]abc]",
+            "[!a-z]",
+            "[[:digit:]]",
+            "[![:alpha:]_.-]"
         ];
 
         foreach(var pattern in _patterns)
@@ -121,7 +121,7 @@ public sealed class CharacterClassParserTests
     [TestMethod]
     public void Parse_DashBeforeClosingBracket_IsLiteral()
     {
-        // "[a-]" → 'a' literal, '-' literal (not a range delimiter before ']').
+        // "[a-]" ? 'a' literal, '-' literal (not a range delimiter before ']').
         var input = "[a-]".AsSpan();
         var i = 0;
 
@@ -177,7 +177,7 @@ public sealed class CharacterClassParserTests
     [TestMethod]
     public void Parse_PosixMixedWithLiteral_ProducesCorrectElements()
     {
-        // [[:digit:]_] → PosixClass("digit") + CharLiteral('_')
+        // [[:digit:]_] ? PosixClass("digit") + CharLiteral('_')
         var input = "[[:digit:]_]".AsSpan();
         var i = 0;
 
@@ -209,7 +209,7 @@ public sealed class CharacterClassParserTests
     [TestMethod]
     public void Parse_EmptyBrackets_TreatsClosingBracketAsLiteral()
     {
-        // "[]" — the ']' at position 0 is a literal, then no closing ']' → unterminated
+        // "[]" — the ']' at position 0 is a literal, then no closing ']' ? unterminated
         var input = "[]".AsSpan();
         var i = 0;
 
@@ -303,7 +303,9 @@ public sealed class CharacterClassParserTests
         env.CreateFiles("a.txt", "b.txt", "c.txt", "d.txt");
 
         var options = new FileQueryOptions(
-            patternInput: new(patterns: ["**", "![abc].txt"])
+            new FileQueryOptionsConfig(
+                PatternInput: new(Patterns: ["**", "![abc].txt"])
+            )
         );
 
         var results = engine.Execute(new(env.Root, options)).ToList();
@@ -323,7 +325,9 @@ public sealed class CharacterClassParserTests
         env.CreateFiles("file0.txt", "file5.txt", "file9.txt", "fileX.txt");
 
         var options = new FileQueryOptions(
-            patternInput: new(patterns: ["**", "!file[0-9].txt"])
+            new FileQueryOptionsConfig(
+                PatternInput: new(Patterns: ["**", "!file[0-9].txt"])
+            )
         );
 
         var results = engine.Execute(new(env.Root, options)).ToList();
@@ -339,9 +343,11 @@ public sealed class CharacterClassParserTests
         using var env = new TestEnvironment();
         env.CreateFiles("a.txt", "b.txt", "c.txt", "d.txt", "e.txt");
 
-        // ![!abc] includes only characters NOT in {a,b,c} → d, e
+        // ![!abc] includes only characters NOT in {a,b,c} ? d, e
         var options = new FileQueryOptions(
-            patternInput: new(patterns: ["**", "![!abc].txt"])
+            new FileQueryOptionsConfig(
+                PatternInput: new(Patterns: ["**", "![!abc].txt"])
+            )
         );
 
         var results = engine.Execute(new(env.Root, options)).ToList();
@@ -360,7 +366,9 @@ public sealed class CharacterClassParserTests
 
         // [[:digit:]] matches any single digit
         var options = new FileQueryOptions(
-            patternInput: new(patterns: ["**", "!file[[:digit:]].txt"])
+            new FileQueryOptionsConfig(
+                PatternInput: new(Patterns: ["**", "!file[[:digit:]].txt"])
+            )
         );
 
         var results = engine.Execute(new(env.Root, options)).ToList();
@@ -384,3 +392,4 @@ public sealed class CharacterClassParserTests
         }
     }
 }
+

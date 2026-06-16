@@ -24,22 +24,27 @@ internal sealed class FileSystem : IFileSystem
         FileQueryErrorRecoveryOptions errorRecovery
     )
     {
-        foreach(var path in FileSystemGuards.EnumerateEntries(directory, ignoreInaccessible, errorRecovery))
+        var attempts = GetMaxAttempts(errorRecovery);
+        var attempt = 0;
+        IEnumerator<string>? enumerator = null;
+
+        while(attempt < attempts)
         {
-            if(!TryGetAttributes(path, ignoreInaccessible, errorRecovery, out var attributes))
+            var res = TryMoveNext(directory, ref enumerator, ignoreInaccessible, errorRecovery, ref attempt, attempts, out var path);
+            if(res == EnumerationResult.Break)
+            {
+                yield break;
+            }
+
+            if(res == EnumerationResult.Continue)
             {
                 continue;
             }
 
-            if(attributes.HasFlag(FileAttributes.Directory))
+            if(TryCreateEntry(path!, ignoreInaccessible, errorRecovery, out var entry))
             {
-                if(!TryEnsureAccessible(path, ignoreInaccessible, errorRecovery))
-                {
-                    continue;
-                }
+                yield return entry;
             }
-
-            yield return new FileSystemEntry(path, attributes);
         }
     }
 
@@ -56,28 +61,30 @@ internal sealed class FileSystem : IFileSystem
             yield break;
         }
 
-        foreach(var path in FileSystemGuards.EnumerateEntries(directory, ignoreInaccessible, errorRecovery))
+        var attempts = GetMaxAttempts(errorRecovery);
+        var attempt = 0;
+        IEnumerator<string>? enumerator = null;
+
+        while(attempt < attempts)
         {
             cancellationToken.ThrowIfCancellationRequested();
 
-            if(!TryGetAttributes(path, ignoreInaccessible, errorRecovery, out var attributes))
+            var res = TryMoveNext(directory, ref enumerator, ignoreInaccessible, errorRecovery, ref attempt, attempts, out var path);
+            if(res == EnumerationResult.Break)
+            {
+                yield break;
+            }
+
+            if(res == EnumerationResult.Continue)
             {
                 continue;
             }
 
-            if(attributes.HasFlag(FileAttributes.Directory))
+            if(TryCreateEntry(path!, ignoreInaccessible, errorRecovery, out var entry))
             {
-                if(!TryEnsureAccessible(path, ignoreInaccessible, errorRecovery))
-                {
-                    continue;
-                }
+                yield return entry;
+                await Task.Yield();
             }
-
-            yield return new FileSystemEntry(path, attributes);
-
-            // Directory enumeration is backed by synchronous OS APIs; yield between
-            // entries so async consumers can observe cancellation and interleave work.
-            await Task.Yield();
         }
     }
 
@@ -118,9 +125,78 @@ internal sealed class FileSystem : IFileSystem
     }
 
     /// <inheritdoc/>
+    public char DirectorySeparator => Path.DirectorySeparatorChar;
+
+    /// <inheritdoc/>
     public string GetFullPath(string path) => Path.GetFullPath(path);
+
     /// <inheritdoc/>
     public string GetFullPath(string path, string basePath) => Path.GetFullPath(path, basePath);
+
+    private static int GetMaxAttempts(FileQueryErrorRecoveryOptions errorRecovery)
+        => errorRecovery.Action is FileQueryErrorAction.Retry ? errorRecovery.MaxRetryAttempts + 1 : 1;
+
+    private enum EnumerationResult { Success, Break, Continue }
+
+    private static EnumerationResult TryMoveNext(
+        string directory,
+        ref IEnumerator<string>? enumerator,
+        bool ignoreInaccessible,
+        FileQueryErrorRecoveryOptions errorRecovery,
+        ref int attempt,
+        int attempts,
+        out string? path
+    )
+    {
+        path = null;
+        try
+        {
+            enumerator ??= Directory.EnumerateFileSystemEntries(directory).GetEnumerator();
+            if(enumerator.MoveNext())
+            {
+                path = enumerator.Current;
+                return EnumerationResult.Success;
+            }
+
+            enumerator.Dispose();
+            return EnumerationResult.Break;
+        }
+        catch(Exception ex) when(FileSystemGuards.IsRecoverable(ex))
+        {
+            enumerator?.Dispose();
+            enumerator = null;
+
+            if(FileSystemGuards.ShouldSkip(ignoreInaccessible, errorRecovery, attempt, attempts))
+            {
+                return EnumerationResult.Break;
+            }
+
+            if(errorRecovery.Action is FileQueryErrorAction.Retry && attempt < attempts - 1)
+            {
+                attempt++;
+                return EnumerationResult.Continue;
+            }
+
+            throw;
+        }
+    }
+
+    private static bool TryCreateEntry(string path, bool ignoreInaccessible, FileQueryErrorRecoveryOptions errorRecovery, out FileSystemEntry entry)
+    {
+        entry = default;
+        if(!TryGetAttributes(path, ignoreInaccessible, errorRecovery, out var attributes))
+        {
+            return false;
+        }
+
+        if(attributes.HasFlag(FileAttributes.Directory) && !TryEnsureAccessible(path, ignoreInaccessible, errorRecovery))
+        {
+            return false;
+        }
+
+        entry = new FileSystemEntry(path, attributes);
+        return true;
+    }
 
     private static bool TryGetAttributes(
         string path,
@@ -130,9 +206,7 @@ internal sealed class FileSystem : IFileSystem
     )
     {
         attributes = default;
-        var attempts = errorRecovery.Action is FileQueryErrorAction.Retry
-            ? errorRecovery.MaxRetryAttempts + 1
-            : 1;
+        var attempts = GetMaxAttempts(errorRecovery);
 
         for(var attempt = 0; attempt < attempts; attempt++)
         {
@@ -166,9 +240,7 @@ internal sealed class FileSystem : IFileSystem
         FileQueryErrorRecoveryOptions errorRecovery
     )
     {
-        var attempts = errorRecovery.Action is FileQueryErrorAction.Retry
-            ? errorRecovery.MaxRetryAttempts + 1
-            : 1;
+        var attempts = GetMaxAttempts(errorRecovery);
 
         for(var attempt = 0; attempt < attempts; attempt++)
         {

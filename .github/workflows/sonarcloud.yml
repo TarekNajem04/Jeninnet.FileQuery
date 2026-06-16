@@ -46,7 +46,7 @@ jobs:
   build-analyze:
     name: Build, Test, Analyze
     runs-on: ubuntu-latest
-    # سيتخطى هذا الـ Job الفحص تماماً إذا تم فتح PR من حساب خارجي ليس لديه صلاحية الوصول للـ Secrets
+    # This job will completely bypass the check if the PR is opened from an external account that does not have access to secrets.
     if: github.event_name == 'push' || github.event.pull_request.head.repo.full_name == github.repository
 
     steps:
@@ -125,7 +125,8 @@ jobs:
             /d:sonar.cs.opencover.reportsPaths="**/coverage.opencover.xml" \
             /d:sonar.scm.provider=git \
             /d:sonar.scm.forceReloadAll=true \
-            /d:sonar.exclusions="samples/**,benchmarks/**"
+            /d:sonar.exclusions="samples/**,src/**[Bb]enchmarks/**,test/**,**/bin/**,**/obj/**,**/TestResults/**" \
+            /d:sonar.test.exclusions="samples/**,src/**[Bb]enchmarks/**,test/**,**/bin/**,**/obj/**,**/TestResults/**"
 
       # ---------------------------------------------------------
       # 9) Restore dependencies

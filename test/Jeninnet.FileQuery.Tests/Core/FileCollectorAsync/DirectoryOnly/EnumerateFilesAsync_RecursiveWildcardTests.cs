@@ -25,13 +25,15 @@ public class EnumerateFilesAsync_RecursiveWildcardTests
         );
 
         var options = new FileQueryOptions(
-            patternInput: new(
-                patterns: [
-                    "**",       // exclude all files in root
-                    "!**/*.txt" // Match any .txt file at any depth
-                ]
-            ),
-            recurseSubdirectories: true
+            new FileQueryOptionsConfig(
+                PatternInput: new(
+                    Patterns: [
+                        "**",       // exclude all files in root
+                        "!**/*.txt" // Match any .txt file at any depth
+                    ]
+                ),
+                RecurseSubdirectories: true
+            )
         );
 
         var fileQueryEngine = FileQueryRuntime.Create();
@@ -56,11 +58,13 @@ public class EnumerateFilesAsync_RecursiveWildcardTests
         );
 
         var options = new FileQueryOptions(
-            patternInput: new(
-                patterns: [
-                    "**",           // exclude all files
-                    "!x/**/z/*.txt" // include .txt files in any 'z' subdirectory under 'x'
-                ]
+            new FileQueryOptionsConfig(
+                PatternInput: new(
+                    Patterns: [
+                        "**",           // exclude all files
+                        "!x/**/z/*.txt" // include .txt files in any 'z' subdirectory under 'x'
+                    ]
+                )
             )
         );
 
@@ -73,3 +77,4 @@ public class EnumerateFilesAsync_RecursiveWildcardTests
 
     public TestContext TestContext { get; set; } = null!;
 }
+

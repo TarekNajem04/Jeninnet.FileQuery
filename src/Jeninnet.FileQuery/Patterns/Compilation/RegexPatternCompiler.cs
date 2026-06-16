@@ -13,15 +13,19 @@ internal sealed class RegexPatternCompiler : PatternCompilerBase
         var state = context.State!;
         var tokens = context.Tokens!;
 
-        return new CompiledPattern(
-            isNegated: state.IsNegated,
-            directoryOnly: state.IsDirectoryOnly,
-            anchoredToRoot: state.IsRootAnchored,
-            segments: tokens,
-            patternKind: PatternKind.Regex,
-            CompiledMatchIntent.FromNegation(state.IsNegated),
-            context.Pattern.Text,
-            context.Pattern.SourceIndex
-        );
+        var regexText = tokens[0][0] is RegularExpressionToken ret ? ret.Pattern : null;
+
+        return new CompiledPattern(new CompiledPatternConfig(
+            IsNegated: state.IsNegated,
+            DirectoryOnly: state.IsDirectoryOnly,
+            AnchoredToRoot: state.IsRootAnchored,
+            Segments: tokens,
+            PatternKind: PatternKind.Regex,
+            Intent: CompiledMatchIntent.FromNegation(state.IsNegated),
+            ConcretePathAnchor: PatternAnchorResolver.Resolve(tokens),
+            SourceText: context.Pattern.Text,
+            SourceIndex: context.Pattern.SourceIndex,
+            RegexText: regexText
+        ));
     }
 }

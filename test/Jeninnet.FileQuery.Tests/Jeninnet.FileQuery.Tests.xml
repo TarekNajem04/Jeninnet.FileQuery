@@ -310,9 +310,9 @@
             Async tests validating behavior when encountering directories
             that cannot be accessed (IO exceptions).
             Ensures async implementation:
-                - respects IgnoreInaccessible
-                - throws when the option is false
-                - continues enumeration properly
+            - respects IgnoreInaccessible
+            - throws when the option is false
+            - continues enumeration properly
             </summary>
         </member>
         <member name="M:Jeninnet.FileQuery.Tests.Core.FileCollectorAsync.Inaccessible.EnumerateFilesAsync_InaccessibleDirectoryTests.EnumerateFilesAsync_InaccessibleDir_ShouldThrowAsync">
@@ -432,8 +432,8 @@
         <member name="T:Jeninnet.FileQuery.Tests.Core.FileCollectorSync.Anchored.AnchoredPatternTests">
             <summary>
             Tests GitIgnore anchored patterns:
-            - leading slash → relative to root
-            - no slash → unanchored (matches at any depth)
+            - leading slash ? relative to root
+            - no slash ? unanchored (matches at any depth)
             </summary>
         </member>
         <member name="M:Jeninnet.FileQuery.Tests.Core.FileCollectorSync.Anchored.AnchoredPatternTests.AnchoredPattern_ShouldMatchRootOnly">
@@ -514,7 +514,7 @@
         </member>
         <member name="M:Jeninnet.FileQuery.Tests.Core.FileCollectorSync.CaseSensitivity.CaseSensitivityTests.DefaultCaseSensitivity_ShouldMatchOSRules">
             <summary>
-            OS-specific behavior: Windows/macOS → case-insensitive, Linux → case-sensitive.
+            OS-specific behavior: Windows/macOS ? case-insensitive, Linux ? case-sensitive.
             </summary>
         </member>
         <member name="T:Jeninnet.FileQuery.Tests.Core.FileCollectorSync.CharacterClasses.CharacterClassPatternTests">

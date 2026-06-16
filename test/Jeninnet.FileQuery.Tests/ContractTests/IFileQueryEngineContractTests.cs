@@ -26,7 +26,13 @@ public class IFileQueryEngineContractTests
     [TestMethod]
     public void Execute_NonExistentDirectory_ShouldThrowDirectoryNotFoundException()
     {
-        var query = new FileQuery(Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString("n")), new(new([])));
+        var query = new FileQuery(
+            rootPath: Path.Combine(
+                path1: Path.GetTempPath(),
+                path2: Guid.NewGuid().ToString("n")
+            ),
+            new FileQueryOptions(new FileQueryOptionsConfig(new([])))
+        );
 
         void Act() => _ = _engine.Execute(query).ToList();
 
@@ -36,7 +42,13 @@ public class IFileQueryEngineContractTests
     [TestMethod]
     public async Task ExecuteAsync_NonExistentDirectory_ShouldThrowDirectoryNotFoundExceptionAsync()
     {
-        var query = new FileQuery(Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString("n")), new(new([])));
+        var query = new FileQuery(
+            rootPath: Path.Combine(
+                path1: Path.GetTempPath(),
+                path2: Guid.NewGuid().ToString("n")
+            ),
+            new FileQueryOptions(new FileQueryOptionsConfig(new([])))
+        );
 
         async Task ActAsync()
         {
@@ -81,7 +93,7 @@ public class IFileQueryEngineContractTests
         env.CreateFiles("a.txt", "b.txt");
 
         // Use "**" which acts as "exclude everything" in this engine's default context (see README)
-        var options = new FileQueryOptions(patternInput: new(patterns: ["**"]));
+        var options = new FileQueryOptions(new FileQueryOptionsConfig(PatternInput: new(Patterns: ["**"])));
         var query = new FileQuery(env.Root, options);
 
         var results = _engine.Execute(query).ToList();

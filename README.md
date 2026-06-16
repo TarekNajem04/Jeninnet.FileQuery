@@ -80,10 +80,15 @@ foreach (var file in files)
 
 `Jeninnet.FileQuery` splits filesystem traversal, pattern compilation, and matching into distinct, highly optimized layers:
 
-```
-                          [ Client Code ]
-                                 â”‚
-                        [ FileQueryBuilder ]
+```txt
+                     ┌───────────────────────┐
+                     │     Client Code       │
+                     └───────────┬───────────┘
+                                 │
+                                 ▼
+                     ┌───────────────────────┐
+                     │   FileQueryBuilder    │
+                     └───────────┬───────────┘
                                  │
                                  ▼
                      ┌───────────────────────┐

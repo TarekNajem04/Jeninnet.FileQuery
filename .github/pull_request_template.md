@@ -2,10 +2,24 @@
 
 Describe the change and why it is needed.
 
+## Motivation / Context
+
+Why is this change necessary? What problem does it solve?
+
+## Type of Change
+
+- [ ] Bug fix (non-breaking change which fixes an issue)
+- [ ] New feature (non-breaking change which adds functionality)
+- [ ] Breaking change (fix or feature that would cause existing functionality to not work as expected)
+- [ ] Documentation update
+- [ ] Chore (refactoring, build, or infrastructure updates)
+
 ## Tests
 
 - [ ] `dotnet build Jeninnet.FileQuery.slnx`
 - [ ] `dotnet test test/Jeninnet.FileQuery.Tests/Jeninnet.FileQuery.Tests.csproj`
+- [ ] New test cases added (if applicable)
+- [ ] All existing tests passed
 - [ ] Other: 
 
 ## Security and Repository Controls

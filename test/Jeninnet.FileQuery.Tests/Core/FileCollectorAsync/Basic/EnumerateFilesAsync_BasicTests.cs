@@ -21,13 +21,15 @@ public class EnumerateFilesAsync_BasicTests
 
         var fileQueryEngine = FileQueryRuntime.Create();
         var options = new FileQueryOptions(
-            patternInput: new(
-                patterns: [
-                    "*.log",    // exclude .log files
-                    "!**/*.txt" // include .txt files from any directory recursively
-                ]
-            ),
-            recurseSubdirectories: true
+            new FileQueryOptionsConfig(
+                PatternInput: new(
+                    Patterns: [
+                        "*.log",    // exclude .log files
+                        "!**/*.txt" // include .txt files from any directory recursively
+                    ]
+                ),
+                RecurseSubdirectories: true
+            )
         );
 
         var results = await fileQueryEngine.ExecuteAsync(new(env.Root, options), TestContext.CancellationToken)
@@ -50,12 +52,14 @@ public class EnumerateFilesAsync_BasicTests
 
         var fileQueryEngine = FileQueryRuntime.Create();
         var options = new FileQueryOptions(
-            patternInput: new(
-                patterns: [
-                    "!**/*.txt"
-                ]
-            ),
-            recurseSubdirectories: true
+            new FileQueryOptionsConfig(
+                PatternInput: new(
+                    Patterns: [
+                        "!**/*.txt"
+                    ]
+                ),
+                RecurseSubdirectories: true
+            )
         );
 
         // sync results
@@ -79,12 +83,14 @@ public class EnumerateFilesAsync_BasicTests
 
         var fileQueryEngine = FileQueryRuntime.Create();
         var options = new FileQueryOptions(
-            patternInput: new(
-                patterns: [
-                    "!**/*.txt"
-                ]
-            ),
-            recurseSubdirectories: true
+            new FileQueryOptionsConfig(
+                PatternInput: new(
+                    Patterns: [
+                        "!**/*.txt"
+                    ]
+                ),
+                RecurseSubdirectories: true
+            )
         );
 
         var dir = Path.Combine(env.Root, "empty");

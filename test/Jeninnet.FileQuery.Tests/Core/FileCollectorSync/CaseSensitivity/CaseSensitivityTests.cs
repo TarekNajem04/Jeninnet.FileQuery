@@ -17,13 +17,15 @@ public class CaseSensitivityTests
 
         var fileQueryEngine = FileQueryRuntime.Create();
         var options = new FileQueryOptions(
-            patternInput: new(
-                patterns: [
-                    "**",
-                    "!file.txt"
-                ]
-            ),
-            caseSensitivity: Enums.CaseSensitivity.Insensitive
+            new FileQueryOptionsConfig(
+                PatternInput: new(
+                    Patterns: [
+                        "**",
+                        "!file.txt"
+                    ]
+                ),
+                CaseSensitivity: Enums.CaseSensitivity.Insensitive
+            )
         );
 
         var result = fileQueryEngine.Execute(new(env.Root, options)).ToList();
@@ -41,13 +43,14 @@ public class CaseSensitivityTests
         env.CreateFiles("FILE.TXT", "file.txt", "FiLe.TxT");
 
         var fileQueryEngine = FileQueryRuntime.Create();
+        IEnumerable<string> patterns = RuntimeInformation.IsOSPlatform(OSPlatform.Linux)
+            ? ["**", "!file.txt"]
+            : ["**", "!FILE.TXT"]; // Windows macOS are case-insensitive file systems by default, therefore, it does not change the case of the letter
         var options = new FileQueryOptions(
-            patternInput: new(
-                patterns: RuntimeInformation.IsOSPlatform(OSPlatform.Linux)
-                            ? ["**", "!file.txt"]
-                            : ["**", "!FILE.TXT"] // Windows macOS are case-insensitive file systems by default, therefore, it does not change the case of the letter.
-            ),
-            caseSensitivity: Enums.CaseSensitivity.Sensitive
+            new FileQueryOptionsConfig(
+                PatternInput: new(Patterns: patterns),
+                CaseSensitivity: Enums.CaseSensitivity.Sensitive
+            )
         );
 
         var result = fileQueryEngine.Execute(new(env.Root, options)).ToList();
@@ -60,7 +63,7 @@ public class CaseSensitivityTests
     }
 
     /// <summary>
-    /// OS-specific behavior: Windows/macOS → case-insensitive, Linux → case-sensitive.
+    /// OS-specific behavior: Windows/macOS ? case-insensitive, Linux ? case-sensitive.
     /// </summary>
     [TestMethod]
     public void DefaultCaseSensitivity_ShouldMatchOSRules()
@@ -70,11 +73,13 @@ public class CaseSensitivityTests
 
         var fileQueryEngine = FileQueryRuntime.Create();
         var options = new FileQueryOptions(
-            patternInput: new(
-                patterns: [
-                    "**",
-                    "!sample.txt"
-                ]
+            new FileQueryOptionsConfig(
+                PatternInput: new(
+                    Patterns: [
+                        "**",
+                        "!sample.txt"
+                    ]
+                )
             )
         );
 
@@ -90,3 +95,4 @@ public class CaseSensitivityTests
         }
     }
 }
+

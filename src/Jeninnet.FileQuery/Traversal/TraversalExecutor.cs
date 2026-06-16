@@ -491,32 +491,46 @@ internal sealed class TraversalExecutor : ITraversalExecutor
             return null;
         }
 
-        ICompiledPattern? lastGitIgnoreMatch = null;
+        var lastGitIgnoreMatch = FindLastGitIgnoreMatch(patterns, context);
 
-        if(patterns.GitIgnoreSubSet is not null)
+        if(lastGitIgnoreMatch is not null && finalOutcome is MatchOutcome.Include)
         {
-            for(var i = 0; i < patterns.GitIgnoreSubSet.Count; i++)
-            {
-                var pattern = patterns.GitIgnoreSubSet[i];
+            return lastGitIgnoreMatch;
+        }
 
-                if(MatchPrecedenceResolver.GitIgnoreMatcher.AppliesToPattern(pattern, context))
-                {
-                    lastGitIgnoreMatch = pattern;
-                }
-            }
+        var match = FindMatchInBuckets(patterns, context);
+        return match ?? (finalOutcome is MatchOutcome.Exclude
+            ? lastGitIgnoreMatch
+            : null);
+    }
 
-            if(lastGitIgnoreMatch is not null && finalOutcome is MatchOutcome.Include)
+    private static ICompiledPattern? FindLastGitIgnoreMatch(ICompiledPatternSet patterns, PathMatchContext context)
+    {
+        if(patterns.GitIgnoreSubSet is null)
+        {
+            return null;
+        }
+
+        ICompiledPattern? lastMatch = null;
+        for(var i = 0; i < patterns.GitIgnoreSubSet.Count; i++)
+        {
+            var pattern = patterns.GitIgnoreSubSet[i];
+            if(MatchPrecedenceResolver.GitIgnoreMatcher.AppliesToPattern(pattern, context))
             {
-                return lastGitIgnoreMatch;
+                lastMatch = pattern;
             }
         }
 
+        return lastMatch;
+    }
+
+    private static ICompiledPattern? FindMatchInBuckets(ICompiledPatternSet patterns, PathMatchContext context)
+    {
         if(patterns.GlobSubSet is not null)
         {
             for(var i = 0; i < patterns.GlobSubSet.Count; i++)
             {
                 var pattern = patterns.GlobSubSet[i];
-
                 if(MatchPrecedenceResolver.GlobMatcher.Match(pattern, context) is MatchOutcome.Include)
                 {
                     return pattern;
@@ -529,7 +543,6 @@ internal sealed class TraversalExecutor : ITraversalExecutor
             for(var i = 0; i < patterns.RegexSubSet.Count; i++)
             {
                 var pattern = patterns.RegexSubSet[i];
-
                 if(MatchPrecedenceResolver.RegexMatcher.Match(pattern, context) is MatchOutcome.Include)
                 {
                     return pattern;
@@ -537,9 +550,7 @@ internal sealed class TraversalExecutor : ITraversalExecutor
             }
         }
 
-        return finalOutcome is MatchOutcome.Exclude
-            ? lastGitIgnoreMatch
-            : null;
+        return null;
     }
 
     /// <summary>

@@ -1,6 +1,32 @@
 ﻿namespace Jeninnet.FileQuery;
 
 /// <summary>
+/// Configuration for creating a <see cref="FileQueryOptions"/>.
+/// </summary>
+/// <param name="PatternInput">The pattern input that defines which files to include or exclude.</param>
+/// <param name="RecurseSubdirectories">Whether to recurse into subdirectories.</param>
+/// <param name="MaxRecursionDepth">The maximum depth for recursion.</param>
+/// <param name="IgnoreInaccessible">Whether to ignore inaccessible files and directories.</param>
+/// <param name="PatternMatchingMode">The mode for pattern matching.</param>
+/// <param name="CaseSensitivity">The case sensitivity for pattern matching.</param>
+/// <param name="Traversal">The traversal options.</param>
+/// <param name="AuditMatches">Whether to audit matches.</param>
+/// <param name="Diagnostics">The diagnostics progress reporter.</param>
+/// <param name="ErrorRecovery">The error recovery options.</param>
+public record FileQueryOptionsConfig(
+    PatternInput PatternInput,
+    bool RecurseSubdirectories = true,
+    int MaxRecursionDepth = FileQueryOptions.UNLIMITED_RECURSION_DEPTH,
+    bool IgnoreInaccessible = true,
+    PatternMatchingMode PatternMatchingMode = PatternMatchingMode.GitIgnore,
+    CaseSensitivity CaseSensitivity = CaseSensitivity.PlatformDefault,
+    TraversalOptions? Traversal = null,
+    bool AuditMatches = false,
+    IProgress<FileQueryDiagnostic>? Diagnostics = null,
+    FileQueryErrorRecoveryOptions? ErrorRecovery = null
+);
+
+/// <summary>
 /// Represents the complete, immutable configuration for a single file query execution.
 /// </summary>
 /// <remarks>
@@ -22,22 +48,6 @@
 /// this instance acts as a read-only execution contract.
 /// </para>
 /// </remarks>
-/// <summary>
-/// Represents the complete, immutable configuration for a single file query execution.
-/// </summary>
-/// <remarks>
-/// <para>
-/// <see cref="FileQueryOptions"/> is a <strong>configuration snapshot</strong>:
-/// once passed to the engine, its values are assumed to remain stable for the
-/// lifetime of the query.
-/// </para>
-/// <para>
-/// <strong>Immutability contract:</strong> This type is physically immutable.
-/// All properties are set during construction and cannot be modified.
-/// The engine, pattern compiler, and matchers rely on this stability to ensure
-/// deterministic behavior, caching safety, and thread safety.
-/// </para>
-/// </remarks>
 public sealed record FileQueryOptions
 {
     /// <summary>
@@ -52,29 +62,24 @@ public sealed record FileQueryOptions
     /// </summary>
     public const int UNLIMITED_RECURSION_DEPTH = UNLIMITED;
 
-    public FileQueryOptions(
-        PatternInput patternInput,
-        bool recurseSubdirectories = true,
-        int maxRecursionDepth = UNLIMITED_RECURSION_DEPTH,
-        bool ignoreInaccessible = true,
-        PatternMatchingMode patternMatchingMode = PatternMatchingMode.GitIgnore,
-        CaseSensitivity caseSensitivity = CaseSensitivity.PlatformDefault,
-        TraversalOptions? traversal = null,
-        bool auditMatches = false,
-        IProgress<FileQueryDiagnostic>? diagnostics = null,
-        FileQueryErrorRecoveryOptions? errorRecovery = null
-)
+    /// <summary>
+    /// Initializes a new instance of the <see cref="FileQueryOptions"/> class with the specified settings.
+    /// </summary>
+    /// <param name="config">The configuration object.</param>
+    public FileQueryOptions(FileQueryOptionsConfig config)
     {
-        PatternInput = patternInput;
-        RecurseSubdirectories = recurseSubdirectories;
-        MaxRecursionDepth = maxRecursionDepth;
-        IgnoreInaccessible = ignoreInaccessible;
-        PatternMatchingMode = patternMatchingMode;
-        CaseSensitivity = caseSensitivity;
-        Traversal = traversal ?? new();
-        AuditMatches = auditMatches;
-        Diagnostics = diagnostics;
-        ErrorRecovery = errorRecovery ?? (ignoreInaccessible
+        ArgumentNullException.ThrowIfNull(config);
+
+        PatternInput = config.PatternInput;
+        RecurseSubdirectories = config.RecurseSubdirectories;
+        MaxRecursionDepth = config.MaxRecursionDepth;
+        IgnoreInaccessible = config.IgnoreInaccessible;
+        PatternMatchingMode = config.PatternMatchingMode;
+        CaseSensitivity = config.CaseSensitivity;
+        Traversal = config.Traversal ?? new();
+        AuditMatches = config.AuditMatches;
+        Diagnostics = config.Diagnostics;
+        ErrorRecovery = config.ErrorRecovery ?? (config.IgnoreInaccessible
             ? FileQueryErrorRecoveryOptions.Skip
             : FileQueryErrorRecoveryOptions.Abort);
     }

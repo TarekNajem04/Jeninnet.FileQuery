@@ -24,8 +24,10 @@ public sealed class FileQueryObservabilityDeepTests
     public void FileQueryOptions_Validation_ShouldPropagateErrorRecoveryValidation()
     {
         var options = new FileQueryOptions(
-            new PatternInput(["*"]),
-            errorRecovery: new FileQueryErrorRecoveryOptions(FileQueryErrorAction.Retry, -1)
+            new FileQueryOptionsConfig(
+                PatternInput: new PatternInput(["*"]),
+                ErrorRecovery: new FileQueryErrorRecoveryOptions(FileQueryErrorAction.Retry, -1)
+            )
         );
 
         TestAssertEx.Throws<ArgumentOutOfRangeException>(options.Validate);
@@ -35,11 +37,11 @@ public sealed class FileQueryObservabilityDeepTests
     public void FileQueryOptions_Constructor_ShouldSetSensibleDefaultsForErrorRecovery()
     {
         // When ignoreInaccessible is true (default)
-        var optionsWithIgnore = new FileQueryOptions(new PatternInput(["*"]), ignoreInaccessible: true);
+        var optionsWithIgnore = new FileQueryOptions(new FileQueryOptionsConfig(PatternInput: new PatternInput(["*"]), IgnoreInaccessible: true));
         Assert.AreEqual(FileQueryErrorAction.Skip, optionsWithIgnore.ErrorRecovery.Action);
 
         // When ignoreInaccessible is false
-        var optionsWithoutIgnore = new FileQueryOptions(new PatternInput(["*"]), ignoreInaccessible: false);
+        var optionsWithoutIgnore = new FileQueryOptions(new FileQueryOptionsConfig(PatternInput: new PatternInput(["*"]), IgnoreInaccessible: false));
         Assert.AreEqual(FileQueryErrorAction.Abort, optionsWithoutIgnore.ErrorRecovery.Action);
     }
 
@@ -78,3 +80,4 @@ public sealed class FileQueryObservabilityDeepTests
         Assert.AreEqual("/root/a.txt", progress.CurrentPath);
     }
 }
+

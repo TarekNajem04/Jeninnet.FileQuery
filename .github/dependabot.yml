@@ -4,7 +4,15 @@ updates:
     directory: "/"
     schedule:
       interval: "weekly"
+      day: "sunday"
+      time: "06:00"
+      timezone: "Europe/Amsterdam"
     open-pull-requests-limit: 10
+    assignees:
+      - "@TarekNajem04"
+    labels:
+      - "dependencies"
+      - "nuget"
     groups:
       nuget-minor-and-patch:
         update-types:
@@ -15,7 +23,15 @@ updates:
     directory: "/"
     schedule:
       interval: "weekly"
+      day: "sunday"
+      time: "06:00"
+      timezone: "Europe/Amsterdam"
     open-pull-requests-limit: 5
+    assignees:
+      - "@TarekNajem04"
+    labels:
+      - "dependencies"
+      - "actions"
     groups:
       actions-minor-and-patch:
         update-types:

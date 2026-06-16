@@ -20,11 +20,13 @@ public class DotfileAndHiddenFileTests
 
         var fileQueryEngine = FileQueryRuntime.Create();
         var options = new FileQueryOptions(
-            patternInput: new(
-                patterns: [
-                    "**",
-                    "!.hidden"
-                ]
+            new FileQueryOptionsConfig(
+                PatternInput: new(
+                    Patterns: [
+                        "**",
+                        "!.hidden"
+                    ]
+                )
             )
         );
 
@@ -47,11 +49,13 @@ public class DotfileAndHiddenFileTests
 
         var fileQueryEngine = FileQueryRuntime.Create();
         var options = new FileQueryOptions(
-            patternInput: new(
-                patterns: [
-                    "**",
-                    "!*.txt"
-                ]
+            new FileQueryOptionsConfig(
+                PatternInput: new(
+                    Patterns: [
+                        "**",
+                        "!*.txt"
+                    ]
+                )
             )
         );
 
@@ -75,10 +79,12 @@ public class DotfileAndHiddenFileTests
 
         var fileQueryEngine = FileQueryRuntime.Create();
         var options = new FileQueryOptions(
-            patternInput: new(
-                patterns: [
-                    "!**"
-                ]
+            new FileQueryOptionsConfig(
+                PatternInput: new(
+                    Patterns: [
+                        "!**"
+                    ]
+                )
             )
         );
 
@@ -103,10 +109,12 @@ public class DotfileAndHiddenFileTests
 
         var fileQueryEngine = FileQueryRuntime.Create();
         var options = new FileQueryOptions(
-            patternInput: new(
-                patterns: [
-                    ".*"
-                ]
+            new FileQueryOptionsConfig(
+                PatternInput: new(
+                    Patterns: [
+                        ".*"
+                    ]
+                )
             )
         );
 
@@ -133,11 +141,13 @@ public class DotfileAndHiddenFileTests
 
         var fileQueryEngine = FileQueryRuntime.Create();
         var options = new FileQueryOptions(
-            patternInput: new(
-                patterns: [
-                    ".*/",
-                    "*.cs"
-                ]
+            new FileQueryOptionsConfig(
+                PatternInput: new(
+                    Patterns: [
+                        ".*/",
+                        "*.cs"
+                    ]
+                )
             )
         );
 
@@ -149,3 +159,4 @@ public class DotfileAndHiddenFileTests
         Assert.Contains(x => x.EndsWith("file.txt", StringComparison.Ordinal), result);
     }
 }
+

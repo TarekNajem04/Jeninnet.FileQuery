@@ -24,11 +24,13 @@ public class EnumerateFilesAsync_StressAndEdgeCaseTests
         }
 
         var options = new FileQueryOptions(
-            patternInput: new(
-                patterns: [
-                    "**",
-                    "!**/*.txt"
-                ]
+            new FileQueryOptionsConfig(
+                PatternInput: new(
+                    Patterns: [
+                        "**",
+                        "!**/*.txt"
+                    ]
+                )
             )
         );
 
@@ -54,11 +56,13 @@ public class EnumerateFilesAsync_StressAndEdgeCaseTests
         );
 
         var options = new FileQueryOptions(
-            patternInput: new(
-                patterns: [
-                    "**",
-                    "folder" // not "folder/"
-                ]
+            new FileQueryOptionsConfig(
+                PatternInput: new(
+                    Patterns: [
+                        "**",
+                        "folder" // not "folder/"
+                    ]
+                )
             )
         );
 
@@ -85,13 +89,15 @@ public class EnumerateFilesAsync_StressAndEdgeCaseTests
         );
 
         var options = new FileQueryOptions(
-            patternInput: new(
-                patterns: [
-                    "**",
-                    "!**/*.txt",
-                    "a/b/*",       // exclude b folder
-                    "!a/b/c/*.txt",  // but re-include nested c inside b
-                ]
+            new FileQueryOptionsConfig(
+                PatternInput: new(
+                    Patterns: [
+                        "**",
+                        "!**/*.txt",
+                        "a/b/*",       // exclude b folder
+                        "!a/b/c/*.txt",  // but re-include nested c inside b
+                    ]
+                )
             )
         );
 
@@ -109,3 +115,4 @@ public class EnumerateFilesAsync_StressAndEdgeCaseTests
 
     public TestContext TestContext { get; set; } = null!;
 }
+

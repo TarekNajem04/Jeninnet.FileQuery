@@ -363,38 +363,55 @@ public sealed class FileQueryBuilder
     /// </exception>
     public FileQuery Build()
     {
-        if(string.IsNullOrWhiteSpace(_rootPath))
-        {
-            throw new InvalidOperationException("Root path must be specified.");
-        }
-
-        if(!_fileSystem.DirectoryExists(_rootPath))
-        {
-            throw new DirectoryNotFoundException($"The specified root path does not exist: '{_rootPath}'");
-        }
+        // Use centralized validation pipeline
+        FileQueryValidator.ValidateExecution(_fileSystem, _rootPath, GetOptions());
 
         var patternInput = new PatternInput(
-            patterns: [],
-            typedPatterns: _patternStorage.ToDictionary(
+            Patterns: [],
+            TypedPatterns: _patternStorage.ToDictionary(
                 kvp => kvp.Key,
                 kvp => (IEnumerable<string>)kvp.Value),
-            interpretationMode: _interpretationMode
+            InterpretationMode: _interpretationMode
         );
 
         var options = new FileQueryOptions(
-            patternInput: patternInput,
-            recurseSubdirectories: _recurse,
-            ignoreInaccessible: true,
-            patternMatchingMode: _patternMatchingMode,
-            caseSensitivity: _caseSensitivity,
-            auditMatches: _auditMatches,
-            diagnostics: _diagnostics,
-            errorRecovery: _errorRecovery
+            new FileQueryOptionsConfig(
+                PatternInput: patternInput,
+                RecurseSubdirectories: _recurse,
+                IgnoreInaccessible: true,
+                PatternMatchingMode: _patternMatchingMode,
+                CaseSensitivity: _caseSensitivity,
+                AuditMatches: _auditMatches,
+                Diagnostics: _diagnostics,
+                ErrorRecovery: _errorRecovery
+            )
         );
 
-        options.Validate();
-
         return new FileQuery(_rootPath, options);
+    }
+
+    private FileQueryOptions GetOptions()
+    {
+        var patternInput = new PatternInput(
+            Patterns: [],
+            TypedPatterns: _patternStorage.ToDictionary(
+                kvp => kvp.Key,
+                kvp => (IEnumerable<string>)kvp.Value),
+            InterpretationMode: _interpretationMode
+        );
+
+        return new FileQueryOptions(
+            new FileQueryOptionsConfig(
+                PatternInput: patternInput,
+                RecurseSubdirectories: _recurse,
+                IgnoreInaccessible: true,
+                PatternMatchingMode: _patternMatchingMode,
+                CaseSensitivity: _caseSensitivity,
+                AuditMatches: _auditMatches,
+                Diagnostics: _diagnostics,
+                ErrorRecovery: _errorRecovery
+            )
+        );
     }
 
     // ===== Private helpers =====

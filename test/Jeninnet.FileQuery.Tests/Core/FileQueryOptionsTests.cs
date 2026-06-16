@@ -7,9 +7,15 @@ public class FileQueryOptionsTests
     public void Validate_ShouldThrowArgumentOutOfRangeException_WhenMaxRecursionDepthIsInvalid()
     {
         // Arrange
-        var options = new FileQueryOptions(new PatternInput(), maxRecursionDepth: -2);
+        var options = new FileQueryOptions(
+            new FileQueryOptionsConfig(
+                PatternInput: new PatternInput(),
+                MaxRecursionDepth: -2
+            )
+        );
 
         // Act & Assert
         Assert.Throws<ArgumentOutOfRangeException>(options.Validate);
     }
 }
+
