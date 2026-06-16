@@ -3771,22 +3771,17 @@
             Represents the result of a pattern classification or compilation operation.
             </summary>
             <typeparam name="T">The result type.</typeparam>
-            <param name="Value">The value of the result.</param>
-            <param name="Error">The error message, if any. </param>
-        </member>
-        <member name="M:Jeninnet.FileQuery.Patterns.Results.PatternResult`1.#ctor(`0,System.String)">
-            <summary>
-            Represents the result of a pattern classification or compilation operation.
-            </summary>
-            <typeparam name="T">The result type.</typeparam>
-            <param name="Value">The value of the result.</param>
-            <param name="Error">The error message, if any. </param>
         </member>
         <member name="P:Jeninnet.FileQuery.Patterns.Results.PatternResult`1.Value">
-            <summary>The value of the result.</summary>
+            <summary>
+            Gets the value of the result. Throws <see cref="T:System.InvalidOperationException"/> if the operation failed.
+            </summary>
+            <exception cref="T:System.InvalidOperationException">Thrown when <see cref="P:Jeninnet.FileQuery.Patterns.Results.PatternResult`1.IsSuccess"/> is <see langword="false"/>.</exception>
         </member>
         <member name="P:Jeninnet.FileQuery.Patterns.Results.PatternResult`1.Error">
-            <summary>The error message, if any. </summary>
+            <summary>
+            Gets the error message, if any.
+            </summary>
         </member>
         <member name="P:Jeninnet.FileQuery.Patterns.Results.PatternResult`1.IsSuccess">
             <summary>

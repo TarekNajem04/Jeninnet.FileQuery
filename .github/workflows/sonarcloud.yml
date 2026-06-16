@@ -46,6 +46,8 @@ jobs:
   build-analyze:
     name: Build, Test, Analyze
     runs-on: ubuntu-latest
+    # This job will completely bypass the check if the PR is opened from an external account that does not have access to secrets.
+    if: github.event_name == 'push' || github.event.pull_request.head.repo.full_name == github.repository
 
     steps:
       # ---------------------------------------------------------
@@ -110,19 +112,21 @@ jobs:
       # 8) Begin SonarCloud analysis
       # ---------------------------------------------------------
       - name: Begin SonarCloud analysis
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         run: |
           dotnet sonarscanner begin \
             /k:"jeninnet-file-query" \
             /o:"jeninnet-file-query" \
             /d:sonar.host.url="https://sonarcloud.io" \
-            /d:sonar.token="${{ secrets.SONAR_TOKEN }}" \
+            /d:sonar.token="$SONAR_TOKEN" \
             /d:sonar.qualitygate.wait=true \
             /d:sonar.cs.vstest.reportsPaths="TestResults/**/*.trx" \
             /d:sonar.cs.opencover.reportsPaths="**/coverage.opencover.xml" \
             /d:sonar.scm.provider=git \
             /d:sonar.scm.forceReloadAll=true \
-            /d:sonar.exclusions="samples/**,src/**[Bb]enchmarks/**,**/bin/**,**/obj/**,**/TestResults/**" \
-            /d:sonar.test.exclusions="samples/**,src/**[Bb]enchmarks/**,**/bin/**,**/obj/**,**/TestResults/**"
+            /d:sonar.exclusions="samples/**,src/**[Bb]enchmarks/**,test/**,**/bin/**,**/obj/**,**/TestResults/**" \
+            /d:sonar.test.exclusions="samples/**,src/**[Bb]enchmarks/**,test/**,**/bin/**,**/obj/**,**/TestResults/**"
 
       # ---------------------------------------------------------
       # 9) Restore dependencies
@@ -156,4 +160,4 @@ jobs:
       - name: End SonarCloud analysis
         run: |
           dotnet sonarscanner end \
-            /d:sonar.token="${{ secrets.SONAR_TOKEN }}"
+            /d:sonar.token="$SONAR_TOKEN"
