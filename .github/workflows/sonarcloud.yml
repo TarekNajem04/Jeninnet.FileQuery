@@ -46,6 +46,8 @@ jobs:
   build-analyze:
     name: Build, Test, Analyze
     runs-on: ubuntu-latest
+    # سيتخطى هذا الـ Job الفحص تماماً إذا تم فتح PR من حساب خارجي ليس لديه صلاحية الوصول للـ Secrets
+    if: github.event_name == 'push' || github.event.pull_request.head.repo.full_name == github.repository
 
     steps:
       # ---------------------------------------------------------
@@ -110,12 +112,14 @@ jobs:
       # 8) Begin SonarCloud analysis
       # ---------------------------------------------------------
       - name: Begin SonarCloud analysis
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         run: |
           dotnet sonarscanner begin \
             /k:"jeninnet-file-query" \
             /o:"jeninnet-file-query" \
             /d:sonar.host.url="https://sonarcloud.io" \
-            /d:sonar.token="${{ secrets.SONAR_TOKEN }}" \
+            /d:sonar.token="$SONAR_TOKEN" \
             /d:sonar.qualitygate.wait=true \
             /d:sonar.cs.vstest.reportsPaths="TestResults/**/*.trx" \
             /d:sonar.cs.opencover.reportsPaths="**/coverage.opencover.xml" \
@@ -153,6 +157,8 @@ jobs:
       # 12) End SonarCloud analysis
       # ---------------------------------------------------------
       - name: End SonarCloud analysis
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         run: |
           dotnet sonarscanner end \
-            /d:sonar.token="${{ secrets.SONAR_TOKEN }}"
+            /d:sonar.token="$SONAR_TOKEN"
