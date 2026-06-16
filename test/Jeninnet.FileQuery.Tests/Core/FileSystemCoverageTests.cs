@@ -101,7 +101,7 @@ public class FileSystemCoverageTests
         var full = FileSystem.Instance.GetFullPath(path);
         Assert.IsTrue(Path.IsPathRooted(full));
 
-        const string baseDir = "C:\\base";
+        var baseDir = Path.GetTempPath();
         var full2 = FileSystem.Instance.GetFullPath(path, baseDir);
         Assert.AreEqual(Path.GetFullPath(Path.Combine(baseDir, path)), full2);
     }
