@@ -121,7 +121,8 @@ jobs:
             /d:sonar.cs.opencover.reportsPaths="**/coverage.opencover.xml" \
             /d:sonar.scm.provider=git \
             /d:sonar.scm.forceReloadAll=true \
-            /d:sonar.exclusions="samples/**,benchmarks/**"
+            /d:sonar.exclusions="samples/**,src/**[Bb]enchmarks/**,**/bin/**,**/obj/**,**/TestResults/**" \
+            /d:sonar.test.exclusions="samples/**,src/**[Bb]enchmarks/**,**/bin/**,**/obj/**,**/TestResults/**"
 
       # ---------------------------------------------------------
       # 9) Restore dependencies

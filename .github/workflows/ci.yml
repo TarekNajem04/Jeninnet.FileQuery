@@ -9,7 +9,6 @@ on:
     paths:
       - 'src/**'
       - 'test/**'
-      - 'benchmarks/**'
       - '**.csproj'
       - 'Directory.Packages.props'
       - 'Directory.Build.props'
@@ -21,7 +20,6 @@ on:
     paths:
       - 'src/**'
       - 'test/**'
-      - 'benchmarks/**'
       - '**.csproj'
       - 'Directory.Packages.props'
       - 'Directory.Build.props'
@@ -217,7 +215,7 @@ jobs:
       - name: Run Benchmarks
         run: >
           dotnet run
-          --project benchmarks/Jeninnet.FileQuery.Benchmarks.csproj
+          --project src/Jeninnet.FileQuery.Benchmarks/Jeninnet.FileQuery.Benchmarks.csproj
           --configuration Release
           -- --job Short --exporters json markdown
 

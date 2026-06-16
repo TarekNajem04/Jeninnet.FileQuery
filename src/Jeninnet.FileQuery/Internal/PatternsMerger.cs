@@ -59,56 +59,45 @@ internal static class PatternsMerger
     /// A dictionary mapping each <see cref="PatternKind"/> to an immutable array of merged pattern strings.
     /// </returns>
     public static Dictionary<PatternKind, ImmutableArray<string>> Merge(
-        IEnumerable<string> patterns,
-        IReadOnlyDictionary<PatternKind, IEnumerable<string>> typedPatterns
+        IEnumerable<string>? patterns,
+        IReadOnlyDictionary<PatternKind, IEnumerable<string>>? typedPatterns
     )
     {
-        var mergedPatterns = new Dictionary<PatternKind, (List<string> List, HashSet<string> Set)>();
+        var buckets = new Dictionary<PatternKind, HashSet<string>>();
+
+        HashSet<string> GetBucket(PatternKind kind)
+        {
+            if(!buckets.TryGetValue(kind, out var set))
+            {
+                set = new HashSet<string>(StringComparer.Ordinal);
+                buckets[kind] = set;
+            }
+
+            return set;
+        }
 
         // Seed the dictionary with explicitly typed patterns first.
         if(typedPatterns is not null)
         {
             foreach(var (kind, values) in typedPatterns)
             {
-                if(!mergedPatterns.TryGetValue(kind, out var bucket))
+                var bucket = GetBucket(kind);
+                foreach(var val in (values ?? []).Where(v => v is not null))
                 {
-                    bucket = (new List<string>(), new HashSet<string>(StringComparer.Ordinal));
-                    mergedPatterns[kind] = bucket;
-                }
-
-                foreach(var val in values)
-                {
-                    if(bucket.Set.Add(val))
-                    {
-                        bucket.List.Add(val);
-                    }
+                    bucket.Add(val);
                 }
             }
         }
 
-        if(patterns is not null)
+        // Classify and append each untyped pattern.
+        foreach(var rawPattern in (patterns ?? []).Where(p => p is not null))
         {
-            // Classify and append each untyped pattern.
-            foreach(var rawPattern in patterns)
-            {
-                var kind = PatternClassifier.Classify(rawPattern);
-
-                if(!mergedPatterns.TryGetValue(kind, out var bucket))
-                {
-                    bucket = (new List<string>(), new HashSet<string>(StringComparer.Ordinal));
-                    mergedPatterns[kind] = bucket;
-                }
-
-                if(bucket.Set.Add(rawPattern))
-                {
-                    bucket.List.Add(rawPattern);
-                }
-            }
+            GetBucket(PatternClassifier.Classify(rawPattern)).Add(rawPattern);
         }
 
-        return mergedPatterns.ToDictionary(
+        return buckets.ToDictionary(
             static kvp => kvp.Key,
-            static kvp => kvp.Value.List.ToImmutableArray()
+            static kvp => kvp.Value.ToImmutableArray()
         );
     }
 }

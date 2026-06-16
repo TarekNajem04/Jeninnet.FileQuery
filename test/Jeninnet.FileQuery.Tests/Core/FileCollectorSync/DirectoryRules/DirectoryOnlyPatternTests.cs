@@ -11,7 +11,7 @@ public class DirectoryOnlyPatternTests
 {
     /// <summary>
     /// Directory-only pattern "sub/" should match the directory,
-    /// but FileQueryEngine never *returns* directories � only filters by them.
+    /// but FileQueryEngine never *returns* directories — only filters by them.
     /// So root/sub/ should be included for recursion decisions,
     /// but no files should be returned unless deeper rules allow it.
     /// </summary>
