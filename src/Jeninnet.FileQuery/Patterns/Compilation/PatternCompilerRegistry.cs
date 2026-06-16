@@ -1,5 +1,6 @@
 ﻿namespace Jeninnet.FileQuery.Patterns.Compilation;
 
+/// <inheritdoc/>
 internal sealed class PatternCompilerRegistry : IPatternCompilerRegistry
 {
     private readonly Dictionary<PatternKind, IPatternCompiler> _registry;
@@ -12,13 +13,14 @@ internal sealed class PatternCompilerRegistry : IPatternCompilerRegistry
             [PatternKind.Regex] = new RegexPatternCompiler()
         };
 
-    public IPatternCompiler GetCompiler(PatternKind type)
+    /// <inheritdoc/>
+    public PatternResult<IPatternCompiler> GetCompiler(PatternKind type)
     {
         if(!_registry.TryGetValue(type, out var compiler))
         {
-            throw new PatternException($"No compiler registered for pattern type {type}.");
+            return PatternResult<IPatternCompiler>.Fail($"No compiler registered for pattern type '{type}'. Ensure the pattern kind is valid and supported by the current runtime configuration.");
         }
 
-        return compiler;
+        return PatternResult<IPatternCompiler>.Success(compiler);
     }
 }

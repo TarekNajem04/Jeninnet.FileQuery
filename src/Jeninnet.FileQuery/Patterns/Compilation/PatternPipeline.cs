@@ -66,8 +66,13 @@ internal sealed class PatternPipeline
         _invariants.ValidateSemantic(context);
 
         // Phase 5 — Compile tokens to compiled pattern.
-        var compiler = _compilers.GetCompiler(pattern.Type);
-        return compiler.Compile(context);
+        var compilerResult = _compilers.GetCompiler(pattern.Type);
+        if(!compilerResult.IsSuccess)
+        {
+            throw new PatternException(compilerResult.Error!);
+        }
+
+        return compilerResult.Value!.Compile(context);
     }
 
     // ------------------------------------------------------------------

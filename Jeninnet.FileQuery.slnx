@@ -1,14 +1,19 @@
 <Solution>
     <Folder Name="/benchmarks/">
-        <Project Path="benchmarks/Jeninnet.FileQuery.Benchmarks.csproj" />
+        <Project Path="src/Jeninnet.FileQuery.Benchmarks/Jeninnet.FileQuery.Benchmarks.csproj" />
     </Folder>
     <Folder Name="/samples/">
         <Project Path="samples/AdvancedUsage/AdvancedUsage.csproj" />
         <Project Path="samples/BasicMatching/BasicMatching.csproj" />
+        <Project Path="samples/DirectoryOnlyMatching/DirectoryOnlyMatching.csproj" />
         <Project Path="samples/HybridMatcher/HybridMatcher.csproj" />
         <Project Path="samples/LogFiltering/LogFiltering.csproj" />
+        <Project Path="samples/NegationAndRecursive/NegationAndRecursive.csproj" />
+        <Project Path="samples/NestedGlobMatching/NestedGlobMatching.csproj" />
         <Project Path="samples/PatternLanguage/PatternLanguage.csproj" />
+        <Project Path="samples/POSIXClassMatching/POSIXClassMatching.csproj" />
         <Project Path="samples/RecursiveTraversal/RecursiveTraversal.csproj" />
+        <Project Path="samples/RegexAnchoredMatching/RegexAnchoredMatching.csproj" />
         <Project Path="samples/RegexMatching/RegexMatching.csproj" />
     </Folder>
     <Folder Name="/Solution Items/">
@@ -25,14 +30,17 @@
         <File Path="global.json" />
         <File Path="LICENSE" />
         <File Path="README.md" />
+		<File Path="ROADMAP.md" />
         <File Path="run-coverage.ps1" />
-        <File Path="SECURITY.md" />
     </Folder>
     <Folder Name="/Solution Items/.github/">
+        <File Path=".github/BRANCH_PROTECTION.md" />
+        <File Path=".github/CODEOWNERS" />
         <File Path=".github/COMMUNITY_GUIDELINES.md" />
+        <File Path=".github/dependabot.yml" />
         <File Path=".github/PULL_REQUEST_TEMPLATE.md" />
+        <File Path=".github/SECURITY.md" />
         <File Path=".github/SUPPORT.md" />
-        <File Path="ROADMAP.md" />
     </Folder>
     <Folder Name="/Solution Items/.github/ISSUE_TEMPLATE/">
         <File Path=".github/ISSUE_TEMPLATE/bug_report.yml" />

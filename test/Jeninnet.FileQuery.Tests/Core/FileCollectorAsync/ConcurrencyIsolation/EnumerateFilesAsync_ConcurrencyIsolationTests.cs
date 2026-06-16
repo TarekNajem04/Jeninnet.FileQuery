@@ -1,5 +1,4 @@
-﻿using System;
-namespace Jeninnet.FileQuery.Tests.Core.FileCollectorAsync.ConcurrencyIsolation;
+﻿namespace Jeninnet.FileQuery.Tests.Core.FileCollectorAsync.ConcurrencyIsolation;
 
 /// <summary>
 /// Ensures async enumeration instances do not interfere with each other
@@ -23,13 +22,15 @@ public class EnumerateFilesAsync_ConcurrencyIsolationTests
 
         var fileQueryEngine = FileQueryRuntime.Create();
         var options = new FileQueryOptions(
-            patternInput: new(
-                patterns: [
-                    "**",        // Exclude everything first
-                    "!**/*.txt"  // Then include all .txt files
-                ]
-            ),
-            recurseSubdirectories: true
+            new FileQueryOptionsConfig(
+                PatternInput: new(
+                    Patterns: [
+                        "**",        // Exclude everything first
+                        "!**/*.txt"  // Then include all .txt files
+                    ]
+                ),
+                RecurseSubdirectories: true
+            )
         );
 
         // Will capture results from 3 parallel runs
@@ -76,29 +77,35 @@ public class EnumerateFilesAsync_ConcurrencyIsolationTests
         var fileQueryEngine = FileQueryRuntime.Create();
 
         var txtOptions = new FileQueryOptions(
-            patternInput: new(
-                patterns: [
-                    "**",       // exclude everything
-                    "!*.txt"    // include only .txt files
-                ]
+            new FileQueryOptionsConfig(
+                PatternInput: new(
+                    Patterns: [
+                        "**",       // exclude everything
+                        "!*.txt"    // include only .txt files
+                    ]
+                )
             )
         );
 
         var logOptions = new FileQueryOptions(
-            patternInput: new(
-                patterns: [
-                    "**",       // exclude everything
-                    "!*.log"    // include only .log files
-                ]
+            new FileQueryOptionsConfig(
+                PatternInput: new(
+                    Patterns: [
+                        "**",       // exclude everything
+                        "!*.log"    // include only .log files
+                    ]
+                )
             )
         );
 
         var mdOptions = new FileQueryOptions(
-            patternInput: new(
-                patterns: [
-                    "**",       // exclude everything
-                    "!*.md"     // include only .md files
-                ]
+            new FileQueryOptionsConfig(
+                PatternInput: new(
+                    Patterns: [
+                        "**",       // exclude everything
+                        "!*.md"     // include only .md files
+                    ]
+                )
             )
         );
 
@@ -114,8 +121,9 @@ public class EnumerateFilesAsync_ConcurrencyIsolationTests
         // Local function for clarity
         async Task<List<string>> CollectAsync(FileQueryOptions options) =>
             await fileQueryEngine.ExecuteAsync(new(env.Root, options), TestContext.CancellationToken)
-                           .ToListAsync(TestContext.CancellationToken);
+                                 .ToListAsync(TestContext.CancellationToken);
     }
 
     public TestContext TestContext { get; set; } = null!;
 }
+

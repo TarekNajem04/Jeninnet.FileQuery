@@ -25,15 +25,16 @@ internal sealed class GlobPatternCompiler : PatternCompilerBase
         var state = context.State!;
         var tokens = context.Tokens!;
 
-        return new CompiledPattern(
-            isNegated: state.IsNegated,
-            directoryOnly: state.IsDirectoryOnly,
-            anchoredToRoot: state.IsRootAnchored,
-            segments: tokens,
-            patternKind: PatternKind.Glob,
-            CompiledMatchIntent.FromNegation(state.IsNegated),
-            context.Pattern.Text,
-            context.Pattern.SourceIndex
-        );
+        return new CompiledPattern(new CompiledPatternConfig(
+            IsNegated: state.IsNegated,
+            DirectoryOnly: state.IsDirectoryOnly,
+            AnchoredToRoot: state.IsRootAnchored,
+            Segments: tokens,
+            PatternKind: PatternKind.Glob,
+            Intent: CompiledMatchIntent.FromNegation(state.IsNegated),
+            ConcretePathAnchor: PatternAnchorResolver.Resolve(tokens),
+            SourceText: context.Pattern.Text,
+            SourceIndex: context.Pattern.SourceIndex
+        ));
     }
 }

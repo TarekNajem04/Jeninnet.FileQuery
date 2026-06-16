@@ -82,7 +82,7 @@ internal sealed class RegexInstructionMatcher : PathMatcher
         for(var i = 0; i < patterns.Count; i++)
         {
             var pattern = patterns[i];
-            var regexText = GetRegularExpressionText(pattern);
+            var regexText = pattern.RegexText;
 
             if(regexText is null)
             {
@@ -129,26 +129,5 @@ internal sealed class RegexInstructionMatcher : PathMatcher
             // Using a default timeout of 1 second as per common recommendations for regex protection.
             return new Regex(k.Pattern, options, TimeSpan.FromSeconds(1));
         });
-    }
-
-    /// <summary>
-    /// Extracts the raw regular expression text from the first token of the
-    /// first segment of <paramref name="pattern"/>.
-    /// </summary>
-    /// <param name="pattern">The compiled pattern to extract the regex from.</param>
-    /// <returns>
-    /// The expression string, or <see langword="null"/> when the pattern does
-    /// not contain a <see cref="RegularExpressionToken"/>.
-    /// </returns>
-    private static string? GetRegularExpressionText(ICompiledPattern pattern)
-    {
-        if(pattern.Segments is not [var firstSegment, ..])
-        {
-            return null;
-        }
-
-        return firstSegment is [RegularExpressionToken { Pattern: var text }, ..]
-            ? text
-            : null;
     }
 }

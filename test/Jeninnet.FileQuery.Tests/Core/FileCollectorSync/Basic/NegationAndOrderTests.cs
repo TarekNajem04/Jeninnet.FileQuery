@@ -14,12 +14,14 @@ public class NegationAndOrderTests
 
         var fileQueryEngine = FileQueryRuntime.Create();
         var options = new FileQueryOptions(
-            patternInput: new(
-                patterns: [
-                    "**",
-                    "!*.txt",
-                    "b.txt"
-                ]
+            new FileQueryOptionsConfig(
+                PatternInput: new(
+                    Patterns: [
+                        "**",
+                        "!*.txt",
+                        "b.txt"
+                    ]
+                )
             )
         );
 
@@ -42,13 +44,15 @@ public class NegationAndOrderTests
 
         var fileQueryEngine = FileQueryRuntime.Create();
         var options = new FileQueryOptions(
-            patternInput: new(
-                patterns: [
-                    "**",
-                    "!*.log",
-                    "data.log",
-                    "!data.log" // last rule → include again
-                ]
+            new FileQueryOptionsConfig(
+                PatternInput: new(
+                    Patterns: [
+                        "**",
+                        "!*.log",
+                        "data.log",
+                        "!data.log" // last rule ? include again
+                    ]
+                )
             )
         );
 
@@ -71,14 +75,16 @@ public class NegationAndOrderTests
 
         var fileQueryEngine = FileQueryRuntime.Create();
         var options = new FileQueryOptions(
-            patternInput: new(
-                patterns: [
-                    "**",
-                    "sub/**",       // exclude everything under sub
-                    "!sub/file.txt" // but re-include this file
-                ]
-            ),
-            recurseSubdirectories: true
+            new FileQueryOptionsConfig(
+                PatternInput: new(
+                    Patterns: [
+                        "**",
+                        "sub/**",       // exclude everything under sub
+                        "!sub/file.txt" // but re-include this file
+                    ]
+                ),
+                RecurseSubdirectories: true
+            )
         );
 
         var result = fileQueryEngine.Execute(new(env.Root, options))
@@ -88,3 +94,4 @@ public class NegationAndOrderTests
         TestAssertEx.Contains(result, x => x.EndsWith("file.txt", StringComparison.Ordinal));
     }
 }
+

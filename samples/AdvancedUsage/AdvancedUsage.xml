@@ -4,5 +4,67 @@
         <name>AdvancedUsage</name>
     </assembly>
     <members>
+        <member name="T:AdvancedUsage.CliOptions">
+            <summary>
+            Defines command-line options for the advanced usage sample.
+            </summary>
+        </member>
+        <member name="T:AdvancedUsage.ConsolePrinter">
+            <summary>
+            Provides a printer implementation that writes to the console.
+            </summary>
+        </member>
+        <member name="M:AdvancedUsage.ConsolePrinter.Print(System.String)">
+            <summary>
+            Prints the specified path to the console.
+            </summary>
+            <param name="path">The path to print.</param>
+        </member>
+        <member name="T:AdvancedUsage.FileQueryCommand">
+            <summary>
+            Implements the file query command for the advanced usage sample.
+            </summary>
+            <param name="engine">The query engine.</param>
+            <param name="printer">The output printer.</param>
+        </member>
+        <member name="M:AdvancedUsage.FileQueryCommand.#ctor(Jeninnet.FileQuery.IFileQueryEngine,AdvancedUsage.IPrinter)">
+            <summary>
+            Implements the file query command for the advanced usage sample.
+            </summary>
+            <param name="engine">The query engine.</param>
+            <param name="printer">The output printer.</param>
+        </member>
+        <member name="M:AdvancedUsage.FileQueryCommand.ExecuteAsync(System.String,System.String[],System.Threading.CancellationToken)">
+            <summary>
+            Executes the query command asynchronously.
+            </summary>
+            <param name="root">The root directory.</param>
+            <param name="args">The command arguments.</param>
+            <param name="cancellationToken">The cancellation token.</param>
+        </member>
+        <member name="T:AdvancedUsage.IFileQueryCommand">
+            <summary>
+            Defines the interface for a file query command.
+            </summary>
+        </member>
+        <member name="M:AdvancedUsage.IFileQueryCommand.ExecuteAsync(System.String,System.String[],System.Threading.CancellationToken)">
+            <summary>
+            Executes the command asynchronously.
+            </summary>
+            <param name="root">The root directory.</param>
+            <param name="args">The command arguments.</param>
+            <param name="cancellationToken">The cancellation token.</param>
+        </member>
+        <member name="T:AdvancedUsage.IPrinter">
+            <summary>
+            Defines the interface for a printer.
+            </summary>
+        </member>
+        <member name="M:AdvancedUsage.IPrinter.Print(System.String)">
+            <summary>
+            Prints the specified path.
+            </summary>
+            <param name="path">The path to print.</param>
+        </member>
     </members>
 </doc>

@@ -1,5 +1,4 @@
-﻿using System;
-namespace Jeninnet.FileQuery.Tests.Core.FileCollectorAsync.PathEdgeCases;
+﻿namespace Jeninnet.FileQuery.Tests.Core.FileCollectorAsync.PathEdgeCases;
 
 /// <summary>
 /// Async tests verifying behavior on tricky or unusual paths.
@@ -25,11 +24,13 @@ public class EnumerateFilesAsync_PathEdgeCaseTests
 
         var fileQueryEngine = FileQueryRuntime.Create();
         var options = new FileQueryOptions(
-            patternInput: new(
-                patterns: [
-                    "**",
-                    "!file.txt"
-                ]
+            new FileQueryOptionsConfig(
+                PatternInput: new(
+                    Patterns: [
+                        "**",
+                        "!file.txt"
+                    ]
+                )
             )
         );
 
@@ -48,26 +49,32 @@ public class EnumerateFilesAsync_PathEdgeCaseTests
     {
         using var env = new TestEnvironment();
 
-        env.CreateFiles("مرحبا.log", "مرحبا.txt", "file.txt", "file1.txT", "file2.TXT", "こんにちは.txt");
+        env.CreateFiles("Test测试.log", "Test测试.txt", "file😍.txt", "file1😀.txT", "file2👍.TXT", "Test😁.txt", "Test07😅.txt");
 
         var options = new FileQueryOptions(
-            patternInput: new(
-                patterns: [
-                    "**",
-                    "!*.txt"
-                ]
-            ),
-            caseSensitivity: CaseSensitivity.Sensitive
+            new FileQueryOptionsConfig(
+                PatternInput: new(
+                    Patterns: [
+                        "**",
+                        "!*.txt"
+                    ]
+                ),
+                CaseSensitivity: CaseSensitivity.Sensitive
+            )
         );
 
         var fileQueryEngine = FileQueryRuntime.Create();
         var results = await fileQueryEngine.ExecuteAsync(new(env.Root, options), TestContext.CancellationToken)
                                            .ToListAsync(TestContext.CancellationToken);
 
-        TestAssertEx.ContainsSingle(results, x => x.Contains("مرحبا.txt", StringComparison.Ordinal));
-        TestAssertEx.DoesNotContain(results, x => x.Contains("file1.txT", StringComparison.Ordinal));
-        TestAssertEx.DoesNotContain(results, x => x.Contains("file2.TXT", StringComparison.Ordinal));
-        TestAssertEx.ContainsSingle(results, x => x.Contains("こんにちは.txt", StringComparison.Ordinal));
+        TestAssertEx.ContainsSingle(results, x => x.Contains("Test测试.txt", StringComparison.Ordinal));
+        TestAssertEx.ContainsSingle(results, x => x.Contains("file😍.txt", StringComparison.Ordinal));
+        TestAssertEx.ContainsSingle(results, x => x.Contains("Test😁.txt", StringComparison.Ordinal));
+        TestAssertEx.ContainsSingle(results, x => x.Contains("Test07😅.txt", StringComparison.Ordinal));
+
+        TestAssertEx.DoesNotContain(results, x => x.Contains("Test测试.log", StringComparison.Ordinal));
+        TestAssertEx.DoesNotContain(results, x => x.Contains("file1😀.txT", StringComparison.Ordinal));
+        TestAssertEx.DoesNotContain(results, x => x.Contains("file2👍.TXT", StringComparison.Ordinal));
     }
 
     /// <summary>
@@ -81,13 +88,15 @@ public class EnumerateFilesAsync_PathEdgeCaseTests
         env.CreateFiles("Alpha.TXT", "beta.txt", "GAMMA.TxT");
 
         var options = new FileQueryOptions(
-            patternInput: new(
-                patterns: [
-                    "**",
-                    "!**/*"
-                ]
-            ),
-            caseSensitivity: CaseSensitivity.Insensitive
+            new FileQueryOptionsConfig(
+                PatternInput: new(
+                    Patterns: [
+                        "**",
+                        "!**/*"
+                    ]
+                ),
+                CaseSensitivity: CaseSensitivity.Insensitive
+            )
         );
 
         var fileQueryEngine = FileQueryRuntime.Create();
@@ -99,3 +108,4 @@ public class EnumerateFilesAsync_PathEdgeCaseTests
 
     public TestContext TestContext { get; set; } = null!;
 }
+

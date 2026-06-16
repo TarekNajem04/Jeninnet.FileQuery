@@ -46,7 +46,7 @@ internal ref struct MatchResult
     /// Checks if the path should be accepted by the query engine (i.e., <see cref="IsIncluded"/> is <see langword="true"/>).
     /// </summary>
     /// <returns><see langword="true"/> if the path should be included; otherwise, <see langword="false"/>.</returns>
-    public readonly bool Successed() => IsIncluded;
+    public readonly bool Succeeded() => IsIncluded;
 
     public readonly MatchOutcome ToOutcome() =>
         (IsIncluded, IsMatched) switch
@@ -149,8 +149,8 @@ internal ref struct MatchResult
     public static MatchResult Matched() => new(isIncluded: false, isMatched: true);
 
     /// <summary>
-    /// Implicit conversion to <see cref="bool"/> using <see cref="Successed"/>.
+    /// Implicit conversion to <see cref="bool"/> using <see cref="Succeeded"/>.
     /// </summary>
     /// <param name="result">The match result.</param>
-    public static implicit operator bool([DisallowNull] MatchResult result) => result.Successed();
+    public static implicit operator bool([DisallowNull] MatchResult result) => result.Succeeded();
 }

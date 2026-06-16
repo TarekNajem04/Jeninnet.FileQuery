@@ -20,11 +20,13 @@ public class ComplexWildcardTests
 
         var fileQueryEngine = FileQueryRuntime.Create();
         var options = new FileQueryOptions(
-            patternInput: new(
-                patterns: [
-                    "**",       // Exclude all files
-                    "!*.txt"    // Include only .txt files in the root directory
-                ]
+            new FileQueryOptionsConfig(
+                PatternInput: new(
+                    Patterns: [
+                        "**",       // Exclude all files
+                        "!*.txt"    // Include only .txt files in the root directory
+                    ]
+                )
             )
         );
 
@@ -50,11 +52,13 @@ public class ComplexWildcardTests
 
         var fileQueryEngine = FileQueryRuntime.Create();
         var options = new FileQueryOptions(
-            patternInput: new(
-                patterns: [
-                    "**",
-                    "!**/*.txt"
-                ]
+            new FileQueryOptionsConfig(
+                PatternInput: new(
+                    Patterns: [
+                        "**",
+                        "!**/*.txt"
+                    ]
+                )
             )
         );
 
@@ -77,11 +81,13 @@ public class ComplexWildcardTests
 
         var fileQueryEngine = FileQueryRuntime.Create();
         var options = new FileQueryOptions(
-            patternInput: new(
-                patterns: [
-                    "**",
-                    "!a?.txt"
-                ]
+            new FileQueryOptionsConfig(
+                PatternInput: new(
+                    Patterns: [
+                        "**",
+                        "!a?.txt"
+                    ]
+                )
             )
         );
 
@@ -91,3 +97,4 @@ public class ComplexWildcardTests
         Assert.IsTrue(results.All(x => x.Contains('a')));
     }
 }
+

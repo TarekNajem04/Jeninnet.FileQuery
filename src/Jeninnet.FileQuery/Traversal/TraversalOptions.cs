@@ -8,18 +8,18 @@ public sealed record TraversalOptions
     /// <summary>
     /// Initializes a new instance of the <see cref="TraversalOptions"/> class.
     /// </summary>
-    /// <param name="strategy">The strategy used to visit directory nodes.</param>
-    /// <param name="symlinkPolicy">The policy for following or ignoring symbolic links.</param>
-    /// <param name="useAsync">A value indicating whether to use asynchronous I/O where possible.</param>
+    /// <param name="Strategy">The strategy used to visit directory nodes.</param>
+    /// <param name="SymlinkPolicy">The policy for following or ignoring symbolic links.</param>
+    /// <param name="UseAsync">A value indicating whether to use asynchronous I/O where possible.</param>
     public TraversalOptions(
-        TraversalStrategy strategy = TraversalStrategy.DepthFirst,
-        SymlinkPolicy symlinkPolicy = SymlinkPolicy.Ignore,
-        bool useAsync = true
+        TraversalStrategy Strategy = TraversalStrategy.DepthFirst,
+        SymlinkPolicy SymlinkPolicy = SymlinkPolicy.Ignore,
+        bool UseAsync = true
     )
     {
-        Strategy = strategy;
-        SymlinkPolicy = symlinkPolicy;
-        UseAsync = useAsync;
+        this.Strategy = Strategy;
+        this.SymlinkPolicy = SymlinkPolicy;
+        this.UseAsync = UseAsync;
     }
 
     /// <summary>

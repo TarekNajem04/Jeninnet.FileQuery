@@ -43,13 +43,10 @@ internal readonly ref struct PathMatchContext
     public CaseSensitivity CaseSensitivity { get; }
 
     /// <summary>
-    /// Converts the case-sensitivity mode into a <see cref="StringComparison"/>
-    /// suitable for span-based comparisons.
+    /// Converts the case-sensitivity mode into a <see cref="StringComparison"/> suitable for span-based comparisons.
     /// </summary>
-    public StringComparison GetStringComparison() =>
-        CaseSensitivity == CaseSensitivity.Insensitive
-            ? StringComparison.OrdinalIgnoreCase
-            : StringComparison.Ordinal;
+    /// <returns>The resolved <see cref="StringComparison"/>.</returns>
+    public StringComparison GetStringComparison() => CaseSensitivity.GetStringComparison();
 
     /// <summary>
     /// Creates a <see cref="PathMatchContext"/> for a file path.

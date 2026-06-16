@@ -1,11 +1,29 @@
-Write-Host "====== [1/4] Cleaning old test results and reports ======" -ForegroundColor Cyan
-if (Test-Path "TestResults") { Remove-Item -Recurse -Force "TestResults" }
-if (Test-Path "TestCoverageReport") { Remove-Item -Recurse -Force "TestCoverageReport" }
+param(
+    [switch]$ForceClean,
+    [switch]$ForceRestore
+)
 
-Write-Host "====== [2/4] Restoring NuGet packages and updating tools ======" -ForegroundColor Cyan
-dotnet clean
-dotnet restore
-dotnet tool update --global dotnet-reportgenerator-globaltool
+Write-Host "====== [1/4] Checking environment ======" -ForegroundColor Cyan
+if ($ForceClean) {
+    Write-Host "Cleaning old test results..." -ForegroundColor Yellow
+    if (Test-Path "TestResults") { Remove-Item -Recurse -Force "TestResults" }
+    if (Test-Path "TestCoverageReport") { Remove-Item -Recurse -Force "TestCoverageReport" }
+}
+
+Write-Host "====== [2/4] Preparing environment ======" -ForegroundColor Cyan
+if ($ForceRestore) {
+    Write-Host "Restoring NuGet packages..." -ForegroundColor Yellow
+    dotnet clean
+    dotnet restore
+}
+
+$reportGeneratorInstalled = dotnet tool list -g | Select-String "dotnet-reportgenerator-globaltool"
+if (-not $reportGeneratorInstalled) {
+    Write-Host "Installing ReportGenerator..." -ForegroundColor Yellow
+    dotnet tool update --global dotnet-reportgenerator-globaltool
+} else {
+    Write-Host "ReportGenerator is already installed. Skipping update." -ForegroundColor Green
+}
 
 Write-Host "====== [3/4] Running dotnet test and collecting coverage ======" -ForegroundColor Cyan
 dotnet test --collect:"XPlat Code Coverage"
@@ -15,7 +33,7 @@ $coverageFiles = Get-ChildItem -Path "TestResults/**/*xml" -Recurse -ErrorAction
 
 if ($null -eq $coverageFiles -or $coverageFiles.Count -eq 0) {
     Write-Host "`n[ERROR] Failed to generate coverage source files! Process aborted." -ForegroundColor Red
-    Exit 1
+    exit 1
 }
 
 Write-Host "====== [4/4] Generating visual coverage report with exclusions ======" -ForegroundColor Cyan

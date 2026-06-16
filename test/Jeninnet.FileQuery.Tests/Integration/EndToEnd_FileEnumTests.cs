@@ -18,8 +18,10 @@ public class EndToEnd_FileEnumTests
 
         var fileQueryEngine = FileQueryRuntime.Create();
         var options = new FileQueryOptions(
-            patternInput: new(patterns: ["**", "!**/*.cs"]),
-            recurseSubdirectories: true
+            new FileQueryOptionsConfig(
+                PatternInput: new(Patterns: ["**", "!**/*.cs"]),
+                RecurseSubdirectories: true
+            )
         );
 
         var result = fileQueryEngine.Execute(new(env.Root, options)).ToList();
@@ -45,12 +47,23 @@ public class EndToEnd_FileEnumTests
             "src/util/helpers.cs");
 
         var result = FileQueryRuntime.Create()
-            .Execute(new(
-                env.Root,
-                new FileQueryOptions(
-                    patternInput: new(patterns: ["**", "!*.cs", "bin/**", "obj/**"]),
-                    recurseSubdirectories: true
-                )))
+            .Execute(
+                new(
+                    env.Root,
+                    new FileQueryOptions(
+                            new FileQueryOptionsConfig(
+                            PatternInput: new(Patterns: [
+                                "**",
+                                "!*.cs",
+                                "bin/**",
+                                "obj/**"
+                                ]
+                            ),
+                            RecurseSubdirectories: true
+                        )
+                    )
+                )
+            )
             .Select(PathUtilities.Normalize)
             .ToList();
 
@@ -79,12 +92,17 @@ public class EndToEnd_FileEnumTests
         var patterns = new[] { "**", "!**/*.cs", "src/util/**", "bin/**", "obj/**" };
 
         var result = FileQueryRuntime.Create()
-            .Execute(new(
-                env.Root,
-                new FileQueryOptions(
-                    patternInput: new(patterns),
-                    recurseSubdirectories: true
-                )))
+            .Execute(
+                new(
+                    env.Root,
+                    new FileQueryOptions(
+                        new FileQueryOptionsConfig(
+                            PatternInput: new(patterns),
+                            RecurseSubdirectories: true
+                        )
+                    )
+                )
+            )
             .ToList();
 
         TestAssertEx.Contains(result, env.Abs("b.cs"));
@@ -109,13 +127,18 @@ public class EndToEnd_FileEnumTests
             "src/util/helpers.cs");
 
         var result = FileQueryRuntime.Create()
-            .Execute(new(
-                env.Root,
-                new FileQueryOptions(
-                    patternInput: new(patterns: ["**", "!**/*.cs"]),
-                    recurseSubdirectories: true,
-                    maxRecursionDepth: 0
-                )))
+            .Execute(
+                new(
+                    env.Root,
+                    new FileQueryOptions(
+                        new FileQueryOptionsConfig(
+                            PatternInput: new(Patterns: ["**", "!**/*.cs"]),
+                            RecurseSubdirectories: true,
+                            MaxRecursionDepth: 0
+                        )
+                    )
+                )
+            )
             .Select(PathUtilities.Normalize)
             .ToList();
 
@@ -136,12 +159,17 @@ public class EndToEnd_FileEnumTests
             "src/util/helpers.cs");
 
         var result = FileQueryRuntime.Create()
-            .Execute(new(
-                env.Root,
-                new FileQueryOptions(
-                    patternInput: new(patterns: ["**", "!**/*.txt"]),
-                    recurseSubdirectories: true
-                )))
+            .Execute(
+                new(
+                    env.Root,
+                    new FileQueryOptions(
+                        new FileQueryOptionsConfig(
+                            PatternInput: new(Patterns: ["**", "!**/*.txt"]),
+                            RecurseSubdirectories: true
+                        )
+                    )
+                )
+            )
             .Select(PathUtilities.Normalize)
             .ToList();
 
@@ -162,8 +190,10 @@ public class EndToEnd_FileEnumTests
             "src/util/helpers.cs");
 
         var options = new FileQueryOptions(
-            patternInput: new(patterns: ["**", "!**/*.cs", "src/util/**"]),
-            recurseSubdirectories: true
+            new FileQueryOptionsConfig(
+                PatternInput: new(Patterns: ["**", "!**/*.cs", "src/util/**"]),
+                RecurseSubdirectories: true
+            )
         );
 
         var result = FileQueryRuntime.Create().Execute(new(env.Root, options)).ToList();
@@ -189,12 +219,16 @@ public class EndToEnd_FileEnumTests
 
         var fileQueryEngine = FileQueryRuntime.Create();
         var insensitiveOptions = new FileQueryOptions(
-            patternInput: new(patterns: ["**", "!a.txt", "!file.txt"]),
-            caseSensitivity: CaseSensitivity.Insensitive
+            new FileQueryOptionsConfig(
+                PatternInput: new(Patterns: ["**", "!a.txt", "!file.txt"]),
+                CaseSensitivity: CaseSensitivity.Insensitive
+            )
         );
         var sensitiveOptions = new FileQueryOptions(
-            patternInput: new(patterns: ["**", "!a.txt", "!file.txt"]),
-            caseSensitivity: CaseSensitivity.Sensitive
+            new FileQueryOptionsConfig(
+                PatternInput: new(Patterns: ["**", "!a.txt", "!file.txt"]),
+                CaseSensitivity: CaseSensitivity.Sensitive
+            )
         );
 
         var insensitiveResult = fileQueryEngine.Execute(new(env.Root, insensitiveOptions)).ToList();

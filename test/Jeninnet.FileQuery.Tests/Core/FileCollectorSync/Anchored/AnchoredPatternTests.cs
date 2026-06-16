@@ -2,8 +2,8 @@
 
 /// <summary>
 /// Tests GitIgnore anchored patterns:
-/// - leading slash → relative to root
-/// - no slash → unanchored (matches at any depth)
+/// - leading slash ? relative to root
+/// - no slash ? unanchored (matches at any depth)
 /// </summary>
 [TestClass]
 public class AnchoredPatternTests
@@ -21,11 +21,13 @@ public class AnchoredPatternTests
 
         var fileQueryEngine = FileQueryRuntime.Create();
         var options = new FileQueryOptions(
-            patternInput: new(
-                patterns: [
-                    "**",
-                    "!/file.txt" // only root/file.txt should match
-                ]
+            new FileQueryOptionsConfig(
+                PatternInput: new(
+                    Patterns: [
+                        "**",
+                        "!/file.txt" // only root/file.txt should match
+                    ]
+                )
             )
         );
 
@@ -48,11 +50,13 @@ public class AnchoredPatternTests
 
         var fileQueryEngine = FileQueryRuntime.Create();
         var options = new FileQueryOptions(
-            patternInput: new(
-                patterns: [
-                    "**",
-                    "!file.md"
-                ]
+            new FileQueryOptionsConfig(
+                PatternInput: new(
+                    Patterns: [
+                        "**",
+                        "!file.md"
+                    ]
+                )
             )
         );
 
@@ -75,11 +79,13 @@ public class AnchoredPatternTests
 
         var fileQueryEngine = FileQueryRuntime.Create();
         var options = new FileQueryOptions(
-            patternInput: new(
-                patterns: [
-                    "**",
-                    "!/sub/"
-                ]
+            new FileQueryOptionsConfig(
+                PatternInput: new(
+                    Patterns: [
+                        "**",
+                        "!/sub/"
+                    ]
+                )
             )
         );
 
@@ -91,3 +97,4 @@ public class AnchoredPatternTests
         TestAssertEx.EndsWith(onlyResult, Path.Combine("sub", "a.txt"), "Only the file inside the root-level 'sub' directory should be included.");
     }
 }
+

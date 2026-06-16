@@ -1,5 +1,4 @@
-﻿using System;
-namespace Jeninnet.FileQuery.Tests.Core.FileCollectorAsync.CharacterClasses;
+﻿namespace Jeninnet.FileQuery.Tests.Core.FileCollectorAsync.CharacterClasses;
 
 /// <summary>
 /// Async tests covering character-class patterns such as:
@@ -21,11 +20,13 @@ public class EnumerateFilesAsync_CharacterClassPatternTests
         env.CreateFiles("a.txt", "b.txt", "c.txt", "d.txt");
 
         var options = new FileQueryOptions(
-            patternInput: new(
-                patterns: [
-                    "*",            // Exclude everything first
-                    "![abc].txt"    // Then include a, b, c
-                ]
+            new FileQueryOptionsConfig(
+                PatternInput: new(
+                    Patterns: [
+                        "*",            // Exclude everything first
+                        "![abc].txt"    // Then include a, b, c
+                    ]
+                )
             )
         );
 
@@ -50,11 +51,13 @@ public class EnumerateFilesAsync_CharacterClassPatternTests
         env.CreateFiles("a.log", "b.log", "c.log", "d.log");
 
         var options = new FileQueryOptions(
-            patternInput: new(
-                patterns: [
-                    "*",            // Exclude everything first
-                    "![a-c].log"    // Then include a, b, c
-                ]
+            new FileQueryOptionsConfig(
+                PatternInput: new(
+                    Patterns: [
+                        "*",            // Exclude everything first
+                        "![a-c].log"    // Then include a, b, c
+                    ]
+                )
             )
         );
 
@@ -75,11 +78,13 @@ public class EnumerateFilesAsync_CharacterClassPatternTests
         env.CreateFiles("apple.txt", "banana.txt", "cherry.txt");
 
         var options = new FileQueryOptions(
-            patternInput: new(
-                patterns: [
-                    "!*.txt",       // include all txt
-                    "[aeiou]*.txt"  // EXCLUDE files starting with a vowel
-                ]
+            new FileQueryOptionsConfig(
+                PatternInput: new(
+                    Patterns: [
+                        "!*.txt",       // include all txt
+                        "[aeiou]*.txt"  // EXCLUDE files starting with a vowel
+                    ]
+                )
             )
         );
 

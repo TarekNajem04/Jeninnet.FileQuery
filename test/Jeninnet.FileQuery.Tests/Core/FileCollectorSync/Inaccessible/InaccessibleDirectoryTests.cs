@@ -20,14 +20,16 @@ public class InaccessibleDirectoryTests
 
         var fileQueryEngine = FileQueryRuntime.Create();
         var options = new FileQueryOptions(
-            patternInput: new(
-                patterns: [
-                    "**",
-                "!**/*.txt"
-                ]
-            ),
-            recurseSubdirectories: true,
-            ignoreInaccessible: false
+            new FileQueryOptionsConfig(
+                PatternInput: new(
+                    Patterns: [
+                        "**",
+                    "!**/*.txt"
+                    ]
+                ),
+                RecurseSubdirectories: true,
+                IgnoreInaccessible: false
+            )
         );
 
         TestAssertEx.Throws<Exception>(() =>
@@ -36,21 +38,17 @@ public class InaccessibleDirectoryTests
             {
                 _ = fileQueryEngine.Execute(new(env.Root, options)).ToList();
 
-                // If we reach this point, no exception was thrown → fail explicitly
-                throw new AssertFailedException(
-                    "Expected an exception due to inaccessible directory, but none was thrown."
-                );
+                // If we reach this point, no exception was thrown ? fail explicitly
+                throw new AssertFailedException("Expected an exception due to inaccessible directory, but none was thrown.");
             }
-            catch(Exception ex) when(
-                ex is DirectoryNotFoundException or IOException or UnauthorizedAccessException
-            )
+            catch(Exception ex) when(ex is DirectoryNotFoundException or IOException or UnauthorizedAccessException)
             {
-                // Valid exception → rethrow so Throws<T> can validate it
+                // Valid exception ? rethrow so Throws<T> can validate it
                 throw;
             }
             catch(Exception ex)
             {
-                // Unexpected exception → wrap and rethrow (no Assert.Fail here)
+                // Unexpected exception ? wrap and rethrow (no Assert.Fail here)
                 throw new AssertFailedException(
                     $"Caught unexpected exception: {ex.GetType().Name}", ex
                 );
@@ -72,14 +70,16 @@ public class InaccessibleDirectoryTests
 
         var fileQueryEngine = FileQueryRuntime.Create();
         var options = new FileQueryOptions(
-            patternInput: new(
-                patterns: [
-                    "**",
-                    "!**/*.txt"
-                ]
-            ),
-            recurseSubdirectories: true,
-            ignoreInaccessible: true
+            new FileQueryOptionsConfig(
+                PatternInput: new(
+                    Patterns: [
+                        "**",
+                        "!**/*.txt"
+                    ]
+                ),
+                RecurseSubdirectories: true,
+                IgnoreInaccessible: true
+            )
         );
 
         var result = fileQueryEngine.Execute(new(env.Root, options)).ToList();
@@ -88,3 +88,4 @@ public class InaccessibleDirectoryTests
         Assert.EndsWith("keep.txt", result.Single());
     }
 }
+

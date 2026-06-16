@@ -13,13 +13,11 @@
         <Nullable>enable</Nullable>
         <UseNETCoreGenerator>true</UseNETCoreGenerator>
         <!--
-			CS1591: C# Missing XML comment for publicly visible type or member
-			CS1701 && CS1702: Assuming assembly reference "Assembly Name #1" matches "Assembly Name #2", you may need to supply runtime policy
-			CA1016: Mark assemblies with AssemblyVersionAttribute
-            CA2012: Use ValueTasks correctly
-            CA1591: Missing XML comment for publicly visible type or member
-		-->
-        <NoWarn>$(NoWarn);1591;1701;1702;1016;2012</NoWarn>
+        CS1701 && CS1702: Assuming assembly reference "Assembly Name #1" matches "Assembly Name #2", you may need to supply runtime policy
+        CA1016: Mark assemblies with AssemblyVersionAttribute
+        CA2012: Use ValueTasks correctly
+        -->
+        <NoWarn>$(NoWarn);1701;1702;1016;2012</NoWarn>
 
         <!--
 		  https://www.tabsoverspaces.com/233608-stopping-msbuild-appending-targetframework-to-outputpath

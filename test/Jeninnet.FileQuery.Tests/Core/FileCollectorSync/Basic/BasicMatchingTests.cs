@@ -15,13 +15,15 @@ public class BasicMatchingTests
 
         var fileQueryEngine = FileQueryRuntime.Create();
         var options = new FileQueryOptions(
-            patternInput: new(
-                patterns: [
-                    "**",
-                    "!file1.txt"
-                ]
-            ),
-            recurseSubdirectories: false
+            new FileQueryOptionsConfig(
+                PatternInput: new(
+                    Patterns: [
+                        "**",
+                        "!file1.txt"
+                    ]
+                ),
+                RecurseSubdirectories: false
+            )
         );
 
         var result = fileQueryEngine.Execute(new(env.Root, options))
@@ -42,11 +44,13 @@ public class BasicMatchingTests
 
         var fileQueryEngine = FileQueryRuntime.Create();
         var options = new FileQueryOptions(
-            patternInput: new(
-                patterns: [
-                    "**",
-                    "!*"
-                ]
+            new FileQueryOptionsConfig(
+                PatternInput: new(
+                    Patterns: [
+                        "**",
+                        "!*"
+                    ]
+                )
             )
         );
 
@@ -68,11 +72,13 @@ public class BasicMatchingTests
 
         var fileQueryEngine = FileQueryRuntime.Create();
         var options = new FileQueryOptions(
-            patternInput: new(
-                patterns: [
-                    "**",
-                    "!file[AB].txt"
-                ]
+            new FileQueryOptionsConfig(
+                PatternInput: new(
+                    Patterns: [
+                        "**",
+                        "!file[AB].txt"
+                    ]
+                )
             )
         );
 
@@ -84,3 +90,4 @@ public class BasicMatchingTests
         Assert.Contains(x => x.EndsWith("fileB.txt", StringComparison.Ordinal), result);
     }
 }
+

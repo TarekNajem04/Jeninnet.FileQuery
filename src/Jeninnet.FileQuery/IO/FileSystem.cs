@@ -24,19 +24,63 @@ internal sealed class FileSystem : IFileSystem
         FileQueryErrorRecoveryOptions errorRecovery
     )
     {
-        foreach(var path in FileSystemGuards.EnumerateEntries(directory, ignoreInaccessible, errorRecovery))
+        var attempts = errorRecovery.Action is FileQueryErrorAction.Retry
+            ? errorRecovery.MaxRetryAttempts + 1
+            : 1;
+
+        var attempt = 0;
+        IEnumerator<string>? enumerator = null;
+
+        while(attempt < attempts)
         {
+            string? current = null;
+            var hasCurrent = false;
+
+            try
+            {
+                enumerator ??= Directory.EnumerateFileSystemEntries(directory).GetEnumerator();
+                hasCurrent = enumerator.MoveNext();
+
+                if(hasCurrent)
+                {
+                    current = enumerator.Current;
+                }
+            }
+            catch(Exception ex) when(FileSystemGuards.IsRecoverable(ex))
+            {
+                enumerator?.Dispose();
+                enumerator = null;
+
+                if(FileSystemGuards.ShouldSkip(ignoreInaccessible, errorRecovery, attempt, attempts))
+                {
+                    yield break;
+                }
+
+                if(errorRecovery.Action is FileQueryErrorAction.Retry && attempt < attempts - 1)
+                {
+                    attempt++;
+                    continue;
+                }
+
+                throw;
+            }
+
+            if(!hasCurrent)
+            {
+                enumerator!.Dispose();
+                yield break;
+            }
+
+            // Yield once we successfully get a path
+            var path = current!;
             if(!TryGetAttributes(path, ignoreInaccessible, errorRecovery, out var attributes))
             {
                 continue;
             }
 
-            if(attributes.HasFlag(FileAttributes.Directory))
+            if(attributes.HasFlag(FileAttributes.Directory) && !TryEnsureAccessible(path, ignoreInaccessible, errorRecovery))
             {
-                if(!TryEnsureAccessible(path, ignoreInaccessible, errorRecovery))
-                {
-                    continue;
-                }
+                continue;
             }
 
             yield return new FileSystemEntry(path, attributes);
@@ -56,21 +100,64 @@ internal sealed class FileSystem : IFileSystem
             yield break;
         }
 
-        foreach(var path in FileSystemGuards.EnumerateEntries(directory, ignoreInaccessible, errorRecovery))
+        var attempts = errorRecovery.Action is FileQueryErrorAction.Retry
+            ? errorRecovery.MaxRetryAttempts + 1
+            : 1;
+
+        var attempt = 0;
+        IEnumerator<string>? enumerator = null;
+
+        while(attempt < attempts)
         {
+            string? current = null;
+            var hasCurrent = false;
+
+            try
+            {
+                enumerator ??= Directory.EnumerateFileSystemEntries(directory).GetEnumerator();
+                hasCurrent = enumerator.MoveNext();
+
+                if(hasCurrent)
+                {
+                    current = enumerator.Current;
+                }
+            }
+            catch(Exception ex) when(FileSystemGuards.IsRecoverable(ex))
+            {
+                enumerator?.Dispose();
+                enumerator = null;
+
+                if(FileSystemGuards.ShouldSkip(ignoreInaccessible, errorRecovery, attempt, attempts))
+                {
+                    yield break;
+                }
+
+                if(errorRecovery.Action is FileQueryErrorAction.Retry && attempt < attempts - 1)
+                {
+                    attempt++;
+                    continue;
+                }
+
+                throw;
+            }
+
+            if(!hasCurrent)
+            {
+                enumerator!.Dispose();
+                yield break;
+            }
+
             cancellationToken.ThrowIfCancellationRequested();
 
+            var path = current!;
             if(!TryGetAttributes(path, ignoreInaccessible, errorRecovery, out var attributes))
             {
                 continue;
             }
 
-            if(attributes.HasFlag(FileAttributes.Directory))
+            if(attributes.HasFlag(FileAttributes.Directory) && !TryEnsureAccessible(path, ignoreInaccessible, errorRecovery))
             {
-                if(!TryEnsureAccessible(path, ignoreInaccessible, errorRecovery))
-                {
-                    continue;
-                }
+                continue;
             }
 
             yield return new FileSystemEntry(path, attributes);
@@ -116,6 +203,9 @@ internal sealed class FileSystem : IFileSystem
 
         return path;
     }
+
+    /// <inheritdoc/>
+    public char DirectorySeparator => Path.DirectorySeparatorChar;
 
     /// <inheritdoc/>
     public string GetFullPath(string path) => Path.GetFullPath(path);

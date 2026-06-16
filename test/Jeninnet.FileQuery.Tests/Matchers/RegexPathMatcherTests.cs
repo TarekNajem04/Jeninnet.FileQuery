@@ -115,14 +115,16 @@ public class RegexPathMatcherTests
         var pattern = compiledPatternSets[0];
         // Manually create a compiled pattern with IsNegated=True to test if the Matcher respects it.
         // It shouldn't, as IsIncluded is hardcoded to 'true' in RegexPathMatcher.IsMatch.
-        var compiledNegated = new CompiledPattern(
-            isNegated: true,
-            directoryOnly: pattern.DirectoryOnly,
-            anchoredToRoot: pattern.AnchoredToRoot,
-            segments: pattern.Segments,
-            patternKind: pattern.PatternKind,
-            CompiledMatchIntent.FromNegation(pattern.IsNegated)
-        );
+        var compiledNegated = new CompiledPattern(new CompiledPatternConfig(
+            IsNegated: true,
+            DirectoryOnly: pattern.DirectoryOnly,
+            AnchoredToRoot: pattern.AnchoredToRoot,
+            Segments: pattern.Segments,
+            PatternKind: pattern.PatternKind,
+            Intent: CompiledMatchIntent.FromNegation(pattern.IsNegated),
+            ConcretePathAnchor: pattern.ConcretePathAnchor,
+            RegexText: @"data\.secret"
+        ));
 
         var matcher = CreateMatcher();
         // Act

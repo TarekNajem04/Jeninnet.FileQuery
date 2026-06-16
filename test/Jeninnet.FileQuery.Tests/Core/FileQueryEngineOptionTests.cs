@@ -28,12 +28,14 @@ public class FileQueryEngineOptionTests
 
         var fileQueryEngine = FileQueryRuntime.Create();
         var options = new FileQueryOptions(
-            patternInput: new(
-                patterns: [
-                    "!**/*.txt" // Include all .txt files
-                ]
-            ),
-            recurseSubdirectories: false
+            new FileQueryOptionsConfig(
+                PatternInput: new(
+                    Patterns: [
+                        "!**/*.txt" // Include all .txt files
+                    ]
+                ),
+                RecurseSubdirectories: false
+            )
         );
 
         // ACT
@@ -65,13 +67,15 @@ public class FileQueryEngineOptionTests
 
         var fileQueryEngine = FileQueryRuntime.Create();
         var options = new FileQueryOptions(
-            patternInput: new(
-                patterns: [
-                    "!**/*.txt"
-                ]
-            ),
-            recurseSubdirectories: true,
-            maxRecursionDepth: 1 // Max depth 1 means traversal stops AFTER level1
+            new FileQueryOptionsConfig(
+                PatternInput: new(
+                    Patterns: [
+                        "!**/*.txt"
+                    ]
+                ),
+                RecurseSubdirectories: true,
+                MaxRecursionDepth: 1 // Max depth 1 means traversal stops AFTER level1
+            )
         );
 
         // ACT
@@ -101,20 +105,23 @@ public class FileQueryEngineOptionTests
 
         var fileQueryEngine = FileQueryRuntime.Create();
         var options = new FileQueryOptions(
-            patternInput: new(
-                patterns: [
-                    "!TestFile.txt"
-                ]
-            ),
-            recurseSubdirectories: true,
-            caseSensitivity: CaseSensitivity.Insensitive // Case-insensitive matching
+            new FileQueryOptionsConfig(
+                PatternInput: new(
+                    Patterns: [
+                        "!TestFile.txt"
+                    ]
+                ),
+                RecurseSubdirectories: true,
+                CaseSensitivity: CaseSensitivity.Insensitive
+            )
         );
 
         // ACT
         var results = await fileQueryEngine.ExecuteAsync(new(env.Root, options), TestContext.CancellationToken)
                                            .ToListAsync(TestContext.CancellationToken);
-        var comparisonType = options.CaseSensitivity.ToStringComparison();
+        var comparisonType = options.CaseSensitivity.GetStringComparison();
         // ASSERT
         TestAssertEx.Contains(results, x => x.EndsWith("testfile.txt", comparisonType), "The file 'testfile.txt' must be included because the test is case-insensitive.");
     }
 }
+

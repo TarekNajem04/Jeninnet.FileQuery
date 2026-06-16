@@ -22,8 +22,10 @@ public class EnumerateFilesAsync_CancellationTests
 
         var fileQueryEngine = FileQueryRuntime.Create();
         var options = new FileQueryOptions(
-            patternInput: new(
-                patterns: ["**/*"]
+            new FileQueryOptionsConfig(
+                PatternInput: new(
+                    Patterns: ["**/*"]
+                )
             )
         );
 
@@ -53,8 +55,10 @@ public class EnumerateFilesAsync_CancellationTests
 
         var fileQueryEngine = FileQueryRuntime.Create();
         var options = new FileQueryOptions(
-            patternInput: new(
-                patterns: ["!*.txt"]
+            new FileQueryOptionsConfig(
+                PatternInput: new(
+                    Patterns: ["!*.txt"]
+                )
             )
         );
 
@@ -96,12 +100,14 @@ public class EnumerateFilesAsync_CancellationTests
 
         var fileQueryEngine = FileQueryRuntime.Create();
         var options = new FileQueryOptions(
-            patternInput: new(
-                patterns: [
-                    "!**/*.txt"
-                ]
-            ),
-            recurseSubdirectories: true
+            new FileQueryOptionsConfig(
+                PatternInput: new(
+                    Patterns: [
+                        "!**/*.txt"
+                    ]
+                ),
+                RecurseSubdirectories: true
+            )
         );
 
         using var cts = new CancellationTokenSource();

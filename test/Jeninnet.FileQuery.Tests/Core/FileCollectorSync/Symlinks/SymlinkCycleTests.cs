@@ -23,11 +23,13 @@ public class SymlinkCycleTests
 
         var fileQueryEngine = FileQueryRuntime.Create();
         var options = new FileQueryOptions(
-            patternInput: new(patterns: ["**", "!**/*.txt"]),
-            recurseSubdirectories: true,
-            ignoreInaccessible: true,
-            traversal: new TraversalOptions(
-                symlinkPolicy: SymlinkPolicy.FollowWithCycleDetection
+            new FileQueryOptionsConfig(
+                PatternInput: new(Patterns: ["**", "!**/*.txt"]),
+                RecurseSubdirectories: true,
+                IgnoreInaccessible: true,
+                Traversal: new TraversalOptions(
+                    SymlinkPolicy: SymlinkPolicy.FollowWithCycleDetection
+                )
             )
         );
 
@@ -53,11 +55,13 @@ public class SymlinkCycleTests
 
         var fileQueryEngine = FileQueryRuntime.Create();
         var options = new FileQueryOptions(
-            patternInput: new(patterns: ["**", "!**/*.txt"]),
-            recurseSubdirectories: true,
-            ignoreInaccessible: true,
-            traversal: new TraversalOptions(
-                symlinkPolicy: SymlinkPolicy.FollowWithCycleDetection
+            new FileQueryOptionsConfig(
+                PatternInput: new(Patterns: ["**", "!**/*.txt"]),
+                RecurseSubdirectories: true,
+                IgnoreInaccessible: true,
+                Traversal: new TraversalOptions(
+                    SymlinkPolicy: SymlinkPolicy.FollowWithCycleDetection
+                )
             )
         );
 
@@ -69,3 +73,4 @@ public class SymlinkCycleTests
 
     public TestContext TestContext { get; set; } = null!;
 }
+

@@ -36,17 +36,21 @@ public class DirectoryPatternTests
             new FileQuery(
                 env.Root,
                 new FileQueryOptions(
-                    patternInput: new(
-                        patterns: [
-                            "**",
-                            "!**/*.cs",
-                            "src/util/**", // Exclusion: Prunes src/util/ and its contents
-                        ]
-                    ),
-                    recurseSubdirectories: true
-                )))
-                .Select(Path.GetFullPath)
-                .ToList();
+                    new FileQueryOptionsConfig(
+                        PatternInput: new(
+                            Patterns: [
+                                "**",
+                                "!**/*.cs",
+                                "src/util/**", // Exclusion: Prunes src/util/ and its contents
+                            ]
+                        ),
+                        RecurseSubdirectories: true
+                    )
+                )
+            )
+        )
+        .Select(Path.GetFullPath)
+        .ToList();
 
         // ASSERT
         // Should include all .cs files EXCEPT those under src/util/
@@ -73,15 +77,19 @@ public class DirectoryPatternTests
                 new FileQuery(
                     env.Root,
                     new FileQueryOptions(
-                        patternInput: new(
-                            patterns: [
-                                "**",
-                                "!**/*.cs",
-                                "src/util/**",    // Exclusion: Prunes src/util/ directory subtree
-                            ]
-                        ),
-                        recurseSubdirectories: true
-                    )))
+                        new FileQueryOptionsConfig(
+                            PatternInput: new(
+                                Patterns: [
+                                    "**",
+                                    "!**/*.cs",
+                                    "src/util/**",    // Exclusion: Prunes src/util/ directory subtree
+                                ]
+                            ),
+                            RecurseSubdirectories: true
+                        )
+                    )
+                )
+            )
             .ToList();
 
         // ASSERT
@@ -106,18 +114,22 @@ public class DirectoryPatternTests
         // ACT
         var result = fileQueryEngine
             .Execute(
-            new FileQuery(
-                env.Root,
-                new FileQueryOptions(
-                    patternInput: new(
-                        patterns: [
-                            "**",
-                            "!**/*.cs",
-                            "src/util/**",   // Exclusion 1: Prunes src/util/ subtree
-                            "src/other/**", // Exclusion 2: Prunes src/other/ subtree
-                        ]
+                new FileQuery(
+                    env.Root,
+                    new FileQueryOptions(
+                        new FileQueryOptionsConfig(
+                            PatternInput: new(
+                                Patterns: [
+                                    "**",
+                                    "!**/*.cs",
+                                    "src/util/**",   // Exclusion 1: Prunes src/util/ subtree
+                                    "src/other/**", // Exclusion 2: Prunes src/other/ subtree
+                                ]
+                            )
+                        )
                     )
-                )))
+                )
+            )
             .ToList();
 
         // ASSERT

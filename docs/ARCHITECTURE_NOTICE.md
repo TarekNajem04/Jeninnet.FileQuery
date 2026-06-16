@@ -1,8 +1,19 @@
 # Architecture Notice
 
-The matching and traversal architecture was redesigned during the v1.0 stabilization phase. All documentation in this repository reflects the **final v1.0 architecture**. No obsolete documents remain.
+The matching and traversal architecture was enhanced during the v1.2 release. All documentation in this repository reflects the current 1.2.0 architecture.
 
-## Key Changes From the Original Design
+## Key Changes in 1.2.0
+
+### Validation Pipeline
+Introduced a centralized `FileQueryValidator` for pre-execution configuration and root path validation, ensuring consistent error handling and early detection of misconfigurations.
+
+### Pattern Results
+Replaced `PatternException` with `PatternResult<T>` in the compilation flow, providing a safer and more predictable approach to handling compilation errors without relying on exceptions for flow control.
+
+### Refactored Compiler Pipeline
+Refined the pattern compilation pipeline and anchor resolution, resolving several SonarCloud quality warnings and improving overall performance and maintainability.
+
+## Key Changes From the Original Design (v1.0)
 
 ### PatternScanner responsibility narrowed
 `PatternScanner` is now a pure lexer. The `ApplyImplicitRecursiveWildcard` method, which was a semantic transform embedded in the scanner, was removed and replaced by `GitIgnoreImplicitRecursiveInvariant` in the Semantic invariant phase.
@@ -24,4 +35,4 @@ All matcher hot-path loops converted from `foreach` over `ICompiledPatternSet` (
 
 ## Current Documentation Status
 
-All documentation files are up to date with the v1.0 implementation. The architecture documents under `/docs/architecture/` reflect the current codebase.
+All documentation files are up to date with the 1.2.0 implementation. The architecture documents under `/docs/architecture/` reflect the current codebase.

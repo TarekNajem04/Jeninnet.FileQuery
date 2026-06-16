@@ -16,12 +16,14 @@ public class PatternMergingTests
     {
         // Arrange
         var options = new FileQueryOptions(
-            patternInput: new(
-                patterns: [
-                    "*.cs",            // Classified as GitIgnore (Superset rule)
-                    "bin/",            // Classified as GitIgnore (Trailing slash)
-                    @"src\**\*.cs"     // Classified as Glob (Backslash rule)
-                ]
+            new FileQueryOptionsConfig(
+                PatternInput: new(
+                    Patterns: [
+                        "*.cs",            // Classified as GitIgnore (Superset rule)
+                        "bin/",            // Classified as GitIgnore (Trailing slash)
+                        @"src\**\*.cs"     // Classified as Glob (Backslash rule)
+                    ]
+                )
             )
         );
 
@@ -44,8 +46,8 @@ public class PatternMergingTests
     {
         // Arrange
         var options = new FileQueryOptions(
-            patternInput: new(
-                typedPatterns: PatternHelpers.Create(PatternKind.Regex, "LICENSE", "README")
+            new FileQueryOptionsConfig(
+                PatternInput: new(TypedPatterns: PatternHelpers.Create(PatternKind.Regex, "LICENSE", "README"))
             )
         );
 
@@ -63,11 +65,13 @@ public class PatternMergingTests
     {
         // Arrange
         var options = new FileQueryOptions(
-            // Raw pattern that will be classified as GitIgnore
-            patternInput: new(
-                patterns: new List<string> { "node_modules/" },
-                // Explicitly typed GitIgnore pattern
-                typedPatterns: PatternHelpers.Create(PatternKind.GitIgnore, ".env")
+            new FileQueryOptionsConfig(
+                // Raw pattern that will be classified as GitIgnore
+                PatternInput: new(
+                    Patterns: new List<string> { "node_modules/" },
+                    // Explicitly typed GitIgnore pattern
+                    TypedPatterns: PatternHelpers.Create(PatternKind.GitIgnore, ".env")
+                )
             )
         );
 
@@ -88,7 +92,7 @@ public class PatternMergingTests
     public void MergePatterns_WithNullCollections_ReturnsEmptyDictionary()
     {
         // Arrange
-        var options = new FileQueryOptions(patternInput: new());
+        var options = new FileQueryOptions(new FileQueryOptionsConfig(PatternInput: new()));
 
         // Act
         var result = PatternsMerger.Merge(options.PatternInput);
@@ -104,11 +108,13 @@ public class PatternMergingTests
         // Arrange
         var originalList = new List<string> { "original" };
         var options = new FileQueryOptions(
-            patternInput: new(
-                typedPatterns: new Dictionary<PatternKind, IEnumerable<string>>
-                {
-                    [PatternKind.Glob] = originalList
-                }
+            new FileQueryOptionsConfig(
+                PatternInput: new(
+                    TypedPatterns: new Dictionary<PatternKind, IEnumerable<string>>
+                    {
+                        [PatternKind.Glob] = originalList
+                    }
+                )
             )
         );
 
@@ -122,3 +128,4 @@ public class PatternMergingTests
         Assert.HasCount(1, result[PatternKind.Glob], "Want the merged result to be immutable and not reflect changes to the original or the merged list.");
     }
 }
+

@@ -27,19 +27,23 @@ public sealed class BfsTraversalTests
         var engine = FileQueryRuntime.Create();
 
         var bfsOptions = new FileQueryOptions(
-            patternInput: new(patterns: ["**", "!**/*.txt"]),
-            recurseSubdirectories: true,
-            traversal: new TraversalOptions(strategy: TraversalStrategy.BreadthFirst)
+            new FileQueryOptionsConfig(
+                PatternInput: new(Patterns: ["**", "!**/*.txt"]),
+                RecurseSubdirectories: true,
+                Traversal: new TraversalOptions(Strategy: TraversalStrategy.BreadthFirst)
+            )
         );
 
         var dfsOptions = new FileQueryOptions(
-            bfsOptions.PatternInput,
-            bfsOptions.RecurseSubdirectories,
-            bfsOptions.MaxRecursionDepth,
-            bfsOptions.IgnoreInaccessible,
-            bfsOptions.PatternMatchingMode,
-            bfsOptions.CaseSensitivity,
-            traversal: new TraversalOptions(strategy: TraversalStrategy.DepthFirst)
+            new FileQueryOptionsConfig(
+                PatternInput: bfsOptions.PatternInput,
+                RecurseSubdirectories: bfsOptions.RecurseSubdirectories,
+                MaxRecursionDepth: bfsOptions.MaxRecursionDepth,
+                IgnoreInaccessible: bfsOptions.IgnoreInaccessible,
+                PatternMatchingMode: bfsOptions.PatternMatchingMode,
+                CaseSensitivity: bfsOptions.CaseSensitivity,
+                Traversal: new TraversalOptions(Strategy: TraversalStrategy.DepthFirst)
+            )
         );
 
         var bfsResults = engine.Execute(new(env.Root, bfsOptions)).ToList();
@@ -65,9 +69,11 @@ public sealed class BfsTraversalTests
         var engine = FileQueryRuntime.Create();
 
         var options = new FileQueryOptions(
-            patternInput: new(patterns: ["**", "!**/*.txt"]),
-            recurseSubdirectories: true,
-            traversal: new TraversalOptions(strategy: TraversalStrategy.BreadthFirst)
+            new FileQueryOptionsConfig(
+                PatternInput: new(Patterns: ["**", "!**/*.txt"]),
+                RecurseSubdirectories: true,
+                Traversal: new TraversalOptions(Strategy: TraversalStrategy.BreadthFirst)
+            )
         );
 
         var results = engine.Execute(new(env.Root, options)).ToList();
@@ -97,10 +103,12 @@ public sealed class BfsTraversalTests
         var engine = FileQueryRuntime.Create();
 
         var options = new FileQueryOptions(
-            patternInput: new(patterns: ["**", "!**/*.txt"]),
-            recurseSubdirectories: true,
-            maxRecursionDepth: 1,
-            traversal: new TraversalOptions(strategy: TraversalStrategy.BreadthFirst)
+            new FileQueryOptionsConfig(
+                PatternInput: new(Patterns: ["**", "!**/*.txt"]),
+                RecurseSubdirectories: true,
+                MaxRecursionDepth: 1,
+                Traversal: new TraversalOptions(Strategy: TraversalStrategy.BreadthFirst)
+            )
         );
 
         var results = engine.Execute(new(env.Root, options)).ToList();
@@ -125,9 +133,11 @@ public sealed class BfsTraversalTests
         var engine = FileQueryRuntime.Create();
 
         var options = new FileQueryOptions(
-            patternInput: new(patterns: ["**", "!**/*.txt"]),
-            recurseSubdirectories: true,
-            traversal: new TraversalOptions(strategy: TraversalStrategy.BreadthFirst)
+            new FileQueryOptionsConfig(
+                PatternInput: new(Patterns: ["**", "!**/*.txt"]),
+                RecurseSubdirectories: true,
+                Traversal: new TraversalOptions(Strategy: TraversalStrategy.BreadthFirst)
+            )
         );
 
         var syncResults = engine.Execute(new(env.Root, options)).Order().ToList();

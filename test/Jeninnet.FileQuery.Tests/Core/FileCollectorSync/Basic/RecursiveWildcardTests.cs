@@ -17,13 +17,15 @@ public class RecursiveWildcardTests
 
         var fileQueryEngine = FileQueryRuntime.Create();
         var options = new FileQueryOptions(
-            patternInput: new(
-                patterns: [
-                    "**",
-                    "!**/*.txt"
-                ]
-            ),
-            recurseSubdirectories: true
+            new FileQueryOptionsConfig(
+                PatternInput: new(
+                    Patterns: [
+                        "**",
+                        "!**/*.txt"
+                    ]
+                ),
+                RecurseSubdirectories: true
+            )
         );
 
         var result = fileQueryEngine.Execute(new(env.Root, options))
@@ -47,13 +49,15 @@ public class RecursiveWildcardTests
 
         var fileQueryEngine = FileQueryRuntime.Create();
         var options = new FileQueryOptions(
-            patternInput: new(
-                patterns: [
-                    "**",
-                    "!logs/**/*.txt"
-                ]
-            ),
-            recurseSubdirectories: true
+            new FileQueryOptionsConfig(
+                PatternInput: new(
+                    Patterns: [
+                        "**",
+                        "!logs/**/*.txt"
+                    ]
+                ),
+                RecurseSubdirectories: true
+            )
         );
 
         var result = fileQueryEngine.Execute(new(env.Root, options))
@@ -75,13 +79,15 @@ public class RecursiveWildcardTests
 
         var fileQueryEngine = FileQueryRuntime.Create();
         var options = new FileQueryOptions(
-            patternInput: new(
-                patterns: [
-                    "**",
-                    "!**/*.txt"
-                ]
-            ),
-            recurseSubdirectories: true
+            new FileQueryOptionsConfig(
+                PatternInput: new(
+                    Patterns: [
+                        "**",
+                        "!**/*.txt"
+                    ]
+                ),
+                RecurseSubdirectories: true
+            )
         );
 
         var result = fileQueryEngine.Execute(new(env.Root, options))
@@ -92,3 +98,4 @@ public class RecursiveWildcardTests
         TestAssertEx.DoesNotContain(result, x => x.EndsWith("b.log", StringComparison.Ordinal));
     }
 }
+

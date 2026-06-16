@@ -1,6 +1,32 @@
 ﻿namespace Jeninnet.FileQuery.Patterns.Compiled;
 
 /// <summary>
+/// Configuration for creating a <see cref="CompiledPattern"/>.
+/// </summary>
+/// <param name="IsNegated">Indicates if the pattern is negated.</param>
+/// <param name="DirectoryOnly">Indicates if the pattern applies only to directories.</param>
+/// <param name="AnchoredToRoot">Indicates if the pattern is anchored to the root.</param>
+/// <param name="Segments">The segments of the pattern.</param>
+/// <param name="PatternKind">The kind of the pattern.</param>
+/// <param name="Intent">The intent of the compiled match.</param>
+/// <param name="ConcretePathAnchor">The concrete path anchor.</param>
+/// <param name="SourceText">The source text.</param>
+/// <param name="SourceIndex">The source index.</param>
+/// <param name="RegexText">The raw regex string.</param>
+internal record CompiledPatternConfig(
+    bool IsNegated,
+    bool DirectoryOnly,
+    bool AnchoredToRoot,
+    IReadOnlyList<IReadOnlyList<IPatternToken>> Segments,
+    PatternKind PatternKind,
+    CompiledMatchIntent Intent,
+    string ConcretePathAnchor,
+    string SourceText = "",
+    int SourceIndex = -1,
+    string? RegexText = null
+);
+
+/// <summary>
 /// Represents a fully compiled, immutable pattern expression produced by a
 /// <see cref="PatternScanner"/> implementation (GitIgnore, Glob, etc.).
 /// </summary>
@@ -42,25 +68,27 @@ internal sealed record CompiledPattern : ICompiledPattern
     /// <inheritdoc/>
     public int SourceIndex { get; init; }
 
-    internal CompiledPattern(
-        bool isNegated,
-        bool directoryOnly,
-        bool anchoredToRoot,
-        IReadOnlyList<IReadOnlyList<IPatternToken>> segments,
-        PatternKind patternKind,
-        CompiledMatchIntent intent,
-        string sourceText = "",
-        int sourceIndex = -1
-    )
+    /// <inheritdoc/>
+    public string ConcretePathAnchor { get; init; }
+
+    /// <summary>
+    /// Gets the raw regex string if the pattern is a Regex kind.
+    /// </summary>
+    public string? RegexText { get; init; }
+
+    internal CompiledPattern(CompiledPatternConfig config)
     {
-        IsNegated = isNegated;
-        DirectoryOnly = directoryOnly;
-        AnchoredToRoot = anchoredToRoot;
-        Segments = segments ?? throw new ArgumentNullException(nameof(segments));
-        PatternKind = patternKind;
-        Intent = intent;
-        SourceText = sourceText;
-        SourceIndex = sourceIndex;
+        ArgumentNullException.ThrowIfNull(config);
+        IsNegated = config.IsNegated;
+        DirectoryOnly = config.DirectoryOnly;
+        AnchoredToRoot = config.AnchoredToRoot;
+        Segments = config.Segments ?? throw new ArgumentNullException(nameof(config));
+        PatternKind = config.PatternKind;
+        Intent = config.Intent;
+        ConcretePathAnchor = config.ConcretePathAnchor ?? throw new ArgumentNullException(nameof(config));
+        SourceText = config.SourceText;
+        SourceIndex = config.SourceIndex;
+        RegexText = config.RegexText;
     }
 
     /// <summary>

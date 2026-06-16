@@ -219,7 +219,7 @@ jobs:
           dotnet run
           --project benchmarks/Jeninnet.FileQuery.Benchmarks.csproj
           --configuration Release
-          -- --job Short --exporters json md
+          -- --job Short --exporters json markdown
 
       - name: Upload Results
         uses: actions/upload-artifact@v7.0.1

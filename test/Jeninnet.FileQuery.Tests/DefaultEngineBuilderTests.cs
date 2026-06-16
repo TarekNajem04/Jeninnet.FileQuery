@@ -15,10 +15,12 @@ public sealed class DefaultEngineBuilderTests
         // Direct API usage
         var fileQueryEngine = FileQueryRuntime.Create();
         var options = new FileQueryOptions(
-            patternInput: new(
-                patterns: [
-                    "!**"
-                ]
+            new FileQueryOptionsConfig(
+                PatternInput: new(
+                    Patterns: [
+                        "!**"
+                    ]
+                )
             )
         );
 
@@ -37,3 +39,4 @@ public sealed class DefaultEngineBuilderTests
         CollectionAssert.AreEqual(expected, actual);
     }
 }
+

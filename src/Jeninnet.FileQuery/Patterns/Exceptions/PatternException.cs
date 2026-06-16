@@ -18,6 +18,9 @@
 /// </summary>
 public class PatternException : Exception
 {
+    /// <summary>
+    /// Initializes a new instance of the <see cref="PatternException"/> class.
+    /// </summary>
     public PatternException() : base() { }
     /// <summary>
     /// Initializes a new instance of the <see cref="PatternException"/> class

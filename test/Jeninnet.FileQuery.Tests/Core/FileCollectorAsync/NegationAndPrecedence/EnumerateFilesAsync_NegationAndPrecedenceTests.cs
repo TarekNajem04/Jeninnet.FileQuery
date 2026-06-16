@@ -1,5 +1,4 @@
-﻿using System;
-namespace Jeninnet.FileQuery.Tests.Core.FileCollectorAsync.NegationAndPrecedence;
+﻿namespace Jeninnet.FileQuery.Tests.Core.FileCollectorAsync.NegationAndPrecedence;
 
 /// <summary>
 /// Async tests that validate hybrid GitIgnore-style precedence rules:
@@ -23,12 +22,14 @@ public class EnumerateFilesAsync_NegationAndPrecedenceTests
 
         var fileQueryEngine = FileQueryRuntime.Create();
         var options = new FileQueryOptions(
-            // Exclude all .txt, but explicitly re-include b.txt
-            patternInput: new(
-                patterns: [
-                    "**",       // exclude all files
-                    "!b.txt"    // re-include b.txt
-                ]
+            new FileQueryOptionsConfig(
+                // Exclude all .txt, but explicitly re-include b.txt
+                PatternInput: new(
+                    Patterns: [
+                        "**",       // exclude all files
+                        "!b.txt"    // re-include b.txt
+                    ]
+                )
             )
         );
 
@@ -51,12 +52,14 @@ public class EnumerateFilesAsync_NegationAndPrecedenceTests
         env.CreateFiles("file.tmp", "file.txt");
 
         var options = new FileQueryOptions(
-            // First rule excludes txt, second rule re-includes txt
-            patternInput: new(
-                patterns: [
-                    "**",       // exclude all files
-                    "!*.txt"    // re-include all .txt files
-                ]
+            new FileQueryOptionsConfig(
+                // First rule excludes txt, second rule re-includes txt
+                PatternInput: new(
+                    Patterns: [
+                        "**",       // exclude all files
+                        "!*.txt"    // re-include all .txt files
+                    ]
+                )
             )
         );
 
@@ -84,14 +87,16 @@ public class EnumerateFilesAsync_NegationAndPrecedenceTests
         );
 
         var options = new FileQueryOptions(
-            patternInput: new(
-                patterns: [
-                    "**",           // exclude all files
-                    "!**/*.txt",    // include all .txt
-                    "x/b.txt",      // override: exclude this specific file
-                    "!x/b.txt",     // re-include it again
-                    "y/*.txt",      // exclude all .txt in folder y
-                ]
+            new FileQueryOptionsConfig(
+                PatternInput: new(
+                    Patterns: [
+                        "**",           // exclude all files
+                        "!**/*.txt",    // include all .txt
+                        "x/b.txt",      // override: exclude this specific file
+                        "!x/b.txt",     // re-include it again
+                        "y/*.txt",      // exclude all .txt in folder y
+                    ]
+                )
             )
         );
 
@@ -107,3 +112,4 @@ public class EnumerateFilesAsync_NegationAndPrecedenceTests
 
     public TestContext TestContext { get; set; } = null!;
 }
+

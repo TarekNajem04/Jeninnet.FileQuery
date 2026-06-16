@@ -20,14 +20,16 @@ public class RecursionDepthTests
 
         var fileQueryEngine = FileQueryRuntime.Create();
         var options = new FileQueryOptions(
-            patternInput: new(
-                patterns: [
-                    "**",
-                    "!**/*.txt"
-                ]
-            ),
-            recurseSubdirectories: true,
-            maxRecursionDepth: 0
+            new FileQueryOptionsConfig(
+                PatternInput: new(
+                    Patterns: [
+                        "**",
+                        "!**/*.txt"
+                    ]
+                ),
+                RecurseSubdirectories: true,
+                MaxRecursionDepth: 0
+            )
         );
 
         var result = fileQueryEngine.Execute(new(env.Root, options)).ToList();
@@ -50,14 +52,16 @@ public class RecursionDepthTests
 
         var fileQueryEngine = FileQueryRuntime.Create();
         var options = new FileQueryOptions(
-            patternInput: new(
-                patterns: [
-                    "**",
-                    "!**/*.txt"
-                ]
-            ),
-            recurseSubdirectories: true,
-            maxRecursionDepth: 1
+            new FileQueryOptionsConfig(
+                PatternInput: new(
+                    Patterns: [
+                        "**",
+                        "!**/*.txt"
+                    ]
+                ),
+                RecurseSubdirectories: true,
+                MaxRecursionDepth: 1
+            )
         );
 
         var result = fileQueryEngine.Execute(new(env.Root, options)).Order().ToList();
@@ -82,14 +86,16 @@ public class RecursionDepthTests
 
         var fileQueryEngine = FileQueryRuntime.Create();
         var options = new FileQueryOptions(
-            patternInput: new(
-                patterns: [
-                    "**",
-                    "!**/*.txt"
-                ]
-            ),
-            recurseSubdirectories: true,
-            maxRecursionDepth: FileQueryOptions.UNLIMITED_RECURSION_DEPTH
+            new FileQueryOptionsConfig(
+                PatternInput: new(
+                    Patterns: [
+                        "**",
+                        "!**/*.txt"
+                    ]
+                ),
+                RecurseSubdirectories: true,
+                MaxRecursionDepth: FileQueryOptions.UNLIMITED_RECURSION_DEPTH
+            )
         );
 
         var result = fileQueryEngine.Execute(new(env.Root, options)).Order().ToList();
@@ -97,3 +103,4 @@ public class RecursionDepthTests
         TestAssertEx.HasCount(result, 3);
     }
 }
+

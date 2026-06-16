@@ -8,7 +8,7 @@ public class FileQueryCoreTests
     {
         // Arrange
         var rootPath = Path.GetTempPath();
-        var options = new FileQueryOptions(new PatternInput());
+        var options = new FileQueryOptions(new FileQueryOptionsConfig(new PatternInput()));
 
         // Act
         var query = FileQuery.CreateUnsafe(rootPath, options);
@@ -19,3 +19,4 @@ public class FileQueryCoreTests
         Assert.AreEqual(options, query.Options);
     }
 }
+

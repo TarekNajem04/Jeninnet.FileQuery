@@ -99,33 +99,24 @@ public sealed record PatternInput
     /// <summary>
     /// Initializes a new <see cref="PatternInput"/> with the specified pattern configuration.
     /// </summary>
-    /// <param name="patterns">
-    /// An optional sequence of untyped pattern strings. When <see langword="null"/>,
-    /// an empty list is used.
-    /// </param>
-    /// <param name="typedPatterns">
-    /// An optional dictionary of explicitly typed patterns. When <see langword="null"/>,
-    /// an empty dictionary is used.
-    /// </param>
-    /// <param name="interpretationMode">
-    /// The classification mode for untyped patterns.
-    /// Defaults to <see cref="PatternInterpretationMode.Hybrid"/>.
-    /// </param>
+    /// <param name="Patterns">An optional sequence of untyped pattern strings. When <see langword="null"/>, an empty list is used.</param>
+    /// <param name="TypedPatterns">An optional dictionary of explicitly typed patterns. When <see langword="null"/>, an empty dictionary is used.</param>
+    /// <param name="InterpretationMode">The classification mode for untyped patterns. Defaults to <see cref="PatternInterpretationMode.Hybrid"/>.</param>
     public PatternInput(
-        IEnumerable<string>? patterns = null,
-        IReadOnlyDictionary<PatternKind, IEnumerable<string>>? typedPatterns = null,
-        PatternInterpretationMode interpretationMode = PatternInterpretationMode.Hybrid
+        IEnumerable<string>? Patterns = null,
+        IReadOnlyDictionary<PatternKind, IEnumerable<string>>? TypedPatterns = null,
+        PatternInterpretationMode InterpretationMode = PatternInterpretationMode.Hybrid
     )
     {
-        Patterns = patterns is null
+        this.Patterns = Patterns is null
             ? _emptyPatterns
-            : patterns.Where(static p => p is not null).ToList().AsReadOnly();
+            : Patterns.Where(static p => p is not null).ToList().AsReadOnly();
 
-        TypedPatterns = typedPatterns is null || typedPatterns.Count == 0
+        this.TypedPatterns = TypedPatterns is null || TypedPatterns.Count == 0
             ? _emptyTypedPatterns
-            : BuildTypedPatterns(typedPatterns);
+            : BuildTypedPatterns(TypedPatterns);
 
-        InterpretationMode = interpretationMode;
+        this.InterpretationMode = InterpretationMode;
     }
 
     /// <summary>

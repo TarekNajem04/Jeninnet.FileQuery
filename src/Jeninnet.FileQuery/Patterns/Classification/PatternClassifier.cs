@@ -28,7 +28,7 @@ internal static partial class PatternClassifier
 
         if(mode == PatternInterpretationMode.Specific)
         {
-            throw new PatternException($"Pattern '{pattern.Text}' requires an explicit PatternKind.");
+            throw new PatternException($"Pattern '{pattern.Text}' requires an explicit PatternKind when interpretation mode is set to 'Specific'.");
         }
 
         return Classify(pattern.Text);

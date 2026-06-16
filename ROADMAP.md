@@ -22,6 +22,7 @@ To be the fastest, most predictable, and most flexible file discovery engine for
 - [x] **Match Diagnostics**: Introduce an optional audit mode to explain *why* a file was included or excluded (e.g., "Matched by Glob line 42 in .gitignore").
 - [x] **Deep Cancellation**: Ensure `CancellationToken` propagation is verified across all hot paths.
 - [x] **Enhanced Error Recovery**: Provide configurable strategies for handling IO errors (e.g., `Skip`, `Retry`, `Abort`).
+- [x] **Pattern Validation Framework**: Implement early detection and reporting for malformed patterns.
 
 ## Phase 3: The "Scalability" Release (v2.0)
 *Goal: Maximize hardware utilization for massive directory trees.*
@@ -29,6 +30,7 @@ To be the fastest, most predictable, and most flexible file discovery engine for
 - [ ] **Parallel Traversal**: Implement a multi-threaded, high-concurrency directory walker.
 - [ ] **Cost-Based Pattern Reordering**: Dynamically reorder patterns based on historical execution cost (e.g., move expensive Regex checks after cheap Globs).
 - [ ] **Matcher Caching 2.0**: Refine internal caching for frequently accessed pattern sets in high-frequency scenarios.
+- [ ] **Advanced Sample Library**: Continue expanding the library of complex matching scenarios (Regex, POSIX, etc.).
 
 ## Phase 4: The "Ecosystem" Release (v2.x+)
 *Goal: Broaden adoption through tooling and specialized integrations.*

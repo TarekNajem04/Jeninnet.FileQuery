@@ -1,0 +1,223 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Jeninnet.FileQuery.Benchmarks</name>
+    </assembly>
+    <members>
+        <member name="T:Jeninnet.FileQuery.Benchmarks.CharacterClassMatcherBenchmark">
+            <summary>
+            Measures <see cref="T:Jeninnet.FileQuery.Matching.Compiled.GitIgnoreInstructionMatcher"/> performance when
+            patterns contain character classes.
+            </summary>
+        </member>
+        <member name="M:Jeninnet.FileQuery.Benchmarks.CharacterClassMatcherBenchmark.Setup">
+            <summary>
+            Sets up the benchmark environment.
+            </summary>
+        </member>
+        <member name="M:Jeninnet.FileQuery.Benchmarks.CharacterClassMatcherBenchmark.Match_LiteralClass">
+            <summary>Baseline: literal set [abc5].</summary>
+        </member>
+        <member name="M:Jeninnet.FileQuery.Benchmarks.CharacterClassMatcherBenchmark.Match_RangeClass">
+            <summary>Range: [0-9] — most common real-world class.</summary>
+        </member>
+        <member name="M:Jeninnet.FileQuery.Benchmarks.CharacterClassMatcherBenchmark.Match_PosixClass">
+            <summary>POSIX: [[:digit:]] — new in v1.0; must not regress.</summary>
+        </member>
+        <member name="M:Jeninnet.FileQuery.Benchmarks.CharacterClassMatcherBenchmark.Match_NegatedClass">
+            <summary>Negated class [!abc] — requires extra negation branch.</summary>
+        </member>
+        <member name="T:Jeninnet.FileQuery.Benchmarks.FileQueryBenchmark">
+            <summary>
+            Measures the performance of the file query engine.
+            </summary>
+        </member>
+        <member name="M:Jeninnet.FileQuery.Benchmarks.FileQueryBenchmark.Setup">
+            <summary>
+            Sets up the benchmark environment.
+            </summary>
+        </member>
+        <member name="M:Jeninnet.FileQuery.Benchmarks.FileQueryBenchmark.Match">
+            <summary>
+            Measures the performance of the file query engine.
+            </summary>
+        </member>
+        <member name="T:Jeninnet.FileQuery.Benchmarks.GitIgnoreMatcherBenchmark">
+            <summary>
+            Measures the performance of the GitIgnore matcher.
+            </summary>
+        </member>
+        <member name="M:Jeninnet.FileQuery.Benchmarks.GitIgnoreMatcherBenchmark.Setup">
+            <summary>
+            Sets up the benchmark environment.
+            </summary>
+        </member>
+        <member name="M:Jeninnet.FileQuery.Benchmarks.GitIgnoreMatcherBenchmark.Match">
+            <summary>
+            Measures the performance of the Glob matcher.
+            </summary>
+            <returns>True if the path matches the patterns, false otherwise.</returns>
+        </member>
+        <member name="T:Jeninnet.FileQuery.Benchmarks.GlobMatcherBenchmark">
+            <summary>
+            Measures the performance of the Glob matcher.
+            </summary>
+        </member>
+        <member name="M:Jeninnet.FileQuery.Benchmarks.GlobMatcherBenchmark.Setup">
+            <summary>
+            Sets up the benchmark environment.
+            </summary>
+        </member>
+        <member name="M:Jeninnet.FileQuery.Benchmarks.GlobMatcherBenchmark.Match">
+            <summary>
+            Measures the performance of the Glob matcher.
+            </summary>
+            <returns>True if the path matches the patterns, false otherwise.</returns>
+        </member>
+        <member name="T:Jeninnet.FileQuery.Benchmarks.HybridMatcherBenchmark">
+            <summary>
+            Measures the performance of the hybrid matcher.
+            </summary>
+        </member>
+        <member name="M:Jeninnet.FileQuery.Benchmarks.HybridMatcherBenchmark.Setup">
+            <summary>
+            Sets up the benchmark environment.
+            </summary>
+        </member>
+        <member name="M:Jeninnet.FileQuery.Benchmarks.HybridMatcherBenchmark.Match">
+            <summary>
+            Measures the performance of the Glob matcher.
+            </summary>
+            <returns>True if the path matches the patterns, false otherwise.</returns>
+        </member>
+        <member name="T:Jeninnet.FileQuery.Benchmarks.PatternClassifierBenchmark">
+            <summary>
+            Measures the performance of the pattern classifier.
+            </summary>
+        </member>
+        <member name="M:Jeninnet.FileQuery.Benchmarks.PatternClassifierBenchmark.ClassifyPatterns">
+            <summary>
+            Sets up the benchmark environment.
+            </summary>
+        </member>
+        <member name="T:Jeninnet.FileQuery.Benchmarks.PatternCompilationColdStartBenchmark">
+            <summary>
+            Measures the cold-start compilation cost for a realistic mixed pattern set.
+            </summary>
+        </member>
+        <member name="M:Jeninnet.FileQuery.Benchmarks.PatternCompilationColdStartBenchmark.CompileHybrid">
+            <summary>
+            Hybrid compilation through PatternClassifier (auto-detect mode).
+            Exercises the full canonicalize → classify → compile pipeline.
+            </summary>
+        </member>
+        <member name="M:Jeninnet.FileQuery.Benchmarks.PatternCompilationColdStartBenchmark.CompileGitIgnoreKnownKind">
+            <summary>
+            Known-kind compilation: PatternKind is supplied directly.
+            After the bypass fix, this skips CanonicalPatternInput and the classifier
+            entirely — expected to allocate significantly less than CompileHybrid.
+            </summary>
+        </member>
+        <member name="M:Jeninnet.FileQuery.Benchmarks.PatternCompilationColdStartBenchmark.BuildViaFluentApi">
+            <summary>
+            Full FileQuery.From(...).Where(...).Build() path — the real public API cost.
+            </summary>
+        </member>
+        <member name="T:Jeninnet.FileQuery.Benchmarks.PatternPipelineAllocationBenchmark">
+            <summary>
+            Measures allocations in the compiled pattern set constructor
+            for single-kind vs mixed-kind pattern sets.
+            </summary>
+        </member>
+        <member name="M:Jeninnet.FileQuery.Benchmarks.PatternPipelineAllocationBenchmark.Compile_PureGitIgnore">
+            <summary>
+            Pure GitIgnore set — after lazy allocation fix, Glob and Regex
+            sub-lists must not be allocated (target: savings of ~2 List allocations).
+            </summary>
+        </member>
+        <member name="M:Jeninnet.FileQuery.Benchmarks.PatternPipelineAllocationBenchmark.Compile_MixedKinds">
+            <summary>
+            Mixed set—all three sub-lists are legitimately needed.
+            </summary>
+        </member>
+        <member name="T:Jeninnet.FileQuery.Benchmarks.PatternTokenizerBenchmark">
+            <summary>
+            Measures the performance of the pattern tokenizer.
+            </summary>
+        </member>
+        <member name="M:Jeninnet.FileQuery.Benchmarks.PatternTokenizerBenchmark.TokenizePatterns">
+            <summary>
+            Measures the performance of the pattern tokenizer.
+            </summary>
+        </member>
+        <member name="T:Jeninnet.FileQuery.Benchmarks.RegexMatcherBenchmark">
+            <summary>
+            Measures the performance of the Regex matcher.
+            </summary>
+        </member>
+        <member name="M:Jeninnet.FileQuery.Benchmarks.RegexMatcherBenchmark.Setup">
+            <summary>
+            Sets up the benchmark environment.
+            </summary>
+        </member>
+        <member name="M:Jeninnet.FileQuery.Benchmarks.RegexMatcherBenchmark.Match">
+            <summary>
+            Measures the performance of the Glob matcher.
+            </summary>
+            <returns>True if the path matches the patterns, false otherwise.</returns>
+        </member>
+        <member name="T:Jeninnet.FileQuery.Benchmarks.RegexMatcherCacheBenchmark">
+            <summary>
+            Measures the warm-cache vs cold-cache cost for regex pattern matching.
+            </summary>
+        </member>
+        <member name="M:Jeninnet.FileQuery.Benchmarks.RegexMatcherCacheBenchmark.Setup">
+            <summary>
+            Sets up the benchmark environment.
+            </summary>
+        </member>
+        <member name="M:Jeninnet.FileQuery.Benchmarks.RegexMatcherCacheBenchmark.Match_WarmCache_Sensitive">
+            <summary>
+            Cache hit — same pattern text + same case sensitivity as GlobalSetup.
+            Expected: ~85 ns, 0 B (Regex object already exists in cache).
+            </summary>
+        </member>
+        <member name="M:Jeninnet.FileQuery.Benchmarks.RegexMatcherCacheBenchmark.Match_WarmCache_Insensitive">
+            <summary>
+            First insensitive call after sensitive calls — cache miss for the
+            new (pattern, Insensitive) key. Expected: slightly higher than baseline.
+            </summary>
+        </member>
+        <member name="T:Jeninnet.FileQuery.Benchmarks.TraversalBenchmark">
+            <summary>
+            Measures the performance of file traversal and pattern matching.
+            </summary>
+        </member>
+        <member name="M:Jeninnet.FileQuery.Benchmarks.TraversalBenchmark.Setup">
+            <summary>
+            Sets up the benchmark environment.
+            </summary>
+        </member>
+        <member name="M:Jeninnet.FileQuery.Benchmarks.TraversalBenchmark.QueryFiles">
+            <summary>
+            Measures the performance of file traversal and pattern matching.
+            </summary>
+        </member>
+        <member name="T:Jeninnet.FileQuery.Benchmarks.TraversalStrategyBenchmark">
+            <summary>
+            Compares DFS and BFS traversal strategies under identical conditions.
+            </summary>
+        </member>
+        <member name="M:Jeninnet.FileQuery.Benchmarks.TraversalStrategyBenchmark.Setup">
+            <summary>
+            Sets up the benchmark environment.
+            </summary>
+        </member>
+        <member name="M:Jeninnet.FileQuery.Benchmarks.TraversalStrategyBenchmark.QueryFiles_DepthFirst">
+            <summary>Depth-first traversal — baseline (current default).</summary>
+        </member>
+        <member name="M:Jeninnet.FileQuery.Benchmarks.TraversalStrategyBenchmark.QueryFiles_BreadthFirst">
+            <summary>Breadth-first traversal — must not be dramatically slower.</summary>
+        </member>
+    </members>
+</doc>
