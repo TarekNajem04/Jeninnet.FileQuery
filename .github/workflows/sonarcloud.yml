@@ -48,6 +48,8 @@ jobs:
     runs-on: ubuntu-latest
     # This job will completely bypass the check if the PR is opened from an external account that does not have access to secrets.
     if: github.event_name == 'push' || github.event.pull_request.head.repo.full_name == github.repository
+    env:
+      SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
     steps:
       # ---------------------------------------------------------
@@ -71,7 +73,7 @@ jobs:
       # 3) Setup Java (required by SonarScanner)
       # ---------------------------------------------------------
       - name: Setup Java 17
-        uses: actions/setup-java@v5.2.0
+        uses: actions/setup-java@v5.3.0
         with:
           distribution: zulu
           java-version: "17"
@@ -112,8 +114,7 @@ jobs:
       # 8) Begin SonarCloud analysis
       # ---------------------------------------------------------
       - name: Begin SonarCloud analysis
-        env:
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        if: env.SONAR_TOKEN != ''
         run: |
           dotnet sonarscanner begin \
             /k:"jeninnet-file-query" \
@@ -125,8 +126,8 @@ jobs:
             /d:sonar.cs.opencover.reportsPaths="**/coverage.opencover.xml" \
             /d:sonar.scm.provider=git \
             /d:sonar.scm.forceReloadAll=true \
-            /d:sonar.exclusions="samples/**,src/**[Bb]enchmarks/**,test/**,**/bin/**,**/obj/**,**/TestResults/**" \
-            /d:sonar.test.exclusions="samples/**,src/**[Bb]enchmarks/**,test/**,**/bin/**,**/obj/**,**/TestResults/**"
+            /d:sonar.exclusions="samples/**,src/**[Bb]enchmarks/**,**/bin/**,**/obj/**,**/TestResults/**" \
+            /d:sonar.test.exclusions="test/**"
 
       # ---------------------------------------------------------
       # 9) Restore dependencies
@@ -158,8 +159,7 @@ jobs:
       # 12) End SonarCloud analysis
       # ---------------------------------------------------------
       - name: End SonarCloud analysis
-        env:
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        if: env.SONAR_TOKEN != ''
         run: |
           dotnet sonarscanner end \
             /d:sonar.token="$SONAR_TOKEN"
