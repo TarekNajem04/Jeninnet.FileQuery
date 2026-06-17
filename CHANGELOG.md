@@ -20,6 +20,7 @@ Versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - **Compiler Registry**: Refactored `IPatternCompilerRegistry` to return `PatternResult` and updated `PatternPipeline` to handle results gracefully.
 - **Infrastructure**: Fixed benchmark exporter configuration, updated `launchSettings.json`, and moved benchmarks to `src/`.
 - **Documentation & Cleanup**: Improved exception messages, updated project configurations, and removed deprecated `SECURITY.md`.
+- **Breaking Change**: `FileQueryOptions` constructor updated. [See Migration Guide](Migration.md).
 
 ### Fixed
 - Fixed benchmark exporter "md" to "markdown" and corrected launchSettings.json syntax.
