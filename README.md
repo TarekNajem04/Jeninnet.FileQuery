@@ -19,6 +19,11 @@
 
 ---
 
+## Upgrading
+If you are upgrading from v1.0.0 or v1.1.0 to v1.2.0, please see the [Migration Guide](Migration.md) for important breaking changes regarding `FileQueryOptions`.
+
+---
+
 `Jeninnet.FileQuery` is a modern, high-performance file query system designed for .NET 10 and C# 14. It combines multiple pattern dialectsâ€”**GitIgnore**, **Glob**, and **Regular Expressions**â€”into a unified, deterministic, and allocation-free matching pipeline. Decoupled from `System.IO`, the engine allows precise, scalable file discovery across massive directory structures on Windows, Linux, and macOS.
 
 The Phase 2 observability surface adds async progress snapshots, optional match audit diagnostics, deep cancellation verification, and configurable IO recovery strategies without changing default query behavior.

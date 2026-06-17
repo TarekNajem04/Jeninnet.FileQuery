@@ -76,6 +76,7 @@
         <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
         <!-- Set the minimum NuGet client version required to install this package -->
         <MinClientVersion>6.0.0</MinClientVersion>
+        <PackageReleaseNotes>See the Migration Guide: https://github.com/TarekNajem04/Jeninnet.FileQuery/blob/main/Migration.md</PackageReleaseNotes>
     </PropertyGroup>
 
     <ItemGroup>
