@@ -7,27 +7,39 @@ on:
       - reopened
       - synchronize
 
+  workflow_dispatch:
+    inputs:
+      pr_number:
+        description: "Pull Request number to auto-approve & merge"
+        required: true
+        type: number
+
 permissions:
   contents: write
   pull-requests: write
 
 jobs:
   auto-approve:
-    if: github.actor == 'dependabot[bot]'
-
     runs-on: ubuntu-latest
 
     steps:
+      - name: Determine PR URL
+        id: pr
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "url=https://github.com/${{ github.repository }}/pull/${{ inputs.pr_number }}" >> $GITHUB_OUTPUT
+          else
+            echo "url=${{ github.event.pull_request.html_url }}" >> $GITHUB_OUTPUT
+          fi
+
       - name: Approve Pull Request
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          PR_URL: ${{ github.event.pull_request.html_url }}
         run: |
-          gh pr review "$PR_URL" --approve
+          gh pr review "${{ steps.pr.outputs.url }}" --approve
 
-      - name: Enable Auto Merge
+      - name: Enable Auto Merge (Squash)
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          PR_URL: ${{ github.event.pull_request.html_url }}
         run: |
-          gh pr merge "$PR_URL" --auto --merge
+          gh pr merge "${{ steps.pr.outputs.url }}" --auto --squash
