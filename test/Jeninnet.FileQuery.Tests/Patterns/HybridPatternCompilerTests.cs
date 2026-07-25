@@ -1,8 +1,4 @@
-using Jeninnet.FileQuery.Patterns.Compilation;
-using Jeninnet.FileQuery.Patterns.Classification;
-using Jeninnet.FileQuery.Patterns;
-
-namespace Jeninnet.FileQuery.Tests.Patterns;
+﻿namespace Jeninnet.FileQuery.Tests.Patterns;
 
 [TestClass]
 public sealed class HybridPatternCompilerTests {
@@ -19,9 +15,9 @@ public sealed class HybridPatternCompilerTests {
     public void Select_Glob_ReturnsGlobCompiler() {
         var compiler = new HybridPatternCompiler(_git, _glob, _regex);
         var pattern = new ClassifiedPattern("test", PatternKind.Glob);
-        
+
         var selected = compiler.Select(pattern);
-        
+
         Assert.AreEqual(PatternKind.Glob, selected.PatternKind);
     }
 
@@ -29,9 +25,9 @@ public sealed class HybridPatternCompilerTests {
     public void Select_Regex_ReturnsRegexCompiler() {
         var compiler = new HybridPatternCompiler(_git, _glob, _regex);
         var pattern = new ClassifiedPattern("test", PatternKind.Regex);
-        
+
         var selected = compiler.Select(pattern);
-        
+
         Assert.AreEqual(PatternKind.Regex, selected.PatternKind);
     }
 
@@ -39,9 +35,9 @@ public sealed class HybridPatternCompilerTests {
     public void Select_GitIgnore_ReturnsGitCompiler() {
         var compiler = new HybridPatternCompiler(_git, _glob, _regex);
         var pattern = new ClassifiedPattern("test", PatternKind.GitIgnore);
-        
+
         var selected = compiler.Select(pattern);
-        
+
         Assert.AreEqual(PatternKind.GitIgnore, selected.PatternKind);
     }
 
@@ -49,9 +45,9 @@ public sealed class HybridPatternCompilerTests {
     public void Select_Unknown_ReturnsGitCompilerAsDefault() {
         var compiler = new HybridPatternCompiler(_git, _glob, _regex);
         var pattern = new ClassifiedPattern("test", (PatternKind)99);
-        
+
         var selected = compiler.Select(pattern);
-        
+
         Assert.AreEqual(PatternKind.GitIgnore, selected.PatternKind);
     }
 }

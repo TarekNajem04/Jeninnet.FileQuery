@@ -14,9 +14,9 @@ public static class CaseSensitivityExtensions {
     /// </returns>
     public static CaseSensitivity Resolve(this CaseSensitivity caseSensitivity)
         => caseSensitivity switch {
-        CaseSensitivity.PlatformDefault => DetectOsCaseSensitivity(),
-        _ => caseSensitivity
-    };
+            CaseSensitivity.PlatformDefault => DetectOsCaseSensitivity(),
+            _ => caseSensitivity
+        };
 
     /// <summary>
     /// Converts the case-sensitivity mode into a <see cref="StringComparison"/>

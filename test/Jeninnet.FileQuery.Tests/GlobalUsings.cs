@@ -16,6 +16,7 @@ global using Jeninnet.FileQuery.Internal;
 global using Jeninnet.FileQuery.IO;
 global using Jeninnet.FileQuery.Matching;
 global using Jeninnet.FileQuery.Matching.Compiled;
+global using Jeninnet.FileQuery.Patterns;
 global using Jeninnet.FileQuery.Patterns.Analysis;
 global using Jeninnet.FileQuery.Patterns.Canonical;
 global using Jeninnet.FileQuery.Patterns.Classification;

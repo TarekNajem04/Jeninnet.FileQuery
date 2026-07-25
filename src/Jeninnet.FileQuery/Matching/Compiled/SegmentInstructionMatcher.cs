@@ -185,12 +185,12 @@ internal static class SegmentInstructionMatcher {
     /// <param name="c">The character to test.</param>
     private static bool MatchesElement(ICharacterClassElement element, char c) =>
         element switch {
-        CharLiteral literal => literal.Value == c,
-        CharRange range => c >= range.Start && c <= range.End,
-        PosixClass posix => MatchesPosixClass(posix.Name, c),
-        CharacterClassParseError _ => false, // sentinel; never matches at runtime
-        _ => false
-    };
+            CharLiteral literal => literal.Value == c,
+            CharRange range => c >= range.Start && c <= range.End,
+            PosixClass posix => MatchesPosixClass(posix.Name, c),
+            CharacterClassParseError _ => false, // sentinel; never matches at runtime
+            _ => false
+        };
 
     /// <summary>
     /// Evaluates whether <paramref name="c"/> belongs to the POSIX named class
@@ -203,20 +203,20 @@ internal static class SegmentInstructionMatcher {
     /// </remarks>
     private static bool MatchesPosixClass(string name, char c) =>
         name switch {
-        "digit" => char.IsDigit(c),
-        "alpha" => char.IsLetter(c),
-        "alnum" => char.IsLetterOrDigit(c),
-        "space" => char.IsWhiteSpace(c),
-        "blank" => c is ' ' or '\t',
-        "upper" => char.IsUpper(c),
-        "lower" => char.IsLower(c),
-        "print" => !char.IsControl(c),
-        "graph" => !char.IsControl(c) && c != ' ',
-        "punct" => char.IsPunctuation(c) || char.IsSymbol(c),
-        "cntrl" => char.IsControl(c),
-        "xdigit" => Uri.IsHexDigit(c),
-        _ => false
-    };
+            "digit" => char.IsDigit(c),
+            "alpha" => char.IsLetter(c),
+            "alnum" => char.IsLetterOrDigit(c),
+            "space" => char.IsWhiteSpace(c),
+            "blank" => c is ' ' or '\t',
+            "upper" => char.IsUpper(c),
+            "lower" => char.IsLower(c),
+            "print" => !char.IsControl(c),
+            "graph" => !char.IsControl(c) && c != ' ',
+            "punct" => char.IsPunctuation(c) || char.IsSymbol(c),
+            "cntrl" => char.IsControl(c),
+            "xdigit" => Uri.IsHexDigit(c),
+            _ => false
+        };
 
     /// <summary>
     /// Handles the single wildcard <c>*</c> using canonical backtracking.

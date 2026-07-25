@@ -1,21 +1,16 @@
-using Jeninnet.FileQuery.Patterns.Canonical;
-using Jeninnet.FileQuery.Patterns;
-
-namespace Jeninnet.FileQuery.Tests.Patterns;
+﻿namespace Jeninnet.FileQuery.Tests.Patterns;
 
 [TestClass]
 public sealed class PatternCanonicalizerTests {
     [TestMethod]
-    public void Canonicalize_NullInput_ThrowsArgumentNullException() {
-        TestAssertEx.Throws<ArgumentNullException>(() => PatternCanonicalizer.Canonicalize(null!));
-    }
+    public void Canonicalize_NullInput_ThrowsArgumentNullException() => TestAssertEx.Throws<ArgumentNullException>(() => PatternCanonicalizer.Canonicalize(null!));
 
     [TestMethod]
     public void Canonicalize_EmptyInput_ReturnsEmptySet() {
         var input = new CanonicalPatternInput();
         var result = PatternCanonicalizer.Canonicalize(input);
-        
-        Assert.AreEqual(0, result.Patterns.Count);
+
+        Assert.IsEmpty(result.Patterns);
     }
 
     [TestMethod]
@@ -25,8 +20,8 @@ public sealed class PatternCanonicalizerTests {
         };
         var input = new CanonicalPatternInput(typedPatterns: typed);
         var result = PatternCanonicalizer.Canonicalize(input);
-        
-        Assert.AreEqual(1, result.Patterns.Count);
+
+        Assert.HasCount(1, result.Patterns);
         Assert.AreEqual("*.txt", result.Patterns[0].Text);
         Assert.AreEqual(PatternKind.Glob, result.Patterns[0].ExplicitType);
     }
@@ -35,8 +30,8 @@ public sealed class PatternCanonicalizerTests {
     public void Canonicalize_RawPatternsOnly_ReturnsRawPatternsWithTypeNull() {
         var input = new CanonicalPatternInput(patterns: ["*.cs"]);
         var result = PatternCanonicalizer.Canonicalize(input);
-        
-        Assert.AreEqual(1, result.Patterns.Count);
+
+        Assert.HasCount(1, result.Patterns);
         Assert.AreEqual("*.cs", result.Patterns[0].Text);
         Assert.IsNull(result.Patterns[0].ExplicitType);
     }
@@ -48,16 +43,16 @@ public sealed class PatternCanonicalizerTests {
         };
         var input = new CanonicalPatternInput(typedPatterns: typed);
         var result = PatternCanonicalizer.Canonicalize(input);
-        
-        Assert.AreEqual(1, result.Patterns.Count);
+
+        Assert.HasCount(1, result.Patterns);
     }
 
     [TestMethod]
     public void Canonicalize_DuplicateRawPatterns_Deduplicates() {
         var input = new CanonicalPatternInput(patterns: ["*.cs", "*.cs"]);
         var result = PatternCanonicalizer.Canonicalize(input);
-        
-        Assert.AreEqual(1, result.Patterns.Count);
+
+        Assert.HasCount(1, result.Patterns);
     }
 
     [TestMethod]
@@ -67,8 +62,8 @@ public sealed class PatternCanonicalizerTests {
         };
         var input = new CanonicalPatternInput(patterns: ["test"], typedPatterns: typed);
         var result = PatternCanonicalizer.Canonicalize(input);
-        
-        Assert.AreEqual(2, result.Patterns.Count);
+
+        Assert.HasCount(2, result.Patterns);
     }
 
     [TestMethod]
@@ -79,7 +74,7 @@ public sealed class PatternCanonicalizerTests {
         };
         var input = new CanonicalPatternInput(typedPatterns: typed);
         var result = PatternCanonicalizer.Canonicalize(input);
-        
-        Assert.AreEqual(2, result.Patterns.Count);
+
+        Assert.HasCount(2, result.Patterns);
     }
 }

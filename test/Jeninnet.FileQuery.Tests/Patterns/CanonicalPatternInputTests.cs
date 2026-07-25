@@ -1,17 +1,13 @@
-using Jeninnet.FileQuery.Patterns.Canonical;
-using Jeninnet.FileQuery.Patterns;
-using System.Collections.Immutable;
-
-namespace Jeninnet.FileQuery.Tests.Patterns;
+﻿namespace Jeninnet.FileQuery.Tests.Patterns;
 
 [TestClass]
 public sealed class CanonicalPatternInputTests {
     [TestMethod]
     public void Constructor_Default_SetsEmptyPatternsAndInterpretationMode() {
         var input = new CanonicalPatternInput();
-        
-        Assert.AreEqual(0, input.Patterns.Length);
-        Assert.AreEqual(0, input.TypedPatterns.Count);
+
+        Assert.IsEmpty(input.Patterns);
+        Assert.IsEmpty(input.TypedPatterns);
         Assert.AreEqual(PatternInterpretationMode.Hybrid, input.InterpretationMode);
     }
 
@@ -19,8 +15,8 @@ public sealed class CanonicalPatternInputTests {
     public void Constructor_WithPatterns_SetsPatterns() {
         string[] patterns = ["a", "b"];
         var input = new CanonicalPatternInput(patterns: patterns);
-        
-        Assert.AreEqual(2, input.Patterns.Length);
+
+        Assert.HasCount(2, input.Patterns);
         Assert.AreEqual("a", input.Patterns[0]);
         Assert.AreEqual("b", input.Patterns[1]);
     }
@@ -31,8 +27,8 @@ public sealed class CanonicalPatternInputTests {
             { PatternKind.Glob, ["*.txt"] }
         };
         var input = new CanonicalPatternInput(typedPatterns: typed);
-        
-        Assert.AreEqual(1, input.TypedPatterns.Count);
+
+        Assert.HasCount(1, input.TypedPatterns);
         Assert.IsTrue(input.TypedPatterns.ContainsKey(PatternKind.Glob));
         Assert.AreEqual("*.txt", input.TypedPatterns[PatternKind.Glob][0]);
     }
@@ -43,9 +39,9 @@ public sealed class CanonicalPatternInputTests {
             { PatternKind.Glob, null! }
         };
         var input = new CanonicalPatternInput(typedPatterns: typed);
-        
-        Assert.AreEqual(1, input.TypedPatterns.Count);
-        Assert.AreEqual(0, input.TypedPatterns[PatternKind.Glob].Length);
+
+        Assert.HasCount(1, input.TypedPatterns);
+        Assert.IsEmpty(input.TypedPatterns[PatternKind.Glob]);
     }
 
     [TestMethod]
@@ -55,8 +51,8 @@ public sealed class CanonicalPatternInputTests {
             { PatternKind.Regex, ["b"] }
         };
         var input = new CanonicalPatternInput(typedPatterns: typed);
-        
-        Assert.AreEqual(2, input.TypedPatterns.Count);
+
+        Assert.HasCount(2, input.TypedPatterns);
         Assert.AreEqual("a", input.TypedPatterns[PatternKind.Glob][0]);
         Assert.AreEqual("b", input.TypedPatterns[PatternKind.Regex][0]);
     }
@@ -64,14 +60,14 @@ public sealed class CanonicalPatternInputTests {
     [TestMethod]
     public void Constructor_WithExplicitMode_SetsMode() {
         var input = new CanonicalPatternInput(interpretationMode: PatternInterpretationMode.Specific);
-        
+
         Assert.AreEqual(PatternInterpretationMode.Specific, input.InterpretationMode);
     }
 
     [TestMethod]
     public void Constructor_WithEmptyTypedPatterns_SetsEmpty() {
         var input = new CanonicalPatternInput(typedPatterns: new Dictionary<PatternKind, IEnumerable<string>>());
-        
-        Assert.AreEqual(0, input.TypedPatterns.Count);
+
+        Assert.IsEmpty(input.TypedPatterns);
     }
 }

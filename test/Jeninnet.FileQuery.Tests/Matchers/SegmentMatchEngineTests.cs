@@ -1,14 +1,9 @@
-using Jeninnet.FileQuery.Matching;
-using Jeninnet.FileQuery.Matching.Compiled;
-
-namespace Jeninnet.FileQuery.Tests.Matchers;
+﻿namespace Jeninnet.FileQuery.Tests.Matchers;
 
 [TestClass]
-public class SegmentMatchEngineTests
-{
+public class SegmentMatchEngineTests {
     [TestMethod]
-    public void PathMatchContext_GetStringComparison_ReturnsCorrectComparison()
-    {
+    public void PathMatchContext_GetStringComparison_ReturnsCorrectComparison() {
         var contextSensitive = new PathMatchContext("test", PathKind.File, CaseSensitivity.Sensitive);
         Assert.AreEqual(StringComparison.Ordinal, contextSensitive.GetStringComparison());
 

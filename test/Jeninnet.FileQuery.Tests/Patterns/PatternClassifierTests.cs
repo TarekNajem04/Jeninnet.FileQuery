@@ -21,7 +21,7 @@ public sealed class PatternClassifierTests {
         // Glob (Windows Path)
         Assert.AreEqual(PatternKind.Glob, PatternClassifier.Classify(@"C:\foo"));
         Assert.AreEqual(PatternKind.Unknown, PatternClassifier.Classify(@"C:\"));
-        
+
         // Glob (Windows Path - negative)
         Assert.AreNotEqual(PatternKind.Glob, PatternClassifier.Classify(@"!C:\foo"));
 

@@ -1,6 +1,4 @@
-using Jeninnet.FileQuery.Patterns;
-
-namespace Jeninnet.FileQuery.Tests.Patterns;
+﻿namespace Jeninnet.FileQuery.Tests.Patterns;
 
 [TestClass]
 public sealed class PatternTypeComparerTests {

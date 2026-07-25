@@ -1,7 +1,4 @@
-using Jeninnet.FileQuery.Patterns.Tokenization;
-using Jeninnet.FileQuery.Patterns.Syntax;
-
-namespace Jeninnet.FileQuery.Tests.Patterns.Tokenization;
+﻿namespace Jeninnet.FileQuery.Tests.Patterns.Tokenization;
 
 [TestClass]
 public sealed class LiteralReaderTests {
@@ -10,21 +7,21 @@ public sealed class LiteralReaderTests {
     [TestMethod]
     public void TryRead_Empty_ReturnsFalse() {
         var pattern = "".AsSpan();
-        int i = 0;
+        var i = 0;
         Assert.IsFalse(_reader.TryRead(pattern, ref i, out _));
     }
 
     [TestMethod]
     public void TryRead_StartsWildcard_ReturnsFalse() {
         var pattern = "*abc".AsSpan();
-        int i = 0;
+        var i = 0;
         Assert.IsFalse(_reader.TryRead(pattern, ref i, out _));
     }
 
     [TestMethod]
     public void TryRead_Literal_ReturnsTrueAndToken() {
         var pattern = "abc".AsSpan();
-        int i = 0;
+        var i = 0;
         Assert.IsTrue(_reader.TryRead(pattern, ref i, out var token));
         Assert.AreEqual(3, i);
         Assert.IsInstanceOfType<LiteralToken>(token);
@@ -34,7 +31,7 @@ public sealed class LiteralReaderTests {
     [TestMethod]
     public void TryRead_LiteralWithWildcard_StopsAtWildcard() {
         var pattern = "abc*def".AsSpan();
-        int i = 0;
+        var i = 0;
         Assert.IsTrue(_reader.TryRead(pattern, ref i, out var token));
         Assert.AreEqual(3, i);
         Assert.IsInstanceOfType<LiteralToken>(token);

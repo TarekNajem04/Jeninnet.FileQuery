@@ -1,9 +1,4 @@
-using Jeninnet.FileQuery.Matching;
-using Jeninnet.FileQuery.Patterns;
-using Jeninnet.FileQuery.Patterns.Syntax;
-using System.Collections.Immutable;
-
-namespace Jeninnet.FileQuery.Tests.Patterns.Invariants;
+﻿namespace Jeninnet.FileQuery.Tests.Patterns.Invariants;
 
 internal sealed class FakeCompiledPattern : ICompiledPattern {
     public bool IsNegated => false;
