@@ -1,14 +1,12 @@
 ﻿namespace Jeninnet.FileQuery.Tests.Core.FileCollectorSync.Basic;
 
 [TestClass]
-public class RecursiveWildcardTests
-{
+public class RecursiveWildcardTests {
     /// <summary>
     /// Ensures ** recurses into subdirectories.
     /// </summary>
     [TestMethod]
-    public void DoubleStar_ShouldMatchFilesInAllSubfolders()
-    {
+    public void DoubleStar_ShouldMatchFilesInAllSubfolders() {
         using var env = new TestEnvironment();
 
         env.CreateFile("file1.txt");
@@ -39,8 +37,7 @@ public class RecursiveWildcardTests
     /// Ensures ** combined with prefix works.
     /// </summary>
     [TestMethod]
-    public void DoubleStar_WithPrefix()
-    {
+    public void DoubleStar_WithPrefix() {
         using var env = new TestEnvironment();
 
         env.CreateFile("logs/a.txt");
@@ -71,8 +68,7 @@ public class RecursiveWildcardTests
     /// Ensures ** behaves like * in a simple, single-segment directory.
     /// </summary>
     [TestMethod]
-    public void DoubleStar_AppliesLikeStar_WhenNoSubfolders()
-    {
+    public void DoubleStar_AppliesLikeStar_WhenNoSubfolders() {
         using var env = new TestEnvironment();
 
         env.CreateFiles("a.txt", "b.log", "c.txt");

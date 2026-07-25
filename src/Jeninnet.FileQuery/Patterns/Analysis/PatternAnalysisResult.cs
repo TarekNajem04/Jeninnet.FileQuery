@@ -28,8 +28,7 @@ internal readonly record struct PatternAnalysisResult(
     bool HasEscapedCharacters,
     bool HasGitIgnoreSyntax,
     int SegmentCount
-)
-{
+) {
     public static PatternAnalysisResult Empty() => new(
         IsEmpty: false,
         IsRegex: false,

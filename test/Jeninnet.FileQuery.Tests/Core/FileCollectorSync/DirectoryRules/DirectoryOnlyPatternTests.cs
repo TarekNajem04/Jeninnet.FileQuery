@@ -7,8 +7,7 @@
 /// - "*" and "**" interaction
 /// </summary>
 [TestClass]
-public class DirectoryOnlyPatternTests
-{
+public class DirectoryOnlyPatternTests {
     /// <summary>
     /// Directory-only pattern "sub/" should match the directory,
     /// but FileQueryEngine never *returns* directories — only filters by them.
@@ -16,8 +15,7 @@ public class DirectoryOnlyPatternTests
     /// but no files should be returned unless deeper rules allow it.
     /// </summary>
     [TestMethod]
-    public void DirectoryOnly_Inclusion_ShouldNotReturnFilesUnlessAllowed()
-    {
+    public void DirectoryOnly_Inclusion_ShouldNotReturnFilesUnlessAllowed() {
         using var env = new TestEnvironment();
 
         env.CreateFile("sub/a.txt");
@@ -44,8 +42,7 @@ public class DirectoryOnlyPatternTests
     /// Directory-only pattern combined with deeper file rule.
     /// </summary>
     [TestMethod]
-    public void DirectoryThenWildcard_ShouldReturnFilesInsideMatchedDirectory()
-    {
+    public void DirectoryThenWildcard_ShouldReturnFilesInsideMatchedDirectory() {
         using var env = new TestEnvironment();
 
         env.CreateFile("sub/inside.txt");
@@ -75,8 +72,7 @@ public class DirectoryOnlyPatternTests
     /// Negated directory rule re-enables access.
     /// </summary>
     [TestMethod]
-    public void NegatedDirectoryRule_ShouldRestoreFilesInsideFolder()
-    {
+    public void NegatedDirectoryRule_ShouldRestoreFilesInsideFolder() {
         using var env = new TestEnvironment();
 
         env.CreateFile("sub/a.txt");
@@ -100,8 +96,7 @@ public class DirectoryOnlyPatternTests
     }
 
     [TestMethod]
-    public void DirectoryOnly_Inclusion_ShouldNotReturnFilesInsideFolder()
-    {
+    public void DirectoryOnly_Inclusion_ShouldNotReturnFilesInsideFolder() {
         using var env = new TestEnvironment();
 
         /*
@@ -135,8 +130,7 @@ public class DirectoryOnlyPatternTests
     }
 
     [TestMethod]
-    public void DirectoryOnly_Inclusion_ShouldReturnFilesInsideSubdirectories()
-    {
+    public void DirectoryOnly_Inclusion_ShouldReturnFilesInsideSubdirectories() {
         using var env = new TestEnvironment();
 
         /*
@@ -176,8 +170,7 @@ public class DirectoryOnlyPatternTests
     }
 
     [TestMethod]
-    public void DirectoryOnly_LastRuleWins_HierarchyAndSpecificNegation0()
-    {
+    public void DirectoryOnly_LastRuleWins_HierarchyAndSpecificNegation0() {
         using var env = new TestEnvironment();
 
         /*

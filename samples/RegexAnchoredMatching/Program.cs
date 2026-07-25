@@ -6,7 +6,6 @@ var query = FileQueryBuilder.From(".")
                             .Where(PatternKind.Regex, ["r:^src/.*\\.cs$"])
                             .Execute();
 
-foreach(var file in query)
-{
+foreach(var file in query) {
     Console.WriteLine(file);
 }

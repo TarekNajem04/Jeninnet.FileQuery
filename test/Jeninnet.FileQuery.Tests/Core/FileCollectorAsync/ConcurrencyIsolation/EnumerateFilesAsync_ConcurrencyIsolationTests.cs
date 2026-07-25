@@ -5,15 +5,13 @@
 /// when executed concurrently.
 /// </summary>
 [TestClass]
-public class EnumerateFilesAsync_ConcurrencyIsolationTests
-{
+public class EnumerateFilesAsync_ConcurrencyIsolationTests {
     /// <summary>
     /// Multiple asynchronous enumerations running in parallel
     /// must NOT share internal state.
     /// </summary>
     [TestMethod]
-    public async Task EnumerateFilesAsync_MultiInstanceParallel_ShouldNotInterfereAsync()
-    {
+    public async Task EnumerateFilesAsync_MultiInstanceParallel_ShouldNotInterfereAsync() {
         using var env = new TestEnvironment();
 
         env.CreateFiles("x1.txt", "x2.txt");
@@ -36,11 +34,9 @@ public class EnumerateFilesAsync_ConcurrencyIsolationTests
         // Will capture results from 3 parallel runs
         var bag = new ConcurrentBag<List<string>>();
 
-        async Task RunOneAsync()
-        {
+        async Task RunOneAsync() {
             var items = new List<string>();
-            await foreach(var path in fileQueryEngine.ExecuteAsync(new(env.Root, options), TestContext.CancellationToken))
-            {
+            await foreach(var path in fileQueryEngine.ExecuteAsync(new(env.Root, options), TestContext.CancellationToken)) {
                 items.Add(path);
             }
 
@@ -55,8 +51,7 @@ public class EnumerateFilesAsync_ConcurrencyIsolationTests
         await Task.WhenAll(tasks);
 
         // All three result sets must contain the *same 4 files*
-        foreach(var result in bag)
-        {
+        foreach(var result in bag) {
             TestAssertEx.HasCount(result, 4);
             Assert.Contains(x => x.EndsWith("x1.txt", StringComparison.Ordinal), result);
             Assert.Contains(x => x.EndsWith("x2.txt", StringComparison.Ordinal), result);
@@ -68,8 +63,7 @@ public class EnumerateFilesAsync_ConcurrencyIsolationTests
     /// Ensures no async state is leaked between instances with different patterns.
     /// </summary>
     [TestMethod]
-    public async Task EnumerateFilesAsync_DifferentPatterns_ShouldRemainIsolatedAsync()
-    {
+    public async Task EnumerateFilesAsync_DifferentPatterns_ShouldRemainIsolatedAsync() {
         using var env = new TestEnvironment();
 
         env.CreateFiles("a.txt", "b.log", "c.md");

@@ -5,28 +5,24 @@
 /// Each test is named after the bug it guards against.
 /// </summary>
 [TestClass]
-public sealed class RegressionTests
-{
+public sealed class RegressionTests {
     /// <summary>
     /// When two separate <c>Where(Dictionary)</c> calls are chained and the second
     /// call contains a key already present from the first call, all patterns from
     /// the second call must still be merged — not just the first key.
     /// </summary>
     [TestMethod]
-    public void Where_Dictionary_MustMergeAllKeys_WhenSomeAlreadyExist()
-    {
+    public void Where_Dictionary_MustMergeAllKeys_WhenSomeAlreadyExist() {
         // Arrange: first call establishes GitIgnore and Glob buckets.
         var builder = FileQuery.From(Directory.GetCurrentDirectory())
-                               .Where(new Dictionary<PatternKind, List<string>>
-                               {
+                               .Where(new Dictionary<PatternKind, List<string>> {
                                    [PatternKind.GitIgnore] = ["**"],
                                    [PatternKind.Glob] = ["*.cs"]
                                });
 
         // Act: second call provides an additional GitIgnore pattern (key already exists)
         // AND a new Regex pattern (key is new).
-        builder.Where(new Dictionary<PatternKind, List<string>>
-        {
+        builder.Where(new Dictionary<PatternKind, List<string>> {
             [PatternKind.GitIgnore] = ["!*.log"],   // merge into existing bucket
             [PatternKind.Regex] = ["r:^data.*"] // add new bucket
         });
@@ -39,32 +35,40 @@ public sealed class RegressionTests
         // GitIgnore bucket must contain both patterns.
         Assert.IsTrue(
             typedPatterns.ContainsKey(PatternKind.GitIgnore),
-            "GitIgnore bucket must exist.");
+            "GitIgnore bucket must exist."
+        );
 
-        CollectionAssert.AreEquivalent(
+        Assert.AreSequenceEqual(
             new List<string>() { "**", "!*.log" },
-            typedPatterns[PatternKind.GitIgnore].ToArray(),
-            "GitIgnore bucket must contain patterns from both Where() calls.");
+            typedPatterns[PatternKind.GitIgnore].ToArray(), SequenceOrder.InAnyOrder,
+            "GitIgnore bucket must contain patterns from both Where() calls."
+        );
 
         // Glob bucket from the first call must still be present.
         Assert.IsTrue(
             typedPatterns.ContainsKey(PatternKind.Glob),
-            "Glob bucket must not be lost when a later Where() call merges a different key.");
+            "Glob bucket must not be lost when a later Where() call merges a different key."
+        );
 
-        CollectionAssert.AreEquivalent(
+        Assert.AreSequenceEqual(
             new List<string>() { "*.cs" },
             typedPatterns[PatternKind.Glob].ToArray(),
-            "Glob bucket must be unchanged.");
+            SequenceOrder.InAnyOrder,
+            "Glob bucket must be unchanged."
+        );
 
         // Regex bucket added by the second call must be present.
         Assert.IsTrue(
             typedPatterns.ContainsKey(PatternKind.Regex),
-            "Regex bucket added in the second Where() call must not be silently dropped.");
+            "Regex bucket added in the second Where() call must not be silently dropped."
+        );
 
-        CollectionAssert.AreEquivalent(
+        Assert.AreSequenceEqual(
             new List<string>() { "r:^data.*" },
             typedPatterns[PatternKind.Regex].ToArray(),
-            "Regex bucket must contain the pattern from the second Where() call.");
+            SequenceOrder.InAnyOrder,
+            "Regex bucket must contain the pattern from the second Where() call."
+        );
     }
 
     /// <summary>
@@ -72,14 +76,12 @@ public sealed class RegressionTests
     /// all of them even when none exists yet.
     /// </summary>
     [TestMethod]
-    public void Where_Dictionary_MustAddAllKeys_InSingleCall()
-    {
+    public void Where_Dictionary_MustAddAllKeys_InSingleCall() {
         // Arrange
         var builder = FileQuery.From(Directory.GetCurrentDirectory());
 
         // Act: single call with three distinct keys.
-        builder.Where(new Dictionary<PatternKind, List<string>>
-        {
+        builder.Where(new Dictionary<PatternKind, List<string>> {
             [PatternKind.GitIgnore] = ["**", "!*.cs"],
             [PatternKind.Glob] = ["src/**/*.ts"],
             [PatternKind.Regex] = ["r:^temp_.*\\.txt$"]
@@ -91,17 +93,11 @@ public sealed class RegressionTests
         // Assert: all three keys must be present.
         Assert.HasCount(3, typedPatterns,
             "All three pattern-kind buckets must be created from a single Where() call.");
-        CollectionAssert.AreEquivalent(
-            new List<string>() { "**", "!*.cs" },
-            typedPatterns[PatternKind.GitIgnore].ToArray());
+        Assert.AreSequenceEqual(new List<string>() { "**", "!*.cs" }, typedPatterns[PatternKind.GitIgnore].ToArray(), SequenceOrder.InAnyOrder);
 
-        CollectionAssert.AreEquivalent(
-            new List<string>() { "src/**/*.ts" },
-            typedPatterns[PatternKind.Glob].ToArray());
+        Assert.AreSequenceEqual(new List<string>() { "src/**/*.ts" }, typedPatterns[PatternKind.Glob].ToArray(), SequenceOrder.InAnyOrder);
 
-        CollectionAssert.AreEquivalent(
-            new List<string>() { "r:^temp_.*\\.txt$" },
-            typedPatterns[PatternKind.Regex].ToArray());
+        Assert.AreSequenceEqual(new List<string>() { "r:^temp_.*\\.txt$" }, typedPatterns[PatternKind.Regex].ToArray(), SequenceOrder.InAnyOrder);
     }
 
     /// <summary>
@@ -109,18 +105,15 @@ public sealed class RegressionTests
     /// when the same pattern is provided again through a second <c>Where</c> call.
     /// </summary>
     [TestMethod]
-    public void Where_Dictionary_MustNotDuplicate_ExistingPatterns()
-    {
+    public void Where_Dictionary_MustNotDuplicate_ExistingPatterns() {
         // Arrange
         var builder = FileQuery.From(Directory.GetCurrentDirectory())
-                               .Where(new Dictionary<PatternKind, List<string>>
-                               {
+                               .Where(new Dictionary<PatternKind, List<string>> {
                                    [PatternKind.GitIgnore] = ["**", "!*.log"]
                                });
 
         // Act: same patterns provided again.
-        builder.Where(new Dictionary<PatternKind, List<string>>
-        {
+        builder.Where(new Dictionary<PatternKind, List<string>> {
             [PatternKind.GitIgnore] = ["**", "!*.log", "!*.tmp"] // two duplicates + one new
         });
 
@@ -133,13 +126,12 @@ public sealed class RegressionTests
     }
 
     private static RegexInstructionMatcher CreateRegexMatcher() => new();
-    private static ICompiledPatternSet CompileRegex(string pattern)
-        => CompiledPatternFactory.Compile(PatternKind.Regex, pattern);
+
+    private static ICompiledPatternSet CompileRegex(string pattern) => CompiledPatternFactory.Compile(PatternKind.Regex, pattern);
 
     private static PathMatchContext FileContext(
         string path,
-        CaseSensitivity cs = CaseSensitivity.Sensitive)
-        => new(path, PathKind.File, cs);
+        CaseSensitivity cs = CaseSensitivity.Sensitive) => new(path, PathKind.File, cs);
 
     /// <summary>
     /// The same regex pattern compiled with <see cref="CaseSensitivity.Sensitive"/>
@@ -147,21 +139,26 @@ public sealed class RegressionTests
     /// return the cached case-sensitive regex for the case-insensitive call.
     /// </summary>
     [TestMethod]
-    public void RegexMatcher_CaseSensitiveAndInsensitive_MustNotShareCachedRegex()
-    {
+    public void RegexMatcher_CaseSensitiveAndInsensitive_MustNotShareCachedRegex() {
         const string pattern = "r:^README\\.md$";
         var matcher = CreateRegexMatcher();
         var patterns = CompileRegex(pattern);
 
         // First call: sensitive — "readme.md" must NOT match "^README\.md$" (case-sensitive).
         var sensitiveResult = matcher.Match(patterns, FileContext("readme.md", CaseSensitivity.Sensitive));
-        Assert.AreEqual(MatchOutcome.NoMatch, sensitiveResult,
-            "Case-sensitive match of 'readme.md' against '^README\\.md$' must not match.");
+        Assert.AreEqual(
+            MatchOutcome.NoMatch,
+            sensitiveResult,
+            "Case-sensitive match of 'readme.md' against '^README\\.md$' must not match."
+        );
 
         // Second call: insensitive — "readme.md" MUST match "^README\.md$" (case-insensitive).
         var insensitiveResult = matcher.Match(patterns, FileContext("readme.md", CaseSensitivity.Insensitive));
-        Assert.AreEqual(MatchOutcome.Include, insensitiveResult,
-            "Case-insensitive match of 'readme.md' against '^README\\.md$' must match.");
+        Assert.AreEqual(
+            MatchOutcome.Include,
+            insensitiveResult,
+            "Case-insensitive match of 'readme.md' against '^README\\.md$' must match."
+        );
     }
 
     /// <summary>
@@ -170,8 +167,7 @@ public sealed class RegressionTests
     /// due to a stale cache entry from the first.
     /// </summary>
     [TestMethod]
-    public void RegexMatcher_TwoIndependentCompiledSets_MustBothMatch()
-    {
+    public void RegexMatcher_TwoIndependentCompiledSets_MustBothMatch() {
         const string pattern = "r:^src/.*\\.cs$";
         var matcher = CreateRegexMatcher();
 
@@ -200,25 +196,29 @@ public sealed class RegressionTests
     /// uses the correct <see cref="Regex"/> from the cache for each call.
     /// </summary>
     [TestMethod]
-    public void RegexMatcher_AlternatingCaseSensitivity_UsesCorrectRegexEachTime()
-    {
+    public void RegexMatcher_AlternatingCaseSensitivity_UsesCorrectRegexEachTime() {
         const string pattern = "r:^DATA_.*\\.log$";
         var matcher = CreateRegexMatcher();
         var patterns = CompileRegex(pattern);
 
         // Insensitive: lowercase subject must match.
-        Assert.AreEqual(MatchOutcome.Include,
+        Assert.AreEqual(
+            MatchOutcome.Include,
             matcher.Match(patterns, FileContext("data_archive.log", CaseSensitivity.Insensitive)),
-            "Insensitive: 'data_archive.log' must match '^DATA_.*\\.log$'.");
+            "Insensitive: 'data_archive.log' must match '^DATA_.*\\.log$'."
+        );
 
         // Sensitive: lowercase subject must NOT match uppercase pattern.
-        Assert.AreEqual(MatchOutcome.NoMatch,
+        Assert.AreEqual(
+            MatchOutcome.NoMatch,
             matcher.Match(patterns, FileContext("data_archive.log", CaseSensitivity.Sensitive)),
             "Sensitive: 'data_archive.log' must NOT match '^DATA_.*\\.log$'.");
 
         // Insensitive again: still must match (correct cache entry reused).
-        Assert.AreEqual(MatchOutcome.Include,
+        Assert.AreEqual(
+            MatchOutcome.Include,
             matcher.Match(patterns, FileContext("data_archive.log", CaseSensitivity.Insensitive)),
-            "Insensitive (second call): must still match using the correct cached Regex.");
+            "Insensitive (second call): must still match using the correct cached Regex."
+        );
     }
 }

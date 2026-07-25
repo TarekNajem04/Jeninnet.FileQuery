@@ -7,8 +7,7 @@
 /// This is a value object, not a flag set.
 /// Invalid combinations are unrepresentable.
 /// </remarks>
-public sealed record PatternSyntaxProfile
-{
+public sealed record PatternSyntaxProfile {
     /// <summary>
     /// Gets a value indicating whether the dialect supports recursive wildcards (e.g. <c>**</c>).
     /// </summary>
@@ -57,8 +56,7 @@ public sealed record PatternSyntaxProfile
     /// <summary>
     /// Gets the syntax profile for GitIgnore patterns.
     /// </summary>
-    public static PatternSyntaxProfile GitIgnore { get; } = new()
-    {
+    public static PatternSyntaxProfile GitIgnore { get; } = new() {
         SupportsRecursiveWildcard = true,
         ImplicitRecursiveWildcard = true,
         SupportsCharacterClasses = true,
@@ -73,8 +71,7 @@ public sealed record PatternSyntaxProfile
     /// <summary>
     /// Gets the syntax profile for Glob patterns.
     /// </summary>
-    public static PatternSyntaxProfile Glob { get; } = new()
-    {
+    public static PatternSyntaxProfile Glob { get; } = new() {
         SupportsRecursiveWildcard = true,
         ImplicitRecursiveWildcard = false,
         SupportsCharacterClasses = true,
@@ -89,8 +86,7 @@ public sealed record PatternSyntaxProfile
     /// <summary>
     /// Gets the syntax profile for Regex patterns.
     /// </summary>
-    public static PatternSyntaxProfile Regex { get; } = new()
-    {
+    public static PatternSyntaxProfile Regex { get; } = new() {
         SupportsRecursiveWildcard = false,
         ImplicitRecursiveWildcard = false,
         SupportsCharacterClasses = false,
@@ -105,8 +101,7 @@ public sealed record PatternSyntaxProfile
     /// <summary>
     /// Gets the default syntax profile.
     /// </summary>
-    public static PatternSyntaxProfile Default { get; } = new()
-    {
+    public static PatternSyntaxProfile Default { get; } = new() {
         SupportsRecursiveWildcard = true,
         ImplicitRecursiveWildcard = true,
         SupportsCharacterClasses = true,
@@ -124,8 +119,7 @@ public sealed record PatternSyntaxProfile
     /// <param name="type">The pattern type kind.</param>
     /// <returns>A syntax profile representing the dialect's capabilities.</returns>
     public static PatternSyntaxProfile GetProfileForPatternType(PatternKind type) =>
-        type switch
-        {
+        type switch {
             PatternKind.GitIgnore => GitIgnore,
             PatternKind.Glob => Glob,
             PatternKind.Regex => Regex,

@@ -17,8 +17,7 @@
 /// unused kind (e.g., compiling two GitIgnore patterns no longer allocates Glob and Regex lists).
 /// </para>
 /// </remarks>
-internal sealed record CompiledPatternSet : ICompiledPatternSet
-{
+internal sealed record CompiledPatternSet : ICompiledPatternSet {
     private static readonly Lazy<CompiledPatternSet> _emptyInstance =
         new(static () => new CompiledPatternSet(patterns: []));
 
@@ -63,14 +62,12 @@ internal sealed record CompiledPatternSet : ICompiledPatternSet
     /// </summary>
     /// <param name="patterns">The ordered compiled patterns.</param>
     /// <param name="createSubSets">Indicates whether to partition patterns into sub-sets.</param>
-    private CompiledPatternSet(IReadOnlyList<ICompiledPattern> patterns, bool createSubSets)
-    {
+    private CompiledPatternSet(IReadOnlyList<ICompiledPattern> patterns, bool createSubSets) {
         ArgumentNullException.ThrowIfNull(patterns);
 
         Patterns = patterns;
 
-        if(!createSubSets)
-        {
+        if(!createSubSets) {
             return;
         }
 
@@ -83,12 +80,10 @@ internal sealed record CompiledPatternSet : ICompiledPatternSet
         List<ICompiledPattern>? glob = null;
         List<ICompiledPattern>? regex = null;
 
-        for(var i = 0; i < patterns.Count; i++)
-        {
+        for(var i = 0; i < patterns.Count; i++) {
             var pattern = patterns[i];
 
-            switch(pattern.PatternKind)
-            {
+            switch(pattern.PatternKind) {
                 case PatternKind.GitIgnore:
                     (git ??= []).Add(pattern);
                     break;
@@ -103,18 +98,15 @@ internal sealed record CompiledPatternSet : ICompiledPatternSet
             }
         }
 
-        if(git is not null)
-        {
+        if(git is not null) {
             GitIgnoreSubSet = new CompiledPatternSet(git.AsReadOnly(), createSubSets: false);
         }
 
-        if(glob is not null)
-        {
+        if(glob is not null) {
             GlobSubSet = new CompiledPatternSet(glob.AsReadOnly(), createSubSets: false);
         }
 
-        if(regex is not null)
-        {
+        if(regex is not null) {
             RegexSubSet = new CompiledPatternSet(regex.AsReadOnly(), createSubSets: false);
         }
     }
@@ -128,37 +120,29 @@ internal sealed record CompiledPatternSet : ICompiledPatternSet
     /// <inheritdoc/>
     public IEnumerator<ICompiledPattern> GetEnumerator() => Patterns.GetEnumerator();
 
-    IEnumerator IEnumerable.GetEnumerator() =>
-        GetEnumerator();
+    IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
     /// <inheritdoc/>
-    public IEnumerable<(PatternKind PatternKind, ICompiledPatternSet Patterns)> GroupByType() =>
-        Patterns.GroupBy(static p => p.PatternKind)
+    public IEnumerable<(PatternKind PatternKind, ICompiledPatternSet Patterns)> GroupByType() => Patterns.GroupBy(static p => p.PatternKind)
                 .Select(static g =>
                     (g.Key, (ICompiledPatternSet)new CompiledPatternSet(g.ToList().AsReadOnly())));
 
     /// <inheritdoc/>
-    public IEnumerable<ICompiledPattern> FindNegated() =>
-        Patterns.Where(static p => p.IsNegated);
+    public IEnumerable<ICompiledPattern> FindNegated() => Patterns.Where(static p => p.IsNegated);
 
     /// <inheritdoc/>
-    public IEnumerable<ICompiledPattern> FindPositive() =>
-        Patterns.Where(static p => !p.IsNegated);
+    public IEnumerable<ICompiledPattern> FindPositive() => Patterns.Where(static p => !p.IsNegated);
 
     /// <inheritdoc/>
-    public IEnumerable<ICompiledPattern> OfType(PatternKind type)
-    {
-        if(type is PatternKind.Unknown)
-        {
+    public IEnumerable<ICompiledPattern> OfType(PatternKind type) {
+        if(type is PatternKind.Unknown) {
             return [];
         }
 
         var buffer = new List<ICompiledPattern>(Patterns.Count);
 
-        foreach(var p in Patterns)
-        {
-            if(p.PatternKind == type)
-            {
+        foreach(var p in Patterns) {
+            if(p.PatternKind == type) {
                 buffer.Add(p);
             }
         }
@@ -167,35 +151,27 @@ internal sealed record CompiledPatternSet : ICompiledPatternSet
     }
 
     /// <inheritdoc/>
-    public IEnumerable<ICompiledPattern> DirectoryOnly() =>
-        Patterns.Where(static p => p.DirectoryOnly);
+    public IEnumerable<ICompiledPattern> DirectoryOnly() => Patterns.Where(static p => p.DirectoryOnly);
 
     /// <inheritdoc/>
-    public IEnumerable<ICompiledPattern> AnchoredToRoot() =>
-        Patterns.Where(static p => p.AnchoredToRoot);
+    public IEnumerable<ICompiledPattern> AnchoredToRoot() => Patterns.Where(static p => p.AnchoredToRoot);
 
     /// <inheritdoc/>
-    public bool Equals(CompiledPatternSet? other)
-    {
-        if(other is null)
-        {
+    public bool Equals(CompiledPatternSet? other) {
+        if(other is null) {
             return false;
         }
 
-        if(ReferenceEquals(this, other))
-        {
+        if(ReferenceEquals(this, other)) {
             return true;
         }
 
-        if(Count != other.Count)
-        {
+        if(Count != other.Count) {
             return false;
         }
 
-        for(var i = 0; i < Count; i++)
-        {
-            if(!Equals(this[i], other[i]))
-            {
+        for(var i = 0; i < Count; i++) {
+            if(!Equals(this[i], other[i])) {
                 return false;
             }
         }
@@ -204,14 +180,11 @@ internal sealed record CompiledPatternSet : ICompiledPatternSet
     }
 
     /// <inheritdoc/>
-    public override int GetHashCode()
-    {
-        unchecked
-        {
+    public override int GetHashCode() {
+        unchecked {
             var hash = 17;
 
-            foreach(var p in Patterns)
-            {
+            foreach(var p in Patterns) {
                 hash = (hash * 31) + (p?.GetHashCode() ?? 0);
             }
 

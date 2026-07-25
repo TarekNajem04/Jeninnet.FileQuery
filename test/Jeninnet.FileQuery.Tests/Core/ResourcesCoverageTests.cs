@@ -1,11 +1,9 @@
 ﻿namespace Jeninnet.FileQuery.Tests.Core;
 
 [TestClass]
-public class ResourcesCoverageTests
-{
+public class ResourcesCoverageTests {
     [TestMethod]
-    public void Strings_Properties_Accessed()
-    {
+    public void Strings_Properties_Accessed() {
         // Access static properties to get coverage on the auto-generated class.
         var rm = Strings.ResourceManager;
         Assert.IsNotNull(rm);
@@ -17,11 +15,10 @@ public class ResourcesCoverageTests
     }
 
     [TestMethod]
-    public void Strings_Constructor_Covered()
-    {
+    public void Strings_Constructor_Covered() {
         // Use reflection to call the internal constructor.
         var ctor = typeof(Strings).GetConstructor(
-            System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic,
+            BindingFlags.Instance | BindingFlags.NonPublic,
             null,
             Type.EmptyTypes,
             null);

@@ -3,8 +3,7 @@
 /// <summary>
 /// Represents the result of a single pattern match evaluation.
 /// </summary>
-internal enum MatchOutcome : byte
-{
+internal enum MatchOutcome : byte {
     /// <summary>
     /// No rule matched this path.
     /// Default GitIgnore state: included.

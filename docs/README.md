@@ -6,6 +6,8 @@ Welcome to the **Jeninnet.FileQuery** documentation suite. This directory contai
 
 ## Getting Started
 
+*   **[System Specification](./system-specification.md)**: Master architectural constraints and invariant contracts.
+
 *   **[Installation](./getting-started/installation.md)**: Nuget instructions and package dependencies.
 *   **[Quick Start Guide](./getting-started/quick-start.md)**: First steps with the fluent builder API.
 *   **[Basic Patterns](./getting-started/basic-patterns.md)**: Core matching rules.
@@ -28,6 +30,8 @@ Welcome to the **Jeninnet.FileQuery** documentation suite. This directory contai
 
 *   **[Engine Architecture](./architecture/engine-architecture.md)**: Subsystem layering and orchestration.
 *   **[Hybrid Matcher](./architecture/hybrid-matcher.md)**: Pattern composition and routing details.
+*   **[Matching Layer](./architecture/matching-layer.md)**: Matcher contracts and execution modes.
+*   **[Pattern Modes](./architecture/pattern-modes.md)**: Interpretation mode behaviors.
 *   **[Pattern Tokenization](./architecture/pattern-tokenization.md)**: Scanner, readers, and token streams.
 *   **[Pattern Classification](./architecture/pattern-classification.md)**: Automatically sorting input strings.
 *   **[Matcher Invariants](./architecture/matcher-invariants.md)**: Validating tokens without throwing exceptions.
@@ -59,7 +63,7 @@ Welcome to the **Jeninnet.FileQuery** documentation suite. This directory contai
 
 ## Integrations & Extensions
 
-*   **[CommandLine Integration](./guides/cli-usage.md)**: Using CLI argument structures.
+*   **[CommandLine Integration](./guides/command-line-integration.md)**: Using CLI argument structures.
 *   **[Dependency Injection Guide](./guides/dependency-injection.md)**: Managing registry configurations.
 
 ---
@@ -69,4 +73,6 @@ Welcome to the **Jeninnet.FileQuery** documentation suite. This directory contai
 *   **[Contributing Guide](./contributing/contributing-guide.md)**: Submitting changes.
 *   **[Project Structure Guide](./contributing/project-structure.md)**: Solution layouts.
 *   **[Testing Guidelines](./contributing/testing.md)**: Ensuring zero-allocation matching checks pass.
+*   **[Testing and Release Plan](./contributing/testing-and-release-plan.md)**: Core QA procedures.
+*   **[Release Checklist](./contributing/release-checklist.md)**: Pre-flight verifications.
 *   **[Refactor Tracking](./architecture-refactor-tracking.md)**: Current roadmap changes.

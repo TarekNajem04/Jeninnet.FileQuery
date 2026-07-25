@@ -1,15 +1,12 @@
 ﻿namespace Jeninnet.FileQuery.Traversal;
 
-internal sealed class TraversalDecisionProvider : ITraversalDecisionProvider
-{
+internal sealed class TraversalDecisionProvider : ITraversalDecisionProvider {
     private readonly TraversalConfiguration _traversalConfiguration;
 
     internal TraversalDecisionProvider(TraversalConfiguration traversalConfiguration) => _traversalConfiguration = traversalConfiguration;
 
-    public TraversalDecision Decide(MatchOutcome outcome, PathKind kind, int depth)
-    {
-        if(kind is PathKind.Directory)
-        {
+    public TraversalDecision Decide(MatchOutcome outcome, PathKind kind, int depth) {
+        if(kind is PathKind.Directory) {
             // Determines whether a directory should be traversed based on match result and recursion constraints.
             var shouldTraverse =
                 // traverse if recursion is enabled

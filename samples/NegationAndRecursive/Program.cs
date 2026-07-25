@@ -7,7 +7,6 @@ var query = FileQueryBuilder.From(".")
                             .Where(PatternKind.GitIgnore, ["!**/bin/debug/**"])
                             .Execute();
 
-foreach(var file in query)
-{
+foreach(var file in query) {
     Console.WriteLine(file);
 }

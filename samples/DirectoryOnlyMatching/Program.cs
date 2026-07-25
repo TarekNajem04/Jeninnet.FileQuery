@@ -5,7 +5,6 @@ var query = FileQueryBuilder.From(".")
                             .Where("**/logs/")
                             .Execute();
 
-foreach(var file in query)
-{
+foreach(var file in query) {
     Console.WriteLine(file);
 }

@@ -3,8 +3,7 @@
 /// <summary>
 /// Builds a traversal plan from a <see cref="FileQuery"/> descriptor.
 /// </summary>
-internal interface ITraversalPlanBuilder
-{
+internal interface ITraversalPlanBuilder {
     /// <summary>
     /// Builds a traversal plan that defines how directory walking should occur.
     /// </summary>

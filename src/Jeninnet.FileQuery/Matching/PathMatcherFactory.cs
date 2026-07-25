@@ -16,8 +16,7 @@
 /// construction elsewhere in the codebase.
 /// </para>
 /// </remarks>
-internal static class PathMatcherFactory
-{
+internal static class PathMatcherFactory {
     /// <summary>
     /// A shared <see cref="HybridPathMatcher"/> instance, reused across queries
     /// since matchers carry no per-query mutable state.
@@ -28,8 +27,7 @@ internal static class PathMatcherFactory
     /// A shared registry of single-dialect matchers, keyed by
     /// <see cref="PatternMatchingMode"/>.
     /// </summary>
-    private static readonly Dictionary<PatternMatchingMode, IPathMatcher> _matchers = new()
-    {
+    private static readonly Dictionary<PatternMatchingMode, IPathMatcher> _matchers = new() {
         [PatternMatchingMode.GitIgnore] = new GitIgnoreInstructionMatcher(),
         [PatternMatchingMode.Glob] = new GlobInstructionMatcher(),
         [PatternMatchingMode.Regex] = new RegexInstructionMatcher()
@@ -68,8 +66,7 @@ internal static class PathMatcherFactory
     /// <exception cref="ArgumentNullException">
     /// Thrown when <paramref name="options"/> is <see langword="null"/>.
     /// </exception>
-    public static IPathMatcher Create(FileQueryOptions options)
-    {
+    public static IPathMatcher Create(FileQueryOptions options) {
         ArgumentNullException.ThrowIfNull(options);
 
         // When no patterns are configured, use the null-object matcher.
@@ -78,8 +75,7 @@ internal static class PathMatcherFactory
         if(
             options.PatternInput.Patterns.Count == 0 &&
             options.PatternInput.TypedPatterns.Count == 0
-        )
-        {
+        ) {
             return NullMatcher.Instance;
         }
 

@@ -1,4 +1,4 @@
-﻿# AdvancedUsage Sample Project
+# AdvancedUsage Sample Project
 
 **Reference implementation showing Dependency Injection, generic hosting, and CommandLine integrations.**
 
@@ -6,7 +6,7 @@ This project demonstrates how to integrate `Jeninnet.FileQuery` in a real-world 
 
 ---
 
-## 🏗️ Project Architecture
+## Project Architecture
 
 The sample is split into three main components:
 

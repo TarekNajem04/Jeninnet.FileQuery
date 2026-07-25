@@ -7,8 +7,7 @@
 /// This interface represents the sole entry point into the traversal subsystem.
 /// The engine must not depend on traversal internals.
 /// </remarks>
-internal interface ITraversalExecutor
-{
+internal interface ITraversalExecutor {
     /// <summary>Executes directory traversal according to a prepared plan (synchronous).</summary>
     /// <param name="plan">The prepared traversal plan to execute.</param>
     IEnumerable<string> Execute(TraversalPlan plan);

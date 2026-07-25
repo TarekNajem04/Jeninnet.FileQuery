@@ -3,8 +3,7 @@
 /// <summary>
 /// Defines the interface for a printer.
 /// </summary>
-public interface IPrinter
-{
+public interface IPrinter {
     /// <summary>
     /// Prints the specified path.
     /// </summary>

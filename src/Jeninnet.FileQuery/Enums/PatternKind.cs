@@ -7,8 +7,7 @@
 /// This describes the <em>dialect</em> of an individual pattern, not the overall matching mode.
 /// A <see cref="PatternMatchingMode"/> determines how patterns are interpreted during evaluation.
 /// </remarks>
-public enum PatternKind
-{
+public enum PatternKind {
     /// <summary>
     /// GitIgnore‑style pattern syntax (anchoring, directory‑only, <c>**</c>).
     /// </summary>

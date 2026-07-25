@@ -1,14 +1,12 @@
 ﻿namespace Jeninnet.FileQuery.Tests.Core.FileCollectorSync.Basic;
 
 [TestClass]
-public class NegationAndOrderTests
-{
+public class NegationAndOrderTests {
     /// <summary>
     /// Basic !pattern exclusion behavior.
     /// </summary>
     [TestMethod]
-    public void Negation_ShouldExcludeSpecifiedFiles()
-    {
+    public void Negation_ShouldExcludeSpecifiedFiles() {
         using var env = new TestEnvironment();
         env.CreateFiles("a.txt", "b.txt", "c.log");
 
@@ -37,8 +35,7 @@ public class NegationAndOrderTests
     /// Ensures last matching rule wins.
     /// </summary>
     [TestMethod]
-    public void LastRuleWins_ShouldOverrideEarlierRules()
-    {
+    public void LastRuleWins_ShouldOverrideEarlierRules() {
         using var env = new TestEnvironment();
         env.CreateFiles("data.log", "data.tmp");
 
@@ -66,8 +63,7 @@ public class NegationAndOrderTests
     /// Directory-only negation cases.
     /// </summary>
     [TestMethod]
-    public void NegateDirectoryOnlyRules()
-    {
+    public void NegateDirectoryOnlyRules() {
         using var env = new TestEnvironment();
 
         env.CreateFile("sub/file.txt");

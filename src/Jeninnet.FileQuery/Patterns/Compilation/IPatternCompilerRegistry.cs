@@ -3,8 +3,7 @@
 /// <summary>
 /// Maps a <see cref="PatternKind"/> to its corresponding compiler.
 /// </summary>
-internal interface IPatternCompilerRegistry
-{
+internal interface IPatternCompilerRegistry {
     /// <summary>
     /// Retrieves the registered pattern compiler for the specified pattern kind.
     /// </summary>

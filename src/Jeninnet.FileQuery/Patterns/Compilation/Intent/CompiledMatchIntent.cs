@@ -3,8 +3,7 @@
 /// <summary>
 /// Represents the match intent of a compiled pattern (either to include or exclude).
 /// </summary>
-internal readonly struct CompiledMatchIntent
-{
+internal readonly struct CompiledMatchIntent {
     private CompiledMatchIntent(MatchOutcome outcome) => Outcome = outcome;
 
     /// <summary>
@@ -29,6 +28,5 @@ internal readonly struct CompiledMatchIntent
     /// </summary>
     /// <param name="isNegated">True if the pattern is negated; otherwise, false.</param>
     /// <returns>A <see cref="CompiledMatchIntent"/> instance.</returns>
-    public static CompiledMatchIntent FromNegation(bool isNegated)
-        => isNegated ? Exclude : Include;
+    public static CompiledMatchIntent FromNegation(bool isNegated) => isNegated ? Exclude : Include;
 }

@@ -19,8 +19,7 @@
 ///   <item><description>Drive-letter prefixes are uppercased on Windows.</description></item>
 /// </list>
 /// </remarks>
-internal static class PathUtilities
-{
+internal static class PathUtilities {
     /// <summary>
     /// Normalizes a filesystem path into a canonical forward-slash form.
     /// </summary>
@@ -42,16 +41,14 @@ internal static class PathUtilities
     /// <exception cref="ArgumentException">
     /// Thrown when <paramref name="path"/> is <see langword="null"/> or empty.
     /// </exception>
-    public static string Normalize(string? path, bool trimTrailingSlash)
-    {
+    public static string Normalize(string? path, bool trimTrailingSlash) {
         ArgumentException.ThrowIfNullOrEmpty(path);
 
         // ALWAYS normalize to forward slashes.
         var normalized = path.Replace('\\', '/');
 
         // Normalize drive letters (Windows only).
-        if(OperatingSystem.IsWindows() && normalized.Length >= 2 && normalized[1] == ':')
-        {
+        if(OperatingSystem.IsWindows() && normalized.Length >= 2 && normalized[1] == ':') {
             normalized = char.ToUpperInvariant(normalized[0]) + normalized[1..];
         }
 
@@ -82,8 +79,7 @@ internal static class PathUtilities
     /// </remarks>
     /// <param name="input">The normalized string to perform slow normalization on.</param>
     /// <param name="trimTrailingSlash">Whether to trim trailing slashes.</param>
-    private static string NormalizeSlow(string input, bool trimTrailingSlash)
-    {
+    private static string NormalizeSlow(string input, bool trimTrailingSlash) {
         // Force evaluation of the input string as a sequence of forward slashes.
         // On Unix, a leading "//" is technically permitted as a root/server indicator (implementation defined).
         // On Windows, "//" or "\\" is a UNC root indicator.
@@ -98,21 +94,17 @@ internal static class PathUtilities
         var startIndex = 0;
         var lastWasSlash = false;
 
-        if(isUnc)
-        {
+        if(isUnc) {
             sb.Append("//");
             startIndex = 2;
             lastWasSlash = true;
         }
 
-        for(var i = startIndex; i < input.Length; i++)
-        {
+        for(var i = startIndex; i < input.Length; i++) {
             var c = input[i];
 
-            if(c == '/')
-            {
-                if(!lastWasSlash)
-                {
+            if(c == '/') {
+                if(!lastWasSlash) {
                     sb.Append('/');
                     lastWasSlash = true;
                 }
@@ -138,14 +130,12 @@ internal static class PathUtilities
     /// </summary>
     /// <param name="rootDir">The root directory of the traversal.</param>
     /// <param name="entry">The filesystem entry to build a path for.</param>
-    public static string BuildRelativePath(string rootDir, FileSystemEntry entry)
-    {
+    public static string BuildRelativePath(string rootDir, FileSystemEntry entry) {
         var full = entry.FullPath.AsSpan();
         var root = rootDir.AsSpan();
         var span = full[root.Length..];
 
-        if(span.Length > 0 && span[0] == Path.DirectorySeparatorChar)
-        {
+        if(span.Length > 0 && span[0] == Path.DirectorySeparatorChar) {
             span = span[1..];
         }
 
@@ -156,13 +146,11 @@ internal static class PathUtilities
 
         var written = 0;
 
-        foreach(var ch in span)
-        {
+        foreach(var ch in span) {
             buffer[written++] = ch == Path.DirectorySeparatorChar ? '/' : ch;
         }
 
-        if(entry.IsDirectory)
-        {
+        if(entry.IsDirectory) {
             buffer[written++] = '/';
         }
 
@@ -180,23 +168,18 @@ internal static class PathUtilities
     /// <summary>Counts path segments in a normalized path.</summary>
     /// <param name="path">The normalized path.</param>
     /// <param name="isDirectory">Whether the path represents a directory.</param>
-    public static int CountSegments(ReadOnlySpan<char> path, bool isDirectory)
-    {
-        if(path.IsEmpty)
-        {
+    public static int CountSegments(ReadOnlySpan<char> path, bool isDirectory) {
+        if(path.IsEmpty) {
             return 0;
         }
 
-        if(isDirectory && path[^1] == '/')
-        {
+        if(isDirectory && path[^1] == '/') {
             path = path[..^1];
         }
 
         var count = 1;
-        for(var i = 0; i < path.Length; i++)
-        {
-            if(path[i] == '/')
-            {
+        for(var i = 0; i < path.Length; i++) {
+            if(path[i] == '/') {
                 count++;
             }
         }
@@ -207,37 +190,30 @@ internal static class PathUtilities
     /// <summary>Splits a normalized, relative path into its constituent segments.</summary>
     /// <param name="normalized">The normalized path to split.</param>
     /// <param name="isDirectory">Whether the path represents a directory.</param>
-    public static string[] SplitNormalizedPath(ReadOnlySpan<char> normalized, bool isDirectory)
-    {
-        if(normalized.IsEmpty || (normalized.Length == 1 && normalized[0] == '/'))
-        {
+    public static string[] SplitNormalizedPath(ReadOnlySpan<char> normalized, bool isDirectory) {
+        if(normalized.IsEmpty || (normalized.Length == 1 && normalized[0] == '/')) {
             return [];
         }
 
-        if(isDirectory && normalized.Length > 0 && normalized[^1] == '/')
-        {
+        if(isDirectory && normalized.Length > 0 && normalized[^1] == '/') {
             normalized = normalized[..^1];
         }
 
         var slashIndex = normalized.IndexOf('/');
 
-        if(slashIndex < 0)
-        {
+        if(slashIndex < 0) {
             return [normalized.ToString()];
         }
 
         List<string> segments = [];
         var start = 0;
 
-        while(true)
-        {
+        while(true) {
             var idx = normalized[start..].IndexOf('/');
 
-            if(idx < 0)
-            {
+            if(idx < 0) {
                 var seg = normalized[start..];
-                if(!seg.IsEmpty)
-                {
+                if(!seg.IsEmpty) {
                     segments.Add(seg.ToString());
                 }
 
@@ -245,8 +221,7 @@ internal static class PathUtilities
             }
 
             var part = normalized.Slice(start, idx);
-            if(!part.IsEmpty)
-            {
+            if(!part.IsEmpty) {
                 segments.Add(part.ToString());
             }
 
@@ -261,21 +236,17 @@ internal static class PathUtilities
     /// is a root whose trailing slash is semantically significant.
     /// </summary>
     /// <param name="path">The path to trim.</param>
-    private static string TrimTrailingSlash(string path)
-    {
-        if(path.Length <= 1)
-        {
+    private static string TrimTrailingSlash(string path) {
+        if(path.Length <= 1) {
             return path;
         }
 
-        if(!path.EndsWith('/'))
-        {
+        if(!path.EndsWith('/')) {
             return path;
         }
 
         // Roots always keep their trailing slash.
-        if(IsDriveRoot(path) || IsUncRoot(path))
-        {
+        if(IsDriveRoot(path) || IsUncRoot(path)) {
             return path;
         }
 
@@ -285,8 +256,7 @@ internal static class PathUtilities
     /// <summary>Checks if a path ends with a slash.</summary>
     /// <param name="path">The path to check.</param>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private static bool EndsWithSlash(string path) =>
-        path.Length > 0 && path[^1] is '/' or '\\';
+    private static bool EndsWithSlash(string path) => path.Length > 0 && path[^1] is '/' or '\\';
 
     /// <summary>
     /// Returns <see langword="true"/> for Windows drive roots such as <c>"C:/"</c>.
@@ -326,18 +296,15 @@ internal static class PathUtilities
     /// </list>
     /// </para>
     /// </remarks>
-    private static bool IsUncRoot(string path)
-    {
-        if(!path.StartsWith("//", StringComparison.Ordinal))
-        {
+    private static bool IsUncRoot(string path) {
+        if(!path.StartsWith("//", StringComparison.Ordinal)) {
             return false;
         }
 
         // Find the slash between the server name and the share name.
         // The search starts at index 2 to skip the leading "//".
         var serverSlash = path.IndexOf('/', 2);
-        if(serverSlash < 0)
-        {
+        if(serverSlash < 0) {
             // "//server" — no share separator, not a valid UNC root.
             return false;
         }
@@ -345,8 +312,7 @@ internal static class PathUtilities
         // Find the slash that follows the share name (if any).
         var afterShare = path.IndexOf('/', serverSlash + 1);
 
-        return afterShare switch
-        {
+        return afterShare switch {
             // No slash after the share name: "//server/share" — canonical UNC root.
             -1 => true,
 

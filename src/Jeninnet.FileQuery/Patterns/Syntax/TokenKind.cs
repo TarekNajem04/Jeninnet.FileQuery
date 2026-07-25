@@ -8,8 +8,7 @@
 /// Use this enumeration to identify and process different pattern elements, including literals, wildcards, character sets, and regular expressions.
 /// The specific meaning of each token type depends on the pattern syntax supported by the consuming API.
 /// </remarks>
-public enum TokenKind
-{
+public enum TokenKind {
     /// <summary>
     /// Represents a constant value in an expression or syntax tree.
     /// </summary>

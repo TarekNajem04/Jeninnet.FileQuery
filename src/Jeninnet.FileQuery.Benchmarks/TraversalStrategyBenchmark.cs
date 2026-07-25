@@ -14,8 +14,7 @@ namespace Jeninnet.FileQuery.Benchmarks;
 /// Compares DFS and BFS traversal strategies under identical conditions.
 /// </summary>
 [MemoryDiagnoser]
-public class TraversalStrategyBenchmark
-{
+public class TraversalStrategyBenchmark {
     private IFileQueryEngine _engine = default!;
     private string _root = default!;
 
@@ -26,8 +25,7 @@ public class TraversalStrategyBenchmark
     /// Sets up the benchmark environment.
     /// </summary>
     [GlobalSetup]
-    public void Setup()
-    {
+    public void Setup() {
         _root = Directory.GetCurrentDirectory();
         _engine = FileQueryRuntime.Create();
 

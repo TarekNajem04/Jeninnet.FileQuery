@@ -8,18 +8,15 @@
 /// This abstract class enforces the standard <see cref="IPathMatcher"/> contract while providing boilerplate
 /// methods for single and set pattern matching.
 /// </remarks>
-internal abstract class PathMatcher : IPathMatcher
-{
+internal abstract class PathMatcher : IPathMatcher {
     /// <inheritdoc/>
     public abstract bool Supports(PatternKind patternKind);
 
     /// <inheritdoc cref="IPathMatcher.Match(ICompiledPatternSet, PathMatchContext)"/>
-    public MatchOutcome Match(ICompiledPatternSet patterns, PathMatchContext context) =>
-        MatchCore(patterns, context).ToOutcome();
+    public MatchOutcome Match(ICompiledPatternSet patterns, PathMatchContext context) => MatchCore(patterns, context).ToOutcome();
 
     /// <inheritdoc cref="IPathMatcher.Match(ICompiledPattern, PathMatchContext)"/>
-    public virtual MatchOutcome Match(ICompiledPattern pattern, PathMatchContext context) =>
-        Match(new CompiledPatternSet([pattern]), context);
+    public virtual MatchOutcome Match(ICompiledPattern pattern, PathMatchContext context) => Match(new CompiledPatternSet([pattern]), context);
 
     /// <summary>
     /// Performs the core, concrete matching logic against the provided patterns and context.

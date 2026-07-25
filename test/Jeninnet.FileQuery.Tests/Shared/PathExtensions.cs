@@ -1,9 +1,7 @@
 ﻿namespace Jeninnet.FileQuery.Tests.Shared;
 
-public static class PathExtensions
-{
-    public static bool EndWithNormalized(this string path, string ending)
-    {
+public static class PathExtensions {
+    public static bool EndWithNormalized(this string path, string ending) {
         ArgumentNullException.ThrowIfNull(path);
         ArgumentNullException.ThrowIfNull(ending);
 
@@ -12,8 +10,7 @@ public static class PathExtensions
         return path.EndsWith(ending, StringComparison.Ordinal);
     }
 
-    public static bool EndWithPath(this string path, string relative)
-    {
+    public static bool EndWithPath(this string path, string relative) {
         ArgumentNullException.ThrowIfNull(path);
         ArgumentNullException.ThrowIfNull(relative);
 

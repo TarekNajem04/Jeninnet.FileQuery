@@ -4,8 +4,7 @@
 /// Translates matcher results and options into traversal decisions.
 /// </summary>
 /// <param name="provider">The traversal decision provider.</param>
-internal sealed class TraversalEvaluator(ITraversalDecisionProvider provider) : ITraversalEvaluator
-{
+internal sealed class TraversalEvaluator(ITraversalDecisionProvider provider) : ITraversalEvaluator {
     /// <summary>
     /// Evaluates the match outcome to determine the traversal decision.
     /// </summary>

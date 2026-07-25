@@ -3,16 +3,13 @@
 /// <summary>
 /// Base class for all pattern compilers.
 /// </summary>
-internal abstract class PatternCompilerBase : IPatternCompiler
-{
+internal abstract class PatternCompilerBase : IPatternCompiler {
     public abstract PatternKind PatternKind { get; }
 
-    public ICompiledPattern Compile(PatternCompilationContext context)
-    {
+    public ICompiledPattern Compile(PatternCompilationContext context) {
         ArgumentNullException.ThrowIfNull(context);
 
-        if(context.Pattern.Type != PatternKind)
-        {
+        if(context.Pattern.Type != PatternKind) {
             throw new PatternException(
                 $"Compiler {GetType().Name} cannot compile {context.Pattern.Type}");
         }

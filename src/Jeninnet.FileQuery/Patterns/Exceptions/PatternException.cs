@@ -16,8 +16,7 @@
 /// domain-level failure rather than a programming error.
 /// </para>
 /// </summary>
-public class PatternException : Exception
-{
+public class PatternException : Exception {
     /// <summary>
     /// Initializes a new instance of the <see cref="PatternException"/> class.
     /// </summary>

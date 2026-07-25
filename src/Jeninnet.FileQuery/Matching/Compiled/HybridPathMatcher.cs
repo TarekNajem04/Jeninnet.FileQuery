@@ -26,15 +26,13 @@
 /// This class is pure and thread-safe after construction.
 /// </para>
 /// </remarks>
-internal sealed class HybridPathMatcher : IPathMatcher
-{
+internal sealed class HybridPathMatcher : IPathMatcher {
     private readonly MatchPrecedenceResolver _precedenceResolver = MatchPrecedenceResolver.Default;
 
     internal HybridPathMatcher() { }
 
     /// <inheritdoc/>
-    public bool Supports(PatternKind patternKind) =>
-        patternKind is PatternKind.GitIgnore or PatternKind.Glob or PatternKind.Regex;
+    public bool Supports(PatternKind patternKind) => patternKind is PatternKind.GitIgnore or PatternKind.Glob or PatternKind.Regex;
 
     /// <inheritdoc/>
     public MatchOutcome Match(ICompiledPatternSet patterns, PathMatchContext context) => MatchPrecedenceResolver.Resolve(patterns, context);

@@ -3,8 +3,7 @@
 /// <summary>
 /// Specifies how textual comparisons should treat character casing.
 /// </summary>
-public enum CaseSensitivity
-{
+public enum CaseSensitivity {
     /// <summary>
     /// Use the default case-sensitivity of the underlying operating system.
     /// </summary>

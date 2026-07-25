@@ -41,8 +41,7 @@
 /// </para>
 ///
 /// </remarks>
-internal static class CharacterClassParser
-{
+internal static class CharacterClassParser {
     /// <summary>
     /// Parses the character class starting at <paramref name="index"/>.
     /// </summary>
@@ -57,8 +56,7 @@ internal static class CharacterClassParser
     /// <see cref="CharacterClass.Elements"/> list contains exactly one
     /// <see cref="CharacterClassParseError"/> sentinel.
     /// </returns>
-    public static CharacterClass Parse(ReadOnlySpan<char> pattern, ref int index)
-    {
+    public static CharacterClass Parse(ReadOnlySpan<char> pattern, ref int index) {
         Debug.Assert(
             index < pattern.Length && pattern[index] == '[',
             "Caller must ensure index points to the opening '['.");
@@ -70,10 +68,8 @@ internal static class CharacterClassParser
         var first = true;
         var closed = false;
 
-        while(index < pattern.Length)
-        {
-            if(IsClassEnd(pattern, index, first))
-            {
+        while(index < pattern.Length) {
+            if(IsClassEnd(pattern, index, first)) {
                 index++; // consume ']'
                 closed = true;
                 break;
@@ -84,8 +80,7 @@ internal static class CharacterClassParser
 
             // Abort accumulation on the first parse error.
             // The sentinel is enough information for the invariant system.
-            if(element is CharacterClassParseError)
-            {
+            if(element is CharacterClassParseError) {
                 break;
             }
 
@@ -93,8 +88,7 @@ internal static class CharacterClassParser
         }
 
         // Avoid adding a second sentinel if ParseElement already added one.
-        if(!closed && elements is not [.., CharacterClassParseError])
-        {
+        if(!closed && elements is not [.., CharacterClassParseError]) {
             elements.Add(new CharacterClassParseError("Unterminated character class."));
         }
 
@@ -106,10 +100,8 @@ internal static class CharacterClassParser
     /// </summary>
     /// <param name="pattern">The pattern string to parse.</param>
     /// <param name="index">The current index in the pattern.</param>
-    private static bool ParseNegation(ReadOnlySpan<char> pattern, ref int index)
-    {
-        if(index < pattern.Length && pattern[index] is '!' or '^')
-        {
+    private static bool ParseNegation(ReadOnlySpan<char> pattern, ref int index) {
+        if(index < pattern.Length && pattern[index] is '!' or '^') {
             index++;
             return true;
         }
@@ -129,8 +121,7 @@ internal static class CharacterClassParser
     /// appears as the first element (or the first element of a negated class).
     /// The <paramref name="first"/> flag tracks whether any element has been consumed yet.
     /// </remarks>
-    private static bool IsClassEnd(ReadOnlySpan<char> pattern, int pos, bool first) =>
-        pattern[pos] == ']' && !first;
+    private static bool IsClassEnd(ReadOnlySpan<char> pattern, int pos, bool first) => pattern[pos] == ']' && !first;
 
     /// <summary>
     /// Parses the next element at <paramref name="index"/> and advances the index.
@@ -142,17 +133,14 @@ internal static class CharacterClassParser
         ReadOnlySpan<char> pattern,
         ref int index,
         bool first
-    )
-    {
+    ) {
         // POSIX class: [: ... :]
-        if(IsPosixStart(pattern, index))
-        {
+        if(IsPosixStart(pattern, index)) {
             return ParsePosix(pattern, ref index);
         }
 
         // Escape sequence: \x
-        if(pattern[index] == '\\')
-        {
+        if(pattern[index] == '\\') {
             return ParseEscape(pattern, ref index);
         }
 
@@ -168,12 +156,10 @@ internal static class CharacterClassParser
     private static ICharacterClassElement ParseEscape(
         ReadOnlySpan<char> pattern,
         ref int index
-    )
-    {
+    ) {
         index++; // skip '\'
 
-        if(index >= pattern.Length)
-        {
+        if(index >= pattern.Length) {
             return new CharacterClassParseError(
                 "Incomplete escape sequence: '\\' at end of character class.");
         }
@@ -199,27 +185,23 @@ internal static class CharacterClassParser
         ReadOnlySpan<char> pattern,
         ref int index,
         bool first
-    )
-    {
+    ) {
         var c = pattern[index];
 
         // '-' as the first element is a literal, not a range delimiter.
-        if(c == '-' && first)
-        {
+        if(c == '-' && first) {
             index++;
             return new CharLiteral('-');
         }
 
         // ']' as the first element is a literal, not the closing bracket.
-        if(c == ']' && first)
-        {
+        if(c == ']' && first) {
             index++;
             return new CharLiteral(']');
         }
 
         // Range detection: requires three characters "x-y" where y != ']'.
-        if(IsValidRange(pattern, index))
-        {
+        if(IsValidRange(pattern, index)) {
             var range = new CharRange(c, pattern[index + 2]);
             index += 3;
             return range;
@@ -241,16 +223,13 @@ internal static class CharacterClassParser
     /// Inverted ranges (<c>z-a</c>) are syntactically valid here and are detected
     /// later by <see cref="CharacterClassRangeInvariant"/>.
     /// </remarks>
-    private static bool IsValidRange(ReadOnlySpan<char> pattern, int index)
-    {
+    private static bool IsValidRange(ReadOnlySpan<char> pattern, int index) {
         // Need at least three characters: start, '-', end.
-        if(index + 2 >= pattern.Length)
-        {
+        if(index + 2 >= pattern.Length) {
             return false;
         }
 
-        if(pattern[index + 1] != '-')
-        {
+        if(pattern[index + 1] != '-') {
             return false;
         }
 
@@ -281,20 +260,17 @@ internal static class CharacterClassParser
     private static ICharacterClassElement ParsePosix(
         ReadOnlySpan<char> pattern,
         ref int index
-    )
-    {
+    ) {
         index += 2; // skip "[:"
 
         var nameStart = index;
 
         // Scan until ':' or end of input.
-        while(index < pattern.Length && pattern[index] != ':')
-        {
+        while(index < pattern.Length && pattern[index] != ':') {
             index++;
         }
 
-        if(index >= pattern.Length)
-        {
+        if(index >= pattern.Length) {
             return new CharacterClassParseError(
                 "Unterminated POSIX class: missing closing ':'.");
         }
@@ -302,8 +278,7 @@ internal static class CharacterClassParser
         var name = pattern[nameStart..index].ToString();
         index++; // consume ':'
 
-        if(index >= pattern.Length || pattern[index] != ']')
-        {
+        if(index >= pattern.Length || pattern[index] != ']') {
             return new CharacterClassParseError(
                 $"Invalid POSIX class syntax for ':{name}': expected ']' after ':'.");
         }

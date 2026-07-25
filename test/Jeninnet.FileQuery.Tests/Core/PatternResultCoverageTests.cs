@@ -1,11 +1,9 @@
 ﻿namespace Jeninnet.FileQuery.Tests.Core;
 
 [TestClass]
-public class PatternResultCoverageTests
-{
+public class PatternResultCoverageTests {
     [TestMethod]
-    public void PatternResult_Success_Properties()
-    {
+    public void PatternResult_Success_Properties() {
         var result = PatternResult<string>.Success("ok");
         Assert.IsTrue(result.IsSuccess);
         Assert.AreEqual("ok", result.Value);
@@ -13,15 +11,13 @@ public class PatternResultCoverageTests
     }
 
     [TestMethod]
-    public void PatternResult_Failure_Properties()
-    {
+    public void PatternResult_Failure_Properties() {
         const string error = "something went wrong";
         var result = PatternResult<string>.Fail(error);
         Assert.IsFalse(result.IsSuccess);
         Assert.AreEqual(error, result.Error);
 
-        try
-        {
+        try {
             _ = result.Value;
             Assert.Fail("Should have thrown InvalidOperationException");
         }
@@ -29,8 +25,7 @@ public class PatternResultCoverageTests
     }
 
     [TestMethod]
-    public void PatternException_Message_Preserved()
-    {
+    public void PatternException_Message_Preserved() {
         const string msg = "error msg";
         var ex = new PatternException(msg);
         Assert.AreEqual(msg, ex.Message);
@@ -42,8 +37,7 @@ public class PatternResultCoverageTests
     }
 
     [TestMethod]
-    public void PatternSyntaxException_Message_Preserved()
-    {
+    public void PatternSyntaxException_Message_Preserved() {
         const string msg = "syntax error";
         var ex = new PatternSyntaxException("*.txt", msg);
         Assert.AreEqual(msg, ex.Message);

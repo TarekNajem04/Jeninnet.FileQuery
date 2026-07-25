@@ -48,8 +48,7 @@ public record FileQueryOptionsConfig(
 /// this instance acts as a read-only execution contract.
 /// </para>
 /// </remarks>
-public sealed record FileQueryOptions
-{
+public sealed record FileQueryOptions {
     /// <summary>
     /// Represents an unlimited value for numeric limits such as
     /// <see cref="MaxRecursionDepth"/>.
@@ -66,8 +65,7 @@ public sealed record FileQueryOptions
     /// Initializes a new instance of the <see cref="FileQueryOptions"/> class with the specified settings.
     /// </summary>
     /// <param name="config">The configuration object.</param>
-    public FileQueryOptions(FileQueryOptionsConfig config)
-    {
+    public FileQueryOptions(FileQueryOptionsConfig config) {
         ArgumentNullException.ThrowIfNull(config);
 
         PatternInput = config.PatternInput;
@@ -144,10 +142,8 @@ public sealed record FileQueryOptions
     /// Thrown when <see cref="MaxRecursionDepth"/> is less than
     /// <see cref="UNLIMITED_RECURSION_DEPTH"/>.
     /// </exception>
-    internal void Validate()
-    {
-        if(MaxRecursionDepth < UNLIMITED)
-        {
+    internal void Validate() {
+        if(MaxRecursionDepth < UNLIMITED) {
 #pragma warning disable S3928
             throw new ArgumentOutOfRangeException(nameof(MaxRecursionDepth), "Recursion depth cannot be less than -1.");
 #pragma warning restore S3928

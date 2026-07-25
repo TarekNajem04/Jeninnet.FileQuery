@@ -3,8 +3,7 @@
 /// <summary>
 /// Defines the compilation phase in which an invariant must run.
 /// </summary>
-internal enum PatternInvariantPhase
-{
+internal enum PatternInvariantPhase {
     /// <summary>
     /// Raw text validation (escaping, forbidden sequences).
     /// </summary>

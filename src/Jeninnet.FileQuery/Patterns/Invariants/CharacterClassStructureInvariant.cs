@@ -28,8 +28,7 @@
 /// </list>
 /// </para>
 /// </remarks>
-internal sealed class CharacterClassStructureInvariant : IPatternInvariant
-{
+internal sealed class CharacterClassStructureInvariant : IPatternInvariant {
     /// <inheritdoc/>
     public PatternInvariantPhase Phase => PatternInvariantPhase.Structural;
 
@@ -37,16 +36,12 @@ internal sealed class CharacterClassStructureInvariant : IPatternInvariant
     public PatternKind? AppliesTo => PatternKind.Glob;
 
     /// <inheritdoc/>
-    public PatternInvariantResult Validate(PatternCompilationContext context)
-    {
-        foreach(var segment in context.Tokens!)
-        {
+    public PatternInvariantResult Validate(PatternCompilationContext context) {
+        foreach(var segment in context.Tokens!) {
 #pragma warning disable S3267
-            foreach(var token in segment.OfType<CharacterClassToken>())
-            {
+            foreach(var token in segment.OfType<CharacterClassToken>()) {
                 // Guard against an unexpectedly empty element list.
-                if(token.Value.Elements.Count == 0)
-                {
+                if(token.Value.Elements.Count == 0) {
                     return PatternInvariantResult.Fail("Empty character class is not allowed.");
                 }
 
@@ -56,8 +51,7 @@ internal sealed class CharacterClassStructureInvariant : IPatternInvariant
                                       .OfType<CharacterClassParseError>()
                                       .FirstOrDefault();
 
-                if(parseError is not null)
-                {
+                if(parseError is not null) {
                     return PatternInvariantResult.Fail(parseError.Message);
                 }
             }

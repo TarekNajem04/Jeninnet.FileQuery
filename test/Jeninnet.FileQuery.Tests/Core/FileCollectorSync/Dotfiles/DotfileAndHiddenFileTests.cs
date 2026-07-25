@@ -5,14 +5,12 @@
 /// GitIgnore rules treat dotfiles as normal files unless explicitly matched.
 /// </summary>
 [TestClass]
-public class DotfileAndHiddenFileTests
-{
+public class DotfileAndHiddenFileTests {
     /// <summary>
     /// Ensures explicit patterns match dotfiles.
     /// </summary>
     [TestMethod]
-    public void DotfilesShouldMatch_WhenIncludedExplicitly()
-    {
+    public void DotfilesShouldMatch_WhenIncludedExplicitly() {
         using var env = new TestEnvironment();
 
         env.CreateFile(".hidden");
@@ -40,8 +38,7 @@ public class DotfileAndHiddenFileTests
     /// "*.txt" should NOT match ".gitignore".
     /// </summary>
     [TestMethod]
-    public void DotfilesShouldNotMatch_WildcardsUnlessPatternStartsWithDot()
-    {
+    public void DotfilesShouldNotMatch_WildcardsUnlessPatternStartsWithDot() {
         using var env = new TestEnvironment();
 
         env.CreateFile(".gitignore");
@@ -69,8 +66,7 @@ public class DotfileAndHiddenFileTests
     /// "**" should match dotfiles because it is recursive and not anchored.
     /// </summary>
     [TestMethod]
-    public void RecursiveWildcard_ShouldIncludeDotfiles()
-    {
+    public void RecursiveWildcard_ShouldIncludeDotfiles() {
         using var env = new TestEnvironment();
 
         env.CreateFile(".env/envfile.txt");
@@ -99,8 +95,7 @@ public class DotfileAndHiddenFileTests
     /// ".*" should match dotfiles and folder because it is recursive and not anchored.
     /// </summary>
     [TestMethod]
-    public void RecursiveWildcard_ShouldExcludeDotfilesAndFolders()
-    {
+    public void RecursiveWildcard_ShouldExcludeDotfilesAndFolders() {
         using var env = new TestEnvironment();
 
         env.CreateFile(".env/envfile.txt");
@@ -130,8 +125,7 @@ public class DotfileAndHiddenFileTests
     /// ".*" should match dotfiles and folder because it is recursive and not anchored.
     /// </summary>
     [TestMethod]
-    public void RecursiveWildcard_ShouldExcludeDotFolders()
-    {
+    public void RecursiveWildcard_ShouldExcludeDotFolders() {
         using var env = new TestEnvironment();
 
         env.CreateFile(".env/envfile.txt");

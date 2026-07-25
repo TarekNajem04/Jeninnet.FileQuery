@@ -37,8 +37,7 @@ namespace Jeninnet.FileQuery.Patterns.Invariants;
 /// guarantee to all pattern kinds (including <see cref="PatternKind.GitIgnore"/>).
 /// </para>
 /// </remarks>
-internal sealed class RecursiveWildcardInSegmentInvariant : IPatternInvariant
-{
+internal sealed class RecursiveWildcardInSegmentInvariant : IPatternInvariant {
     /// <inheritdoc/>
     public PatternInvariantPhase Phase => PatternInvariantPhase.Structural;
 
@@ -46,14 +45,11 @@ internal sealed class RecursiveWildcardInSegmentInvariant : IPatternInvariant
     public PatternKind? AppliesTo => null; // all dialects
 
     /// <inheritdoc/>
-    public PatternInvariantResult Validate(PatternCompilationContext context)
-    {
-        foreach(var segment in context.Tokens!)
-        {
+    public PatternInvariantResult Validate(PatternCompilationContext context) {
+        foreach(var segment in context.Tokens!) {
             var hasRecursive = segment.Any(static t => t is RecursiveWildcardToken);
 
-            if(hasRecursive && segment.Count > 1)
-            {
+            if(hasRecursive && segment.Count > 1) {
                 return PatternInvariantResult.Fail(
                     "In glob and GitIgnore patterns, '**' must appear as a " +
                     "standalone segment. Mixed segments such as '**a' or 'a**' " +

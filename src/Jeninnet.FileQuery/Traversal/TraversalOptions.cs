@@ -3,8 +3,7 @@
 /// <summary>
 /// Controls directory traversal behavior.
 /// </summary>
-public sealed record TraversalOptions
-{
+public sealed record TraversalOptions {
     /// <summary>
     /// Initializes a new instance of the <see cref="TraversalOptions"/> class.
     /// </summary>
@@ -15,8 +14,7 @@ public sealed record TraversalOptions
         TraversalStrategy Strategy = TraversalStrategy.DepthFirst,
         SymlinkPolicy SymlinkPolicy = SymlinkPolicy.Ignore,
         bool UseAsync = true
-    )
-    {
+    ) {
         this.Strategy = Strategy;
         this.SymlinkPolicy = SymlinkPolicy;
         this.UseAsync = UseAsync;

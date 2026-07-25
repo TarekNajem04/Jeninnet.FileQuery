@@ -3,8 +3,7 @@
 /// <summary>
 /// Provides extension methods and resolution logic for the <see cref="CaseSensitivity"/> enumeration.
 /// </summary>
-public static class CaseSensitivityExtensions
-{
+public static class CaseSensitivityExtensions {
     /// <summary>
     /// Resolves a <see cref="CaseSensitivity"/> value into a concrete mode,
     /// handling platform-specific defaults when specified.
@@ -14,11 +13,10 @@ public static class CaseSensitivityExtensions
     /// The final resolved <see cref="CaseSensitivity"/> value.
     /// </returns>
     public static CaseSensitivity Resolve(this CaseSensitivity caseSensitivity)
-        => caseSensitivity switch
-        {
-            CaseSensitivity.PlatformDefault => DetectOsCaseSensitivity(),
-            _ => caseSensitivity
-        };
+        => caseSensitivity switch {
+        CaseSensitivity.PlatformDefault => DetectOsCaseSensitivity(),
+        _ => caseSensitivity
+    };
 
     /// <summary>
     /// Converts the case-sensitivity mode into a <see cref="StringComparison"/>
@@ -38,7 +36,7 @@ public static class CaseSensitivityExtensions
     /// <see cref="CaseSensitivity.Sensitive"/> on Linux, and <see cref="CaseSensitivity.Insensitive"/> on Windows or macOS.
     /// </returns>
     private static CaseSensitivity DetectOsCaseSensitivity() =>
-       OperatingSystem.IsLinux()
+        OperatingSystem.IsLinux()
            ? CaseSensitivity.Sensitive
            : CaseSensitivity.Insensitive;
 }

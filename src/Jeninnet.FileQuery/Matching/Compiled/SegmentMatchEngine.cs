@@ -7,26 +7,21 @@
 /// This engine is policy-free and shared by Glob and GitIgnore matchers.
 /// It relies exclusively on value-type enumerator snapshots for backtracking.
 /// </remarks>
-internal abstract class SegmentMatchEngine : PathMatcher
-{
+internal abstract class SegmentMatchEngine : PathMatcher {
     protected static bool MatchExact(
         IReadOnlyList<IReadOnlyList<IPatternToken>> patternSegments,
         int patternIndex,
         StringComparison comparison,
         ref PathSegmentEnumerator pathSegmentEnumerator
-    )
-    {
-        while(true)
-        {
-            if(patternIndex == patternSegments.Count)
-            {
+    ) {
+        while(true) {
+            if(patternIndex == patternSegments.Count) {
                 return !pathSegmentEnumerator.MoveNext();
             }
 
             var tokens = patternSegments[patternIndex];
 
-            if(IsDoubleStar(tokens))
-            {
+            if(IsDoubleStar(tokens)) {
                 return MatchAfterDoubleStar(
                     patternSegments,
                     patternIndex,
@@ -35,13 +30,11 @@ internal abstract class SegmentMatchEngine : PathMatcher
                 );
             }
 
-            if(!pathSegmentEnumerator.MoveNext())
-            {
+            if(!pathSegmentEnumerator.MoveNext()) {
                 return false;
             }
 
-            if(!SegmentInstructionMatcher.MatchSegment(pathSegmentEnumerator.Current, tokens, comparison))
-            {
+            if(!SegmentInstructionMatcher.MatchSegment(pathSegmentEnumerator.Current, tokens, comparison)) {
                 return false;
             }
 
@@ -53,13 +46,10 @@ internal abstract class SegmentMatchEngine : PathMatcher
         IReadOnlyList<IReadOnlyList<IPatternToken>> patternSegments,
         StringComparison comparison,
         PathSegmentEnumerator pathSegmentEnumerator
-    )
-    {
-        do
-        {
+    ) {
+        do {
             var snapshot = pathSegmentEnumerator;
-            if(MatchExact(patternSegments, 0, comparison, ref snapshot))
-            {
+            if(MatchExact(patternSegments, 0, comparison, ref snapshot)) {
                 return true;
             }
         }
@@ -73,25 +63,21 @@ internal abstract class SegmentMatchEngine : PathMatcher
         int patternIndex,
         StringComparison comparison,
         ref PathSegmentEnumerator pathSegmentEnumerator
-    )
-    {
+    ) {
         // Trailing "**" matches everything
-        if(patternIndex == patternSegments.Count - 1)
-        {
+        if(patternIndex == patternSegments.Count - 1) {
             return true;
         }
 
         var snapshot = pathSegmentEnumerator;
 
-        do
-        {
+        do {
             var attempt = snapshot;
             if(MatchExact(
                 patternSegments,
                 patternIndex + 1,
                 comparison,
-                ref attempt))
-            {
+                ref attempt)) {
                 return true;
             }
         }

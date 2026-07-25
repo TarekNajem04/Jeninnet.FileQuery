@@ -1,19 +1,15 @@
 ﻿namespace Jeninnet.FileQuery.Patterns.Analysis;
 
 /// <inheritdoc/>
-internal sealed class PatternAnalyzer : IPatternAnalyzer
-{
+internal sealed class PatternAnalyzer : IPatternAnalyzer {
     /// <inheritdoc/>
-    public PatternAnalysisResult Analyze(ReadOnlySpan<char> pattern)
-    {
-        if(pattern.IsEmpty)
-        {
+    public PatternAnalysisResult Analyze(ReadOnlySpan<char> pattern) {
+        if(pattern.IsEmpty) {
             return PatternAnalysisResult.Empty();
         }
 
         // Fast-path: regex prefix
-        if(pattern.StartsWith("r:".AsSpan(), StringComparison.Ordinal))
-        {
+        if(pattern.StartsWith("r:".AsSpan(), StringComparison.Ordinal)) {
             return PatternAnalysisResult.Regex();
         }
 
@@ -26,8 +22,7 @@ internal sealed class PatternAnalyzer : IPatternAnalyzer
         ScanPattern(pattern, state, index);
 
         // Trailing slash → GitIgnore directory rule
-        if(pattern[^1] == '/')
-        {
+        if(pattern[^1] == '/') {
             state.HasGitIgnoreSyntax = true;
         }
 
@@ -43,10 +38,8 @@ internal sealed class PatternAnalyzer : IPatternAnalyzer
     /// <param name="pattern">The pattern string being analyzed.</param>
     /// <param name="state">Mutable analysis state.</param>
     /// <returns>The index at which normal scanning should begin.</returns>
-    private static int HandleNegation(ReadOnlySpan<char> pattern, AnalysisState state)
-    {
-        if(pattern[0] == '!')
-        {
+    private static int HandleNegation(ReadOnlySpan<char> pattern, AnalysisState state) {
+        if(pattern[0] == '!') {
             state.IsNegated = true;
             state.HasGitIgnoreSyntax = true;
             return 1;
@@ -62,37 +55,30 @@ internal sealed class PatternAnalyzer : IPatternAnalyzer
     /// <param name="pattern">The pattern being analyzed.</param>
     /// <param name="state">Mutable analysis state.</param>
     /// <param name="start">Starting index after prefix handling.</param>
-    private static void ScanPattern(ReadOnlySpan<char> pattern, AnalysisState state, int start)
-    {
+    private static void ScanPattern(ReadOnlySpan<char> pattern, AnalysisState state, int start) {
         var skipNext = false;
 
-        for(var i = start; i < pattern.Length; i++)
-        {
-            if(skipNext)
-            {
+        for(var i = start; i < pattern.Length; i++) {
+            if(skipNext) {
                 skipNext = false;
                 continue;
             }
 
             var c = pattern[i];
 
-            if(HandleEscape(pattern, state, i, out skipNext))
-            {
+            if(HandleEscape(pattern, state, i, out skipNext)) {
                 continue;
             }
 
-            if(HandleSeparator(c, state))
-            {
+            if(HandleSeparator(c, state)) {
                 continue;
             }
 
-            if(HandleWildcard(pattern, state, i, out skipNext))
-            {
+            if(HandleWildcard(pattern, state, i, out skipNext)) {
                 continue;
             }
 
-            if(HandleBracket(c, state))
-            {
+            if(HandleBracket(c, state)) {
                 continue;
             }
 
@@ -111,21 +97,17 @@ internal sealed class PatternAnalyzer : IPatternAnalyzer
     /// <param name="state">Mutable analysis state.</param>
     /// <param name="i">The current index in the pattern.</param>
     /// <param name="skipNext">Output indicating whether the next character should be skipped.</param>
-    private static bool HandleEscape(ReadOnlySpan<char> pattern, AnalysisState state, int i, out bool skipNext)
-    {
+    private static bool HandleEscape(ReadOnlySpan<char> pattern, AnalysisState state, int i, out bool skipNext) {
         skipNext = false;
 
-        if(pattern[i] != '\\')
-        {
+        if(pattern[i] != '\\') {
             return false;
         }
 
-        if(i + 1 < pattern.Length)
-        {
+        if(i + 1 < pattern.Length) {
             var next = pattern[i + 1];
 
-            if(i == 0 && IsEscapable(next))
-            {
+            if(i == 0 && IsEscapable(next)) {
                 state.HasEscapedCharacters = true;
                 state.HasGitIgnoreSyntax = true;
                 skipNext = true;
@@ -142,10 +124,8 @@ internal sealed class PatternAnalyzer : IPatternAnalyzer
     /// </summary>
     /// <param name="c">The character to check.</param>
     /// <param name="state">Mutable analysis state.</param>
-    private static bool HandleSeparator(char c, AnalysisState state)
-    {
-        if(c != '/')
-        {
+    private static bool HandleSeparator(char c, AnalysisState state) {
+        if(c != '/') {
             return false;
         }
 
@@ -164,16 +144,13 @@ internal sealed class PatternAnalyzer : IPatternAnalyzer
     /// <param name="state">The current analysis state.</param>
     /// <param name="i">The index of the wildcard character.</param>
     /// <param name="skipNext">Whether to skip the next character in analysis.</param>
-    private static bool HandleWildcard(ReadOnlySpan<char> pattern, AnalysisState state, int i, out bool skipNext)
-    {
+    private static bool HandleWildcard(ReadOnlySpan<char> pattern, AnalysisState state, int i, out bool skipNext) {
         skipNext = false;
 
-        if(pattern[i] == '*')
-        {
+        if(pattern[i] == '*') {
             state.HasWildcard = true;
 
-            if(i + 1 < pattern.Length && pattern[i + 1] == '*')
-            {
+            if(i + 1 < pattern.Length && pattern[i + 1] == '*') {
                 state.HasRecursiveWildcard = true;
                 state.HasGitIgnoreSyntax = true;
                 skipNext = true;
@@ -182,8 +159,7 @@ internal sealed class PatternAnalyzer : IPatternAnalyzer
             return true;
         }
 
-        if(pattern[i] == '?')
-        {
+        if(pattern[i] == '?') {
             state.HasWildcard = true;
             state.HasSingleCharWildcard = true;
             return true;
@@ -197,10 +173,8 @@ internal sealed class PatternAnalyzer : IPatternAnalyzer
     /// </summary>
     /// <param name="c">The character to check.</param>
     /// <param name="state">Mutable analysis state.</param>
-    private static bool HandleBracket(char c, AnalysisState state)
-    {
-        if(c is '[' or ']')
-        {
+    private static bool HandleBracket(char c, AnalysisState state) {
+        if(c is '[' or ']') {
             state.HasBracket = true;
             return true;
         }
@@ -214,10 +188,8 @@ internal sealed class PatternAnalyzer : IPatternAnalyzer
     /// <param name="c">The character to check.</param>
     /// <param name="index">The current index.</param>
     /// <param name="state">Mutable analysis state.</param>
-    private static bool HandleComment(char c, int index, AnalysisState state)
-    {
-        if(c == '#' && index == 0)
-        {
+    private static bool HandleComment(char c, int index, AnalysisState state) {
+        if(c == '#' && index == 0) {
             state.HasGitIgnoreSyntax = true;
             return true;
         }
@@ -225,8 +197,7 @@ internal sealed class PatternAnalyzer : IPatternAnalyzer
         return false;
     }
 
-    private static bool IsEscapable(char c) =>
-        c is '*' or '?' or '!' or '#' or '[' or ']' or '\\';
+    private static bool IsEscapable(char c) => c is '*' or '?' or '!' or '#' or '[' or ']' or '\\';
 
     // -------------------------------------------------
     // Internal state container
@@ -238,8 +209,7 @@ internal sealed class PatternAnalyzer : IPatternAnalyzer
     /// This is used internally during scanning and later converted
     /// into an immutable <see cref="PatternAnalysisResult"/>.
     /// </remarks>
-    private sealed class AnalysisState
-    {
+    private sealed class AnalysisState {
         /// <summary>True if the pattern begins with a negation marker (<c>!</c>).</summary>
         public bool IsNegated;
 

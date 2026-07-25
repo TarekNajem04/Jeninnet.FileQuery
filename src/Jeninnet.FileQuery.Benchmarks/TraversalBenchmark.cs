@@ -13,8 +13,7 @@
 /// Measures the performance of file traversal and pattern matching.
 /// </summary>
 [MemoryDiagnoser]
-public class TraversalBenchmark
-{
+public class TraversalBenchmark {
     private IFileQueryEngine _engine = default!;
     private string _root = default!;
 
@@ -22,8 +21,7 @@ public class TraversalBenchmark
     /// Sets up the benchmark environment.
     /// </summary>
     [GlobalSetup]
-    public void Setup()
-    {
+    public void Setup() {
         _root = Directory.GetCurrentDirectory();
         _engine = FileQueryRuntime.Create();
     }
@@ -32,8 +30,7 @@ public class TraversalBenchmark
     /// Measures the performance of file traversal and pattern matching.
     /// </summary>
     [Benchmark]
-    public void QueryFiles()
-    {
+    public void QueryFiles() {
         var options = new FileQueryOptions(
             new FileQueryOptionsConfig(
                 PatternInput: new(

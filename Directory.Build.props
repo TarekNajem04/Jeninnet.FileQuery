@@ -37,6 +37,13 @@
         <DocumentationFile>$(MSBuildProjectName).xml</DocumentationFile>
     </PropertyGroup>
 
+    <ItemGroup>
+        <PackageReference Include="SonarAnalyzer.CSharp">
+            <PrivateAssets>all</PrivateAssets>
+            <IncludeAssets>analyzers</IncludeAssets>
+        </PackageReference>
+    </ItemGroup>
+
     <PropertyGroup>
         <EnableNETAnalyzers>true</EnableNETAnalyzers>
         <AnalysisLevel>latest</AnalysisLevel>

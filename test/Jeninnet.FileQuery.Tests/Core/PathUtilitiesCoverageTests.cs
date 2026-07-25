@@ -1,20 +1,16 @@
 ﻿namespace Jeninnet.FileQuery.Tests.Core;
 
 [TestClass]
-public class PathUtilitiesCoverageTests
-{
+public class PathUtilitiesCoverageTests {
     [TestMethod]
-    public void PathUtilities_Normalize_NullOrEmpty_Throws()
-    {
-        try
-        {
+    public void PathUtilities_Normalize_NullOrEmpty_Throws() {
+        try {
             PathUtilities.Normalize(null);
             Assert.Fail("Should have thrown ArgumentException");
         }
         catch(ArgumentException) { /* Ignore */ }
 
-        try
-        {
+        try {
             PathUtilities.Normalize("");
             Assert.Fail("Should have thrown ArgumentException");
         }
@@ -25,8 +21,7 @@ public class PathUtilitiesCoverageTests
     public void PathUtilities_ToForward_Works() => Assert.AreEqual("a/b/c", PathUtilities.ToForward("a\\b\\c"));
 
     [TestMethod]
-    public void PathUtilities_UncRoot_EdgeCases()
-    {
+    public void PathUtilities_UncRoot_EdgeCases() {
         // UNC roots should keep their trailing slash
         Assert.AreEqual("//server/share/", PathUtilities.Normalize("//server/share/", true));
         Assert.AreEqual("//server/share", PathUtilities.Normalize("//server/share", true));
@@ -39,8 +34,7 @@ public class PathUtilitiesCoverageTests
     }
 
     [TestMethod]
-    public void PathUtilities_CountSegments_EdgeCases()
-    {
+    public void PathUtilities_CountSegments_EdgeCases() {
         Assert.AreEqual(0, PathUtilities.CountSegments("".AsSpan(), false));
         Assert.AreEqual(1, PathUtilities.CountSegments("a".AsSpan(), false));
         Assert.AreEqual(2, PathUtilities.CountSegments("a/b".AsSpan(), false));
@@ -48,8 +42,7 @@ public class PathUtilitiesCoverageTests
     }
 
     [TestMethod]
-    public void PathUtilities_SplitNormalizedPath_EdgeCases()
-    {
+    public void PathUtilities_SplitNormalizedPath_EdgeCases() {
         var empty = PathUtilities.SplitNormalizedPath("".AsSpan(), false);
         Assert.IsEmpty(empty);
 
@@ -68,8 +61,7 @@ public class PathUtilitiesCoverageTests
     }
 
     [TestMethod]
-    public void PathUtilities_BuildRelativePath_LargeBuffer()
-    {
+    public void PathUtilities_BuildRelativePath_LargeBuffer() {
         // Create a path longer than 256 chars to trigger the heap allocation path
         var longSegment = new string('a', 300);
         const string root = "C:/";

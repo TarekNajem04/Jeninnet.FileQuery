@@ -1,9 +1,7 @@
 ﻿namespace Jeninnet.FileQuery.Benchmarks;
 
-internal static class Program
-{
-    public static void Main(string[] args)
-    {
+internal static class Program {
+    public static void Main(string[] args) {
         var config = ManualConfig.Create(DefaultConfig.Instance)
                                  .WithOptions(ConfigOptions.DisableOptimizationsValidator);
         _ = BenchmarkRunner.Run(

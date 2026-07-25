@@ -3,8 +3,7 @@
 /// <summary>
 /// Represents a single pattern invariant that can validate a pattern.
 /// </summary>
-internal interface IPatternInvariant
-{
+internal interface IPatternInvariant {
     /// <summary>
     /// The execution phase of this invariant.
     /// </summary>

@@ -1,11 +1,9 @@
 ﻿namespace Jeninnet.FileQuery.Tests.CommandLine;
 
 [TestClass]
-public sealed class PatternOptionsTests
-{
+public sealed class PatternOptionsTests {
     [TestMethod]
-    public void Record_ShouldBeInstantiable()
-    {
+    public void Record_ShouldBeInstantiable() {
         var options = new PatternOptions("p", "g", "gl", "r");
         Assert.AreEqual("p", options.Patterns);
         Assert.AreEqual("g", options.Gitignore);

@@ -3,8 +3,7 @@
 /// <summary>
 /// Collects files from a directory based on include/exclude patterns.
 /// </summary>
-public interface IFileQueryEngine
-{
+public interface IFileQueryEngine {
     /// <summary>
     /// Enumerates files from <paramref name="query"/>.RootPath according to the provided <paramref name="query"/>.Options.
     /// Paths returned are absolute file-system paths (as returned by <see cref="Directory"/> APIs).

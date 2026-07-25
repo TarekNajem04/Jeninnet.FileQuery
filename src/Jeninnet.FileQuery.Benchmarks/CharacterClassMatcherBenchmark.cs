@@ -12,8 +12,7 @@ namespace Jeninnet.FileQuery.Benchmarks;
 /// patterns contain character classes.
 /// </summary>
 [MemoryDiagnoser]
-public class CharacterClassMatcherBenchmark
-{
+public class CharacterClassMatcherBenchmark {
     private GitIgnoreInstructionMatcher _matcher = default!;
     private ICompiledPatternSet _literalClass = default!;
     private ICompiledPatternSet _rangeClass = default!;
@@ -26,8 +25,7 @@ public class CharacterClassMatcherBenchmark
     /// Sets up the benchmark environment.
     /// </summary>
     [GlobalSetup]
-    public void Setup()
-    {
+    public void Setup() {
         _matcher = new GitIgnoreInstructionMatcher();
 
         _literalClass = Compile("!file[abc5].cs");      // CharLiteral elements
@@ -38,27 +36,21 @@ public class CharacterClassMatcherBenchmark
 
     /// <summary>Baseline: literal set [abc5].</summary>
     [Benchmark(Baseline = true)]
-    public bool Match_LiteralClass()
-        => _matcher.Match(_literalClass, Context()) is MatchOutcome.Include;
+    public bool Match_LiteralClass() => _matcher.Match(_literalClass, Context()) is MatchOutcome.Include;
 
     /// <summary>Range: [0-9] — most common real-world class.</summary>
     [Benchmark]
-    public bool Match_RangeClass()
-        => _matcher.Match(_rangeClass, Context()) is MatchOutcome.Include;
+    public bool Match_RangeClass() => _matcher.Match(_rangeClass, Context()) is MatchOutcome.Include;
 
     /// <summary>POSIX: [[:digit:]] — new in v1.0; must not regress.</summary>
     [Benchmark]
-    public bool Match_PosixClass()
-        => _matcher.Match(_posixClass, Context()) is MatchOutcome.Include;
+    public bool Match_PosixClass() => _matcher.Match(_posixClass, Context()) is MatchOutcome.Include;
 
     /// <summary>Negated class [!abc] — requires extra negation branch.</summary>
     [Benchmark]
-    public bool Match_NegatedClass()
-        => _matcher.Match(_negatedClass, Context()) is MatchOutcome.Include;
+    public bool Match_NegatedClass() => _matcher.Match(_negatedClass, Context()) is MatchOutcome.Include;
 
-    private PathMatchContext Context() =>
-        new(_path, PathKind.File, CaseSensitivity.Sensitive);
+    private PathMatchContext Context() => new(_path, PathKind.File, CaseSensitivity.Sensitive);
 
-    private static ICompiledPatternSet Compile(string pattern)
-        => CompiledPatternFactory.Compile(PatternKind.GitIgnore, pattern);
+    private static ICompiledPatternSet Compile(string pattern) => CompiledPatternFactory.Compile(PatternKind.GitIgnore, pattern);
 }

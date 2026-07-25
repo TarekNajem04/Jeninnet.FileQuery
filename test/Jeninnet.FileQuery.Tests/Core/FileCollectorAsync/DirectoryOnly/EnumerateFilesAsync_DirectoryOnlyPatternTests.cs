@@ -8,14 +8,12 @@
 ///   - recursive directory ignore matching
 /// </summary>
 [TestClass]
-public class EnumerateFilesAsync_DirectoryOnlyPatternTests
-{
+public class EnumerateFilesAsync_DirectoryOnlyPatternTests {
     /// <summary>
     /// Ensures directory-only pattern excludes an entire folder.
     /// </summary>
     [TestMethod]
-    public async Task EnumerateFilesAsync_DirectoryOnlyPattern_ShouldExcludeFolderAsync()
-    {
+    public async Task EnumerateFilesAsync_DirectoryOnlyPattern_ShouldExcludeFolderAsync() {
         using var env = new TestEnvironment();
 
         env.CreateFiles(
@@ -48,8 +46,7 @@ public class EnumerateFilesAsync_DirectoryOnlyPatternTests
     /// This test proves files inside a directory-excluded path can be re-included.
     /// </summary>
     [TestMethod]
-    public async Task EnumerateFilesAsync_DirectoryOnly_RestoreSubDirAsync()
-    {
+    public async Task EnumerateFilesAsync_DirectoryOnly_RestoreSubDirAsync() {
         using var env = new TestEnvironment();
 
         env.CreateFiles(
@@ -85,8 +82,7 @@ public class EnumerateFilesAsync_DirectoryOnlyPatternTests
     /// Tests directory-only patterns combined with ** recursion.
     /// </summary>
     [TestMethod]
-    public async Task EnumerateFilesAsync_DirectoryOnlyWithRecursiveWildcardAsync()
-    {
+    public async Task EnumerateFilesAsync_DirectoryOnlyWithRecursiveWildcardAsync() {
         using var env = new TestEnvironment();
 
         env.CreateFiles(

@@ -1,11 +1,9 @@
 ﻿namespace Jeninnet.FileQuery.Tests.IO;
 
 [TestClass]
-public sealed class FileSystemEntryTests
-{
+public sealed class FileSystemEntryTests {
     [TestMethod]
-    public void Properties_ShouldReflectAttributesCorrectly()
-    {
+    public void Properties_ShouldReflectAttributesCorrectly() {
         var entry = new FileSystemEntry("C:/test.txt", FileAttributes.ReadOnly | FileAttributes.Hidden | FileAttributes.Directory);
 
         Assert.IsTrue(entry.IsReadOnly);
@@ -16,8 +14,7 @@ public sealed class FileSystemEntryTests
     }
 
     [TestMethod]
-    public void ActiveAttributes_ReturnsCorrectAttributes()
-    {
+    public void ActiveAttributes_ReturnsCorrectAttributes() {
         var entry = new FileSystemEntry("C:/test.txt", FileAttributes.ReadOnly | FileAttributes.Hidden);
         var active = entry.ActiveAttributes.ToList();
 

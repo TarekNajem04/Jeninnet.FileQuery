@@ -7,8 +7,7 @@
 /// This context is mutable by design but scoped to a single compilation.
 /// It must never escape the pipeline.
 /// </remarks>
-internal sealed class PatternCompilationContext
-{
+internal sealed class PatternCompilationContext {
     internal PatternCompilationContext(ClassifiedPattern pattern) => Pattern = pattern;
 
     public ClassifiedPattern Pattern { get; }

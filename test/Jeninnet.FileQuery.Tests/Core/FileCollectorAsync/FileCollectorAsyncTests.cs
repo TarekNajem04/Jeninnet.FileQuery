@@ -5,8 +5,7 @@
 /// Validates recursive enumeration, pattern matching, and cancellation.
 /// </summary>
 [TestClass]
-public class FileQueryEngineAsyncTests
-{
+public class FileQueryEngineAsyncTests {
     // Remove _tempDir field, Setup, and Cleanup methods.
 
     // The TestContext is retained as it is necessary for CancellationToken access.
@@ -19,8 +18,7 @@ public class FileQueryEngineAsyncTests
     /// Only top-level files should be returned when max depth is 0.
     /// </summary>
     [TestMethod]
-    public async Task EnumerateFilesAsync_RespectsMaxDepthAsync()
-    {
+    public async Task EnumerateFilesAsync_RespectsMaxDepthAsync() {
         // ARRANGE: Setup isolated environment using TestEnvironment
         using var env = new TestEnvironment();
         env.CreateFiles(
@@ -53,13 +51,14 @@ public class FileQueryEngineAsyncTests
         // ASSERT
         // Both file1.txt and file3.txt are at the root and match "*.txt". Expected count is 2.
         Assert.HasCount(2, results, "Should only return top-level matching files (file1.txt and file3.txt).");
-        CollectionAssert.AreEquivalent(
+        Assert.AreSequenceEqual(
             new[]
             {
                 env.Abs("file1.txt"),
                 env.Abs("file3.txt")
             },
-            results
+            results,
+            SequenceOrder.InAnyOrder
         );
         // env.Dispose() is called automatically at the end of the using block.
     }
@@ -69,8 +68,7 @@ public class FileQueryEngineAsyncTests
     /// Tests recursive matching with a wildcard.
     /// </summary>
     [TestMethod]
-    public async Task EnumerateFilesAsync_ShouldReturnMatchingFilesAsync()
-    {
+    public async Task EnumerateFilesAsync_ShouldReturnMatchingFilesAsync() {
         // ARRANGE: Setup isolated environment
         using var env = new TestEnvironment();
         env.CreateFiles(
@@ -101,7 +99,7 @@ public class FileQueryEngineAsyncTests
 
         // ASSERT
         // The pattern "**/*.txt" matches all four .txt files in the hierarchy. Expected count is 4.
-        CollectionAssert.AreEquivalent(
+        Assert.AreSequenceEqual(
             new[]
             {
                 env.Abs("file1.txt"),
@@ -109,7 +107,8 @@ public class FileQueryEngineAsyncTests
                 env.Abs("subdir", "file3.txt"),
                 env.Abs("bin", "file3.txt")
             },
-            results
+            results,
+            SequenceOrder.InAnyOrder
         );
     }
 
@@ -117,8 +116,7 @@ public class FileQueryEngineAsyncTests
     /// Verifies that cancellation token correctly interrupts async enumeration.
     /// </summary>
     [TestMethod]
-    public async Task EnumerateFilesAsync_CanBeCancelledAsync()
-    {
+    public async Task EnumerateFilesAsync_CanBeCancelledAsync() {
         // ARRANGE: Setup isolated environment
         using var env = new TestEnvironment();
         env.CreateFiles(
@@ -146,10 +144,8 @@ public class FileQueryEngineAsyncTests
 
         // ACT & ASSERT
         // Cancellation should throw OperationCanceledException
-        await Assert.ThrowsAsync<OperationCanceledException>(async () =>
-        {
-            await foreach(var file in fileQueryEngine.ExecuteAsync(new(env.Root, options), cts.Token))
-            {
+        await Assert.ThrowsAsync<OperationCanceledException>(async () => {
+            await foreach(var file in fileQueryEngine.ExecuteAsync(new(env.Root, options), cts.Token)) {
                 // Should never reach here
             }
         });
@@ -160,8 +156,7 @@ public class FileQueryEngineAsyncTests
     /// Uses standard GitIgnore pruning semantics (un-negated directory-only rules exclude the subtree).
     /// </summary>
     [TestMethod]
-    public async Task EnumerateFilesAsync_HandlesComplexPatternsAsync()
-    {
+    public async Task EnumerateFilesAsync_HandlesComplexPatternsAsync() {
         // ARRANGE: Setup isolated environment
         using var env = new TestEnvironment();
         env.CreateFiles(
@@ -194,7 +189,7 @@ public class FileQueryEngineAsyncTests
                                            .ToListAsync(TestContext.CancellationToken);
 
         // ASSERT
-        CollectionAssert.AreEquivalent(
+        Assert.AreSequenceEqual(
             new[] {
                 // 1. file1.txt is included by !file1.txt
                 env.Abs("file1.txt"),
@@ -203,7 +198,8 @@ public class FileQueryEngineAsyncTests
                 // 3. bin/file3.txt is included by ![fF]ile3.txt (recursively) and is NOT pruned
                 env.Abs("bin","file3.txt") // This file MUST be included
             },
-            results
+            results,
+            SequenceOrder.InAnyOrder
         );
         Assert.HasCount(3, results, "Should return file1.txt, file3.txt (root) and bin/file3.txt after exclusions/pruning.");
     }

@@ -1,7 +1,6 @@
 ﻿namespace Jeninnet.FileQuery.Patterns.Invariants;
 
-internal sealed class EmptyPatternInvariant : IPatternInvariant
-{
+internal sealed class EmptyPatternInvariant : IPatternInvariant {
     public PatternInvariantPhase Phase => PatternInvariantPhase.Lexical;
 
     public PatternKind? AppliesTo { get; }

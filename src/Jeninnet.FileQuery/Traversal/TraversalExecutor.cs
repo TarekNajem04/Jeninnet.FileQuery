@@ -1,13 +1,11 @@
 ﻿namespace Jeninnet.FileQuery.Traversal;
 
-internal sealed class TraversalExecutor : ITraversalExecutor
-{
+internal sealed class TraversalExecutor : ITraversalExecutor {
     /// <summary>
     /// Executes the traversal plan and returns the matched file paths.
     /// </summary>
     /// <param name="plan">The traversal plan to execute.</param>
-    public IEnumerable<string> Execute(TraversalPlan plan)
-    {
+    public IEnumerable<string> Execute(TraversalPlan plan) {
         using var buffer = new TraversalFrontier();
         var visited = plan.Traversal.SymlinkPolicy is SymlinkPolicy.FollowWithCycleDetection
             ? new HashSet<string>(StringComparer.OrdinalIgnoreCase)
@@ -23,8 +21,7 @@ internal sealed class TraversalExecutor : ITraversalExecutor
     /// </summary>
     /// <param name="plan">The traversal plan to execute.</param>
     /// <param name="cancellationToken">Token to monitor for cancellation requests.</param>
-    public async IAsyncEnumerable<string> ExecuteAsync(TraversalPlan plan, [EnumeratorCancellation] CancellationToken cancellationToken)
-    {
+    public async IAsyncEnumerable<string> ExecuteAsync(TraversalPlan plan, [EnumeratorCancellation] CancellationToken cancellationToken) {
         // Check for cancellation before starting
         cancellationToken.ThrowIfCancellationRequested();
 
@@ -37,8 +34,7 @@ internal sealed class TraversalExecutor : ITraversalExecutor
 
         var state = new TraversalProgressState();
 
-        await foreach(var item in TraverseCoreAsync(plan, plan.RootDirectory, buffer, visited, state, cancellationToken))
-        {
+        await foreach(var item in TraverseCoreAsync(plan, plan.RootDirectory, buffer, visited, state, cancellationToken)) {
             yield return item;
         }
     }
@@ -50,12 +46,10 @@ internal sealed class TraversalExecutor : ITraversalExecutor
         HashSet<string>? visited,
         TraversalProgressState state,
         [EnumeratorCancellation] CancellationToken cancellationToken
-    )
-    {
+    ) {
         buffer.Push(new TraversalFrame(startDir, Depth: 0));
 
-        while(!buffer.IsEmpty)
-        {
+        while(!buffer.IsEmpty) {
             cancellationToken.ThrowIfCancellationRequested();
             var frame = TakeFrame(buffer, plan.Traversal);
             state.DirectoriesVisited++;
@@ -66,8 +60,7 @@ internal sealed class TraversalExecutor : ITraversalExecutor
                 plan.Traversal.IgnoreInaccessible,
                 plan.Traversal.ErrorRecovery,
                 cancellationToken
-            ))
-            {
+            )) {
                 cancellationToken.ThrowIfCancellationRequested();
                 state.EntriesScanned++;
                 ReportProgress(plan, state, entry.FullPath);
@@ -81,13 +74,11 @@ internal sealed class TraversalExecutor : ITraversalExecutor
                         visited,
                         out var yieldedFile
                     )
-                )
-                {
+                ) {
                     continue;
                 }
 
-                if(yieldedFile.HasValue)
-                {
+                if(yieldedFile.HasValue) {
                     state.FilesMatched++;
                     ReportProgress(plan, state, yieldedFile.Value.FullPath);
                     yield return yieldedFile.Value.FullPath;
@@ -101,20 +92,17 @@ internal sealed class TraversalExecutor : ITraversalExecutor
         string startDir,
         TraversalFrontier buffer,
         HashSet<string>? visited
-    )
-    {
+    ) {
         buffer.Push(new TraversalFrame(startDir, Depth: 0));
 
-        while(!buffer.IsEmpty)
-        {
+        while(!buffer.IsEmpty) {
             var frame = TakeFrame(buffer, plan.Traversal);
 
             foreach(var entry in plan.FileSystem.Enumerate(
                 frame.Directory,
                 plan.Traversal.IgnoreInaccessible,
                 plan.Traversal.ErrorRecovery
-            ))
-            {
+            )) {
                 if(
                     !TryProcessEntry(
                         plan,
@@ -124,13 +112,11 @@ internal sealed class TraversalExecutor : ITraversalExecutor
                         visited,
                         out var yieldedFile
                     )
-                )
-                {
+                ) {
                     continue;
                 }
 
-                if(yieldedFile.HasValue)
-                {
+                if(yieldedFile.HasValue) {
                     yield return yieldedFile.Value.FullPath;
                 }
             }
@@ -163,12 +149,10 @@ internal sealed class TraversalExecutor : ITraversalExecutor
         TraversalFrontier buffer,
         HashSet<string>? visited,
         out FileSystemEntry? yieldedFile
-    )
-    {
+    ) {
         yieldedFile = null;
 
-        if(IsIgnoredSymlink(entry, plan.Traversal))
-        {
+        if(IsIgnoredSymlink(entry, plan.Traversal)) {
             return false;
         }
 
@@ -194,22 +178,18 @@ internal sealed class TraversalExecutor : ITraversalExecutor
                 relativePath,
                 plan.Matching.CaseSensitivity.GetStringComparison()
             )
-        )
-        {
+        ) {
             matchOutcome = MatchOutcome.NoMatch;  // allow traversal
         }
 
         var decision = plan.Evaluator.Evaluate(matchOutcome, entry.PathKind, frame.Depth);
 
-        if(decision.ShouldTraverse)
-        {
-            if(visited is not null && entry.IsDirectory)
-            {
+        if(decision.ShouldTraverse) {
+            if(visited is not null && entry.IsDirectory) {
                 var realPath = entry.IsReparsePoint
                     ? plan.FileSystem.ResolveRealPath(entry.FullPath)
                     : entry.FullPath;
-                if(!visited.Add(realPath))
-                {
+                if(!visited.Add(realPath)) {
                     return false;
                 }
             }
@@ -217,8 +197,7 @@ internal sealed class TraversalExecutor : ITraversalExecutor
             buffer.Push(new TraversalFrame(entry.FullPath, frame.Depth + 1));
         }
 
-        if(decision.ShouldYield)
-        {
+        if(decision.ShouldYield) {
             yieldedFile = entry;
         }
 
@@ -237,15 +216,12 @@ internal sealed class TraversalExecutor : ITraversalExecutor
         ICompiledPatternSet patterns,
         string directoryRelativePath,
         StringComparison comparison
-    )
-    {
+    ) {
         var dirPath = directoryRelativePath.TrimEnd('/');
 
-        for(var i = 0; i < patterns.Count; i++)
-        {
+        for(var i = 0; i < patterns.Count; i++) {
             var pattern = patterns[i];
-            if(!pattern.IsNegated)
-            {
+            if(!pattern.IsNegated) {
                 continue;
             }
 
@@ -253,8 +229,7 @@ internal sealed class TraversalExecutor : ITraversalExecutor
 
             // A broad wildcard (e.g. !** or !**/*.txt) has no concrete anchor
             // and can match inside any directory.
-            if(anchor.Length == 0)
-            {
+            if(anchor.Length == 0) {
                 return true;
             }
 
@@ -264,8 +239,7 @@ internal sealed class TraversalExecutor : ITraversalExecutor
             // - The directory IS inside the anchor target area
             //   ("ignore_me/recover/deep" is inside "ignore_me/recover")
             if(IsPathPrefixOrEqual(dirPath, anchor, comparison) ||
-                IsPathPrefixOrEqual(anchor, dirPath, comparison))
-            {
+                IsPathPrefixOrEqual(anchor, dirPath, comparison)) {
                 return true;
             }
         }
@@ -285,15 +259,12 @@ internal sealed class TraversalExecutor : ITraversalExecutor
         string prefix,
         string path,
         StringComparison comparison
-    )
-    {
-        if(!path.StartsWith(prefix, comparison))
-        {
+    ) {
+        if(!path.StartsWith(prefix, comparison)) {
             return false;
         }
 
-        if(path.Length == prefix.Length)
-        {
+        if(path.Length == prefix.Length) {
             return true;     // equal
         }
 
@@ -307,44 +278,37 @@ internal sealed class TraversalExecutor : ITraversalExecutor
     /// <c>!**/*.txt</c>.
     /// </summary>
     /// <param name="pattern">The compiled pattern.</param>
-    private static string GetConcretePathAnchor(ICompiledPattern pattern)
-    {
+    private static string GetConcretePathAnchor(ICompiledPattern pattern) {
         var sb = new StringBuilder();
         var skipLeadingDoubleStar = true;
         var first = true;
         var stoppedEarly = false;      // ← track whether a wildcard/dstar broke the loop
 
-        for(var segmentIndex = 0; segmentIndex < pattern.Segments.Count; segmentIndex++)
-        {
+        for(var segmentIndex = 0; segmentIndex < pattern.Segments.Count; segmentIndex++) {
             var segment = pattern.Segments[segmentIndex];
             var isDoubleStar = IsDoubleStar(segment);
 
-            if(skipLeadingDoubleStar)
-            {
-                if(isDoubleStar)
-                {
+            if(skipLeadingDoubleStar) {
+                if(isDoubleStar) {
                     continue;   // skip the mandatory leading **
                 }
 
                 skipLeadingDoubleStar = false;
             }
 
-            if(isDoubleStar)
-            {
+            if(isDoubleStar) {
                 stoppedEarly = true;         // non-leading ** ends the concrete prefix
                 break;
             }
 
             var hasWildcard = HasWildcard(segment);
 
-            if(hasWildcard)
-            {
+            if(hasWildcard) {
                 stoppedEarly = true;         // wildcard segment ends the concrete prefix
                 break;
             }
 
-            if(!first)
-            {
+            if(!first) {
                 sb.Append('/');
             }
 
@@ -361,8 +325,7 @@ internal sealed class TraversalExecutor : ITraversalExecutor
         //   !sub/*.txt   → [**, sub, *.txt]    → breaks at wildcard → keep "sub"
         //   !rec/**      → [**, rec, **]       → breaks at **        → keep "rec"
         // ─────────────────────────────────────────────────────────────────────
-        if(!stoppedEarly)
-        {
+        if(!stoppedEarly) {
             var built = sb.ToString();
             var lastSlash = built.LastIndexOf('/');
             return lastSlash < 0 ? string.Empty : built[..lastSlash];
@@ -373,18 +336,14 @@ internal sealed class TraversalExecutor : ITraversalExecutor
         static bool IsDoubleStar(IReadOnlyList<IPatternToken> segment) => segment.Count == 1 && segment[0] is RecursiveWildcardToken;
 
         // Checks whether the segment contains any wildcard token, which would prevent it from contributing to the concrete anchor.
-        static bool HasWildcard(IReadOnlyList<IPatternToken>? segment)
-        {
-            if(segment is null)
-            {
+        static bool HasWildcard(IReadOnlyList<IPatternToken>? segment) {
+            if(segment is null) {
                 return false;
             }
 
-            for(var tokenIndex = 0; tokenIndex < segment.Count; tokenIndex++)
-            {
+            for(var tokenIndex = 0; tokenIndex < segment.Count; tokenIndex++) {
                 var token = segment[tokenIndex];
-                if(token is WildcardToken or SingleCharToken or CharacterClassToken)
-                {
+                if(token is WildcardToken or SingleCharToken or CharacterClassToken) {
                     return true;
                 }
             }
@@ -393,16 +352,12 @@ internal sealed class TraversalExecutor : ITraversalExecutor
         }
 
         // Append literal and escaped tokens, which both contribute to the concrete anchor.
-        static void AppendTokenToPath(StringBuilder sb, IReadOnlyList<IPatternToken> segment)
-        {
-            for(var tokenIndex = 0; tokenIndex < segment.Count; tokenIndex++)
-            {
+        static void AppendTokenToPath(StringBuilder sb, IReadOnlyList<IPatternToken> segment) {
+            for(var tokenIndex = 0; tokenIndex < segment.Count; tokenIndex++) {
                 var token = segment[tokenIndex];
-                if(token is LiteralToken lit)
-                {
+                if(token is LiteralToken lit) {
                     sb.Append(lit.Text);
-                } else if(token is EscapeToken esc)
-                {
+                } else if(token is EscapeToken esc) {
                     sb.Append(esc.Escaped);
                 }
             }
@@ -450,10 +405,8 @@ internal sealed class TraversalExecutor : ITraversalExecutor
         string relativePath,
         PathMatchContext context,
         MatchOutcome outcome
-    )
-    {
-        if(plan.Diagnostics is null)
-        {
+    ) {
+        if(plan.Diagnostics is null) {
             return;
         }
 
@@ -484,17 +437,14 @@ internal sealed class TraversalExecutor : ITraversalExecutor
         ICompiledPatternSet patterns,
         PathMatchContext context,
         MatchOutcome finalOutcome
-    )
-    {
-        if(patterns.Count == 0 || finalOutcome is MatchOutcome.NoMatch)
-        {
+    ) {
+        if(patterns.Count == 0 || finalOutcome is MatchOutcome.NoMatch) {
             return null;
         }
 
         var lastGitIgnoreMatch = FindLastGitIgnoreMatch(patterns, context);
 
-        if(lastGitIgnoreMatch is not null && finalOutcome is MatchOutcome.Include)
-        {
+        if(lastGitIgnoreMatch is not null && finalOutcome is MatchOutcome.Include) {
             return lastGitIgnoreMatch;
         }
 
@@ -504,19 +454,15 @@ internal sealed class TraversalExecutor : ITraversalExecutor
             : null);
     }
 
-    private static ICompiledPattern? FindLastGitIgnoreMatch(ICompiledPatternSet patterns, PathMatchContext context)
-    {
-        if(patterns.GitIgnoreSubSet is null)
-        {
+    private static ICompiledPattern? FindLastGitIgnoreMatch(ICompiledPatternSet patterns, PathMatchContext context) {
+        if(patterns.GitIgnoreSubSet is null) {
             return null;
         }
 
         ICompiledPattern? lastMatch = null;
-        for(var i = 0; i < patterns.GitIgnoreSubSet.Count; i++)
-        {
+        for(var i = 0; i < patterns.GitIgnoreSubSet.Count; i++) {
             var pattern = patterns.GitIgnoreSubSet[i];
-            if(MatchPrecedenceResolver.GitIgnoreMatcher.AppliesToPattern(pattern, context))
-            {
+            if(MatchPrecedenceResolver.GitIgnoreMatcher.AppliesToPattern(pattern, context)) {
                 lastMatch = pattern;
             }
         }
@@ -524,27 +470,20 @@ internal sealed class TraversalExecutor : ITraversalExecutor
         return lastMatch;
     }
 
-    private static ICompiledPattern? FindMatchInBuckets(ICompiledPatternSet patterns, PathMatchContext context)
-    {
-        if(patterns.GlobSubSet is not null)
-        {
-            for(var i = 0; i < patterns.GlobSubSet.Count; i++)
-            {
+    private static ICompiledPattern? FindMatchInBuckets(ICompiledPatternSet patterns, PathMatchContext context) {
+        if(patterns.GlobSubSet is not null) {
+            for(var i = 0; i < patterns.GlobSubSet.Count; i++) {
                 var pattern = patterns.GlobSubSet[i];
-                if(MatchPrecedenceResolver.GlobMatcher.Match(pattern, context) is MatchOutcome.Include)
-                {
+                if(MatchPrecedenceResolver.GlobMatcher.Match(pattern, context) is MatchOutcome.Include) {
                     return pattern;
                 }
             }
         }
 
-        if(patterns.RegexSubSet is not null)
-        {
-            for(var i = 0; i < patterns.RegexSubSet.Count; i++)
-            {
+        if(patterns.RegexSubSet is not null) {
+            for(var i = 0; i < patterns.RegexSubSet.Count; i++) {
                 var pattern = patterns.RegexSubSet[i];
-                if(MatchPrecedenceResolver.RegexMatcher.Match(pattern, context) is MatchOutcome.Include)
-                {
+                if(MatchPrecedenceResolver.RegexMatcher.Match(pattern, context) is MatchOutcome.Include) {
                     return pattern;
                 }
             }
@@ -558,15 +497,13 @@ internal sealed class TraversalExecutor : ITraversalExecutor
     /// </summary>
     /// <param name="outcome">The match outcome.</param>
     private static string GetDefaultDiagnosticReason(MatchOutcome outcome) =>
-        outcome switch
-        {
+        outcome switch {
             MatchOutcome.Include => "Included by default because no excluding pattern matched.",
             MatchOutcome.Exclude => "Excluded without source pattern metadata.",
             _ => "No pattern matched this entry."
         };
 
-    private sealed class TraversalProgressState
-    {
+    private sealed class TraversalProgressState {
         public long DirectoriesVisited { get; set; }
         public long EntriesScanned { get; set; }
         public long FilesMatched { get; set; }

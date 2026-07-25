@@ -4,14 +4,12 @@
 /// Tests character classes: [abc], [a-z], [!abc], etc.
 /// </summary>
 [TestClass]
-public class CharacterClassPatternTests
-{
+public class CharacterClassPatternTests {
     /// <summary>
     /// Simple character set.
     /// </summary>
     [TestMethod]
-    public void CharacterClass_BasicSetShouldMatch()
-    {
+    public void CharacterClass_BasicSetShouldMatch() {
         using var env = new TestEnvironment();
 
         env.CreateFiles("a.txt", "b.txt", "c.txt", "x.txt");
@@ -37,8 +35,7 @@ public class CharacterClassPatternTests
     /// Range-based class.
     /// </summary>
     [TestMethod]
-    public void CharacterClass_RangeShouldMatch()
-    {
+    public void CharacterClass_RangeShouldMatch() {
         using var env = new TestEnvironment();
 
         env.CreateFiles("file0.txt", "file5.txt", "file9.txt", "fileX.txt");
@@ -64,8 +61,7 @@ public class CharacterClassPatternTests
     /// Negated class [!abc] should match anything except a, b, or c.
     /// </summary>
     [TestMethod]
-    public void CharacterClass_NegatedShouldMatchAllExceptGivenSet()
-    {
+    public void CharacterClass_NegatedShouldMatchAllExceptGivenSet() {
         using var env = new TestEnvironment();
 
         env.CreateFiles("a.txt", "b.txt", "c.txt", "d.txt", "e.txt");

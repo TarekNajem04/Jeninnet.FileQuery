@@ -17,22 +17,18 @@
 /// </list>
 /// </para>
 /// </remarks>
-internal sealed class SingleCharWildcardTokenizer : IPatternTokenizer
-{
+internal sealed class SingleCharWildcardTokenizer : IPatternTokenizer {
     public bool TryTokenize(
         ReadOnlySpan<char> input,
         ref int index,
         PatternSyntaxProfile syntax,
         List<IPatternToken> tokens
-    )
-    {
-        if(!syntax.SupportsSingleCharWildcard)
-        {
+    ) {
+        if(!syntax.SupportsSingleCharWildcard) {
             return false;
         }
 
-        if(input[index] != '?')
-        {
+        if(input[index] != '?') {
             return false;
         }
 

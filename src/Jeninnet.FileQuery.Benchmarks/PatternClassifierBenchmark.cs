@@ -6,8 +6,7 @@
 /// Measures the performance of the pattern classifier.
 /// </summary>
 [MemoryDiagnoser]
-public class PatternClassifierBenchmark
-{
+public class PatternClassifierBenchmark {
     private readonly string[] _patterns =
     [
         "**",
@@ -20,10 +19,8 @@ public class PatternClassifierBenchmark
     /// Sets up the benchmark environment.
     /// </summary>
     [Benchmark]
-    public void ClassifyPatterns()
-    {
-        foreach(var pattern in _patterns)
-        {
+    public void ClassifyPatterns() {
+        foreach(var pattern in _patterns) {
             PatternClassifier.Classify(pattern);
         }
     }

@@ -3,8 +3,7 @@
 /// <summary>
 /// Defines the interface for a file query command.
 /// </summary>
-public interface IFileQueryCommand
-{
+public interface IFileQueryCommand {
     /// <summary>
     /// Executes the command asynchronously.
     /// </summary>

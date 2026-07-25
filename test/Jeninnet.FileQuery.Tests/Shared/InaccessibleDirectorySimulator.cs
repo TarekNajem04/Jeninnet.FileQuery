@@ -4,16 +4,14 @@
 /// Simulates a directory that throws UnauthorizedAccessException without
 /// actually modifying ACLs (safe for unit tests).
 /// </summary>
-public static class InaccessibleDirectorySimulator
-{
+public static class InaccessibleDirectorySimulator {
     /// <summary>
     /// Makes a directory "inaccessible" by creating a *file* where a directory
     /// would normally be expected. Attempting to enumerate into it will throw.
     /// </summary>
     /// <param name="env">The test environment.</param>
     /// <param name="name">The name of the pseudo-directory.</param>
-    public static string CreatePseudoInaccessibleDir(TestEnvironment env, string name)
-    {
+    public static string CreatePseudoInaccessibleDir(TestEnvironment env, string name) {
         ArgumentNullException.ThrowIfNull(env);
         ArgumentNullException.ThrowIfNull(name);
 
@@ -33,8 +31,7 @@ public static class InaccessibleDirectorySimulator
     /// <param name="env">The test environment.</param>
     /// <param name="name">The name of the locked directory.</param>
     /// <param name="lockHandle">The handle to the locked file.</param>
-    public static string CreateLockedDir(TestEnvironment env, string name, out FileStream lockHandle)
-    {
+    public static string CreateLockedDir(TestEnvironment env, string name, out FileStream lockHandle) {
         ArgumentNullException.ThrowIfNull(env);
         ArgumentNullException.ThrowIfNull(name);
 

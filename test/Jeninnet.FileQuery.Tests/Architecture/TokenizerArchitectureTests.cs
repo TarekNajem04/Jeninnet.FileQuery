@@ -1,8 +1,7 @@
 ﻿namespace Jeninnet.FileQuery.Tests.Architecture;
 
 [TestClass]
-public sealed class TokenizerArchitectureTests
-{
+public sealed class TokenizerArchitectureTests {
     private static readonly IPatternTokenizer[] _tokenizers =
     [
         new EscapeTokenizer(),
@@ -17,14 +16,11 @@ public sealed class TokenizerArchitectureTests
         PatternSyntaxProfile.GitIgnore;
 
     [TestMethod]
-    public void Tokenizers_MustAdvanceIndex_OrDecline()
-    {
+    public void Tokenizers_MustAdvanceIndex_OrDecline() {
         const string input = "*?[abc]\\x**foo";
 
-        foreach(var tokenizer in _tokenizers)
-        {
-            for(var i = 0; i < input.Length; i++)
-            {
+        foreach(var tokenizer in _tokenizers) {
+            for(var i = 0; i < input.Length; i++) {
                 var span = input.AsSpan();
                 var index = i;
                 var tokens = new List<IPatternToken>();
@@ -35,8 +31,7 @@ public sealed class TokenizerArchitectureTests
                     _syntax,
                     tokens);
 
-                if(accepted)
-                {
+                if(accepted) {
                     Assert.IsGreaterThan(
                         i,
                         index, $"""
@@ -47,8 +42,7 @@ public sealed class TokenizerArchitectureTests
                         Input: "{input}"
                         """
                     );
-                } else
-                {
+                } else {
                     Assert.AreEqual(
                         i,
                         index,

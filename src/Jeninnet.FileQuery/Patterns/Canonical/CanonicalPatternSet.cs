@@ -6,8 +6,7 @@
 /// <remarks>
 /// This is the only input accepted by the classifier.
 /// </remarks>
-public sealed record CanonicalPatternSet
-{
+public sealed record CanonicalPatternSet {
     /// <summary>
     /// Gets the list of canonical patterns.
     /// </summary>

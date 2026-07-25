@@ -1,11 +1,9 @@
 ﻿namespace Jeninnet.FileQuery.Tests.PatternEngine;
 
 [TestClass]
-public class GlobPatternCompilerTests
-{
+public class GlobPatternCompilerTests {
     [TestMethod]
-    public void SingleStar_ShouldProduceWildcardToken()
-    {
+    public void SingleStar_ShouldProduceWildcardToken() {
         var compiledPatternSets = CompiledPatternFactory.Compile(PatternKind.Glob, "*.cs");
 
         TestAssertEx.HasCount(compiledPatternSets, 1, "because we compiled a single pattern string");
@@ -15,8 +13,7 @@ public class GlobPatternCompilerTests
     }
 
     [TestMethod]
-    public void DoubleStar_ShouldProduceRecursiveWildcardToken()
-    {
+    public void DoubleStar_ShouldProduceRecursiveWildcardToken() {
         var compiledPatternSets = CompiledPatternFactory.Compile(PatternKind.Glob, "**/*.cs");
 
         TestAssertEx.HasCount(compiledPatternSets, 1, "because we compiled a single pattern string");
