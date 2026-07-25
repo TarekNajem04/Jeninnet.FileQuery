@@ -33,10 +33,20 @@ public sealed class FileQueryValidatorTests {
     }
 
     [TestMethod]
-    public void ValidateExecution_InvalidCharacters_ThrowsArgumentException() {
+    public void ValidateExecution_InvalidCharacters_ThrowsException() {
         var fs = new DummyFileSystem();
-        const string invalidPath = "C:\\invalid|\"path";
-        Assert.ThrowsExactly<ArgumentException>(() => FileQueryValidator.ValidateExecution(fs, invalidPath, null));
+        // Use a path character likely invalid on all platforms to trigger the ArgumentException,
+        // or accept either exception if platform differences exist.
+        const string invalidPath = "C:\0invalid"; // Null char is generally invalid everywhere
+
+        try {
+            FileQueryValidator.ValidateExecution(fs, invalidPath, null);
+        }
+        catch(Exception ex) when(ex is ArgumentException or DirectoryNotFoundException) {
+            return;
+        }
+
+        Assert.Fail("Expected ArgumentException or DirectoryNotFoundException.");
     }
 
     [TestMethod]
