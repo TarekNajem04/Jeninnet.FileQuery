@@ -12,14 +12,20 @@ public sealed class PatternClassifierTests {
 
         // Regex
         Assert.AreEqual(PatternKind.Regex, PatternClassifier.Classify("r:.*"));
+        Assert.AreEqual(PatternKind.GitIgnore, PatternClassifier.Classify("regex:^.*$"));
+        Assert.AreEqual(PatternKind.GitIgnore, PatternClassifier.Classify("regex:"));
 
         // Glob (Stray bracket)
         Assert.AreEqual(PatternKind.Glob, PatternClassifier.Classify("a]"));
 
         // Glob (Windows Path)
         Assert.AreEqual(PatternKind.Glob, PatternClassifier.Classify(@"C:\foo"));
+        Assert.AreEqual(PatternKind.Unknown, PatternClassifier.Classify(@"C:\"));
+        
+        // Glob (Windows Path - negative)
+        Assert.AreNotEqual(PatternKind.Glob, PatternClassifier.Classify(@"!C:\foo"));
 
-        // GitIgnore (Escaped)
+        // Literal with escaped characters (no backslash)
         Assert.AreEqual(PatternKind.GitIgnore, PatternClassifier.Classify(@"\!foo"));
 
         // GitIgnore (GitIgnore syntax)

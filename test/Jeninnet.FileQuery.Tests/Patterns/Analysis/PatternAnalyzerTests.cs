@@ -13,11 +13,9 @@ public class PatternAnalyzerTests {
     }
 
     [TestMethod]
-    public void Analyze_ShouldDetectNegation() {
+    public void Analyze_ShouldDetectTrailingSlash() {
         var analyzer = new PatternAnalyzer();
-
-        var result = analyzer.Analyze("!bin/*.dll");
-
-        Assert.IsTrue(result.IsNegated);
+        var result = analyzer.Analyze("foo/");
+        Assert.IsTrue(result.HasGitIgnoreSyntax);
     }
 }
