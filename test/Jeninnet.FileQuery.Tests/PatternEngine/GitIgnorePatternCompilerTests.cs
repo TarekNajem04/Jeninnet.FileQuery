@@ -1,11 +1,9 @@
 ﻿namespace Jeninnet.FileQuery.Tests.PatternEngine;
 
 [TestClass]
-public class GitIgnorePatternCompilerTests
-{
+public class GitIgnorePatternCompilerTests {
     [TestMethod]
-    public void NegatedPattern_ShouldSetIsNegated()
-    {
+    public void NegatedPattern_ShouldSetIsNegated() {
         var compiledPatternSets = CompiledPatternFactory.Compile(PatternKind.GitIgnore, "!bin/");
 
         TestAssertEx.HasCount(compiledPatternSets, 1, "because we compiled a single pattern string");
@@ -23,8 +21,7 @@ public class GitIgnorePatternCompilerTests
     }
 
     [TestMethod]
-    public void AnchoredPattern_ShouldProduceSegments()
-    {
+    public void AnchoredPattern_ShouldProduceSegments() {
         var compiledPatternSets = CompiledPatternFactory.Compile(PatternKind.GitIgnore, "/obj/**/*.tmp");
 
         TestAssertEx.HasCount(compiledPatternSets, 1, "because we compiled a single pattern string");
@@ -36,8 +33,7 @@ public class GitIgnorePatternCompilerTests
     }
 
     [TestMethod]
-    public void DoubleStar_ShouldProduceRecursiveToken()
-    {
+    public void DoubleStar_ShouldProduceRecursiveToken() {
         var compiledPatternSets = CompiledPatternFactory.Compile(PatternKind.GitIgnore, "**/test");
 
         TestAssertEx.HasCount(compiledPatternSets, 1, "because we compiled a single pattern string");
@@ -47,8 +43,7 @@ public class GitIgnorePatternCompilerTests
     }
 
     [TestMethod]
-    public void GitIgnore_EmptyPattern_ShouldHandleCorrectly()
-    {
+    public void GitIgnore_EmptyPattern_ShouldHandleCorrectly() {
         var compiledPatternSets = CompiledPatternFactory.Compile(PatternKind.GitIgnore, "");
         Assert.IsEmpty(compiledPatternSets);
     }

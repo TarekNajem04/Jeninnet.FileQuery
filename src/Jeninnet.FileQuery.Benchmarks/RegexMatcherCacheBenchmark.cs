@@ -12,8 +12,7 @@ namespace Jeninnet.FileQuery.Benchmarks;
 /// Measures the warm-cache vs cold-cache cost for regex pattern matching.
 /// </summary>
 [MemoryDiagnoser]
-public class RegexMatcherCacheBenchmark
-{
+public class RegexMatcherCacheBenchmark {
     private RegexInstructionMatcher _matcher = default!;
     private ICompiledPatternSet _patterns = default!;
 
@@ -23,8 +22,7 @@ public class RegexMatcherCacheBenchmark
     /// Sets up the benchmark environment.
     /// </summary>
     [GlobalSetup]
-    public void Setup()
-    {
+    public void Setup() {
         _matcher = new RegexInstructionMatcher();
         _patterns = CompiledPatternFactory.Compile(
             PatternKind.Regex,
@@ -40,20 +38,16 @@ public class RegexMatcherCacheBenchmark
     /// Expected: ~85 ns, 0 B (Regex object already exists in cache).
     /// </summary>
     [Benchmark(Baseline = true)]
-    public bool Match_WarmCache_Sensitive()
-        => _matcher.Match(_patterns, SensitiveCtx()) is MatchOutcome.Include;
+    public bool Match_WarmCache_Sensitive() => _matcher.Match(_patterns, SensitiveCtx()) is MatchOutcome.Include;
 
     /// <summary>
     /// First insensitive call after sensitive calls — cache miss for the
     /// new (pattern, Insensitive) key. Expected: slightly higher than baseline.
     /// </summary>
     [Benchmark]
-    public bool Match_WarmCache_Insensitive()
-        => _matcher.Match(_patterns, InsensitiveCtx()) is MatchOutcome.Include;
+    public bool Match_WarmCache_Insensitive() => _matcher.Match(_patterns, InsensitiveCtx()) is MatchOutcome.Include;
 
-    private PathMatchContext SensitiveCtx() =>
-        new(_path, PathKind.File, CaseSensitivity.Sensitive);
+    private PathMatchContext SensitiveCtx() => new(_path, PathKind.File, CaseSensitivity.Sensitive);
 
-    private PathMatchContext InsensitiveCtx() =>
-        new(_path, PathKind.File, CaseSensitivity.Insensitive);
+    private PathMatchContext InsensitiveCtx() => new(_path, PathKind.File, CaseSensitivity.Insensitive);
 }

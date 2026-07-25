@@ -40,15 +40,12 @@
 /// Violating this contract results in undefined matching behavior.
 /// </para>
 /// </remarks>
-internal ref struct PathSegmentEnumerator
-{
+internal ref struct PathSegmentEnumerator {
     private ReadOnlySpan<char> _remaining;
 
-    public PathSegmentEnumerator(ReadOnlySpan<char> path, bool isDirectory)
-    {
+    public PathSegmentEnumerator(ReadOnlySpan<char> path, bool isDirectory) {
         // Trim trailing slash for directories
-        if(isDirectory && path.Length > 0 && path[^1] == '/')
-        {
+        if(isDirectory && path.Length > 0 && path[^1] == '/') {
             path = path[..^1];
         }
 
@@ -58,16 +55,13 @@ internal ref struct PathSegmentEnumerator
 
     public ReadOnlySpan<char> Current { get; private set; }
 
-    public bool MoveNext()
-    {
-        if(_remaining.IsEmpty)
-        {
+    public bool MoveNext() {
+        if(_remaining.IsEmpty) {
             return false;
         }
 
         var index = _remaining.IndexOf('/');
-        if(index < 0)
-        {
+        if(index < 0) {
             Current = _remaining;
             _remaining = [];
             return true;

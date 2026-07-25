@@ -13,7 +13,7 @@
 
 ---
 
-## ✨ Repo Stats
+## Repo Stats
 
 ![Repobeats analytics image](https://repobeats.axiom.co/api/embed/57d92552dfb25309185f7457c01037a504b5fa24.svg "Repobeats analytics image")
 
@@ -25,7 +25,7 @@ Registered engines support the Phase 2 observability surface: async progress sna
 
 ---
 
-## 🚀 Installation
+## Installation
 
 Install the Dependency Injection integration package via NuGet:
 
@@ -35,7 +35,7 @@ dotnet add package Jeninnet.FileQuery.DependencyInjection
 
 ---
 
-## 🛠️ Usage Example
+## Usage Example
 
 ### 1. Service Registration
 
@@ -110,7 +110,7 @@ await foreach (var file in _engine.ExecuteAsync(query, progress, cancellationTok
 
 ---
 
-## ⚙️ Service Registrations & Lifetimes
+## Service Registrations & Lifetimes
 
 Calling `AddFileQuery()` registers the following components in the container:
 

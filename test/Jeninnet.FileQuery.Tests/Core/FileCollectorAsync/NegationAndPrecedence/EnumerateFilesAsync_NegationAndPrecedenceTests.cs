@@ -8,14 +8,12 @@
 /// These are the most critical tests for correctness.
 /// </summary>
 [TestClass]
-public class EnumerateFilesAsync_NegationAndPrecedenceTests
-{
+public class EnumerateFilesAsync_NegationAndPrecedenceTests {
     /// <summary>
     /// Validates that a negated pattern re-includes a file that was previously excluded.
     /// </summary>
     [TestMethod]
-    public async Task EnumerateFilesAsync_Negation_ShouldReIncludeFilesAsync()
-    {
+    public async Task EnumerateFilesAsync_Negation_ShouldReIncludeFilesAsync() {
         using var env = new TestEnvironment();
 
         env.CreateFiles("a.txt", "b.txt", "c.log");
@@ -45,8 +43,7 @@ public class EnumerateFilesAsync_NegationAndPrecedenceTests
     /// Tests "last rule wins" behavior across async traversal.
     /// </summary>
     [TestMethod]
-    public async Task EnumerateFilesAsync_LastRuleWins_ShouldApplyAsync()
-    {
+    public async Task EnumerateFilesAsync_LastRuleWins_ShouldApplyAsync() {
         using var env = new TestEnvironment();
 
         env.CreateFiles("file.tmp", "file.txt");
@@ -75,8 +72,7 @@ public class EnumerateFilesAsync_NegationAndPrecedenceTests
     /// Complex case mixing exclusion, inclusion, and wildcard paths.
     /// </summary>
     [TestMethod]
-    public async Task EnumerateFilesAsync_ComplexNegationOrdering_ShouldBehaveCorrectlyAsync()
-    {
+    public async Task EnumerateFilesAsync_ComplexNegationOrdering_ShouldBehaveCorrectlyAsync() {
         using var env = new TestEnvironment();
 
         env.CreateFiles(

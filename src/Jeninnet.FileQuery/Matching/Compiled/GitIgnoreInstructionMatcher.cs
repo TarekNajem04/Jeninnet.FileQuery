@@ -24,8 +24,7 @@
 /// on every call (~40 B per enumerator, confirmed by benchmarks).
 /// </para>
 /// </remarks>
-internal sealed class GitIgnoreInstructionMatcher : SegmentMatchEngine
-{
+internal sealed class GitIgnoreInstructionMatcher : SegmentMatchEngine {
     /// <summary>
     /// Initializes a new instance of the <see cref="GitIgnoreInstructionMatcher"/>.
     /// </summary>
@@ -36,21 +35,17 @@ internal sealed class GitIgnoreInstructionMatcher : SegmentMatchEngine
     internal GitIgnoreInstructionMatcher() { }
 
     /// <inheritdoc/>
-    public override bool Supports(PatternKind patternKind) =>
-        patternKind is PatternKind.GitIgnore;
+    public override bool Supports(PatternKind patternKind) => patternKind is PatternKind.GitIgnore;
 
-    internal bool AppliesToPattern(ICompiledPattern pattern, PathMatchContext context)
-    {
-        if(context.Path.IsEmpty)
-        {
+    internal bool AppliesToPattern(ICompiledPattern pattern, PathMatchContext context) {
+        if(context.Path.IsEmpty) {
             return false;
         }
 
         var pathView = new PathView(context.Path, context.PathKind == PathKind.Directory);
         var comparison = context.CaseSensitivity.GetStringComparison();
 
-        if(!MatchPathAgainstCompiledPattern(pattern, pathView, comparison))
-        {
+        if(!MatchPathAgainstCompiledPattern(pattern, pathView, comparison)) {
             return false;
         }
 
@@ -63,15 +58,12 @@ internal sealed class GitIgnoreInstructionMatcher : SegmentMatchEngine
     protected override MatchResult MatchCore(
         ICompiledPatternSet patterns,
         PathMatchContext context
-    )
-    {
-        if(context.Path.IsEmpty)
-        {
+    ) {
+        if(context.Path.IsEmpty) {
             return MatchResult.Fail();
         }
 
-        if(patterns.Count == 0)
-        {
+        if(patterns.Count == 0) {
             return MatchResult.Success();
         }
 
@@ -79,16 +71,14 @@ internal sealed class GitIgnoreInstructionMatcher : SegmentMatchEngine
         var comparison = context.CaseSensitivity.GetStringComparison();
         var result = MatchResult.Included();
 
-        for(var i = 0; i < patterns.Count; i++)
-        {
+        for(var i = 0; i < patterns.Count; i++) {
             var pattern = patterns[i];
 
             // If the pattern does not match, skip WITHOUT resetting IsMatched.
             // Resetting it (the original bug) turned a prior Exclude into NoMatch
             // when a non-matching pattern followed, allowing traversal into pruned
             // directories like .xx/ after .*/  was followed by *.xxx.
-            if(!MatchPathAgainstCompiledPattern(pattern, pathView, comparison))
-            {
+            if(!MatchPathAgainstCompiledPattern(pattern, pathView, comparison)) {
                 continue;
             }
 
@@ -96,18 +86,15 @@ internal sealed class GitIgnoreInstructionMatcher : SegmentMatchEngine
             // named "xxx" at the same nesting level — it targets the directory only.
             if(pattern.DirectoryOnly &&
                 !pathView.IsDirectory &&
-                pathView.SegmentCount == pattern.Segments.Count - 1)
-            {
+                pathView.SegmentCount == pattern.Segments.Count - 1) {
                 continue;
             }
 
             // Pattern genuinely applies — record the match and update inclusion state.
             result.Match();
-            if(pattern.IsNegated)
-            {
+            if(pattern.IsNegated) {
                 result.Include();
-            } else
-            {
+            } else {
                 result.Exclude();
             }
         }
@@ -133,15 +120,12 @@ internal sealed class GitIgnoreInstructionMatcher : SegmentMatchEngine
         IReadOnlyList<ICompiledPattern> patterns,
         PathView pathView,
         StringComparison comparison
-    )
-    {
-        if(pathView.IsDirectory || result.IsIncluded)
-        {
+    ) {
+        if(pathView.IsDirectory || result.IsIncluded) {
             return false;
         }
 
-        if(pathView.SegmentCount <= 1)
-        {
+        if(pathView.SegmentCount <= 1) {
             return false;
         }
 
@@ -151,18 +135,15 @@ internal sealed class GitIgnoreInstructionMatcher : SegmentMatchEngine
         // Avoiding a second enumerator here eliminates another 40 B allocation,
         // confirmed by the HybridMatcher benchmark showing 120 B (80 B from the
         // two GitIgnore loops + 40 B from the Regex loop).
-        for(var i = 0; i < patterns.Count; i++)
-        {
+        for(var i = 0; i < patterns.Count; i++) {
             var pattern = patterns[i];
 
             // Only directory-only inclusion rules (!dir/) are relevant.
-            if(!pattern.IsNegated || !pattern.DirectoryOnly)
-            {
+            if(!pattern.IsNegated || !pattern.DirectoryOnly) {
                 continue;
             }
 
-            if(MatchParentDirectory(pattern, pathView, comparison))
-            {
+            if(MatchParentDirectory(pattern, pathView, comparison)) {
                 result.Include();
                 return true;
             }
@@ -182,8 +163,7 @@ internal sealed class GitIgnoreInstructionMatcher : SegmentMatchEngine
         ICompiledPattern pattern,
         PathView pathView,
         StringComparison comparison
-    )
-    {
+    ) {
         var enumerator = pathView.EnumerateSegments();
         var remaining = pathView.SegmentCount - 1;
 
@@ -208,17 +188,14 @@ internal sealed class GitIgnoreInstructionMatcher : SegmentMatchEngine
         ICompiledPattern pattern,
         PathView pathView,
         StringComparison comparison
-    )
-    {
-        if(pathView.SegmentCount == 0)
-        {
+    ) {
+        if(pathView.SegmentCount == 0) {
             return false;
         }
 
         if(pattern.DirectoryOnly &&
             !pathView.IsDirectory &&
-            !pattern.AnchoredToRoot)
-        {
+            !pattern.AnchoredToRoot) {
             return false;
         }
 
@@ -228,8 +205,7 @@ internal sealed class GitIgnoreInstructionMatcher : SegmentMatchEngine
             pattern.Segments.Count > 0 &&
             IsDoubleStar(pattern.Segments[0]);
 
-        if(pattern.AnchoredToRoot || hasLeadingDoubleStar)
-        {
+        if(pattern.AnchoredToRoot || hasLeadingDoubleStar) {
             return MatchRecursiveSegments(
                 pattern,
                 patternIndex: 0,
@@ -242,8 +218,7 @@ internal sealed class GitIgnoreInstructionMatcher : SegmentMatchEngine
 
         // Unanchored: slide the pattern across segments.
         var skip = 0;
-        while(true)
-        {
+        while(true) {
             var fork = enumerator; // value-type copy for speculation
 
             if(MatchRecursiveSegments(
@@ -252,13 +227,11 @@ internal sealed class GitIgnoreInstructionMatcher : SegmentMatchEngine
                     comparison,
                     fork,
                     pathView.SegmentCount - skip,
-                    pathView.IsDirectory))
-            {
+                    pathView.IsDirectory)) {
                 return true;
             }
 
-            if(!enumerator.MoveNext())
-            {
+            if(!enumerator.MoveNext()) {
                 break;
             }
 
@@ -284,24 +257,20 @@ internal sealed class GitIgnoreInstructionMatcher : SegmentMatchEngine
         PathSegmentEnumerator path,
         int remainingSegments,
         bool isDirectory
-    )
-    {
-        if(patternIndex == pattern.Segments.Count)
-        {
+    ) {
+        if(patternIndex == pattern.Segments.Count) {
             return remainingSegments == 0
                 ? (!pattern.DirectoryOnly || isDirectory)
                 : pattern.DirectoryOnly;
         }
 
-        if(remainingSegments == 0)
-        {
+        if(remainingSegments == 0) {
             return CanRemainingPatternMatchEmpty(pattern.Segments, patternIndex);
         }
 
         var currentPattern = pattern.Segments[patternIndex];
 
-        if(IsDoubleStar(currentPattern))
-        {
+        if(IsDoubleStar(currentPattern)) {
             return MatchRecursiveWildcard(
                 pattern,
                 patternIndex,
@@ -312,16 +281,14 @@ internal sealed class GitIgnoreInstructionMatcher : SegmentMatchEngine
             );
         }
 
-        if(!path.MoveNext())
-        {
+        if(!path.MoveNext()) {
             return false;
         }
 
         if(!SegmentInstructionMatcher.MatchSegment(
                 path.Current,
                 currentPattern,
-                comparison))
-        {
+                comparison)) {
             return false;
         }
 
@@ -351,8 +318,7 @@ internal sealed class GitIgnoreInstructionMatcher : SegmentMatchEngine
         PathSegmentEnumerator path,
         int remainingSegments,
         bool isDirectory
-    )
-    {
+    ) {
         // Match zero segments.
         if(MatchRecursiveSegments(
                 pattern,
@@ -360,16 +326,13 @@ internal sealed class GitIgnoreInstructionMatcher : SegmentMatchEngine
                 comparison,
                 path,
                 remainingSegments,
-                isDirectory))
-        {
+                isDirectory)) {
             return true;
         }
 
         // Match one or more segments.
-        while(remainingSegments > 0)
-        {
-            if(!path.MoveNext())
-            {
+        while(remainingSegments > 0) {
+            if(!path.MoveNext()) {
                 break;
             }
 
@@ -384,8 +347,7 @@ internal sealed class GitIgnoreInstructionMatcher : SegmentMatchEngine
                     fork,
                     remainingSegments,
                     isDirectory)
-            )
-            {
+            ) {
                 return true;
             }
         }
@@ -402,12 +364,9 @@ internal sealed class GitIgnoreInstructionMatcher : SegmentMatchEngine
     private static bool CanRemainingPatternMatchEmpty(
         IReadOnlyList<IReadOnlyList<IPatternToken>> patternSegments,
         int startIndex
-    )
-    {
-        for(var i = startIndex; i < patternSegments.Count; i++)
-        {
-            if(!IsDoubleStar(patternSegments[i]))
-            {
+    ) {
+        for(var i = startIndex; i < patternSegments.Count; i++) {
+            if(!IsDoubleStar(patternSegments[i])) {
                 return false;
             }
         }

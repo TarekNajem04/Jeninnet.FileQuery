@@ -6,8 +6,7 @@
 /// and "POSIX class syntax" (valid).
 /// </summary>
 [TestClass]
-public sealed class PatternValidatorTests
-{
+public sealed class PatternValidatorTests {
     /// <summary>
     /// A simple POSIX class <c>[[:digit:]]</c> must not be malformed.
     /// This was the root cause of the EndToEnd_PosixDigitClass_MatchesCorrectly failure:
@@ -89,9 +88,11 @@ public sealed class PatternValidatorTests
     public void IsMalformed_DoubleDash_IsMalformed() => AssertMalformed("[--x]");
 
     [TestMethod]
-    public void IsMalformed_StrayClosingBracket_ReturnedByHasStrayClosingBracket() => Assert.IsTrue(
+    public void IsMalformed_StrayClosingBracket_ReturnedByHasStrayClosingBracket() =>
+        Assert.IsTrue(
             PatternValidator.HasStrayClosingBracket("file].txt".AsSpan()),
-            "A ']' without a preceding '[' must be detected by HasStrayClosingBracket.");
+            "A ']' without a preceding '[' must be detected by HasStrayClosingBracket."
+        );
 
     /// <summary>
     /// PatternClassifier must not return <see cref="PatternKind.Unknown"/>
@@ -100,24 +101,21 @@ public sealed class PatternValidatorTests
     /// at runtime.
     /// </summary>
     [TestMethod]
-    public void Classifier_PatternWithPosixClass_DoesNotReturnUnknown()
-    {
-        var kind = Jeninnet.FileQuery.Patterns.Classification.PatternClassifier
-            .Classify("!file[[:digit:]].txt");
+    public void Classifier_PatternWithPosixClass_DoesNotReturnUnknown() {
+        var kind = PatternClassifier.Classify("!file[[:digit:]].txt");
 
         Assert.AreNotEqual(
             PatternKind.Unknown,
             kind,
             "A pattern containing a POSIX class must not be classified as Unknown. " +
             "Unknown causes a PatternException at compile time because no compiler " +
-            "is registered for that kind.");
+            "is registered for that kind."
+        );
     }
 
     [TestMethod]
-    public void Classifier_PurePosixClass_DoesNotReturnUnknown()
-    {
-        var kind = Jeninnet.FileQuery.Patterns.Classification.PatternClassifier
-            .Classify("[[:alpha:]]");
+    public void Classifier_PurePosixClass_DoesNotReturnUnknown() {
+        var kind = PatternClassifier.Classify("[[:alpha:]]");
 
         Assert.AreNotEqual(PatternKind.Unknown, kind);
     }
@@ -125,10 +123,12 @@ public sealed class PatternValidatorTests
     private static void AssertMalformed(string pattern) =>
         Assert.IsTrue(
             PatternValidator.IsMalformed(pattern.AsSpan()),
-            $"Pattern '{pattern}' must be reported as malformed.");
+            $"Pattern '{pattern}' must be reported as malformed."
+        );
 
     private static void AssertNotMalformed(string pattern) =>
         Assert.IsFalse(
             PatternValidator.IsMalformed(pattern.AsSpan()),
-            $"Pattern '{pattern}' must not be reported as malformed.");
+            $"Pattern '{pattern}' must not be reported as malformed."
+        );
 }

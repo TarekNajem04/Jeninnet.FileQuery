@@ -26,10 +26,8 @@ namespace AdvancedUsage;
  * OR
  * dotnet run -- --gitignore "**;!*.txt"
  */
-internal static class Program
-{
-    public static async Task Main(string[] args)
-    {
+internal static class Program {
+    public static async Task Main(string[] args) {
         var builder = Host.CreateApplicationBuilder(args);
 
         // Register FileQuery services
@@ -43,15 +41,13 @@ internal static class Program
         var command = host.Services.GetRequiredService<IFileQueryCommand>();
         var root = @"C:\repo";
 
-        if(!Directory.Exists(root))
-        {
+        if(!Directory.Exists(root)) {
             Console.WriteLine($"Directory '{root}' does not exist. We will use the directory of the executing assembly as the root for our query.");
             root = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
             Console.WriteLine();
         }
 
-        if(string.IsNullOrEmpty(root))
-        {
+        if(string.IsNullOrEmpty(root)) {
             Console.WriteLine("Unable to determine a valid root directory for the query.");
             Console.WriteLine();
             return;

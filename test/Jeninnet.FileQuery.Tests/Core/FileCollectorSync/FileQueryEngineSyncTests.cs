@@ -1,8 +1,7 @@
 ﻿namespace Jeninnet.FileQuery.Tests.Core.FileCollectorSync;
 
 [TestClass]
-public class FileQueryEngineSyncTests
-{
+public class FileQueryEngineSyncTests {
     private readonly IFileQueryEngine _fileQueryEngine = FileQueryRuntime.Create();
 
     /// <summary>
@@ -10,8 +9,7 @@ public class FileQueryEngineSyncTests
     /// Cleans up after use.
     /// </summary>
     /// <param name="populate">An action to populate the temporary directory.</param>
-    private static string CreateTempDir(Action<string> populate)
-    {
+    private static string CreateTempDir(Action<string> populate) {
         var tempDir = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
         Directory.CreateDirectory(tempDir);
         populate(tempDir);
@@ -19,17 +17,14 @@ public class FileQueryEngineSyncTests
     }
 
     [TestMethod]
-    public void ShouldEnumerateMatchingFiles()
-    {
-        var tempDir = CreateTempDir(dir =>
-        {
+    public void ShouldEnumerateMatchingFiles() {
+        var tempDir = CreateTempDir(dir => {
             File.WriteAllText(Path.Combine(dir, "file1.txt"), "data");
             File.WriteAllText(Path.Combine(dir, "file2.txt"), "data");
             File.WriteAllText(Path.Combine(dir, "ignore.me"), "data");
         });
 
-        try
-        {
+        try {
             var options = new FileQueryOptions(
                 new FileQueryOptionsConfig(
                     PatternInput: new(
@@ -50,23 +45,19 @@ public class FileQueryEngineSyncTests
             TestAssertEx.Contains(files, Path.Combine(tempDir, "file1.txt"));
             TestAssertEx.Contains(files, Path.Combine(tempDir, "file2.txt"));
         }
-        finally
-        {
+        finally {
             Directory.Delete(tempDir, true);
         }
     }
 
     [TestMethod]
-    public void IgnoreInaccessibleFalse_ShouldEnumerateAccessibleFiles()
-    {
-        var tempDir = CreateTempDir(dir =>
-        {
+    public void IgnoreInaccessibleFalse_ShouldEnumerateAccessibleFiles() {
+        var tempDir = CreateTempDir(dir => {
             File.WriteAllText(Path.Combine(dir, "file1.txt"), "data");
             File.WriteAllText(Path.Combine(dir, "file2.txt"), "data");
         });
 
-        try
-        {
+        try {
             var options = new FileQueryOptions(
                 new FileQueryOptionsConfig(
                     PatternInput: new(
@@ -86,24 +77,20 @@ public class FileQueryEngineSyncTests
             TestAssertEx.Contains(files, Path.Combine(tempDir, "file1.txt"));
             TestAssertEx.Contains(files, Path.Combine(tempDir, "file2.txt"));
         }
-        finally
-        {
+        finally {
             Directory.Delete(tempDir, true);
         }
     }
 
     [TestMethod]
-    public void RespectMaxDepth()
-    {
-        var tempDir = CreateTempDir(dir =>
-        {
+    public void RespectMaxDepth() {
+        var tempDir = CreateTempDir(dir => {
             Directory.CreateDirectory(Path.Combine(dir, "sub"));
             File.WriteAllText(Path.Combine(dir, "root.txt"), "data");
             File.WriteAllText(Path.Combine(dir, "sub", "subfile.txt"), "data");
         });
 
-        try
-        {
+        try {
             var options = new FileQueryOptions(
                 new FileQueryOptionsConfig(
                     PatternInput: new(
@@ -125,8 +112,7 @@ public class FileQueryEngineSyncTests
             TestAssertEx.ContainsSingle(files);
             TestAssertEx.Contains(files, PathUtilities.Normalize(Path.Combine(tempDir, "root.txt")));
         }
-        finally
-        {
+        finally {
             Directory.Delete(tempDir, true);
         }
     }

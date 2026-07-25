@@ -13,7 +13,7 @@
 
 ---
 
-## ✨ Repo Stats
+## Repo Stats
 
 ![Repobeats analytics image](https://repobeats.axiom.co/api/embed/57d92552dfb25309185f7457c01037a504b5fa24.svg "Repobeats analytics image")
 
@@ -25,7 +25,7 @@ The command-line package produces pattern inputs for the core engine. Runtime ob
 
 ---
 
-## 🚀 Installation
+## Installation
 
 Install the CLI integration package via NuGet:
 
@@ -35,7 +35,7 @@ dotnet add package Jeninnet.FileQuery.CommandLine
 
 ---
 
-## 🛠️ Usage Example
+## Usage Example
 
 Because [CommandLinePatternOptions](./CommandLinePatternOptions.cs) uses a `protected` constructor to encourage customization, you must subclass it in your application.
 
@@ -89,7 +89,7 @@ await rootCommand.InvokeAsync(args);
 
 ---
 
-## ⚙️ Supported Command-Line Flags
+## Supported Command-Line Flags
 
 The following options are exposed by [CommandLinePatternOptions](./CommandLinePatternOptions.cs):
 
@@ -102,7 +102,7 @@ The following options are exposed by [CommandLinePatternOptions](./CommandLinePa
 
 ---
 
-## 🧠 Pattern Splitting and Fallback
+## Pattern Splitting and Fallback
 
 *   **Semicolon Splitting**: Delimited values (e.g., `-p "*.txt;*.md;!temp.txt"`) are split and trimmed by [PatternSplitter](./PatternSplitter.cs).
 *   **Default Fallback**: If no pattern arguments are supplied by the user, the builder defaults to `!**` (GitIgnore syntax: include all files recursively).

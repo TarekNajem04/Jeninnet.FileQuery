@@ -1,11 +1,9 @@
 ﻿namespace Jeninnet.FileQuery.Tests.Correctness;
 
 [TestClass]
-public sealed class MatchPrecedenceTests
-{
+public sealed class MatchPrecedenceTests {
     [TestMethod]
-    public void LaterPatternOverridesEarlier()
-    {
+    public void LaterPatternOverridesEarlier() {
         var matcher = TestMatcher.Create();
         var context = TestPath.File("a.txt");
 
@@ -21,8 +19,7 @@ public sealed class MatchPrecedenceTests
     }
 
     [TestMethod]
-    public void NegatedPatternOverridesPreviousInclude()
-    {
+    public void NegatedPatternOverridesPreviousInclude() {
         var matcher = TestMatcher.Create();
         var context = TestPath.File("error.log");
 

@@ -3,8 +3,7 @@
 /// <summary>
 /// Represents a compiled, immutable pattern used for matching file paths.
 /// </summary>
-internal interface ICompiledPattern
-{
+internal interface ICompiledPattern {
     /// <summary>
     /// Gets a value indicating whether the pattern begins with <c>!</c>, negating matches.
     /// </summary>

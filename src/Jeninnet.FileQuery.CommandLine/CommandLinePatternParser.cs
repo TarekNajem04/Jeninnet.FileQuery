@@ -3,16 +3,14 @@
 /// <summary>
 /// Parses command-line input into a <see cref="PatternOptions"/> object.
 /// </summary>
-public static class CommandLinePatternParser
-{
+public static class CommandLinePatternParser {
     /// <summary>
     /// Extracts raw pattern values from <see cref="ParseResult"/> using defined options.
     /// </summary>
     /// <param name="parseResult">The parsed command-line input.</param>
     /// <param name="options">The command-line option definitions.</param>
     /// <returns>A <see cref="PatternOptions"/> instance containing all extracted values.</returns>
-    public static PatternOptions Parse(ParseResult parseResult, CommandLinePatternOptions options)
-    {
+    public static PatternOptions Parse(ParseResult parseResult, CommandLinePatternOptions options) {
         ArgumentNullException.ThrowIfNull(parseResult);
         ArgumentNullException.ThrowIfNull(options);
 

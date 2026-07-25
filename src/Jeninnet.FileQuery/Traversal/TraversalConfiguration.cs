@@ -18,8 +18,7 @@ internal sealed record TraversalConfiguration(
     SymlinkPolicy SymlinkPolicy,
     bool UseAsync,
     FileQueryErrorRecoveryOptions ErrorRecovery
-)
-{
+) {
     /// <summary>
     /// Represents an unlimited value for numeric limits.
     /// </summary>

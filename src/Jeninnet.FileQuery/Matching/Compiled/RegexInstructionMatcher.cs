@@ -28,8 +28,7 @@
 /// <see cref="Regex"/>.
 /// </para>
 /// </remarks>
-internal sealed class RegexInstructionMatcher : PathMatcher
-{
+internal sealed class RegexInstructionMatcher : PathMatcher {
     /// <summary>
     /// Composite key used to cache compiled <see cref="Regex"/> instances.
     /// </summary>
@@ -55,8 +54,7 @@ internal sealed class RegexInstructionMatcher : PathMatcher
     internal RegexInstructionMatcher() { }
 
     /// <inheritdoc/>
-    public override bool Supports(PatternKind patternKind) =>
-        patternKind is PatternKind.Regex;
+    public override bool Supports(PatternKind patternKind) => patternKind is PatternKind.Regex;
 
     /// <inheritdoc/>
     /// <param name="patterns">The set of compiled patterns to match.</param>
@@ -64,28 +62,23 @@ internal sealed class RegexInstructionMatcher : PathMatcher
     protected override MatchResult MatchCore(
         ICompiledPatternSet patterns,
         PathMatchContext context
-    )
-    {
-        if(context.Path.IsEmpty)
-        {
+    ) {
+        if(context.Path.IsEmpty) {
             return MatchResult.Fail();
         }
 
-        if(patterns.Count == 0)
-        {
+        if(patterns.Count == 0) {
             return MatchResult.Success();
         }
 
         // INDEX-BASED LOOP — avoids boxing a heap-allocated IEnumerator<ICompiledPattern>
         // that a foreach over the ICompiledPatternSet interface would create (~40 B per call).
         // Benchmarks confirmed 40 B allocated before this fix; target is 0 B.
-        for(var i = 0; i < patterns.Count; i++)
-        {
+        for(var i = 0; i < patterns.Count; i++) {
             var pattern = patterns[i];
             var regexText = pattern.RegexText;
 
-            if(regexText is null)
-            {
+            if(regexText is null) {
                 // Pattern did not contain a valid RegularExpressionToken — skip.
                 return MatchResult.Fail();
             }
@@ -93,8 +86,7 @@ internal sealed class RegexInstructionMatcher : PathMatcher
             var regex = GetOrCreateRegex(regexText, context.CaseSensitivity);
 
             // Full-path match: the entire normalized path must satisfy the expression.
-            if(regex.IsMatch(context.Path))
-            {
+            if(regex.IsMatch(context.Path)) {
                 return MatchResult.Success();
             }
         }
@@ -112,16 +104,13 @@ internal sealed class RegexInstructionMatcher : PathMatcher
     /// <param name="caseSensitivity">
     /// Determines whether <see cref="RegexOptions.IgnoreCase"/> is applied.
     /// </param>
-    private Regex GetOrCreateRegex(string patternText, CaseSensitivity caseSensitivity)
-    {
+    private Regex GetOrCreateRegex(string patternText, CaseSensitivity caseSensitivity) {
         var key = new RegexCacheKey(patternText, caseSensitivity);
 
-        return _regexCache.GetOrAdd(key, static k =>
-        {
+        return _regexCache.GetOrAdd(key, static k => {
             var options = RegexOptions.Compiled | RegexOptions.CultureInvariant;
 
-            if(k.CaseSensitivity is CaseSensitivity.Insensitive)
-            {
+            if(k.CaseSensitivity is CaseSensitivity.Insensitive) {
                 options |= RegexOptions.IgnoreCase;
             }
 

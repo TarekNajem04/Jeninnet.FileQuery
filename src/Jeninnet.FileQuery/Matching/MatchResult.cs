@@ -13,8 +13,7 @@
 /// </list>
 /// For directories, these properties determine whether a directory should be traversed (pruned).
 /// </remarks>
-internal ref struct MatchResult
-{
+internal ref struct MatchResult {
     /// <summary>
     /// Gets a value indicating whether the path is ultimately included in the final collection.
     /// </summary>
@@ -36,8 +35,7 @@ internal ref struct MatchResult
     /// </remarks>
     public bool IsMatched { get; private set; }
 
-    private MatchResult(bool isIncluded, bool isMatched)
-    {
+    private MatchResult(bool isIncluded, bool isMatched) {
         IsIncluded = isIncluded;
         IsMatched = isMatched;
     }
@@ -49,8 +47,7 @@ internal ref struct MatchResult
     public readonly bool Succeeded() => IsIncluded;
 
     public readonly MatchOutcome ToOutcome() =>
-        (IsIncluded, IsMatched) switch
-        {
+        (IsIncluded, IsMatched) switch {
             (true, _) => MatchOutcome.Include,
             (false, true) => MatchOutcome.Exclude,
             _ => MatchOutcome.NoMatch
@@ -60,8 +57,7 @@ internal ref struct MatchResult
     /// Sets <see cref="IsIncluded"/> to <see langword="true"/> (included).
     /// </summary>
     /// <returns>The current <see cref="MatchResult"/> instance for method chaining.</returns>
-    public MatchResult Include()
-    {
+    public MatchResult Include() {
         IsIncluded = true;
         return this;
     }
@@ -75,8 +71,7 @@ internal ref struct MatchResult
     /// This overload is useful when inclusion depends on a more complex condition that should
     /// only be evaluated when needed.
     /// </remarks>
-    public MatchResult Include(Func<bool> func)
-    {
+    public MatchResult Include(Func<bool> func) {
         ArgumentNullException.ThrowIfNull(func);
         IsIncluded = func();
         return this;
@@ -86,8 +81,7 @@ internal ref struct MatchResult
     /// Sets <see cref="IsIncluded"/> to <see langword="false"/> (excluded).
     /// </summary>
     /// <returns>The current <see cref="MatchResult"/> instance for method chaining.</returns>
-    public MatchResult Exclude()
-    {
+    public MatchResult Exclude() {
         IsIncluded = false;
         return this;
     }
@@ -96,8 +90,7 @@ internal ref struct MatchResult
     /// Sets <see cref="IsMatched"/> to <see langword="true"/>.
     /// </summary>
     /// <returns>The current <see cref="MatchResult"/> instance for method chaining.</returns>
-    public MatchResult Match()
-    {
+    public MatchResult Match() {
         IsMatched = true;
         return this;
     }
@@ -111,8 +104,7 @@ internal ref struct MatchResult
     /// This overload allows deferring potentially expensive match checks until they are needed,
     /// while still preserving fluent usage.
     /// </remarks>
-    public MatchResult Match(Func<bool> func)
-    {
+    public MatchResult Match(Func<bool> func) {
         ArgumentNullException.ThrowIfNull(func);
         IsMatched = func();
         return this;
@@ -122,8 +114,7 @@ internal ref struct MatchResult
     /// Sets <see cref="IsMatched"/> to <see langword="false"/>.
     /// </summary>
     /// <returns>The current <see cref="MatchResult"/> instance for method chaining.</returns>
-    public MatchResult NotMatch()
-    {
+    public MatchResult NotMatch() {
         IsMatched = false;
         return this;
     }

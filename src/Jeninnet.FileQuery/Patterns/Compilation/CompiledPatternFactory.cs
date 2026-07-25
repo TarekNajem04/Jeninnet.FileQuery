@@ -20,8 +20,7 @@
 /// <see cref="CanonicalPatternSet"/>, and <see cref="ClassifiedPatternSet"/>).
 /// </para>
 /// </remarks>
-internal static class CompiledPatternFactory
-{
+internal static class CompiledPatternFactory {
     private static PatternPipeline? _pipeline = PatternPipeline.CreateDefault();
 
     /// <summary>
@@ -38,12 +37,10 @@ internal static class CompiledPatternFactory
     /// <exception cref="InvalidOperationException">
     /// Thrown when the factory has already been configured.
     /// </exception>
-    public static void Configure(PatternPipeline pipeline)
-    {
+    public static void Configure(PatternPipeline pipeline) {
         ArgumentNullException.ThrowIfNull(pipeline);
 
-        if(_pipeline is not null)
-        {
+        if(_pipeline is not null) {
             throw new InvalidOperationException(
                 "CompiledPatternFactory has already been configured.");
         }
@@ -60,15 +57,13 @@ internal static class CompiledPatternFactory
     /// Compiles a <see cref="ClassifiedPatternSet"/> through the full pipeline.
     /// </summary>
     /// <param name="patterns">The set of patterns to compile.</param>
-    public static ICompiledPatternSet Compile(ClassifiedPatternSet patterns) =>
-        Pipeline.Compile(patterns);
+    public static ICompiledPatternSet Compile(ClassifiedPatternSet patterns) => Pipeline.Compile(patterns);
 
     /// <summary>
     /// Compiles a single untyped pattern using <see cref="DefaultPatternType"/>.
     /// </summary>
     /// <param name="pattern">The pattern string to compile.</param>
-    public static ICompiledPatternSet Compile(string pattern) =>
-        Compile(DefaultPatternType, pattern);
+    public static ICompiledPatternSet Compile(string pattern) => Compile(DefaultPatternType, pattern);
 
     /// <summary>
     /// Compiles a single pattern of the specified <paramref name="type"/>.
@@ -79,17 +74,14 @@ internal static class CompiledPatternFactory
     /// Delegates to <see cref="Compile(PatternKind, IEnumerable{string})"/>
     /// with a single-element span, avoiding an intermediate array allocation.
     /// </remarks>
-    public static ICompiledPatternSet Compile(PatternKind type, string pattern)
-    {
-        if(string.IsNullOrWhiteSpace(pattern))
-        {
+    public static ICompiledPatternSet Compile(PatternKind type, string pattern) {
+        if(string.IsNullOrWhiteSpace(pattern)) {
             return CompiledPatternSet.Empty;
         }
 
         // Single-element overload: construct ClassifiedPatternSet with one entry.
         // This avoids the array allocation in the multi-pattern overload.
-        var classified = new ClassifiedPatternSet
-        {
+        var classified = new ClassifiedPatternSet {
             Patterns = [new ClassifiedPattern(Text: pattern, Type: type, SourceIndex: 0)]
         };
 
@@ -120,8 +112,7 @@ internal static class CompiledPatternFactory
     /// <exception cref="ArgumentNullException">
     /// Thrown when <paramref name="patterns"/> is <see langword="null"/>.
     /// </exception>
-    public static ICompiledPatternSet Compile(PatternKind type, IEnumerable<string> patterns)
-    {
+    public static ICompiledPatternSet Compile(PatternKind type, IEnumerable<string> patterns) {
         ArgumentNullException.ThrowIfNull(patterns);
 
         // Build ClassifiedPatternSet directly — bypasses the full
@@ -129,10 +120,8 @@ internal static class CompiledPatternFactory
         var classifiedPatterns = new List<ClassifiedPattern>();
         var sourceIndex = 0;
 
-        foreach(var pattern in patterns)
-        {
-            if(string.IsNullOrWhiteSpace(pattern))
-            {
+        foreach(var pattern in patterns) {
+            if(string.IsNullOrWhiteSpace(pattern)) {
                 continue;
             }
 
@@ -140,8 +129,7 @@ internal static class CompiledPatternFactory
             sourceIndex++;
         }
 
-        if(classifiedPatterns.Count == 0)
-        {
+        if(classifiedPatterns.Count == 0) {
             return CompiledPatternSet.Empty;
         }
 
@@ -155,16 +143,14 @@ internal static class CompiledPatternFactory
     /// <param name="configuration">The configuration to compile.</param>
     public static Dictionary<PatternKind, ICompiledPatternSet> Compile(
         MatchingConfiguration configuration
-    )
-    {
+    ) {
         ArgumentNullException.ThrowIfNull(configuration);
 
         var result = new Dictionary<PatternKind, ICompiledPatternSet>(
             configuration.TypedPatterns.Count
         );
 
-        foreach(var (type, list) in configuration.TypedPatterns)
-        {
+        foreach(var (type, list) in configuration.TypedPatterns) {
             result[type] = Compile(type, list);
         }
 
@@ -186,20 +172,17 @@ internal static class CompiledPatternFactory
     /// that appends directly into one pre-allocated <see cref="List{T}"/>.
     /// </para>
     /// </remarks>
-    public static ICompiledPatternSet CompileSet(MatchingConfiguration configuration)
-    {
+    public static ICompiledPatternSet CompileSet(MatchingConfiguration configuration) {
         ArgumentNullException.ThrowIfNull(configuration);
 
         // Count total patterns across all kinds to pre-size the result list.
         // This avoids list resizing during accumulation.
         var total = 0;
-        foreach(var arr in configuration.TypedPatterns.Values)
-        {
+        foreach(var arr in configuration.TypedPatterns.Values) {
             total += arr.Length;
         }
 
-        if(total == 0)
-        {
+        if(total == 0) {
             return CompiledPatternSet.Empty;
         }
 
@@ -207,16 +190,13 @@ internal static class CompiledPatternFactory
 
         var sourceIndex = 0;
 
-        foreach(var (type, list) in configuration.TypedPatterns)
-        {
+        foreach(var (type, list) in configuration.TypedPatterns) {
             var classifiedPatterns = new List<ClassifiedPattern>(list.Length);
 
-            for(var i = 0; i < list.Length; i++)
-            {
+            for(var i = 0; i < list.Length; i++) {
                 var pattern = list[i];
 
-                if(string.IsNullOrWhiteSpace(pattern))
-                {
+                if(string.IsNullOrWhiteSpace(pattern)) {
                     continue;
                 }
 
@@ -224,8 +204,7 @@ internal static class CompiledPatternFactory
                 sourceIndex++;
             }
 
-            if(classifiedPatterns.Count == 0)
-            {
+            if(classifiedPatterns.Count == 0) {
                 continue;
             }
 
@@ -233,8 +212,7 @@ internal static class CompiledPatternFactory
 
             // Direct indexed loop — avoids foreach enumerator boxing over
             // the ICompiledPatternSet interface (same fix as matcher hot paths).
-            for(var i = 0; i < compiled.Count; i++)
-            {
+            for(var i = 0; i < compiled.Count; i++) {
                 all.Add(compiled[i]);
             }
         }

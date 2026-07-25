@@ -383,3 +383,7 @@ FodyWeavers.xsd
 .sonar/
 .sonarcloud/
 .sonarqube/
+
+# Build-generated project XML documentation files
+src/**/*.xml
+archive/**/*.xml

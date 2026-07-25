@@ -7,14 +7,12 @@
 ///   - Multi-token directory/file name patterns
 /// </summary>
 [TestClass]
-public class EnumerateFilesAsync_AnchoredAndMixedPatternTests
-{
+public class EnumerateFilesAsync_AnchoredAndMixedPatternTests {
     /// <summary>
     /// Checks anchored patterns — those starting with '/' should only match from root.
     /// </summary>
     [TestMethod]
-    public async Task EnumerateFilesAsync_AnchoredPattern_ShouldOnlyMatchAtRootAsync()
-    {
+    public async Task EnumerateFilesAsync_AnchoredPattern_ShouldOnlyMatchAtRootAsync() {
         using var env = new TestEnvironment();
         env.CreateFiles(
             "root.txt",
@@ -46,8 +44,7 @@ public class EnumerateFilesAsync_AnchoredAndMixedPatternTests
     /// Tests a complex mixed-token pattern.
     /// </summary>
     [TestMethod]
-    public async Task EnumerateFilesAsync_MixedTokens_ShouldMatchCorrectlyAsync()
-    {
+    public async Task EnumerateFilesAsync_MixedTokens_ShouldMatchCorrectlyAsync() {
         using var env = new TestEnvironment();
 
         env.CreateFiles(
@@ -85,8 +82,7 @@ public class EnumerateFilesAsync_AnchoredAndMixedPatternTests
     /// Ensures anchored + wildcard paths behave correctly.
     /// </summary>
     [TestMethod]
-    public async Task EnumerateFilesAsync_AnchoredWildcard_ShouldBehaveAsync()
-    {
+    public async Task EnumerateFilesAsync_AnchoredWildcard_ShouldBehaveAsync() {
         using var env = new TestEnvironment();
 
         env.CreateFiles(

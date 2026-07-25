@@ -19,7 +19,7 @@ It supports GitIgnore, Glob, and flat Regex (`r:`) patterns, powered by a strict
 
 ---
 
-# ✨ Overview
+# Overview
 
 Jeninnet.FileQuery is not just a file filter — it is a **pattern execution engine** with:
 
@@ -31,7 +31,7 @@ Jeninnet.FileQuery is not just a file filter — it is a **pattern execution eng
 
 ---
 
-# 🚀 Key Features
+# Key Features
 
 - Ultra‑fast file enumeration (1M–2M files/sec)
 - GitIgnore‑compatible pattern engine
@@ -46,7 +46,7 @@ Jeninnet.FileQuery is not just a file filter — it is a **pattern execution eng
 
 ---
 
-# 📦 Installation
+# Installation
 
 ```bash
 dotnet add package Jeninnet.FileQuery
@@ -54,7 +54,7 @@ dotnet add package Jeninnet.FileQuery
 
 ---
 
-# ⚡ Quick Start
+# Quick Start
 
 ## Enumerate all `.cs` files
 
@@ -89,7 +89,7 @@ await foreach (var file in engine.ExecuteAsync(
 
 ---
 
-# 🧩 Pattern Engines
+# Pattern Engines
 
 ## 1️⃣ GitIgnore Mode
 
@@ -114,7 +114,7 @@ bin/
 
 ---
 
-## 2️⃣ Glob Mode
+## 2️⃣Glob Mode
 
 Filesystem-style matching:
 
@@ -165,7 +165,7 @@ Automatic engine selection:
 
 ---
 
-# 📊 Pattern Engine Comparison
+# Pattern Engine Comparison
 
 | Feature | GitIgnore | Glob | Regex (Flat) |
 |--------|-----------|-------|--------------|
@@ -180,7 +180,7 @@ Automatic engine selection:
 
 ---
 
-# 🧪 Advanced Examples
+# Advanced Examples
 
 ## 1️⃣ Exclude a folder but include a specific file inside it
 
@@ -240,7 +240,7 @@ src/[a-z]*/**/*.cs
 r:^.*\.(cs|md|json)$
 ```
 
-## 🔟 Match files inside numeric folders only
+## Match files inside numeric folders only
 
 ```
 r:^logs\/\d+\/.*\.txt$
@@ -271,7 +271,7 @@ r:^logs\/\d+\/.*\.txt$
 
 ---
 
-# 🧠 Architecture
+# Architecture
 
 ```
 Raw Pattern Text
@@ -295,7 +295,7 @@ HybridPathMatcher
 
 ---
 
-# 📘 Appendix A — Pattern Grammar (Extended & Complete)
+# Appendix A — Pattern Grammar (Extended & Complete)
 
 This appendix defines the **formal grammar** for all pattern engines supported by Jeninnet.FileQuery.
 

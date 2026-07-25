@@ -16,13 +16,11 @@
 /// pipeline, and all invariants are applied through <see cref="PatternCompilerBase"/>.
 /// </para>
 /// </remarks>
-internal sealed class GlobPatternCompiler : PatternCompilerBase
-{
+internal sealed class GlobPatternCompiler : PatternCompilerBase {
     public override PatternKind PatternKind => PatternKind.Glob;
 
-    protected override ICompiledPattern CompileCore(PatternCompilationContext context)
-    {
-        var state = context.State!;
+    protected override ICompiledPattern CompileCore(PatternCompilationContext context) {
+        var state = context.State;
         var tokens = context.Tokens!;
 
         return new CompiledPattern(new CompiledPatternConfig(

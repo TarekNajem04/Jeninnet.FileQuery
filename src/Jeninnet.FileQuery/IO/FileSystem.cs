@@ -7,8 +7,7 @@
 /// Wraps standard <see cref="System.IO"/> APIs. This class is implemented as a singleton
 /// to avoid overhead and provide a consistent access point for the engine.
 /// </remarks>
-internal sealed class FileSystem : IFileSystem
-{
+internal sealed class FileSystem : IFileSystem {
     /// <summary>
     /// Gets the singleton instance of the <see cref="FileSystem"/>.
     /// </summary>
@@ -22,27 +21,22 @@ internal sealed class FileSystem : IFileSystem
         string directory,
         bool ignoreInaccessible,
         FileQueryErrorRecoveryOptions errorRecovery
-    )
-    {
+    ) {
         var attempts = GetMaxAttempts(errorRecovery);
         var attempt = 0;
         IEnumerator<string>? enumerator = null;
 
-        while(attempt < attempts)
-        {
+        while(attempt < attempts) {
             var res = TryMoveNext(directory, ref enumerator, ignoreInaccessible, errorRecovery, ref attempt, attempts, out var path);
-            if(res == EnumerationResult.Break)
-            {
+            if(res == EnumerationResult.Break) {
                 yield break;
             }
 
-            if(res == EnumerationResult.Continue)
-            {
+            if(res == EnumerationResult.Continue) {
                 continue;
             }
 
-            if(TryCreateEntry(path!, ignoreInaccessible, errorRecovery, out var entry))
-            {
+            if(TryCreateEntry(path!, ignoreInaccessible, errorRecovery, out var entry)) {
                 yield return entry;
             }
         }
@@ -54,10 +48,8 @@ internal sealed class FileSystem : IFileSystem
         bool ignoreInaccessible,
         FileQueryErrorRecoveryOptions errorRecovery,
         [EnumeratorCancellation] CancellationToken cancellationToken = default
-    )
-    {
-        if(!TryEnsureAccessible(directory, ignoreInaccessible, errorRecovery))
-        {
+    ) {
+        if(!TryEnsureAccessible(directory, ignoreInaccessible, errorRecovery)) {
             yield break;
         }
 
@@ -65,23 +57,19 @@ internal sealed class FileSystem : IFileSystem
         var attempt = 0;
         IEnumerator<string>? enumerator = null;
 
-        while(attempt < attempts)
-        {
+        while(attempt < attempts) {
             cancellationToken.ThrowIfCancellationRequested();
 
             var res = TryMoveNext(directory, ref enumerator, ignoreInaccessible, errorRecovery, ref attempt, attempts, out var path);
-            if(res == EnumerationResult.Break)
-            {
+            if(res == EnumerationResult.Break) {
                 yield break;
             }
 
-            if(res == EnumerationResult.Continue)
-            {
+            if(res == EnumerationResult.Continue) {
                 continue;
             }
 
-            if(TryCreateEntry(path!, ignoreInaccessible, errorRecovery, out var entry))
-            {
+            if(TryCreateEntry(path!, ignoreInaccessible, errorRecovery, out var entry)) {
                 yield return entry;
                 await Task.Yield();
             }
@@ -89,25 +77,20 @@ internal sealed class FileSystem : IFileSystem
     }
 
     /// <inheritdoc/>
-    public bool DirectoryExists(string path)
-        => Directory.Exists(path);
+    public bool DirectoryExists(string path) => Directory.Exists(path);
 
     /// <summary>
     /// Retrieves attributes for the given path directly from the OS.
     /// </summary>
     /// <inheritdoc/>
-    public FileAttributes GetAttributes(string path)
-        => File.GetAttributes(path);
+    public FileAttributes GetAttributes(string path) => File.GetAttributes(path);
 
     /// <inheritdoc/>
-    public string ResolveRealPath(string path)
-    {
-        try
-        {
+    public string ResolveRealPath(string path) {
+        try {
             var attributes = File.GetAttributes(path);
 
-            if(attributes.HasFlag(FileAttributes.ReparsePoint))
-            {
+            if(attributes.HasFlag(FileAttributes.ReparsePoint)) {
                 var target = attributes.HasFlag(FileAttributes.Directory)
                     ? Directory.ResolveLinkTarget(path, returnFinalTarget: true)
                     : File.ResolveLinkTarget(path, returnFinalTarget: true);
@@ -115,8 +98,7 @@ internal sealed class FileSystem : IFileSystem
                 return target?.FullName ?? path;
             }
         }
-        catch
-        {
+        catch {
             // If we cannot resolve (e.g. permission error), return the original path.
             // The engine will handle the access error during enumeration.
         }
@@ -133,8 +115,7 @@ internal sealed class FileSystem : IFileSystem
     /// <inheritdoc/>
     public string GetFullPath(string path, string basePath) => Path.GetFullPath(path, basePath);
 
-    private static int GetMaxAttempts(FileQueryErrorRecoveryOptions errorRecovery)
-        => errorRecovery.Action is FileQueryErrorAction.Retry ? errorRecovery.MaxRetryAttempts + 1 : 1;
+    private static int GetMaxAttempts(FileQueryErrorRecoveryOptions errorRecovery) => errorRecovery.Action is FileQueryErrorAction.Retry ? errorRecovery.MaxRetryAttempts + 1 : 1;
 
     private enum EnumerationResult { Success, Break, Continue }
 
@@ -146,14 +127,11 @@ internal sealed class FileSystem : IFileSystem
         ref int attempt,
         int attempts,
         out string? path
-    )
-    {
+    ) {
         path = null;
-        try
-        {
+        try {
             enumerator ??= Directory.EnumerateFileSystemEntries(directory).GetEnumerator();
-            if(enumerator.MoveNext())
-            {
+            if(enumerator.MoveNext()) {
                 path = enumerator.Current;
                 return EnumerationResult.Success;
             }
@@ -161,18 +139,15 @@ internal sealed class FileSystem : IFileSystem
             enumerator.Dispose();
             return EnumerationResult.Break;
         }
-        catch(Exception ex) when(FileSystemGuards.IsRecoverable(ex))
-        {
+        catch(Exception ex) when(FileSystemGuards.IsRecoverable(ex)) {
             enumerator?.Dispose();
             enumerator = null;
 
-            if(FileSystemGuards.ShouldSkip(ignoreInaccessible, errorRecovery, attempt, attempts))
-            {
+            if(FileSystemGuards.ShouldSkip(ignoreInaccessible, errorRecovery, attempt, attempts)) {
                 return EnumerationResult.Break;
             }
 
-            if(errorRecovery.Action is FileQueryErrorAction.Retry && attempt < attempts - 1)
-            {
+            if(errorRecovery.Action is FileQueryErrorAction.Retry && attempt < attempts - 1) {
                 attempt++;
                 return EnumerationResult.Continue;
             }
@@ -181,16 +156,13 @@ internal sealed class FileSystem : IFileSystem
         }
     }
 
-    private static bool TryCreateEntry(string path, bool ignoreInaccessible, FileQueryErrorRecoveryOptions errorRecovery, out FileSystemEntry entry)
-    {
+    private static bool TryCreateEntry(string path, bool ignoreInaccessible, FileQueryErrorRecoveryOptions errorRecovery, out FileSystemEntry entry) {
         entry = default;
-        if(!TryGetAttributes(path, ignoreInaccessible, errorRecovery, out var attributes))
-        {
+        if(!TryGetAttributes(path, ignoreInaccessible, errorRecovery, out var attributes)) {
             return false;
         }
 
-        if(attributes.HasFlag(FileAttributes.Directory) && !TryEnsureAccessible(path, ignoreInaccessible, errorRecovery))
-        {
+        if(attributes.HasFlag(FileAttributes.Directory) && !TryEnsureAccessible(path, ignoreInaccessible, errorRecovery)) {
             return false;
         }
 
@@ -203,27 +175,21 @@ internal sealed class FileSystem : IFileSystem
         bool ignoreInaccessible,
         FileQueryErrorRecoveryOptions errorRecovery,
         out FileAttributes attributes
-    )
-    {
+    ) {
         attributes = default;
         var attempts = GetMaxAttempts(errorRecovery);
 
-        for(var attempt = 0; attempt < attempts; attempt++)
-        {
-            try
-            {
+        for(var attempt = 0; attempt < attempts; attempt++) {
+            try {
                 attributes = File.GetAttributes(path);
                 return true;
             }
-            catch(Exception ex) when(FileSystemGuards.IsRecoverable(ex))
-            {
-                if(FileSystemGuards.ShouldSkip(ignoreInaccessible, errorRecovery, attempt, attempts))
-                {
+            catch(Exception ex) when(FileSystemGuards.IsRecoverable(ex)) {
+                if(FileSystemGuards.ShouldSkip(ignoreInaccessible, errorRecovery, attempt, attempts)) {
                     return false;
                 }
 
-                if(errorRecovery.Action is FileQueryErrorAction.Retry && attempt < attempts - 1)
-                {
+                if(errorRecovery.Action is FileQueryErrorAction.Retry && attempt < attempts - 1) {
                     continue;
                 }
 
@@ -238,26 +204,20 @@ internal sealed class FileSystem : IFileSystem
         string directory,
         bool ignoreInaccessible,
         FileQueryErrorRecoveryOptions errorRecovery
-    )
-    {
+    ) {
         var attempts = GetMaxAttempts(errorRecovery);
 
-        for(var attempt = 0; attempt < attempts; attempt++)
-        {
-            try
-            {
+        for(var attempt = 0; attempt < attempts; attempt++) {
+            try {
                 FileSystemGuards.EnsureAccessible(directory, ignoreInaccessible);
                 return true;
             }
-            catch(Exception ex) when(FileSystemGuards.IsRecoverable(ex))
-            {
-                if(FileSystemGuards.ShouldSkip(ignoreInaccessible, errorRecovery, attempt, attempts))
-                {
+            catch(Exception ex) when(FileSystemGuards.IsRecoverable(ex)) {
+                if(FileSystemGuards.ShouldSkip(ignoreInaccessible, errorRecovery, attempt, attempts)) {
                     return false;
                 }
 
-                if(errorRecovery.Action is FileQueryErrorAction.Retry && attempt < attempts - 1)
-                {
+                if(errorRecovery.Action is FileQueryErrorAction.Retry && attempt < attempts - 1) {
                     continue;
                 }
 

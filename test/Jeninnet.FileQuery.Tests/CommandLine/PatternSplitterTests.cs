@@ -1,11 +1,9 @@
 ﻿namespace Jeninnet.FileQuery.Tests.CommandLine;
 
 [TestClass]
-public sealed class PatternSplitterTests
-{
+public sealed class PatternSplitterTests {
     [TestMethod]
-    public void Split_ShouldSplitBySemicolon()
-    {
+    public void Split_ShouldSplitBySemicolon() {
         const string input = "a.txt;b.txt;c.txt";
         var result = PatternSplitter.Split(input).ToList();
 
@@ -16,8 +14,7 @@ public sealed class PatternSplitterTests
     }
 
     [TestMethod]
-    public void Split_ShouldHandleMultipleSeparators()
-    {
+    public void Split_ShouldHandleMultipleSeparators() {
         const string input = "a.txt,b.txt;c.txt";
         var separators = new[] { ',', ';' };
         var result = PatternSplitter.Split(input, separators).ToList();
@@ -29,8 +26,7 @@ public sealed class PatternSplitterTests
     }
 
     [TestMethod]
-    public void Split_ShouldReturnSingleItem_WhenNoSeparatorPresent()
-    {
+    public void Split_ShouldReturnSingleItem_WhenNoSeparatorPresent() {
         const string input = "a.txt";
         var result = PatternSplitter.Split(input).ToList();
 
@@ -39,8 +35,7 @@ public sealed class PatternSplitterTests
     }
 
     [TestMethod]
-    public void Split_ShouldHandleEmptyAndWhitespaceInput()
-    {
+    public void Split_ShouldHandleEmptyAndWhitespaceInput() {
         const string input = " ; ; ";
         var result = PatternSplitter.Split(input).ToList();
         Assert.IsEmpty(result);

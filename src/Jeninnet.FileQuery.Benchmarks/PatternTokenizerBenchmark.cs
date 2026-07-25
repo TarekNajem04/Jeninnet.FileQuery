@@ -16,8 +16,7 @@
 /// Measures the performance of the pattern tokenizer.
 /// </summary>
 [MemoryDiagnoser]
-public class PatternTokenizerBenchmark
-{
+public class PatternTokenizerBenchmark {
     private readonly string[] _patterns =
     [
         "**",
@@ -32,10 +31,8 @@ public class PatternTokenizerBenchmark
     /// Measures the performance of the pattern tokenizer.
     /// </summary>
     [Benchmark]
-    public void TokenizePatterns()
-    {
-        foreach(var pattern in _patterns)
-        {
+    public void TokenizePatterns() {
+        foreach(var pattern in _patterns) {
             _ = CompiledPatternFactory.Compile(pattern);
 
             // var compiledPatternSets = CompiledPatternFactory.Compile(pattern)

@@ -1,11 +1,9 @@
 ﻿namespace Jeninnet.FileQuery.Tests.Core;
 
 [TestClass]
-public class FileQueryCoreTests
-{
+public class FileQueryCoreTests {
     [TestMethod]
-    public void CreateUnsafe_ShouldReturnFileQuery_WhenValidParamsProvided()
-    {
+    public void CreateUnsafe_ShouldReturnFileQuery_WhenValidParamsProvided() {
         // Arrange
         var rootPath = Path.GetTempPath();
         var options = new FileQueryOptions(new FileQueryOptionsConfig(new PatternInput()));

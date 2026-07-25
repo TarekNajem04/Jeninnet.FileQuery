@@ -8,18 +8,15 @@
 ///   - Performance consistency under async enumeration
 /// </summary>
 [TestClass]
-public class EnumerateFilesAsync_StressAndEdgeCaseTests
-{
+public class EnumerateFilesAsync_StressAndEdgeCaseTests {
     /// <summary>
     /// Stress test: Verify async enumeration works correctly with many files.
     /// </summary>
     [TestMethod]
-    public async Task EnumerateFilesAsync_Stress_ShouldHandleManyFilesAsync()
-    {
+    public async Task EnumerateFilesAsync_Stress_ShouldHandleManyFilesAsync() {
         using var env = new TestEnvironment();
 
-        for(var i = 0; i < 200; i++)
-        {
+        for(var i = 0; i < 200; i++) {
             env.CreateFile($"group/file{i}.txt");
         }
 
@@ -46,8 +43,7 @@ public class EnumerateFilesAsync_StressAndEdgeCaseTests
     /// it must be treated as a file pattern.
     /// </summary>
     [TestMethod]
-    public async Task EnumerateFilesAsync_FakeDirectoryPattern_ShouldNotIgnoreFolderAsync()
-    {
+    public async Task EnumerateFilesAsync_FakeDirectoryPattern_ShouldNotIgnoreFolderAsync() {
         using var env = new TestEnvironment();
 
         env.CreateFiles(
@@ -78,8 +74,7 @@ public class EnumerateFilesAsync_StressAndEdgeCaseTests
     /// Ensures async behavior is identical to sync when combining many rules.
     /// </summary>
     [TestMethod]
-    public async Task EnumerateFilesAsync_ComplexRuleSet_ShouldReturnSameAsSyncAsync()
-    {
+    public async Task EnumerateFilesAsync_ComplexRuleSet_ShouldReturnSameAsSyncAsync() {
         using var env = new TestEnvironment();
 
         env.CreateFiles(
@@ -110,7 +105,7 @@ public class EnumerateFilesAsync_StressAndEdgeCaseTests
         // sync
         var syncResults = fileQueryEngine.Execute(new(env.Root, options)).ToList();
 
-        CollectionAssert.AreEquivalent(syncResults, asyncResults);
+        Assert.AreSequenceEqual(syncResults, asyncResults, SequenceOrder.InAnyOrder);
     }
 
     public TestContext TestContext { get; set; } = null!;

@@ -9,8 +9,7 @@
 internal readonly record struct FileSystemEntry(
     string FullPath,
     FileAttributes Attributes
-)
-{
+) {
     /// <summary>
     /// Gets the full absolute path of the filesystem entry.
     /// </summary>
@@ -81,17 +80,14 @@ internal readonly record struct FileSystemEntry(
     /// Determines whether the entry has the specified attribute flag.
     /// </summary>
     /// <param name="attribute">The attribute flag to test.</param>
-    public bool HasAttribute(FileAttributes attribute) =>
-        (Attributes & attribute) is not 0;
+    public bool HasAttribute(FileAttributes attribute) => (Attributes & attribute) is not 0;
 
     /// <summary>
     /// Returns all active attribute flags for this entry.
     /// Useful for debugging or UI display.
     /// </summary>
-    public IEnumerable<FileAttributes> ActiveAttributes
-    {
-        get
-        {
+    public IEnumerable<FileAttributes> ActiveAttributes {
+        get {
             var entry = this;
 
             return Enum.GetValues<FileAttributes>()

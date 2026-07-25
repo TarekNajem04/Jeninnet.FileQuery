@@ -5,14 +5,12 @@
 /// Last matching rule wins.
 /// </summary>
 [TestClass]
-public class NegationRuleTests
-{
+public class NegationRuleTests {
     /// <summary>
     /// Basic inclusion via catch-all + negation for a specific file.
     /// </summary>
     [TestMethod]
-    public void NegatedPattern_ShouldExcludeSpecificFile()
-    {
+    public void NegatedPattern_ShouldExcludeSpecificFile() {
         using var env = new TestEnvironment();
 
         env.CreateFiles("a.txt", "b.txt", "c.txt");
@@ -40,8 +38,7 @@ public class NegationRuleTests
     /// Negation should re-include files previously excluded.
     /// </summary>
     [TestMethod]
-    public void NegationShouldReIncludeFiles()
-    {
+    public void NegationShouldReIncludeFiles() {
         using var env = new TestEnvironment();
 
         env.CreateFiles("keep.txt", "ignore.txt");
@@ -68,8 +65,7 @@ public class NegationRuleTests
     /// More complex rule chain: include all, exclude folder, re-include specific file.
     /// </summary>
     [TestMethod]
-    public void NegationAppliedAfterExclusion_ShouldWin()
-    {
+    public void NegationAppliedAfterExclusion_ShouldWin() {
         using var env = new TestEnvironment();
 
         env.CreateFile("sub/inside.txt");

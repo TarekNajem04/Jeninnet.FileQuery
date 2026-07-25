@@ -8,8 +8,7 @@
 /// the actual <see cref="File"/> and <see cref="Directory"/> APIs,
 /// facilitating easier unit testing through mocking.
 /// </remarks>
-internal interface IFileSystem
-{
+internal interface IFileSystem {
     /// <summary>
     /// Enumerates all file system entries within the specified directory.
     /// </summary>

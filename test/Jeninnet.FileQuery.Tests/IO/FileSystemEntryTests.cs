@@ -1,24 +1,29 @@
 ﻿namespace Jeninnet.FileQuery.Tests.IO;
 
 [TestClass]
-public sealed class FileSystemEntryTests
-{
+public class FileSystemEntryTests {
     [TestMethod]
-    public void Properties_ShouldReflectAttributesCorrectly()
-    {
-        var entry = new FileSystemEntry("C:/test.txt", FileAttributes.ReadOnly | FileAttributes.Hidden | FileAttributes.Directory);
+    public void FileSystemEntry_Properties_TestAllAttributes() {
+        var entry = new FileSystemEntry("test", FileAttributes.ReadOnly | FileAttributes.Hidden | FileAttributes.Directory);
 
         Assert.IsTrue(entry.IsReadOnly);
         Assert.IsTrue(entry.IsHidden);
         Assert.IsTrue(entry.IsDirectory);
-        Assert.AreEqual(PathKind.Directory, entry.PathKind);
         Assert.IsFalse(entry.IsSystem);
+        Assert.IsFalse(entry.IsArchive);
     }
 
     [TestMethod]
-    public void ActiveAttributes_ReturnsCorrectAttributes()
-    {
-        var entry = new FileSystemEntry("C:/test.txt", FileAttributes.ReadOnly | FileAttributes.Hidden);
+    public void FileSystemEntry_HasAttribute_Test() {
+        var entry = new FileSystemEntry("test", FileAttributes.Encrypted);
+
+        Assert.IsTrue(entry.HasAttribute(FileAttributes.Encrypted));
+        Assert.IsFalse(entry.HasAttribute(FileAttributes.ReadOnly));
+    }
+
+    [TestMethod]
+    public void FileSystemEntry_ActiveAttributes_Test() {
+        var entry = new FileSystemEntry("test", FileAttributes.ReadOnly | FileAttributes.Hidden);
         var active = entry.ActiveAttributes.ToList();
 
         Assert.Contains(FileAttributes.ReadOnly, active);

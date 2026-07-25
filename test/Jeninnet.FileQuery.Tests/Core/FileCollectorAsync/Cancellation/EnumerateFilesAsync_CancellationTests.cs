@@ -8,14 +8,12 @@
 /// - Cancellation is detected early
 /// </summary>
 [TestClass]
-public class EnumerateFilesAsync_CancellationTests
-{
+public class EnumerateFilesAsync_CancellationTests {
     /// <summary>
     /// Immediate cancellation before enumeration starts.
     /// </summary>
     [TestMethod]
-    public async Task EnumerateFilesAsync_ShouldThrowImmediatelyWhenCanceledAsync()
-    {
+    public async Task EnumerateFilesAsync_ShouldThrowImmediatelyWhenCanceledAsync() {
         using var env = new TestEnvironment();
 
         env.CreateFiles("a.txt", "b.txt", "c.log");
@@ -32,10 +30,8 @@ public class EnumerateFilesAsync_CancellationTests
         using var cts = new CancellationTokenSource();
         await cts.CancelAsync(); // Cancel BEFORE starting enumeration
 
-        async Task ActAsync()
-        {
-            await foreach(var _ in fileQueryEngine.ExecuteAsync(new(env.Root, options), cts.Token))
-            {
+        async Task ActAsync() {
+            await foreach(var _ in fileQueryEngine.ExecuteAsync(new(env.Root, options), cts.Token)) {
                 // Should never enter
             }
         }
@@ -47,8 +43,7 @@ public class EnumerateFilesAsync_CancellationTests
     /// Cancellation occurs in the middle of enumeration.
     /// </summary>
     [TestMethod]
-    public async Task EnumerateFilesAsync_ShouldStopWhenCanceledDuringIterationAsync()
-    {
+    public async Task EnumerateFilesAsync_ShouldStopWhenCanceledDuringIterationAsync() {
         using var env = new TestEnvironment();
 
         env.CreateFiles("1.txt", "2.txt", "3.txt", "4.txt", "5.txt");
@@ -66,15 +61,12 @@ public class EnumerateFilesAsync_CancellationTests
 
         using var cts = new CancellationTokenSource();
 
-        async Task ActAsync()
-        {
-            await foreach(var path in fileQueryEngine.ExecuteAsync(new(env.Root, options), cts.Token))
-            {
+        async Task ActAsync() {
+            await foreach(var path in fileQueryEngine.ExecuteAsync(new(env.Root, options), cts.Token)) {
                 results.Add(path);
 
                 // cancel after first item
-                if(results.Count == 1)
-                {
+                if(results.Count == 1) {
                     await cts.CancelAsync();
                 }
             }
@@ -89,8 +81,7 @@ public class EnumerateFilesAsync_CancellationTests
     /// Cancellation inside a deep recursive directory tree.
     /// </summary>
     [TestMethod]
-    public async Task EnumerateFilesAsync_ShouldCancelDuringDeepRecursionAsync()
-    {
+    public async Task EnumerateFilesAsync_ShouldCancelDuringDeepRecursionAsync() {
         using var env = new TestEnvironment();
 
         env.CreateFile("a/b/c/d/e/f/g/deep.txt");
@@ -114,10 +105,8 @@ public class EnumerateFilesAsync_CancellationTests
 
         var count = 0;
 
-        async Task ActAsync()
-        {
-            await foreach(var path in fileQueryEngine.ExecuteAsync(new(env.Root, options), cts.Token))
-            {
+        async Task ActAsync() {
+            await foreach(var path in fileQueryEngine.ExecuteAsync(new(env.Root, options), cts.Token)) {
                 count++;
                 await cts.CancelAsync(); // Cancel immediately when first file found
             }

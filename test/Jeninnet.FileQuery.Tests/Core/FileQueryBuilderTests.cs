@@ -1,29 +1,24 @@
 ﻿namespace Jeninnet.FileQuery.Tests.Core;
 
 [TestClass]
-public class FileQueryBuilderTests
-{
+public class FileQueryBuilderTests {
     private string _tempRoot = string.Empty;
 
     [TestInitialize]
-    public void Init()
-    {
+    public void Init() {
         _tempRoot = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
         Directory.CreateDirectory(_tempRoot);
     }
 
     [TestCleanup]
-    public void Cleanup()
-    {
-        if(Directory.Exists(_tempRoot))
-        {
+    public void Cleanup() {
+        if(Directory.Exists(_tempRoot)) {
             Directory.Delete(_tempRoot, true);
         }
     }
 
     [TestMethod]
-    public void Where_ShouldAddPatterns_WhenPatternKindAndListProvided()
-    {
+    public void Where_ShouldAddPatterns_WhenPatternKindAndListProvided() {
         // Arrange
         var builder = FileQuery.From(_tempRoot);
         var patterns = new List<string> { "*.txt", "*.log" };
@@ -35,12 +30,11 @@ public class FileQueryBuilderTests
         // Assert
         Assert.IsNotNull(query.Options.PatternInput.TypedPatterns);
         Assert.IsTrue(query.Options.PatternInput.TypedPatterns.ContainsKey(PatternKind.Glob));
-        CollectionAssert.AreEquivalent(patterns, query.Options.PatternInput.TypedPatterns[PatternKind.Glob].ToList());
+        Assert.AreSequenceEqual(patterns, query.Options.PatternInput.TypedPatterns[PatternKind.Glob].ToList(), SequenceOrder.InAnyOrder);
     }
 
     [TestMethod]
-    public void UsingHybrid_ShouldSetMatchingModeToHybrid_WhenCalled()
-    {
+    public void UsingHybrid_ShouldSetMatchingModeToHybrid_WhenCalled() {
         // Arrange
         var builder = FileQuery.From(_tempRoot);
 
@@ -53,8 +47,7 @@ public class FileQueryBuilderTests
     }
 
     [TestMethod]
-    public void UsingGitIgnore_ShouldSetMatchingModeToGitIgnore_WhenCalled()
-    {
+    public void UsingGitIgnore_ShouldSetMatchingModeToGitIgnore_WhenCalled() {
         // Arrange
         var builder = FileQuery.From(_tempRoot);
 
@@ -67,8 +60,7 @@ public class FileQueryBuilderTests
     }
 
     [TestMethod]
-    public void UsingGlob_ShouldSetMatchingModeToGlob_WhenCalled()
-    {
+    public void UsingGlob_ShouldSetMatchingModeToGlob_WhenCalled() {
         // Arrange
         var builder = FileQuery.From(_tempRoot);
 
@@ -81,8 +73,7 @@ public class FileQueryBuilderTests
     }
 
     [TestMethod]
-    public void UsingRegex_ShouldSetMatchingModeToRegex_WhenCalled()
-    {
+    public void UsingRegex_ShouldSetMatchingModeToRegex_WhenCalled() {
         // Arrange
         var builder = FileQuery.From(_tempRoot);
 
@@ -95,8 +86,7 @@ public class FileQueryBuilderTests
     }
 
     [TestMethod]
-    public void WithRecursion_ShouldUpdateRecurseSubdirectories_WhenValueProvided()
-    {
+    public void WithRecursion_ShouldUpdateRecurseSubdirectories_WhenValueProvided() {
         // Arrange
         var builder = FileQuery.From(_tempRoot);
 
@@ -109,8 +99,7 @@ public class FileQueryBuilderTests
     }
 
     [TestMethod]
-    public void WithoutRecursion_ShouldSetRecurseSubdirectoriesToFalse_WhenCalled()
-    {
+    public void WithoutRecursion_ShouldSetRecurseSubdirectoriesToFalse_WhenCalled() {
         // Arrange
         var builder = FileQuery.From(_tempRoot);
 
@@ -123,8 +112,7 @@ public class FileQueryBuilderTests
     }
 
     [TestMethod]
-    public void IgnoreCase_ShouldUpdateCaseSensitivity_WhenValueProvided()
-    {
+    public void IgnoreCase_ShouldUpdateCaseSensitivity_WhenValueProvided() {
         // Arrange
         var builder = FileQuery.From(_tempRoot);
 
@@ -137,8 +125,7 @@ public class FileQueryBuilderTests
     }
 
     [TestMethod]
-    public void ValidatePatternType_ShouldThrowInvalidOperationException_WhenModeAndKindConflict_AllCases()
-    {
+    public void ValidatePatternType_ShouldThrowInvalidOperationException_WhenModeAndKindConflict_AllCases() {
         // Test GitIgnore mode conflicts
         var builder1 = FileQuery.From(_tempRoot).UsingGitIgnore();
         Assert.Throws<InvalidOperationException>(() => builder1.Where(PatternKind.Glob, ["*.txt"]));
@@ -163,8 +150,7 @@ public class FileQueryBuilderTests
 
     [TestMethod]
 #pragma warning disable S2699
-    public void ValidatePatternType_ShouldHandleAllPatternKinds_WhenHybrid()
-    {
+    public void ValidatePatternType_ShouldHandleAllPatternKinds_WhenHybrid() {
         // Arrange
         var builder = FileQuery.From(_tempRoot);
         builder.UsingHybrid();
@@ -177,15 +163,13 @@ public class FileQueryBuilderTests
 #pragma warning restore S2699
 
     [TestMethod]
-    public void Build_ShouldThrow_WhenRootPathIsNullOrEmpty()
-    {
+    public void Build_ShouldThrow_WhenRootPathIsNullOrEmpty() {
         var builder = new FileQueryBuilder("   ", FileSystem.Instance);
         Assert.Throws<InvalidOperationException>(builder.Build);
     }
 
     [TestMethod]
-    public void Build_ShouldThrow_WhenRootPathDoesNotExist()
-    {
+    public void Build_ShouldThrow_WhenRootPathDoesNotExist() {
         var builder = FileQuery.From(Path.Combine(_tempRoot, "does-not-exist"));
         Assert.Throws<DirectoryNotFoundException>(builder.Build);
     }

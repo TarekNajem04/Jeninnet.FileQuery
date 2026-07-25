@@ -3,8 +3,7 @@
 /// <summary>
 /// Provides a printer implementation that writes to the console.
 /// </summary>
-public sealed class ConsolePrinter : IPrinter
-{
+public sealed class ConsolePrinter : IPrinter {
     /// <summary>
     /// Prints the specified path to the console.
     /// </summary>

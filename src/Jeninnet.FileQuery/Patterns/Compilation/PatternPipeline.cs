@@ -24,16 +24,14 @@
 /// </list>
 /// </para>
 /// </remarks>
-internal sealed class PatternPipeline
-{
+internal sealed class PatternPipeline {
     private readonly PatternInvariantRegistry _invariants;
     private readonly IPatternCompilerRegistry _compilers;
 
     internal PatternPipeline(
         PatternInvariantRegistry invariants,
         IPatternCompilerRegistry compilers
-    )
-    {
+    ) {
         _invariants = invariants ?? throw new ArgumentNullException(nameof(invariants));
         _compilers = compilers ?? throw new ArgumentNullException(nameof(compilers));
     }
@@ -46,8 +44,7 @@ internal sealed class PatternPipeline
     /// Compiles a single classified pattern through the full pipeline.
     /// </summary>
     /// <param name="pattern">The classified pattern to compile.</param>
-    public ICompiledPattern Compile(ClassifiedPattern pattern)
-    {
+    public ICompiledPattern Compile(ClassifiedPattern pattern) {
         ArgumentNullException.ThrowIfNull(pattern);
 
         var context = new PatternCompilationContext(pattern);
@@ -67,12 +64,11 @@ internal sealed class PatternPipeline
 
         // Phase 5 — Compile tokens to compiled pattern.
         var compilerResult = _compilers.GetCompiler(pattern.Type);
-        if(!compilerResult.IsSuccess)
-        {
+        if(!compilerResult.IsSuccess) {
             throw new PatternException(compilerResult.Error!);
         }
 
-        return compilerResult.Value!.Compile(context);
+        return compilerResult.Value.Compile(context);
     }
 
     // ------------------------------------------------------------------
@@ -84,19 +80,16 @@ internal sealed class PatternPipeline
     /// compiled set.
     /// </summary>
     /// <param name="set">The classified pattern set.</param>
-    public ICompiledPatternSet Compile(ClassifiedPatternSet set)
-    {
+    public ICompiledPatternSet Compile(ClassifiedPatternSet set) {
         ArgumentNullException.ThrowIfNull(set);
 
-        if(set.Patterns.Count == 0)
-        {
+        if(set.Patterns.Count == 0) {
             return CompiledPatternSet.Empty;
         }
 
         var compiled = new List<ICompiledPattern>(set.Patterns.Count);
 
-        foreach(var pattern in set.Patterns)
-        {
+        foreach(var pattern in set.Patterns) {
             compiled.Add(Compile(pattern));
         }
 
@@ -138,8 +131,7 @@ internal sealed class PatternPipeline
     /// </list>
     /// </para>
     /// </remarks>
-    public static PatternPipeline CreateDefault()
-    {
+    public static PatternPipeline CreateDefault() {
         var invariants = new PatternInvariantRegistry([
 
             // ---- Lexical phase ----

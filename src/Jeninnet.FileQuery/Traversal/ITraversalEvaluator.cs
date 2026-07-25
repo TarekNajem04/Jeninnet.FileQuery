@@ -3,8 +3,7 @@
 /// <summary>
 /// Evaluates traversal decisions for filesystem entries.
 /// </summary>
-internal interface ITraversalEvaluator
-{
+internal interface ITraversalEvaluator {
     /// <summary>
     /// Evaluates traversal decisions for filesystem entries based on the match outcome,
     /// entry kind, and current traversal depth.

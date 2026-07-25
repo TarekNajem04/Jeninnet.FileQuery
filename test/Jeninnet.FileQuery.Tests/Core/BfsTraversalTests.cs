@@ -4,8 +4,7 @@
 /// Tests for breadth-first traversal strategy.
 /// </summary>
 [TestClass]
-public sealed class BfsTraversalTests
-{
+public sealed class BfsTraversalTests {
     // ======================================================================
     // BFS must return the same file set as DFS — only order may differ.
     // ======================================================================
@@ -14,8 +13,7 @@ public sealed class BfsTraversalTests
     /// BFS and DFS must return identical file sets; only traversal order may differ.
     /// </summary>
     [TestMethod]
-    public void BfsTraversal_ReturnsAllFiles_IdenticalToDfs()
-    {
+    public void BfsTraversal_ReturnsAllFiles_IdenticalToDfs() {
         using var env = new TestEnvironment();
         env.CreateFiles(
             "root.txt",
@@ -49,8 +47,7 @@ public sealed class BfsTraversalTests
         var bfsResults = engine.Execute(new(env.Root, bfsOptions)).ToList();
         var dfsResults = engine.Execute(new(env.Root, dfsOptions)).ToList();
 
-        CollectionAssert.AreEquivalent(dfsResults, bfsResults,
-            "BFS and DFS must return the same set of files.");
+        Assert.AreSequenceEqual(dfsResults, bfsResults, SequenceOrder.InAnyOrder, "BFS and DFS must return the same set of files.");
 
         Assert.HasCount(4, bfsResults);
     }
@@ -60,8 +57,7 @@ public sealed class BfsTraversalTests
     /// This is the defining property of breadth-first traversal.
     /// </summary>
     [TestMethod]
-    public void BfsTraversal_RootFilesAppearBeforeDeepFiles()
-    {
+    public void BfsTraversal_RootFilesAppearBeforeDeepFiles() {
         using var env = new TestEnvironment();
         env.CreateFile("root.txt");
         env.CreateFile("sub/nested/deep.txt");
@@ -93,8 +89,7 @@ public sealed class BfsTraversalTests
     /// way DFS does.
     /// </summary>
     [TestMethod]
-    public void BfsTraversal_RespectsMaxRecursionDepth()
-    {
+    public void BfsTraversal_RespectsMaxRecursionDepth() {
         using var env = new TestEnvironment();
         env.CreateFile("root.txt");
         env.CreateFile("level1/a.txt");
@@ -125,8 +120,7 @@ public sealed class BfsTraversalTests
     /// BFS async must return the same files as BFS sync.
     /// </summary>
     [TestMethod]
-    public async Task BfsTraversal_AsyncMatchesSyncAsync()
-    {
+    public async Task BfsTraversal_AsyncMatchesSyncAsync() {
         using var env = new TestEnvironment();
         env.CreateFiles("a.txt", "sub/b.txt", "sub/deep/c.txt");
 
@@ -146,8 +140,7 @@ public sealed class BfsTraversalTests
             .ToListAsync(TestContext.CancellationToken);
         asyncResults.Sort();
 
-        CollectionAssert.AreEqual(syncResults, asyncResults,
-            "BFS async must match BFS sync when both results are sorted.");
+        Assert.AreSequenceEqual(syncResults, asyncResults, "BFS async must match BFS sync when both results are sorted.");
     }
 
     public TestContext TestContext { get; set; } = null!;
@@ -163,8 +156,7 @@ public sealed class BfsTraversalTests
 /// produces an invalid path that matchers cannot evaluate correctly.
 /// </remarks>
 [TestClass]
-public sealed class PathUtilitiesUncTests
-{
+public sealed class PathUtilitiesUncTests {
 
     // ======================================================================
     // IsUncRoot structural cases
@@ -176,8 +168,7 @@ public sealed class PathUtilitiesUncTests
     /// and the leading double-slash is preserved.
     /// </summary>
     [TestMethod]
-    public void Normalize_UncPath_NoTrailingSlash_LeadingDoubleSlashPreserved()
-    {
+    public void Normalize_UncPath_NoTrailingSlash_LeadingDoubleSlashPreserved() {
         const string input = @"\\server\share\file.txt";
         const string expected = "//server/share/file.txt";
 
@@ -197,8 +188,7 @@ public sealed class PathUtilitiesUncTests
     /// removed the final slash. This test failed before the structural-parsing fix.
     /// </remarks>
     [TestMethod]
-    public void Normalize_UncRoot_WithTrailingSlash_SlashPreserved()
-    {
+    public void Normalize_UncRoot_WithTrailingSlash_SlashPreserved() {
         const string input = @"\\server\share\";
         const string expected = "//server/share/";
 
@@ -210,8 +200,7 @@ public sealed class PathUtilitiesUncTests
     /// A UNC root path without a trailing slash must not have one added.
     /// </summary>
     [TestMethod]
-    public void Normalize_UncRoot_WithoutTrailingSlash_NoSlashAdded()
-    {
+    public void Normalize_UncRoot_WithoutTrailingSlash_NoSlashAdded() {
         const string input = @"\\server\share";
         const string expected = "//server/share";
 
@@ -223,8 +212,7 @@ public sealed class PathUtilitiesUncTests
     /// trailing slash trimmed — it is a non-root path.
     /// </summary>
     [TestMethod]
-    public void Normalize_UncPath_BelowRoot_TrailingSlashTrimmed()
-    {
+    public void Normalize_UncPath_BelowRoot_TrailingSlashTrimmed() {
         const string input = "//server/share/folder/";
         const string expected = "//server/share/folder";
 
@@ -237,8 +225,7 @@ public sealed class PathUtilitiesUncTests
     /// all separators normalized and the double-slash preserved.
     /// </summary>
     [TestMethod]
-    public void Normalize_DeepUncPath_NormalizedCorrectly()
-    {
+    public void Normalize_DeepUncPath_NormalizedCorrectly() {
         const string input = @"\\server\share\project\src\Program.cs";
         const string expected = "//server/share/project/src/Program.cs";
 
@@ -254,8 +241,7 @@ public sealed class PathUtilitiesUncTests
     /// leading <c>//</c> is preserved.
     /// </summary>
     [TestMethod]
-    public void Normalize_UncPath_InternalDuplicateSlashes_Collapsed()
-    {
+    public void Normalize_UncPath_InternalDuplicateSlashes_Collapsed() {
         const string input = "//server//share//file.txt";
         const string expected = "//server/share/file.txt";
 
@@ -268,8 +254,7 @@ public sealed class PathUtilitiesUncTests
     /// non-root local path must be preserved.
     /// </summary>
     [TestMethod]
-    public void Normalize_LocalPath_TrimTrailingSlashFalse_SlashPreserved()
-    {
+    public void Normalize_LocalPath_TrimTrailingSlashFalse_SlashPreserved() {
         const string input = @"C:\Users\Test\";
         const string expected = "C:/Users/Test/";
 
@@ -282,8 +267,7 @@ public sealed class PathUtilitiesUncTests
     /// non-root UNC path must be preserved.
     /// </summary>
     [TestMethod]
-    public void Normalize_UncNonRootPath_TrimTrailingSlashFalse_SlashPreserved()
-    {
+    public void Normalize_UncNonRootPath_TrimTrailingSlashFalse_SlashPreserved() {
         const string input = @"\\server\share\folder\";
         const string expected = "//server/share/folder/";
 
@@ -297,8 +281,7 @@ public sealed class PathUtilitiesUncTests
     /// from non-root paths — exactly as before the parameter was added.
     /// </summary>
     [TestMethod]
-    public void Normalize_DefaultBehavior_TrimTrailingSlashIsTrue()
-    {
+    public void Normalize_DefaultBehavior_TrimTrailingSlashIsTrue() {
         const string input = @"C:\Users\Test\";
         const string expected = "C:/Users/Test";
 
@@ -323,8 +306,7 @@ public sealed class PathUtilitiesUncTests
         Assert.AreEqual("C:/", PathUtilities.Normalize("C:/"));
 
     [TestMethod]
-    public void Normalize_NullOrEmpty_ThrowsArgumentException()
-    {
+    public void Normalize_NullOrEmpty_ThrowsArgumentException() {
         Assert.ThrowsExactly<ArgumentNullException>(() => PathUtilities.Normalize(null));
         Assert.ThrowsExactly<ArgumentException>(() => PathUtilities.Normalize(""));
     }

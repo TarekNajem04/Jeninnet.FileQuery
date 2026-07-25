@@ -4,8 +4,7 @@
 /// Represents the result of a pattern classification or compilation operation.
 /// </summary>
 /// <typeparam name="T">The result type.</typeparam>
-internal readonly record struct PatternResult<T>
-{
+internal readonly record struct PatternResult<T> {
     /// <summary>
     /// Gets the value of the result. Throws <see cref="InvalidOperationException"/> if the operation failed.
     /// </summary>
@@ -23,8 +22,7 @@ internal readonly record struct PatternResult<T>
     /// </summary>
     public bool IsSuccess => Error is null;
 
-    private PatternResult(T? value, string? error)
-    {
+    private PatternResult(T? value, string? error) {
         Value = value;
         Error = error;
     }

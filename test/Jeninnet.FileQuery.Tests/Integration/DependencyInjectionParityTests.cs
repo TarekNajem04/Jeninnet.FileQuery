@@ -1,11 +1,9 @@
 ﻿namespace Jeninnet.FileQuery.Tests.Integration;
 
 [TestClass]
-public sealed class DependencyInjectionParityTests
-{
+public sealed class DependencyInjectionParityTests {
     [TestMethod]
-    public void AddFileQuery_ShouldResolveSingletonEngineEquivalentToDefaultRuntime()
-    {
+    public void AddFileQuery_ShouldResolveSingletonEngineEquivalentToDefaultRuntime() {
         using var env = new TestEnvironment();
         env.CreateFiles(
             "keep/root.txt",
@@ -24,12 +22,11 @@ public sealed class DependencyInjectionParityTests
         var actual = diEngine.Execute(query).Order().ToArray();
 
         Assert.AreSame(diEngine, secondResolvedEngine);
-        CollectionAssert.AreEqual(expected, actual);
+        Assert.AreSequenceEqual(expected, actual);
     }
 
     [TestMethod]
-    public async Task AddFileQuery_ShouldResolveAsyncEngineEquivalentToDefaultRuntimeAsync()
-    {
+    public async Task AddFileQuery_ShouldResolveAsyncEngineEquivalentToDefaultRuntimeAsync() {
         using var env = new TestEnvironment();
         env.CreateFiles(
             "keep/root.txt",
@@ -52,21 +49,19 @@ public sealed class DependencyInjectionParityTests
             .Order()
             .ToArray();
 
-        CollectionAssert.AreEqual(expected, actual);
+        Assert.AreSequenceEqual(expected, actual);
     }
 
     public TestContext TestContext { get; set; } = null!;
 
-    private static ServiceProvider CreateProvider()
-    {
+    private static ServiceProvider CreateProvider() {
         var services = new ServiceCollection();
         services.AddFileQuery();
 
         return services.BuildServiceProvider();
     }
 
-    private static FileQuery CreateParityQuery(string root)
-    {
+    private static FileQuery CreateParityQuery(string root) {
         var options = new FileQueryOptions(
             new FileQueryOptionsConfig(
                 PatternInput: new(

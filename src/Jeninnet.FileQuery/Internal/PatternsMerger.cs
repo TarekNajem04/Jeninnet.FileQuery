@@ -23,8 +23,7 @@
 /// never added again, preserving the first occurrence.
 /// </para>
 /// </remarks>
-internal static class PatternsMerger
-{
+internal static class PatternsMerger {
     /// <summary>
     /// Merges the pattern configuration from a <see cref="PatternInput"/> into a
     /// dictionary keyed by <see cref="PatternKind"/>, classifying any untyped patterns.
@@ -61,14 +60,11 @@ internal static class PatternsMerger
     public static Dictionary<PatternKind, ImmutableArray<string>> Merge(
         IEnumerable<string>? patterns,
         IReadOnlyDictionary<PatternKind, IEnumerable<string>>? typedPatterns
-    )
-    {
+    ) {
         var buckets = new Dictionary<PatternKind, HashSet<string>>();
 
-        HashSet<string> GetBucket(PatternKind kind)
-        {
-            if(!buckets.TryGetValue(kind, out var set))
-            {
+        HashSet<string> GetBucket(PatternKind kind) {
+            if(!buckets.TryGetValue(kind, out var set)) {
                 set = new HashSet<string>(StringComparer.Ordinal);
                 buckets[kind] = set;
             }
@@ -77,21 +73,17 @@ internal static class PatternsMerger
         }
 
         // Seed the dictionary with explicitly typed patterns first.
-        if(typedPatterns is not null)
-        {
-            foreach(var (kind, values) in typedPatterns)
-            {
+        if(typedPatterns is not null) {
+            foreach(var (kind, values) in typedPatterns) {
                 var bucket = GetBucket(kind);
-                foreach(var val in (values ?? []).Where(v => v is not null))
-                {
+                foreach(var val in (values ?? []).Where(v => v is not null)) {
                     bucket.Add(val);
                 }
             }
         }
 
         // Classify and append each untyped pattern.
-        foreach(var rawPattern in (patterns ?? []).Where(p => p is not null))
-        {
+        foreach(var rawPattern in (patterns ?? []).Where(p => p is not null)) {
             GetBucket(PatternClassifier.Classify(rawPattern)).Add(rawPattern);
         }
 

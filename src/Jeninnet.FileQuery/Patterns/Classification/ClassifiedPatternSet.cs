@@ -6,7 +6,6 @@
 /// <remarks>
 /// This structure is the only valid input to pattern compilation.
 /// </remarks>
-internal sealed record ClassifiedPatternSet
-{
+internal sealed record ClassifiedPatternSet {
     public IReadOnlyList<ClassifiedPattern> Patterns { get; init; } = [];
 }

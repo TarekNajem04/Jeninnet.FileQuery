@@ -3,8 +3,7 @@
 /// <summary>
 /// Defines a compiler for a single <see cref="PatternKind"/>.
 /// </summary>
-internal interface IPatternCompiler
-{
+internal interface IPatternCompiler {
     PatternKind PatternKind { get; }
     ICompiledPattern Compile(PatternCompilationContext context);
 }

@@ -31,11 +31,9 @@ using var cts = new CancellationTokenSource();
 // For demo purposes, we'll cancel after 5 seconds if not finished (though this is instant)
 cts.CancelAfter(TimeSpan.FromSeconds(5));
 
-try
-{
+try {
     var count = 0;
-    await foreach(var filePath in engine.ExecuteAsync(query, cts.Token))
-    {
+    await foreach(var filePath in engine.ExecuteAsync(query, cts.Token)) {
         count++;
         Console.WriteLine($"[FOUND {count:D2}] {Path.GetFileName(filePath)} -> {filePath}");
 
@@ -45,12 +43,10 @@ try
 
     Console.WriteLine($"\nScan complete. Total logs found: {count}");
 }
-catch(OperationCanceledException)
-{
+catch(OperationCanceledException) {
     Console.WriteLine("\nScan was canceled.");
 }
-finally
-{
+finally {
     // Cleanup
     try { Directory.Delete(root, true); } catch { /* ignore */ }
 }

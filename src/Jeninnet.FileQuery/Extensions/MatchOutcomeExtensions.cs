@@ -4,15 +4,14 @@ namespace Jeninnet.FileQuery.Extensions;
 /// <summary>
 /// Provides extension methods for <see cref="MatchOutcome"/> to simplify rule evaluation.
 /// </summary>
-internal static class MatchOutcomeExtensions
-{
-    extension(MatchOutcome result)
-    {
+internal static class MatchOutcomeExtensions {
+    extension(MatchOutcome result) {
         /// <summary>
         /// Determines if the <see cref="MatchOutcome"/> represents a successful match that should be included.
         /// </summary>
         /// <returns><see langword="true"/> if matched and included; otherwise, <see langword="false"/>.</returns>
         public bool IsSuccess() => result is MatchOutcome.Include;
+
         /// <summary>
         /// Determines if the <see cref="MatchOutcome"/>represents a match that is explicitly included.
         /// </summary>

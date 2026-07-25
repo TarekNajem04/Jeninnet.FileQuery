@@ -1,13 +1,10 @@
 ﻿namespace Jeninnet.FileQuery.Tests.Core;
 
 [TestClass]
-public sealed class Phase2CoverageDeepDiveTests
-{
+public sealed class Phase2CoverageDeepDiveTests {
     [TestMethod]
-    public void SegmentInstructionMatcher_PosixClasses_ShouldMatchCorrectly()
-    {
-        static void AssertPosix(string className, char match, char noMatch)
-        {
+    public void SegmentInstructionMatcher_PosixClasses_ShouldMatchCorrectly() {
+        static void AssertPosix(string className, char match, char noMatch) {
             var tokens = new List<IPatternToken> { new CharacterClassToken(new CharacterClass(false, new[] { new PosixClass(className) })) };
             Assert.IsTrue(SegmentInstructionMatcher.MatchSegment(match.ToString().AsSpan(), tokens, StringComparison.Ordinal), $"Expected {match} to match {className}");
             Assert.IsFalse(SegmentInstructionMatcher.MatchSegment(noMatch.ToString().AsSpan(), tokens, StringComparison.Ordinal), $"Expected {noMatch} NOT to match {className}");
@@ -32,8 +29,7 @@ public sealed class Phase2CoverageDeepDiveTests
     }
 
     [TestMethod]
-    public void SegmentInstructionMatcher_CharRange_ShouldMatchCorrectly()
-    {
+    public void SegmentInstructionMatcher_CharRange_ShouldMatchCorrectly() {
         var tokens = new List<IPatternToken> { new CharacterClassToken(new CharacterClass(false, new[] { new CharRange('a', 'c') })) };
         Assert.IsTrue(SegmentInstructionMatcher.MatchSegment("a".AsSpan(), tokens, StringComparison.Ordinal));
         Assert.IsTrue(SegmentInstructionMatcher.MatchSegment("b".AsSpan(), tokens, StringComparison.Ordinal));
@@ -42,8 +38,7 @@ public sealed class Phase2CoverageDeepDiveTests
     }
 
     [TestMethod]
-    public void TraversalFrontier_BufferResizing_ShouldWorkCorrectly()
-    {
+    public void TraversalFrontier_BufferResizing_ShouldWorkCorrectly() {
         using var frontier = new TraversalFrontier(initialCapacity: 2);
 
         // Fill and force resize
@@ -67,16 +62,14 @@ public sealed class Phase2CoverageDeepDiveTests
     }
 
     [TestMethod]
-    public void TraversalFrontier_EmptyPopDequeue_ShouldThrow()
-    {
+    public void TraversalFrontier_EmptyPopDequeue_ShouldThrow() {
         using var frontier = new TraversalFrontier();
         TestAssertEx.Throws<InvalidOperationException>(() => frontier.Pop());
         TestAssertEx.Throws<InvalidOperationException>(() => frontier.Dequeue());
     }
 
     [TestMethod]
-    public void CompiledPatternSet_VariousMethods_ShouldWorkCorrectly()
-    {
+    public void CompiledPatternSet_VariousMethods_ShouldWorkCorrectly() {
         var mockPattern = new MockCompiledPattern(PatternKind.Glob, isNegated: true, directoryOnly: true, anchoredToRoot: true);
         var set = new CompiledPatternSet(new[] { mockPattern });
 
@@ -105,59 +98,50 @@ public sealed class Phase2CoverageDeepDiveTests
     }
 
     [TestMethod]
-    public void MatchResult_DelegateInclusion_ShouldWorkCorrectly()
-    {
+    public void MatchResult_DelegateInclusion_ShouldWorkCorrectly() {
         TestInclusion(true);
         TestInclusion(false);
 
         // Check argument null exception
         var result = MatchResult.Fail();
-        try
-        {
+        try {
             result.Include(null!);
             Assert.Fail("Should have thrown");
         }
-        catch(ArgumentNullException)
-        {
+        catch(ArgumentNullException) {
             // Ignore the exception, as it's expected behavior
         }
     }
 
-    private static void TestInclusion(bool value)
-    {
+    private static void TestInclusion(bool value) {
         var result = MatchResult.Fail();
         result.Include(() => value);
         Assert.AreEqual(value, result.IsIncluded);
     }
 
     [TestMethod]
-    public void MatchResult_DelegateMatch_ShouldWorkCorrectly()
-    {
+    public void MatchResult_DelegateMatch_ShouldWorkCorrectly() {
         TestMatch(true);
         TestMatch(false);
 
         var result = MatchResult.Fail();
-        try
-        {
+        try {
             result.Match(null!);
             Assert.Fail("Should have thrown");
         }
-        catch(ArgumentNullException)
-        {
+        catch(ArgumentNullException) {
             // Ignore the exception, as it's expected behavior
         }
     }
 
-    private static void TestMatch(bool value)
-    {
+    private static void TestMatch(bool value) {
         var result = MatchResult.Fail();
         result.Match(() => value);
         Assert.AreEqual(value, result.IsMatched);
     }
 
     [TestMethod]
-    public void FileQueryBuilder_SemanticModes_ShouldSetCorrectOptions()
-    {
+    public void FileQueryBuilder_SemanticModes_ShouldSetCorrectOptions() {
         using var env = new TestEnvironment();
 
         var gitIgnoreQuery = FileQueryBuilder.From(env.Root).UsingGitIgnore().Build();
@@ -175,8 +159,7 @@ public sealed class Phase2CoverageDeepDiveTests
     }
 
     [TestMethod]
-    public void FileQueryBuilder_WhereTyped_ShouldThrowOnConflict()
-    {
+    public void FileQueryBuilder_WhereTyped_ShouldThrowOnConflict() {
         using var env = new TestEnvironment();
         var builder = FileQueryBuilder.From(env.Root).UsingGlob();
 
@@ -185,11 +168,9 @@ public sealed class Phase2CoverageDeepDiveTests
     }
 
     [TestMethod]
-    public void FileQueryBuilder_WhereDictionary_ShouldMergeCorrectly()
-    {
+    public void FileQueryBuilder_WhereDictionary_ShouldMergeCorrectly() {
         using var env = new TestEnvironment();
-        var typedPatterns = new Dictionary<PatternKind, List<string>>
-        {
+        var typedPatterns = new Dictionary<PatternKind, List<string>> {
             [PatternKind.Glob] = ["*.cs"],
             [PatternKind.GitIgnore] = ["bin/"]
         };
@@ -200,8 +181,7 @@ public sealed class Phase2CoverageDeepDiveTests
     }
 
     [TestMethod]
-    public void FileQueryBuilder_WithErrorRecovery_ShouldSetOption()
-    {
+    public void FileQueryBuilder_WithErrorRecovery_ShouldSetOption() {
         using var env = new TestEnvironment();
         var options = FileQueryErrorRecoveryOptions.Retry(3);
         var query = FileQueryBuilder.From(env.Root).WithErrorRecovery(options).Build();
@@ -210,8 +190,7 @@ public sealed class Phase2CoverageDeepDiveTests
     }
 
     [TestMethod]
-    public async Task FileQueryBuilder_Execute_ShouldWorkAsync()
-    {
+    public async Task FileQueryBuilder_Execute_ShouldWorkAsync() {
         using var env = new TestEnvironment();
         env.CreateFile("a.txt");
 
@@ -233,15 +212,13 @@ public sealed class Phase2CoverageDeepDiveTests
     }
 
     [TestMethod]
-    public void FileQueryBuilder_Build_ShouldThrowOnMissingRoot()
-    {
+    public void FileQueryBuilder_Build_ShouldThrowOnMissingRoot() {
         using var env = new TestEnvironment();
         var builder = new FileQueryBuilder("   ", FileSystem.Instance);
         TestAssertEx.Throws<InvalidOperationException>(() => builder.Build());
     }
 
-    private sealed class MockProgress<T> : IProgress<T>
-    {
+    private sealed class MockProgress<T> : IProgress<T> {
         public void Report(T value) { }
     }
 
@@ -250,8 +227,7 @@ public sealed class Phase2CoverageDeepDiveTests
         bool isNegated = false,
         bool directoryOnly = false,
         bool anchoredToRoot = false
-    ) : ICompiledPattern
-    {
+    ) : ICompiledPattern {
         public PatternKind PatternKind => kind;
         public bool IsNegated => isNegated;
         public bool DirectoryOnly => directoryOnly;

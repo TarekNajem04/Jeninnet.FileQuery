@@ -1,37 +1,30 @@
 ﻿namespace Jeninnet.FileQuery.Patterns.Compilation;
 
-internal static class PatternAnchorResolver
-{
-    public static string Resolve(IReadOnlyList<IReadOnlyList<IPatternToken>> segments)
-    {
+internal static class PatternAnchorResolver {
+    public static string Resolve(IReadOnlyList<IReadOnlyList<IPatternToken>> segments) {
         var sb = new StringBuilder();
         var skipLeadingDoubleStar = true;
         var first = true;
         var stoppedEarly = false;
 
-        for(var segmentIndex = 0; segmentIndex < segments.Count; segmentIndex++)
-        {
+        for(var segmentIndex = 0; segmentIndex < segments.Count; segmentIndex++) {
             var segment = segments[segmentIndex];
             var isDoubleStar = IsDoubleStar(segment);
 
-            if(skipLeadingDoubleStar)
-            {
-                if(isDoubleStar)
-                {
+            if(skipLeadingDoubleStar) {
+                if(isDoubleStar) {
                     continue;
                 }
 
                 skipLeadingDoubleStar = false;
             }
 
-            if(isDoubleStar || HasWildcard(segment))
-            {
+            if(isDoubleStar || HasWildcard(segment)) {
                 stoppedEarly = true;
                 break;
             }
 
-            if(!first)
-            {
+            if(!first) {
                 sb.Append('/');
             }
 
@@ -39,8 +32,7 @@ internal static class PatternAnchorResolver
             AppendTokenToPath(sb, segment);
         }
 
-        if(!stoppedEarly)
-        {
+        if(!stoppedEarly) {
             var built = sb.ToString();
             var lastSlash = built.LastIndexOf('/');
             return lastSlash < 0 ? string.Empty : built[..lastSlash];
@@ -49,21 +41,16 @@ internal static class PatternAnchorResolver
         return sb.ToString();
     }
 
-    private static bool IsDoubleStar(IReadOnlyList<IPatternToken> segment) =>
-        segment.Count == 1 && segment[0] is RecursiveWildcardToken;
+    private static bool IsDoubleStar(IReadOnlyList<IPatternToken> segment) => segment.Count == 1 && segment[0] is RecursiveWildcardToken;
 
-    private static bool HasWildcard(IReadOnlyList<IPatternToken>? segment)
-    {
-        if(segment is null)
-        {
+    private static bool HasWildcard(IReadOnlyList<IPatternToken>? segment) {
+        if(segment is null) {
             return false;
         }
 
-        for(var tokenIndex = 0; tokenIndex < segment.Count; tokenIndex++)
-        {
+        for(var tokenIndex = 0; tokenIndex < segment.Count; tokenIndex++) {
             var token = segment[tokenIndex];
-            if(token is WildcardToken or SingleCharToken or CharacterClassToken)
-            {
+            if(token is WildcardToken or SingleCharToken or CharacterClassToken) {
                 return true;
             }
         }
@@ -71,16 +58,12 @@ internal static class PatternAnchorResolver
         return false;
     }
 
-    private static void AppendTokenToPath(StringBuilder sb, IReadOnlyList<IPatternToken> segment)
-    {
-        for(var tokenIndex = 0; tokenIndex < segment.Count; tokenIndex++)
-        {
+    private static void AppendTokenToPath(StringBuilder sb, IReadOnlyList<IPatternToken> segment) {
+        for(var tokenIndex = 0; tokenIndex < segment.Count; tokenIndex++) {
             var token = segment[tokenIndex];
-            if(token is LiteralToken lit)
-            {
+            if(token is LiteralToken lit) {
                 sb.Append(lit.Text);
-            } else if(token is EscapeToken esc)
-            {
+            } else if(token is EscapeToken esc) {
                 sb.Append(esc.Escaped);
             }
         }

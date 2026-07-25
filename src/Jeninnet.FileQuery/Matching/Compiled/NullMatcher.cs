@@ -8,8 +8,7 @@
 /// a concrete implementation that always returns an inclusive, non-matching result.
 /// This simplifies client code by removing the need for null checks and special cases.
 /// </remarks>
-internal sealed class NullMatcher : PathMatcher
-{
+internal sealed class NullMatcher : PathMatcher {
     /// <summary>
     /// A shared <see cref="NullMatcher"/> instance.
     /// </summary>

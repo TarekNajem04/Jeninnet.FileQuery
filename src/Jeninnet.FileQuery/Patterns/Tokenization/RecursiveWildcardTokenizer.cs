@@ -16,29 +16,24 @@
 /// All semantic and structural rules are enforced by invariants.
 /// </para>
 /// </remarks>
-internal sealed class RecursiveWildcardTokenizer : IPatternTokenizer
-{
+internal sealed class RecursiveWildcardTokenizer : IPatternTokenizer {
     public bool TryTokenize(
         ReadOnlySpan<char> input,
         ref int index,
         PatternSyntaxProfile syntax,
         List<IPatternToken> tokens
-    )
-    {
+    ) {
         // Feature disabled → decline fast
-        if(!syntax.SupportsRecursiveWildcard)
-        {
+        if(!syntax.SupportsRecursiveWildcard) {
             return false;
         }
 
         // Need at least "**"
-        if(index + 1 >= input.Length)
-        {
+        if(index + 1 >= input.Length) {
             return false;
         }
 
-        if(input[index] != '*' || input[index + 1] != '*')
-        {
+        if(input[index] != '*' || input[index + 1] != '*') {
             return false;
         }
 

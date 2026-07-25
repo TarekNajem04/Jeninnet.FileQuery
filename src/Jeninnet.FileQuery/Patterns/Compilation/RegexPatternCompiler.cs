@@ -4,13 +4,11 @@
 /// Compiles patterns that follow Flat Glob-style semantics by delegating all parsing
 /// to the centralized <see cref="PatternScanner"/>.
 /// </summary>
-internal sealed class RegexPatternCompiler : PatternCompilerBase
-{
+internal sealed class RegexPatternCompiler : PatternCompilerBase {
     public override PatternKind PatternKind => PatternKind.Regex;
 
-    protected override ICompiledPattern CompileCore(PatternCompilationContext context)
-    {
-        var state = context.State!;
+    protected override ICompiledPattern CompileCore(PatternCompilationContext context) {
+        var state = context.State;
         var tokens = context.Tokens!;
 
         var regexText = tokens[0][0] is RegularExpressionToken ret ? ret.Pattern : null;

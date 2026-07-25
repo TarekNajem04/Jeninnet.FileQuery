@@ -3,8 +3,7 @@
 /// <summary>
 /// Represents an ordered, immutable set of compiled patterns that can be evaluated against paths.
 /// </summary>
-internal interface ICompiledPatternSet : IReadOnlyList<ICompiledPattern>
-{
+internal interface ICompiledPatternSet : IReadOnlyList<ICompiledPattern> {
     /// <summary>Gets the underlying pattern collection.</summary>
     IReadOnlyList<ICompiledPattern> Patterns { get; }
 

@@ -4,14 +4,12 @@
 /// Tests for MaxRecursionDepth behavior during synchronous file enumeration.
 /// </summary>
 [TestClass]
-public class RecursionDepthTests
-{
+public class RecursionDepthTests {
     /// <summary>
     /// Ensures MaxRecursionDepth = 0 enumerates only the root directory.
     /// </summary>
     [TestMethod]
-    public void MaxDepthZero_ShouldEnumerateOnlyRoot()
-    {
+    public void MaxDepthZero_ShouldEnumerateOnlyRoot() {
         using var env = new TestEnvironment();
 
         env.CreateFile("root.txt");
@@ -42,8 +40,7 @@ public class RecursionDepthTests
     /// Ensures MaxRecursionDepth = 1 includes root and its direct children.
     /// </summary>
     [TestMethod]
-    public void MaxDepthOne_ShouldIncludeOneLevelDeep()
-    {
+    public void MaxDepthOne_ShouldIncludeOneLevelDeep() {
         using var env = new TestEnvironment();
 
         env.CreateFile("root.txt");
@@ -76,8 +73,7 @@ public class RecursionDepthTests
     /// Ensures negative MaxRecursionDepth disables the limit entirely.
     /// </summary>
     [TestMethod]
-    public void MaxDepthNegative_ShouldAllowUnlimitedDepth()
-    {
+    public void MaxDepthNegative_ShouldAllowUnlimitedDepth() {
         using var env = new TestEnvironment();
 
         env.CreateFile("root.txt");

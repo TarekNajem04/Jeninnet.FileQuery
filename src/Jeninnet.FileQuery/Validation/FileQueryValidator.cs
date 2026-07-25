@@ -3,8 +3,7 @@
 /// <summary>
 /// Provides a centralized validation pipeline for file query configuration and execution parameters.
 /// </summary>
-internal static class FileQueryValidator
-{
+internal static class FileQueryValidator {
     /// <summary>
     /// Validates the provided configuration and parameters before engine execution.
     /// </summary>
@@ -13,20 +12,28 @@ internal static class FileQueryValidator
     /// <param name="options">The execution options.</param>
     /// <exception cref="ArgumentNullException">Thrown if rootPath or options are null.</exception>
     /// <exception cref="ArgumentException">Thrown if configuration is invalid.</exception>
-    public static void ValidateExecution(IFileSystem fileSystem, string? rootPath, FileQueryOptions? options)
-    {
-        if(string.IsNullOrWhiteSpace(rootPath))
-        {
+    public static void ValidateExecution(IFileSystem fileSystem, string? rootPath, FileQueryOptions? options) {
+        if(string.IsNullOrWhiteSpace(rootPath)) {
             throw new InvalidOperationException("Root path must be specified.");
         }
 
-        if(!fileSystem.DirectoryExists(rootPath))
-        {
+        if(rootPath.IndexOfAny(Path.GetInvalidPathChars()) >= 0) {
+            throw new ArgumentException("Root path contains invalid characters.", nameof(rootPath));
+        }
+
+        if(rootPath.Length > 4096) {
+            throw new ArgumentException("Root path exceeds maximum reasonable length.", nameof(rootPath));
+        }
+
+        if(rootPath.StartsWith(@"\\", StringComparison.Ordinal) && rootPath.Length < 5) {
+            throw new ArgumentException("UNC paths must specify a server and share.", nameof(rootPath));
+        }
+
+        if(!fileSystem.DirectoryExists(rootPath)) {
             throw new DirectoryNotFoundException($"The specified root path does not exist: '{rootPath}'");
         }
 
-        if(options is null)
-        {
+        if(options is null) {
             throw new InvalidOperationException("Execution options must be provided.");
         }
 

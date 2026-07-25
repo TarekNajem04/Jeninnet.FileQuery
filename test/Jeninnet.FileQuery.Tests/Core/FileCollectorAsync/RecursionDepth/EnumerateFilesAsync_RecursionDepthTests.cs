@@ -8,14 +8,12 @@
 ///  - directories at disallowed levels are not visited
 /// </summary>
 [TestClass]
-public class EnumerateFilesAsync_RecursionDepthTests
-{
+public class EnumerateFilesAsync_RecursionDepthTests {
     /// <summary>
     /// Ensures async enumeration stops at depth 0 (only root files).
     /// </summary>
     [TestMethod]
-    public async Task EnumerateFilesAsync_Depth0_ShouldOnlyReturnRootFilesAsync()
-    {
+    public async Task EnumerateFilesAsync_Depth0_ShouldOnlyReturnRootFilesAsync() {
         using var env = new TestEnvironment();
 
         env.CreateFiles(
@@ -49,8 +47,7 @@ public class EnumerateFilesAsync_RecursionDepthTests
     /// Ensures async enumeration stops after 1 level of recursion.
     /// </summary>
     [TestMethod]
-    public async Task EnumerateFilesAsync_Depth1_ShouldIncludeSubdirectoriesButNotDeepOnesAsync()
-    {
+    public async Task EnumerateFilesAsync_Depth1_ShouldIncludeSubdirectoriesButNotDeepOnesAsync() {
         using var env = new TestEnvironment();
 
         env.CreateFiles(
@@ -86,8 +83,7 @@ public class EnumerateFilesAsync_RecursionDepthTests
     /// Ensures async enumeration honors depth limit even with many sibling folders.
     /// </summary>
     [TestMethod]
-    public async Task EnumerateFilesAsync_ShouldRespectDepthLimitWithWideTreeAsync()
-    {
+    public async Task EnumerateFilesAsync_ShouldRespectDepthLimitWithWideTreeAsync() {
         using var env = new TestEnvironment();
 
         // root files

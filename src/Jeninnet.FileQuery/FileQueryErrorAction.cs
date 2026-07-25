@@ -3,8 +3,7 @@
 /// <summary>
 /// Defines how traversal handles recoverable IO errors.
 /// </summary>
-public enum FileQueryErrorAction
-{
+public enum FileQueryErrorAction {
     /// <summary>
     /// Skip the failing entry or directory and continue traversal.
     /// </summary>

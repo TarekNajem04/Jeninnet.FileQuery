@@ -1,11 +1,9 @@
 ﻿namespace Jeninnet.FileQuery.Tests.Patterns.Analysis;
 
 [TestClass]
-public class PatternAnalyzerTests
-{
+public class PatternAnalyzerTests {
     [TestMethod]
-    public void Analyze_ShouldDetectRecursiveWildcard()
-    {
+    public void Analyze_ShouldDetectRecursiveWildcard() {
         var analyzer = new PatternAnalyzer();
 
         var result = analyzer.Analyze("**/*.cs");
@@ -15,12 +13,9 @@ public class PatternAnalyzerTests
     }
 
     [TestMethod]
-    public void Analyze_ShouldDetectNegation()
-    {
+    public void Analyze_ShouldDetectTrailingSlash() {
         var analyzer = new PatternAnalyzer();
-
-        var result = analyzer.Analyze("!bin/*.dll");
-
-        Assert.IsTrue(result.IsNegated);
+        var result = analyzer.Analyze("foo/");
+        Assert.IsTrue(result.HasGitIgnoreSyntax);
     }
 }

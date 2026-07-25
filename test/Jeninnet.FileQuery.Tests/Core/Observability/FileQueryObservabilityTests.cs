@@ -1,11 +1,9 @@
 ﻿namespace Jeninnet.FileQuery.Tests.Core.Observability;
 
 [TestClass]
-public sealed class FileQueryObservabilityTests
-{
+public sealed class FileQueryObservabilityTests {
     [TestMethod]
-    public async Task ExecuteAsync_WithProgress_ShouldReportTraversalStatisticsAsync()
-    {
+    public async Task ExecuteAsync_WithProgress_ShouldReportTraversalStatisticsAsync() {
         using var env = new TestEnvironment();
         env.CreateFiles("a.txt", "sub/b.txt", "sub/c.log");
 
@@ -32,8 +30,7 @@ public sealed class FileQueryObservabilityTests
     }
 
     [TestMethod]
-    public void Execute_WithDiagnostics_ShouldReportResponsiblePattern()
-    {
+    public void Execute_WithDiagnostics_ShouldReportResponsiblePattern() {
         using var env = new TestEnvironment();
         env.CreateFiles("keep.txt", "drop.log");
 
@@ -64,8 +61,7 @@ public sealed class FileQueryObservabilityTests
     }
 
     [TestMethod]
-    public async Task ExecuteAsync_ShouldPropagateCancellationThroughFilesystemEnumerationAsync()
-    {
+    public async Task ExecuteAsync_ShouldPropagateCancellationThroughFilesystemEnumerationAsync() {
         var fileSystem = new CancellationObservingFileSystem();
         var engine = new Engine.FileQueryEngine(
             new TraversalExecutor(),
@@ -79,10 +75,8 @@ public sealed class FileQueryObservabilityTests
         using var cts = new CancellationTokenSource();
         await cts.CancelAsync();
 
-        async Task ActAsync()
-        {
-            await foreach(var _ in engine.ExecuteAsync(query, cts.Token))
-            {
+        async Task ActAsync() {
+            await foreach(var _ in engine.ExecuteAsync(query, cts.Token)) {
                 // No-op
             }
         }
@@ -91,48 +85,43 @@ public sealed class FileQueryObservabilityTests
     }
 
     [TestMethod]
-    public void Execute_WithSkipRecovery_ShouldSkipFailingDirectory()
-    {
+    public void Execute_WithSkipRecovery_ShouldSkipFailingDirectory() {
         var fileSystem = new RecoverableFailureFileSystem(failLockedDirectoryAttempts: 1);
         var engine = CreateEngine(fileSystem);
         var query = CreateRecoveryQuery(fileSystem, FileQueryErrorRecoveryOptions.Skip);
 
         var results = engine.Execute(query).ToList();
 
-        CollectionAssert.Contains(results, fileSystem.KeepFile);
-        CollectionAssert.DoesNotContain(results, fileSystem.RetryFile);
+        Assert.Contains(fileSystem.KeepFile, results);
+        Assert.DoesNotContain(fileSystem.RetryFile, results);
     }
 
     [TestMethod]
-    public void Execute_WithAbortRecovery_ShouldPropagateFailingDirectory()
-    {
+    public void Execute_WithAbortRecovery_ShouldPropagateFailingDirectory() {
         var fileSystem = new RecoverableFailureFileSystem(failLockedDirectoryAttempts: 1);
         var engine = CreateEngine(fileSystem);
         var query = CreateRecoveryQuery(fileSystem, FileQueryErrorRecoveryOptions.Abort);
 
-        TestAssertEx.Throws<IOException>(() =>
-        {
+        TestAssertEx.Throws<IOException>(() => {
             var _ = engine.Execute(query).ToList();
         });
     }
 
     [TestMethod]
-    public void Execute_WithRetryRecovery_ShouldRetryFailingDirectory()
-    {
+    public void Execute_WithRetryRecovery_ShouldRetryFailingDirectory() {
         var fileSystem = new RecoverableFailureFileSystem(failLockedDirectoryAttempts: 1);
         var engine = CreateEngine(fileSystem);
         var query = CreateRecoveryQuery(fileSystem, FileQueryErrorRecoveryOptions.Retry(maxRetryAttempts: 1));
 
         var results = engine.Execute(query).ToList();
 
-        CollectionAssert.Contains(results, fileSystem.KeepFile);
-        CollectionAssert.Contains(results, fileSystem.RetryFile);
+        Assert.Contains(fileSystem.KeepFile, results);
+        Assert.Contains(fileSystem.RetryFile, results);
     }
 
     public TestContext TestContext { get; set; } = null!;
 
-    private static Engine.FileQueryEngine CreateEngine(IFileSystem fileSystem) =>
-        new(
+    private static Engine.FileQueryEngine CreateEngine(IFileSystem fileSystem) => new(
             new TraversalExecutor(),
             new TraversalPlanBuilder(fileSystem)
         );
@@ -140,8 +129,7 @@ public sealed class FileQueryObservabilityTests
     private static FileQuery CreateRecoveryQuery(
         RecoverableFailureFileSystem fileSystem,
         FileQueryErrorRecoveryOptions errorRecovery
-    ) =>
-        new(
+    ) => new(
             fileSystem.Root,
             new FileQueryOptions(
                 new FileQueryOptionsConfig(
@@ -153,23 +141,20 @@ public sealed class FileQueryObservabilityTests
             )
         );
 
-    private sealed class RecordingProgress<T> : IProgress<T>
-    {
+    private sealed class RecordingProgress<T> : IProgress<T> {
         public List<T> Values { get; } = [];
 
         public void Report(T value) => Values.Add(value);
     }
 
-    private sealed class CancellationObservingFileSystem : IFileSystem
-    {
+    private sealed class CancellationObservingFileSystem : IFileSystem {
         public string Root { get; } = Path.Combine(Path.GetTempPath(), "filequery-cancel");
 
         public IEnumerable<FileSystemEntry> Enumerate(
             string directory,
             bool ignoreInaccessible,
             FileQueryErrorRecoveryOptions errorRecovery
-        )
-        {
+        ) {
             yield return new FileSystemEntry(Path.Combine(Root, "a.txt"), FileAttributes.Normal);
         }
 
@@ -178,23 +163,25 @@ public sealed class FileQueryObservabilityTests
             bool ignoreInaccessible,
             FileQueryErrorRecoveryOptions errorRecovery,
             [EnumeratorCancellation] CancellationToken cancellationToken = default
-        )
-        {
+        ) {
             cancellationToken.ThrowIfCancellationRequested();
             await Task.Yield();
             yield return new FileSystemEntry(Path.Combine(Root, "a.txt"), FileAttributes.Normal);
         }
 
         public FileAttributes GetAttributes(string path) => FileAttributes.Normal;
+
         public bool DirectoryExists(string path) => path == Root;
+
         public string ResolveRealPath(string path) => path;
+
         public char DirectorySeparator => Path.DirectorySeparatorChar;
         public string GetFullPath(string path) => path;
+
         public string GetFullPath(string path, string basePath) => Path.Combine(basePath, path);
     }
 
-    private sealed class RecoverableFailureFileSystem(int failLockedDirectoryAttempts) : IFileSystem
-    {
+    private sealed class RecoverableFailureFileSystem(int failLockedDirectoryAttempts) : IFileSystem {
         private int _lockedDirectoryAttempts;
 
         public string Root { get; } = Path.Combine(Path.GetTempPath(), "filequery-recovery");
@@ -206,29 +193,23 @@ public sealed class FileQueryObservabilityTests
             string directory,
             bool ignoreInaccessible,
             FileQueryErrorRecoveryOptions errorRecovery
-        )
-        {
-            if(directory == Root)
-            {
+        ) {
+            if(directory == Root) {
                 yield return new FileSystemEntry(KeepFile, FileAttributes.Normal);
                 yield return new FileSystemEntry(LockedDirectory, FileAttributes.Directory);
                 yield break;
             }
 
-            if(directory == LockedDirectory)
-            {
-                while(_lockedDirectoryAttempts < failLockedDirectoryAttempts)
-                {
+            if(directory == LockedDirectory) {
+                while(_lockedDirectoryAttempts < failLockedDirectoryAttempts) {
                     _lockedDirectoryAttempts++;
 
-                    if(errorRecovery.Action is FileQueryErrorAction.Skip || ignoreInaccessible)
-                    {
+                    if(errorRecovery.Action is FileQueryErrorAction.Skip || ignoreInaccessible) {
                         yield break;
                     }
 
                     if(errorRecovery.Action is FileQueryErrorAction.Retry &&
-                        _lockedDirectoryAttempts <= errorRecovery.MaxRetryAttempts)
-                    {
+                        _lockedDirectoryAttempts <= errorRecovery.MaxRetryAttempts) {
                         continue;
                     }
 
@@ -244,23 +225,23 @@ public sealed class FileQueryObservabilityTests
             bool ignoreInaccessible,
             FileQueryErrorRecoveryOptions errorRecovery,
             [EnumeratorCancellation] CancellationToken cancellationToken = default
-        )
-        {
-            foreach(var entry in Enumerate(directory, ignoreInaccessible, errorRecovery))
-            {
+        ) {
+            foreach(var entry in Enumerate(directory, ignoreInaccessible, errorRecovery)) {
                 cancellationToken.ThrowIfCancellationRequested();
                 yield return entry;
                 await Task.Yield();
             }
         }
 
-        public FileAttributes GetAttributes(string path) =>
-            path == LockedDirectory ? FileAttributes.Directory : FileAttributes.Normal;
+        public FileAttributes GetAttributes(string path) => path == LockedDirectory ? FileAttributes.Directory : FileAttributes.Normal;
 
         public bool DirectoryExists(string path) => path == Root;
+
         public string ResolveRealPath(string path) => path;
+
         public char DirectorySeparator => Path.DirectorySeparatorChar;
         public string GetFullPath(string path) => path;
+
         public string GetFullPath(string path, string basePath) => Path.Combine(basePath, path);
     }
 }

@@ -1,4 +1,4 @@
-﻿# Project Roadmap: Jeninnet.FileQuery
+# Project Roadmap: Jeninnet.FileQuery
 
 This roadmap outlines the strategic direction for **Jeninnet.FileQuery**, focusing on performance, observability, and ecosystem integration.
 
@@ -15,7 +15,7 @@ To be the fastest, most predictable, and most flexible file discovery engine for
 - [x] **Cross-Platform Baseline**: Establish and publish performance benchmarks for Windows, Linux (Ubuntu), and macOS.
 - [x] **Matcher Order Optimization**: Ensure that "fail-fast" logic is applied to pattern evaluation to minimize execution time.
 
-## Phase 2: The "Observability" Release (v1.1 - v1.x)
+## Phase 2: The "Observability" Release (v1.1 - v1.3)
 *Goal: Provide deep insights into the enumeration and matching process.*
 
 - [x] **Progress Reporting**: Support `IProgress<T>` in `EnumerateFilesAsync` for real-time scan statistics.
@@ -23,19 +23,16 @@ To be the fastest, most predictable, and most flexible file discovery engine for
 - [x] **Deep Cancellation**: Ensure `CancellationToken` propagation is verified across all hot paths.
 - [x] **Enhanced Error Recovery**: Provide configurable strategies for handling IO errors (e.g., `Skip`, `Retry`, `Abort`).
 - [x] **Pattern Validation Framework**: Implement early detection and reporting for malformed patterns.
-
-## Phase 3: The "Scalability" Release (v2.0)
-*Goal: Maximize hardware utilization for massive directory trees.*
-
-- [ ] **Parallel Traversal**: Implement a multi-threaded, high-concurrency directory walker.
-- [ ] **Cost-Based Pattern Reordering**: Dynamically reorder patterns based on historical execution cost (e.g., move expensive Regex checks after cheap Globs).
-- [ ] **Matcher Caching 2.0**: Refine internal caching for frequently accessed pattern sets in high-frequency scenarios.
-- [ ] **Advanced Sample Library**: Continue expanding the library of complex matching scenarios (Regex, POSIX, etc.).
+- [x] **Improved Path Validation**: Enhanced `FileQueryValidator` for eager path structure validation.
+- [x] **OpenTelemetry Integration**: Export metrics and spans for structured observability, expanding upon the existing `IProgress<T>` and diagnostic models.
+- [x] **AOT Compilation Validation Pipeline**: Establish strict Native AOT compatibility checks in CI to ensure zero-reflection guarantees remain unbroken.
+- [x] **Roslyn Analyzers for Pattern Validation**: Provide design-time warnings and code fixes for malformed GitIgnore, Glob, or Regex patterns.
 
 ## Phase 4: The "Ecosystem" Release (v2.x+)
 *Goal: Broaden adoption through tooling and specialized integrations.*
 
 - [ ] **Dotnet Global Tool**: Release `dotnet-filequery` CLI for terminal-based file discovery and piping.
 - [ ] **IDE Extensions**: Create VS and VS Code plugins for real-time pattern testing and visualization.
+- [ ] **Roslyn Analyzers for Pattern Validation**: Provide design-time warnings and code fixes for malformed GitIgnore, Glob, or Regex patterns.
 - [ ] **Diff-Aware Queries**: Support "incremental" scans that only process files changed since a specific Git commit or timestamp.
 - [ ] **Developer Tooling SDK**: Expose internal tokenizers and classifiers for use by other build-tool authors.

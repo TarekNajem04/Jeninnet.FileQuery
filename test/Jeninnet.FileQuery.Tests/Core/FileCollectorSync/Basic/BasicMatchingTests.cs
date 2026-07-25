@@ -1,14 +1,12 @@
 ﻿namespace Jeninnet.FileQuery.Tests.Core.FileCollectorSync.Basic;
 
 [TestClass]
-public class BasicMatchingTests
-{
+public class BasicMatchingTests {
     /// <summary>
     /// Ensures the <see cref="IFileQueryEngine"/> returns only exact matching files.
     /// </summary>
     [TestMethod]
-    public void ExactFileMatch_ShouldReturnSingleFile()
-    {
+    public void ExactFileMatch_ShouldReturnSingleFile() {
         using var env = new TestEnvironment();
         env.CreateFile("file1.txt");
         env.CreateFile("file2.log");
@@ -37,8 +35,7 @@ public class BasicMatchingTests
     /// Ensures * wildcard matches all items in root.
     /// </summary>
     [TestMethod]
-    public void Wildcard_AllFilesInRoot_AreReturned()
-    {
+    public void Wildcard_AllFilesInRoot_AreReturned() {
         using var env = new TestEnvironment();
         env.CreateFiles("a.txt", "b.txt", "c.log");
 
@@ -65,8 +62,7 @@ public class BasicMatchingTests
     /// Ensures character-class matches work.
     /// </summary>
     [TestMethod]
-    public void CharacterClasses_ShouldMatchCorrectly()
-    {
+    public void CharacterClasses_ShouldMatchCorrectly() {
         using var env = new TestEnvironment();
         env.CreateFiles("file1.txt", "fileA.txt", "fileB.txt");
 

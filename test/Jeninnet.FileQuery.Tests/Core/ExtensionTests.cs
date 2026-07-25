@@ -1,11 +1,9 @@
 ﻿namespace Jeninnet.FileQuery.Tests.Core;
 
 [TestClass]
-public sealed class ExtensionTests
-{
+public sealed class ExtensionTests {
     [TestMethod]
-    public void MatchOutcomeExtensions_ShouldReturnCorrectBooleans()
-    {
+    public void MatchOutcomeExtensions_ShouldReturnCorrectBooleans() {
         Assert.IsTrue(MatchOutcome.Include.IsSuccess());
         Assert.IsTrue(MatchOutcome.Include.IsIncluded());
         Assert.IsFalse(MatchOutcome.Include.IsExcluded());
@@ -23,8 +21,7 @@ public sealed class ExtensionTests
     }
 
     [TestMethod]
-    public void MatchResultExtensions_ShouldReturnCorrectBooleans()
-    {
+    public void MatchResultExtensions_ShouldReturnCorrectBooleans() {
         var includeResult = MatchResult.Included().Match();
         Assert.IsTrue(includeResult.IsSuccess());
         Assert.IsFalse(includeResult.IsExcluded());

@@ -1,28 +1,24 @@
 ﻿namespace Jeninnet.FileQuery.Tests.Core.Observability;
 
 [TestClass]
-public sealed class FileQueryObservabilityDeepTests
-{
+public sealed class FileQueryObservabilityDeepTests {
     [TestMethod]
     public void FileQueryErrorRecoveryOptions_Validation_ShouldThrowWhenNegativeRetryAttempts() =>
         TestAssertEx.Throws<ArgumentOutOfRangeException>(
-            () =>
-            {
+            () => {
                 var options = new FileQueryErrorRecoveryOptions(FileQueryErrorAction.Retry, -1);
                 options.Validate();
             }
         );
 
     [TestMethod]
-    public void FileQueryErrorRecoveryOptions_Validation_ShouldSucceedWhenZeroOrPositiveRetryAttempts()
-    {
+    public void FileQueryErrorRecoveryOptions_Validation_ShouldSucceedWhenZeroOrPositiveRetryAttempts() {
         new FileQueryErrorRecoveryOptions(FileQueryErrorAction.Retry, 0).Validate();
         new FileQueryErrorRecoveryOptions(FileQueryErrorAction.Retry, 5).Validate();
     }
 
     [TestMethod]
-    public void FileQueryOptions_Validation_ShouldPropagateErrorRecoveryValidation()
-    {
+    public void FileQueryOptions_Validation_ShouldPropagateErrorRecoveryValidation() {
         var options = new FileQueryOptions(
             new FileQueryOptionsConfig(
                 PatternInput: new PatternInput(["*"]),
@@ -34,8 +30,7 @@ public sealed class FileQueryObservabilityDeepTests
     }
 
     [TestMethod]
-    public void FileQueryOptions_Constructor_ShouldSetSensibleDefaultsForErrorRecovery()
-    {
+    public void FileQueryOptions_Constructor_ShouldSetSensibleDefaultsForErrorRecovery() {
         // When ignoreInaccessible is true (default)
         var optionsWithIgnore = new FileQueryOptions(new FileQueryOptionsConfig(PatternInput: new PatternInput(["*"]), IgnoreInaccessible: true));
         Assert.AreEqual(FileQueryErrorAction.Skip, optionsWithIgnore.ErrorRecovery.Action);
@@ -46,8 +41,7 @@ public sealed class FileQueryObservabilityDeepTests
     }
 
     [TestMethod]
-    public void FileQueryDiagnostic_ShouldStorePropertiesCorrectly()
-    {
+    public void FileQueryDiagnostic_ShouldStorePropertiesCorrectly() {
         var diagnostic = new FileQueryDiagnostic(
             Path: "/root/a.txt",
             RelativePath: "a.txt",
@@ -70,8 +64,7 @@ public sealed class FileQueryObservabilityDeepTests
     }
 
     [TestMethod]
-    public void FileQueryProgress_ShouldStorePropertiesCorrectly()
-    {
+    public void FileQueryProgress_ShouldStorePropertiesCorrectly() {
         var progress = new FileQueryProgress(1, 2, 3, "/root/a.txt");
 
         Assert.AreEqual(1, progress.DirectoriesVisited);

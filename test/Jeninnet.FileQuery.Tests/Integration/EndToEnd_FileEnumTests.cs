@@ -1,11 +1,9 @@
 ﻿namespace Jeninnet.FileQuery.Tests.Integration;
 
 [TestClass]
-public class EndToEnd_FileEnumTests
-{
+public class EndToEnd_FileEnumTests {
     [TestMethod]
-    public void ShouldEnumerate_AllCsFiles()
-    {
+    public void ShouldEnumerate_AllCsFiles() {
         using var env = new TestEnvironment();
         env.CreateFiles(
             "a.txt",
@@ -34,8 +32,7 @@ public class EndToEnd_FileEnumTests
     }
 
     [TestMethod]
-    public void ShouldRespect_IgnoreDirectories()
-    {
+    public void ShouldRespect_IgnoreDirectories() {
         using var env = new TestEnvironment();
         env.CreateFiles(
             "a.txt",
@@ -77,8 +74,7 @@ public class EndToEnd_FileEnumTests
     }
 
     [TestMethod]
-    public void Complex_GitIgnoreScenario()
-    {
+    public void Complex_GitIgnoreScenario() {
         using var env = new TestEnvironment();
         env.CreateFiles(
             "a.txt",
@@ -114,8 +110,7 @@ public class EndToEnd_FileEnumTests
     }
 
     [TestMethod]
-    public void ShouldLimit_Depth()
-    {
+    public void ShouldLimit_Depth() {
         using var env = new TestEnvironment();
         env.CreateFiles(
             "a.txt",
@@ -146,8 +141,7 @@ public class EndToEnd_FileEnumTests
     }
 
     [TestMethod]
-    public void DoubleStar_ShouldMatchNested()
-    {
+    public void DoubleStar_ShouldMatchNested() {
         using var env = new TestEnvironment();
         env.CreateFiles(
             "a.txt",
@@ -177,8 +171,7 @@ public class EndToEnd_FileEnumTests
     }
 
     [TestMethod]
-    public void DirectoryOnlyPattern_ShouldExcludeFilesCorrectly()
-    {
+    public void DirectoryOnlyPattern_ShouldExcludeFilesCorrectly() {
         using var env = new TestEnvironment();
         env.CreateFiles(
             "a.txt",
@@ -203,8 +196,7 @@ public class EndToEnd_FileEnumTests
     }
 
     [TestMethod]
-    public void CaseSensitivity_ShouldFollow_Options()
-    {
+    public void CaseSensitivity_ShouldFollow_Options() {
         using var env = new TestEnvironment();
         env.CreateFiles(
             "a.txt",

@@ -15,33 +15,27 @@
 /// Any pattern valid in both → GitIgnore.
 /// </para>
 /// </summary>
-internal static partial class PatternClassifier
-{
+internal static partial class PatternClassifier {
     private static readonly PatternAnalyzer _analyzer = new();
 
-    private static PatternKind ResolveType(CanonicalPattern pattern, PatternInterpretationMode mode)
-    {
-        if(pattern.ExplicitType is not null)
-        {
+    private static PatternKind ResolveType(CanonicalPattern pattern, PatternInterpretationMode mode) {
+        if(pattern.ExplicitType is not null) {
             return pattern.ExplicitType.Value;
         }
 
-        if(mode == PatternInterpretationMode.Specific)
-        {
+        if(mode == PatternInterpretationMode.Specific) {
             throw new PatternException($"Pattern '{pattern.Text}' requires an explicit PatternKind when interpretation mode is set to 'Specific'.");
         }
 
         return Classify(pattern.Text);
     }
 
-    public static ClassifiedPatternSet Classify(CanonicalPatternSet input, PatternInterpretationMode mode)
-    {
+    public static ClassifiedPatternSet Classify(CanonicalPatternSet input, PatternInterpretationMode mode) {
         ArgumentNullException.ThrowIfNull(input);
 
         var result = new List<ClassifiedPattern>();
 
-        foreach(var pattern in input.Patterns)
-        {
+        foreach(var pattern in input.Patterns) {
             var type = ResolveType(pattern, mode);
 
             result.Add(new ClassifiedPattern(pattern.Text, type));
@@ -55,15 +49,13 @@ internal static partial class PatternClassifier
     /// </summary>
     /// <param name="pattern">The pattern string to classify.</param>
     /// <returns>The detected <see cref="PatternKind"/>.</returns>
-    public static PatternKind Classify(string pattern)
-    {
+    public static PatternKind Classify(string pattern) {
         pattern = pattern.Trim();
 
         var span = pattern.AsSpan();
 
         var (isMalformed, _) = PatternValidator.Validate(span);
-        if(isMalformed)
-        {
+        if(isMalformed) {
             // Store the specific error reason in a way the compiler can access.
             // For now, we mark as Unknown and the compiler can throw based on this.
             // To fully implement 'error index', we would need to pass the error string/index through ClassifiedPattern.
@@ -75,24 +67,21 @@ internal static partial class PatternClassifier
         // ---------------------------------------------------------
         // 1. Empty
         // ---------------------------------------------------------
-        if(analysis.IsEmpty)
-        {
+        if(analysis.IsEmpty) {
             return PatternKind.GitIgnore;
         }
 
         // ---------------------------------------------------------
         // 2. Regex (terminal)
         // ---------------------------------------------------------
-        if(analysis.IsRegex)
-        {
+        if(analysis.IsRegex) {
             return PatternKind.Regex;
         }
 
         // ---------------------------------------------------------
         // 3. Stray bracket → Glob
         // ---------------------------------------------------------
-        if(PatternValidator.HasStrayClosingBracket(span))
-        {
+        if(PatternValidator.HasStrayClosingBracket(span)) {
             return PatternKind.Glob;
         }
 
@@ -100,32 +89,28 @@ internal static partial class PatternClassifier
         // 4. WINDOWS PATH RULE (HIGHEST PRIORITY)
         // ---------------------------------------------------------
         // escaped-only case must NOT be treated as path
-        if(analysis.HasBackslash && !analysis.HasEscapedCharacters && !analysis.IsNegated)
-        {
+        if(analysis.HasBackslash && !analysis.HasEscapedCharacters && !analysis.IsNegated) {
             return PatternKind.Glob;
         }
 
         // ---------------------------------------------------------
         // 5. Escaped → GitIgnore
         // ---------------------------------------------------------
-        if(analysis.HasEscapedCharacters)
-        {
+        if(analysis.HasEscapedCharacters) {
             return PatternKind.GitIgnore;
         }
 
         // ---------------------------------------------------------
         // 6. GitIgnore syntax
         // ---------------------------------------------------------
-        if(analysis.HasGitIgnoreSyntax)
-        {
+        if(analysis.HasGitIgnoreSyntax) {
             return PatternKind.GitIgnore;
         }
 
         // ---------------------------------------------------------
         // 7. Wildcards default to GitIgnore
         // ---------------------------------------------------------
-        if(analysis.HasWildcard || analysis.HasBracket)
-        {
+        if(analysis.HasWildcard || analysis.HasBracket) {
             return PatternKind.GitIgnore;
         }
 

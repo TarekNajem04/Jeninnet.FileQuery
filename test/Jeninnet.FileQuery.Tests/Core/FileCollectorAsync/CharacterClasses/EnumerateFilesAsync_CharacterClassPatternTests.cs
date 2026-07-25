@@ -8,14 +8,12 @@
 /// These are important because glob engines vary widely in how they handle brackets.
 /// </summary>
 [TestClass]
-public class EnumerateFilesAsync_CharacterClassPatternTests
-{
+public class EnumerateFilesAsync_CharacterClassPatternTests {
     /// <summary>
     /// Validates simple character class matching.
     /// </summary>
     [TestMethod]
-    public async Task EnumerateFilesAsync_CharacterClass_ShouldMatchSpecificLettersAsync()
-    {
+    public async Task EnumerateFilesAsync_CharacterClass_ShouldMatchSpecificLettersAsync() {
         using var env = new TestEnvironment();
         env.CreateFiles("a.txt", "b.txt", "c.txt", "d.txt");
 
@@ -45,8 +43,7 @@ public class EnumerateFilesAsync_CharacterClassPatternTests
     /// Tests range classes such as [a-c].
     /// </summary>
     [TestMethod]
-    public async Task EnumerateFilesAsync_CharacterRange_ShouldMatchRangeAsync()
-    {
+    public async Task EnumerateFilesAsync_CharacterRange_ShouldMatchRangeAsync() {
         using var env = new TestEnvironment();
         env.CreateFiles("a.log", "b.log", "c.log", "d.log");
 
@@ -72,8 +69,7 @@ public class EnumerateFilesAsync_CharacterClassPatternTests
     /// Ensures vowel-prefixed .txt files are excluded using GitIgnore negation.
     /// </summary>
     [TestMethod]
-    public async Task EnumerateFilesAsync_NegatedClass_ShouldExcludeAsync()
-    {
+    public async Task EnumerateFilesAsync_NegatedClass_ShouldExcludeAsync() {
         using var env = new TestEnvironment();
         env.CreateFiles("apple.txt", "banana.txt", "cherry.txt");
 

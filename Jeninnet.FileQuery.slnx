@@ -29,6 +29,7 @@
         <File Path="Directory.Packages.props" />
         <File Path="global.json" />
         <File Path="LICENSE" />
+        <File Path="Migration.md" />
         <File Path="README.md" />
 		<File Path="ROADMAP.md" />
         <File Path="run-coverage.ps1" />

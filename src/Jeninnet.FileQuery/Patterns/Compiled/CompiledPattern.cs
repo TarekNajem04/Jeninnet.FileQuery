@@ -39,8 +39,7 @@ internal record CompiledPatternConfig(
 /// </list>
 /// </remarks>
 [DebuggerDisplay($"{{{nameof(GetDebuggerDisplay)}(),nq}}")]
-internal sealed record CompiledPattern : ICompiledPattern
-{
+internal sealed record CompiledPattern : ICompiledPattern {
     /// <summary>
     /// True if the pattern begins with <c>!</c>, negating matches.
     /// </summary>
@@ -76,8 +75,7 @@ internal sealed record CompiledPattern : ICompiledPattern
     /// </summary>
     public string? RegexText { get; init; }
 
-    internal CompiledPattern(CompiledPatternConfig config)
-    {
+    internal CompiledPattern(CompiledPatternConfig config) {
         ArgumentNullException.ThrowIfNull(config);
         IsNegated = config.IsNegated;
         DirectoryOnly = config.DirectoryOnly;
@@ -94,8 +92,7 @@ internal sealed record CompiledPattern : ICompiledPattern
     /// <summary>
     /// Returns a debug string representation of this compiled pattern.
     /// </summary>
-    public override string ToString() =>
-        string.Join("/", Segments.Select(seg => string.Concat(seg.Select(t => t.ToString() ?? "*"))));
+    public override string ToString() => string.Join("/", Segments.Select(seg => string.Concat(seg.Select(t => t.ToString() ?? "*"))));
 
     private string GetDebuggerDisplay() => ToString();
 }

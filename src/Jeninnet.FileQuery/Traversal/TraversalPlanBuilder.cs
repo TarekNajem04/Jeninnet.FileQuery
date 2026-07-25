@@ -4,11 +4,9 @@
 /// Builds a <see cref="TraversalPlan"/> from a <see cref="FileQuery"/> descriptor.
 /// </summary>
 /// <param name="fileSystem">The file system abstraction.</param>
-internal sealed class TraversalPlanBuilder(IFileSystem fileSystem) : ITraversalPlanBuilder
-{
+internal sealed class TraversalPlanBuilder(IFileSystem fileSystem) : ITraversalPlanBuilder {
     /// <inheritdoc/>
-    public TraversalPlan Build(FileQuery query, IProgress<FileQueryProgress>? progress = null)
-    {
+    public TraversalPlan Build(FileQuery query, IProgress<FileQueryProgress>? progress = null) {
         Validate(query);
 
         var options = query.Options;
@@ -53,16 +51,14 @@ internal sealed class TraversalPlanBuilder(IFileSystem fileSystem) : ITraversalP
         );
     }
 
-    private void Validate(FileQuery query)
-    {
+    private void Validate(FileQuery query) {
         ArgumentNullException.ThrowIfNull(query);
         ArgumentException.ThrowIfNullOrEmpty(query.RootPath);
         ArgumentNullException.ThrowIfNull(query.Options);
 
         query.Options.Validate();
 
-        if(!fileSystem.DirectoryExists(query.RootPath))
-        {
+        if(!fileSystem.DirectoryExists(query.RootPath)) {
             throw new DirectoryNotFoundException(query.RootPath);
         }
     }

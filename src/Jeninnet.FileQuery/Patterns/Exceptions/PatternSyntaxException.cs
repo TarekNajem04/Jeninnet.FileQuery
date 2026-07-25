@@ -4,8 +4,7 @@ namespace Jeninnet.FileQuery.Patterns.Exceptions;
 /// <summary>
 /// Represents a syntax error in a pattern string.
 /// </summary>
-public sealed class PatternSyntaxException : PatternException
-{
+public sealed class PatternSyntaxException : PatternException {
     /// <summary>The original pattern text that caused the error.</summary>
     public string Pattern { get; }
 

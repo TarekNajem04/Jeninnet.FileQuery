@@ -15,8 +15,7 @@
 /// messages. The prefix is now stripped before compilation.
 /// </para>
 /// </remarks>
-internal sealed class RegexSyntaxInvariant : IPatternInvariant
-{
+internal sealed class RegexSyntaxInvariant : IPatternInvariant {
     private const string REGEX_PREFIX = "r:";
 
     /// <inheritdoc/>
@@ -26,8 +25,7 @@ internal sealed class RegexSyntaxInvariant : IPatternInvariant
     public PatternKind? AppliesTo => PatternKind.Regex;
 
     /// <inheritdoc/>
-    public PatternInvariantResult Validate(PatternCompilationContext context)
-    {
+    public PatternInvariantResult Validate(PatternCompilationContext context) {
         var text = context.Pattern.Text;
 
         // Strip the "r:" prefix before validating so the Regex engine sees only
@@ -36,8 +34,7 @@ internal sealed class RegexSyntaxInvariant : IPatternInvariant
             ? text[REGEX_PREFIX.Length..]
             : text;
 
-        try
-        {
+        try {
             _ = new Regex(
                 expression,
                 RegexOptions.Compiled | RegexOptions.CultureInvariant,
@@ -45,8 +42,7 @@ internal sealed class RegexSyntaxInvariant : IPatternInvariant
             );
             return PatternInvariantResult.Success;
         }
-        catch(ArgumentException ex)
-        {
+        catch(ArgumentException ex) {
             return PatternInvariantResult.Fail(
                 $"Invalid regex syntax in '{expression}': {ex.Message}");
         }

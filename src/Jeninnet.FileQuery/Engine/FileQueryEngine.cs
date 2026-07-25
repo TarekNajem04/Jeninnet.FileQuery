@@ -8,15 +8,11 @@
 internal sealed class FileQueryEngine(
     ITraversalExecutor traversal,
     ITraversalPlanBuilder planBuilder
-) : IFileQueryEngine
-{
-    public IEnumerable<string> Execute(FileQuery query)
-        => traversal.Execute(planBuilder.Build(query));
+) : IFileQueryEngine {
+    public IEnumerable<string> Execute(FileQuery query) => traversal.Execute(planBuilder.Build(query));
 
-    public async IAsyncEnumerable<string> ExecuteAsync(FileQuery query, [EnumeratorCancellation] CancellationToken cancellationToken = default)
-    {
-        await foreach(var result in ExecuteAsync(query, progress: null, cancellationToken))
-        {
+    public async IAsyncEnumerable<string> ExecuteAsync(FileQuery query, [EnumeratorCancellation] CancellationToken cancellationToken = default) {
+        await foreach(var result in ExecuteAsync(query, progress: null, cancellationToken)) {
             yield return result;
         }
     }
@@ -25,10 +21,8 @@ internal sealed class FileQueryEngine(
         FileQuery query,
         IProgress<FileQueryProgress>? progress,
         [EnumeratorCancellation] CancellationToken cancellationToken = default
-    )
-    {
-        await foreach(var result in traversal.ExecuteAsync(planBuilder.Build(query, progress), cancellationToken))
-        {
+    ) {
+        await foreach(var result in traversal.ExecuteAsync(planBuilder.Build(query, progress), cancellationToken)) {
             yield return result;
         }
     }

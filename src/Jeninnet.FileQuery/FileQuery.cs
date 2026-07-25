@@ -17,8 +17,7 @@
 /// Execution is delegated to <see cref="IFileQueryEngine"/>.
 /// </para>
 /// </remarks>
-public sealed class FileQuery(string rootPath, FileQueryOptions options)
-{
+public sealed class FileQuery(string rootPath, FileQueryOptions options) {
     /// <summary>
     /// Gets the root directory from which the file query begins.
     /// </summary>

@@ -10,14 +10,12 @@
 ///     - case sensitivity (async + options.IgnoreCase)
 /// </summary>
 [TestClass]
-public class EnumerateFilesAsync_PathEdgeCaseTests
-{
+public class EnumerateFilesAsync_PathEdgeCaseTests {
     /// <summary>
     /// Ensures directory ending with a slash is accepted and normalized.
     /// </summary>
     [TestMethod]
-    public async Task EnumerateFilesAsync_TrailingSlash_ShouldWorkAsync()
-    {
+    public async Task EnumerateFilesAsync_TrailingSlash_ShouldWorkAsync() {
         using var env = new TestEnvironment();
 
         env.CreateFiles("file.txt", "file1.txt");
@@ -45,8 +43,7 @@ public class EnumerateFilesAsync_PathEdgeCaseTests
     /// Tests Unicode file name handling.
     /// </summary>
     [TestMethod]
-    public async Task EnumerateFilesAsync_UnicodeNames_ShouldWorkAsync()
-    {
+    public async Task EnumerateFilesAsync_UnicodeNames_ShouldWorkAsync() {
         using var env = new TestEnvironment();
 
         env.CreateFiles("Test测试.log", "Test测试.txt", "file😍.txt", "file1😀.txT", "file2👍.TXT", "Test😁.txt", "Test07😅.txt");
@@ -81,8 +78,7 @@ public class EnumerateFilesAsync_PathEdgeCaseTests
     /// Ensures IgnoreCase works asynchronously across platforms.
     /// </summary>
     [TestMethod]
-    public async Task EnumerateFilesAsync_IgnoreCase_ShouldMatchMixedCaseAsync()
-    {
+    public async Task EnumerateFilesAsync_IgnoreCase_ShouldMatchMixedCaseAsync() {
         using var env = new TestEnvironment();
 
         env.CreateFiles("Alpha.TXT", "beta.txt", "GAMMA.TxT");

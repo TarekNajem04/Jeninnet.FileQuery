@@ -38,8 +38,7 @@
 /// All modes support negation (<c>!pattern</c>) unless explicitly disabled.
 /// </para>
 /// </remarks>
-public enum PatternMatchingMode
-{
+public enum PatternMatchingMode {
     /// <summary>
     /// GitIgnore‑compatible, directory‑aware interpretation.
     /// Recommended for tooling that needs hierarchical semantics.

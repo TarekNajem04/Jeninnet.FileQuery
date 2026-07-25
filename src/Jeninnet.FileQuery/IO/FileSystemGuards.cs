@@ -8,8 +8,7 @@
 /// ensuring that <see cref="UnauthorizedAccessException"/> and <see cref="IOException"/>
 /// are handled consistently across the engine based on the <see langword="ignoreInaccessible"/> policy.
 /// </remarks>
-internal static class FileSystemGuards
-{
+internal static class FileSystemGuards {
     /// <summary>
     /// Validates that a directory is accessible according to the configured policy.
     /// </summary>
@@ -22,15 +21,12 @@ internal static class FileSystemGuards
     /// <see cref="UnauthorizedAccessException"/> before the engine continues traversal.
     /// </remarks>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static void EnsureAccessible(string directory, bool ignoreInaccessible)
-    {
-        if(ignoreInaccessible)
-        {
+    public static void EnsureAccessible(string directory, bool ignoreInaccessible) {
+        if(ignoreInaccessible) {
             return;
         }
 
-        try
-        {
+        try {
             // Force enumeration to trigger access checks.
             using var entries = Directory.EnumerateFileSystemEntries(directory).GetEnumerator();
             _ = entries.MoveNext();
@@ -39,8 +35,7 @@ internal static class FileSystemGuards
             ex is UnauthorizedAccessException
             or IOException
             or DirectoryNotFoundException
-        )
-        {
+        ) {
             throw;
         }
     }

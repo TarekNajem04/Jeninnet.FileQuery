@@ -6,14 +6,12 @@
 /// - no slash ? unanchored (matches at any depth)
 /// </summary>
 [TestClass]
-public class AnchoredPatternTests
-{
+public class AnchoredPatternTests {
     /// <summary>
     /// Leading slash anchors to the root only.
     /// </summary>
     [TestMethod]
-    public void AnchoredPattern_ShouldMatchRootOnly()
-    {
+    public void AnchoredPattern_ShouldMatchRootOnly() {
         using var env = new TestEnvironment();
 
         env.CreateFile("file.txt");
@@ -41,8 +39,7 @@ public class AnchoredPatternTests
     /// Unanchored patterns match at any depth.
     /// </summary>
     [TestMethod]
-    public void UnanchoredPattern_ShouldMatchAnywhere()
-    {
+    public void UnanchoredPattern_ShouldMatchAnywhere() {
         using var env = new TestEnvironment();
 
         env.CreateFile("file.md");
@@ -70,8 +67,7 @@ public class AnchoredPatternTests
     /// for the root directory 'sub', but not for nested directories like 'x/sub'.
     /// </summary>
     [TestMethod]
-    public void AnchoredDirectoryPattern_ShouldMatchRootDirOnly()
-    {
+    public void AnchoredDirectoryPattern_ShouldMatchRootDirOnly() {
         using var env = new TestEnvironment();
 
         env.CreateFile("sub/a.txt");
