@@ -42,7 +42,7 @@ reportgenerator `
   -reports:"TestResults/**/*xml" `
   -targetdir:"TestCoverageReport" `
   -reporttypes:"Html;HtmlSummary;TextSummary" `
-  -assemblyfilters:"-*.Tests;-*.Test;-*Migrations*"
+  -assemblyfilters:"+Jeninnet.FileQuery*;+Jeninnet.FileQuery.CommandLine*;+Jeninnet.FileQuery.DependencyInjection*"
 
 # Verify that the final HTML report was actually generated
 if (Test-Path "TestCoverageReport/index.html") {
