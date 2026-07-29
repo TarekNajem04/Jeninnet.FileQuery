@@ -5,15 +5,27 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 Versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [1.3.0] - 2026-07-26
+## [1.4.0] - 2026-07-29
 
 ### Added
-- **OpenTelemetry Integration**: Export metrics and spans for structured observability.
-- **AOT Compilation Validation Pipeline**: Strict Native AOT compatibility checks in CI.
-- **Roslyn Analyzers for Pattern Validation**: Design-time warnings and code fixes for malformed patterns.
+- **Jeninnet.Testing.Assertions Library** (`v1.0.0`): Extracted shared test infrastructure into a reusable, well-documented assertion library with fluent `.Should()` syntax. Supports Action, AsyncAction, Bool, Collection, Exception, Object, and String assertions.
+- **Traversal Optimization**: `TraversalExecutor` now skips unnecessary directory traversal for negated directory-only patterns with a literal suffix (e.g., `!*.github/`), reducing IO for excluded directory subtrees.
+- **New Test Suites**: Added FileEnumeration, Unit, and Integration test directories with improved organization.
 
 ### Changed
-- **Improved Path Validation**: `FileQueryValidator.ValidateExecution` now eagerly validates paths, providing more descriptive `ArgumentException` messages for invalid paths, excessive length, or malformed UNC structures.
+- **Test Assertion Migration**: All 90+ test files migrated from `TestAssertEx.*` to fluent `.Should()` assertion syntax.
+- **Test Infrastructure**: Removed `Shared/` and `Infrastructure/` folders in favor of assertion library types.
+- **Enums**: Added explicit underlying values to all enum members for binary compatibility.
+- **Editorconfig**: Enabled Roslynator analyzer category, elevated RCS1141 to warning, refined code style preferences.
+- **Collection Expressions**: Modernized `.ToArray()` calls to collection expressions (`[.. x]`) across benchmarks and test files.
+- **XML Documentation**: Added missing `<param>`, `<exception>`, and `<returns>` XML doc elements; converted inline comments to proper `<summary>` tags.
+
+### Fixed
+- **PatternException**: Removed redundant `: base()` constructor call.
+- **CS0104 Ambiguity**: Resolved `PathUtilities` naming conflict by renaming assertion library utility to `PathHelper`.
+- **CS1591 Warnings**: Added XML documentation to all public types and members in the assertion library.
+- **RCS1141 Warnings**: Added missing `<param>` elements to `Should()` methods and primary constructors.
+- **All Analyzer Warnings**: Solution now builds with 0 warnings and 0 errors.
 
 ---
 
