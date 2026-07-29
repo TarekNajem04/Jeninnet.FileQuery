@@ -81,9 +81,9 @@ public class CharacterClassPatternTests {
         var results = fileQueryEngine.Execute(new(env.Root, options)).ToList();
 
         results.Should().HaveCount(2);
-        results.Should().NotContain(x => x.EndsWith("a.txt", StringComparison.Ordinal));
-        results.Should().NotContain(x => x.EndsWith("b.txt", StringComparison.Ordinal));
-        results.Should().NotContain(x => x.EndsWith("c.txt", StringComparison.Ordinal));
+        results.Should().NotContain(static x => x.EndsWith("a.txt", StringComparison.Ordinal));
+        results.Should().NotContain(static x => x.EndsWith("b.txt", StringComparison.Ordinal));
+        results.Should().NotContain(static x => x.EndsWith("c.txt", StringComparison.Ordinal));
     }
 }
 

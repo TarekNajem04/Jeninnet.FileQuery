@@ -51,7 +51,7 @@ public class GitIgnorePatternCompilerTests {
         compiledPatternSets.Should().HaveCount(1, "because we compiled a single pattern string");
         var compiledPattern = compiledPatternSets[0];
 
-        compiledPattern.Segments[0].Should().ContainSingle(t => t is RecursiveWildcardToken);
+        compiledPattern.Segments[0].Should().ContainSingle(static t => t is RecursiveWildcardToken);
     }
 
     /// <summary>

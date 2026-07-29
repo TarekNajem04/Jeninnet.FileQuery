@@ -20,7 +20,7 @@ public static class PatternHelpers {
         PatternKind patternKind,
         params string[] patterns
     ) => new Dictionary<PatternKind, IEnumerable<string>> {
-        [patternKind] = patterns.Where(p => !string.IsNullOrWhiteSpace(p))
+        [patternKind] = patterns.Where(static p => !string.IsNullOrWhiteSpace(p))
     };
 }
 

@@ -148,7 +148,7 @@ public sealed class PathUtilitiesUncTests {
     /// </summary>
     [TestMethod]
     public void Should_ThrowArgumentException_When_NormalizingNullOrEmpty() {
-        Assert.ThrowsExactly<ArgumentNullException>(() => PathUtilities.Normalize(null));
-        Assert.ThrowsExactly<ArgumentException>(() => PathUtilities.Normalize(""));
+        Assert.ThrowsExactly<ArgumentNullException>(static () => PathUtilities.Normalize(null));
+        Assert.ThrowsExactly<ArgumentException>(static () => PathUtilities.Normalize(""));
     }
 }

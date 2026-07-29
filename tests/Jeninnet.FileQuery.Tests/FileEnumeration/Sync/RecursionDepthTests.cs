@@ -64,9 +64,9 @@ public class RecursionDepthTests {
         var result = fileQueryEngine.Execute(new(env.Root, options)).Order().ToList();
 
         result.Should().HaveCount(2);
-        result.Should().Contain(x => x.EndsWith("root.txt", StringComparison.Ordinal));
-        result.Should().Contain(x => x.EndsWith("fileA.txt", StringComparison.Ordinal));
-        result.Should().NotContain(x => x.EndsWith("fileB.txt", StringComparison.Ordinal));
+        result.Should().Contain(static x => x.EndsWith("root.txt", StringComparison.Ordinal));
+        result.Should().Contain(static x => x.EndsWith("fileA.txt", StringComparison.Ordinal));
+        result.Should().NotContain(static x => x.EndsWith("fileB.txt", StringComparison.Ordinal));
     }
 
     /// <summary>

@@ -92,9 +92,9 @@ public class RecursiveWildcardTests {
         var result = fileQueryEngine.Execute(new(env.Root, options))
                                     .ToList();
 
-        result.Should().Contain(x => x.EndsWith("a.txt", StringComparison.Ordinal));
-        result.Should().Contain(x => x.EndsWith("c.txt", StringComparison.Ordinal));
-        result.Should().NotContain(x => x.EndsWith("b.log", StringComparison.Ordinal));
+        result.Should().Contain(static x => x.EndsWith("a.txt", StringComparison.Ordinal));
+        result.Should().Contain(static x => x.EndsWith("c.txt", StringComparison.Ordinal));
+        result.Should().NotContain(static x => x.EndsWith("b.log", StringComparison.Ordinal));
     }
 }
 

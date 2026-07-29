@@ -17,7 +17,7 @@ public sealed class CollectionAssertionSmokeTests {
 
     /// <summary>BeEmpty throws on a non-empty collection.</summary>
     [TestMethod]
-    public void BeEmpty_OnNonEmptyCollection_Throws() => Assert.ThrowsExactly<AssertionFailedException>(() => _single.Should().BeEmpty());
+    public void BeEmpty_OnNonEmptyCollection_Throws() => Assert.ThrowsExactly<AssertionFailedException>(static () => _single.Should().BeEmpty());
 
     /// <summary>Contain passes when the item is present.</summary>
     [TestMethod]
@@ -28,7 +28,7 @@ public sealed class CollectionAssertionSmokeTests {
 
     /// <summary>Contain throws when the item is missing.</summary>
     [TestMethod]
-    public void Contain_MissingItem_Throws() => Assert.ThrowsExactly<AssertionFailedException>(() => _two.Should().Contain(99));
+    public void Contain_MissingItem_Throws() => Assert.ThrowsExactly<AssertionFailedException>(static () => _two.Should().Contain(99));
 
     /// <summary>HaveCount passes when counts match.</summary>
     [TestMethod]
@@ -39,7 +39,7 @@ public sealed class CollectionAssertionSmokeTests {
 
     /// <summary>HaveCount throws when counts differ.</summary>
     [TestMethod]
-    public void HaveCount_WithNonMatchingCount_Throws() => Assert.ThrowsExactly<AssertionFailedException>(() => _two.Should().HaveCount(5));
+    public void HaveCount_WithNonMatchingCount_Throws() => Assert.ThrowsExactly<AssertionFailedException>(static () => _two.Should().HaveCount(5));
 
     /// <summary>BeEquivalentTo passes for permutations of the same elements.</summary>
     [TestMethod]
@@ -50,5 +50,5 @@ public sealed class CollectionAssertionSmokeTests {
 
     /// <summary>BeEquivalentTo throws when element sets differ.</summary>
     [TestMethod]
-    public void BeEquivalentTo_WithDifferentElements_Throws() => Assert.ThrowsExactly<AssertionFailedException>(() => _two.Should().BeEquivalentTo([1, 3]));
+    public void BeEquivalentTo_WithDifferentElements_Throws() => Assert.ThrowsExactly<AssertionFailedException>(static () => _two.Should().BeEquivalentTo([1, 3]));
 }

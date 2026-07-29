@@ -12,7 +12,7 @@ internal sealed class NullMatcher : PathMatcher {
     /// <summary>
     /// A shared <see cref="NullMatcher"/> instance.
     /// </summary>
-    private static readonly Lazy<NullMatcher> _instance = new(() => new NullMatcher()); // Thread-safe by default
+    private static readonly Lazy<NullMatcher> _instance = new(static () => new NullMatcher()); // Thread-safe by default
 
     /// <summary>
     /// Gets the shared singleton instance of <see cref="NullMatcher"/>.

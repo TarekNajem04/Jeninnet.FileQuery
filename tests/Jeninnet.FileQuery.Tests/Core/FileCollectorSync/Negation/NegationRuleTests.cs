@@ -31,7 +31,7 @@ public class NegationRuleTests {
         var result = fileQueryEngine.Execute(new(env.Root, options)).Order().ToList();
 
         TestAssertEx.HasCount(result, 2);
-        Assert.DoesNotContain(x => x.EndsWith("b.txt", StringComparison.Ordinal), result);
+        Assert.DoesNotContain(static x => x.EndsWith("b.txt", StringComparison.Ordinal), result);
     }
 
     /// <summary>
@@ -58,7 +58,7 @@ public class NegationRuleTests {
 
         var result = fileQueryEngine.Execute(new(env.Root, options)).ToList();
 
-        TestAssertEx.ContainsSingle(result, x => x.EndsWith("keep.txt", StringComparison.Ordinal));
+        TestAssertEx.ContainsSingle(result, static x => x.EndsWith("keep.txt", StringComparison.Ordinal));
     }
 
     /// <summary>
@@ -87,7 +87,7 @@ public class NegationRuleTests {
 
         var result = fileQueryEngine.Execute(new(env.Root, options)).ToList();
 
-        TestAssertEx.ContainsSingle(result, x => x.EndsWith("revive.txt", StringComparison.Ordinal));
+        TestAssertEx.ContainsSingle(result, static x => x.EndsWith("revive.txt", StringComparison.Ordinal));
     }
 }
 

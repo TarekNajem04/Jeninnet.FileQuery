@@ -30,7 +30,7 @@ public class DotfileAndHiddenFileTests {
 
         var result = fileQueryEngine.Execute(new(env.Root, options)).ToList();
 
-        TestAssertEx.ContainsSingle(result, x => x.EndsWith(".hidden", StringComparison.Ordinal));
+        TestAssertEx.ContainsSingle(result, static x => x.EndsWith(".hidden", StringComparison.Ordinal));
     }
 
     /// <summary>
@@ -87,8 +87,8 @@ public class DotfileAndHiddenFileTests {
         var result = fileQueryEngine.Execute(new(env.Root, options)).ToList();
 
         TestAssertEx.HasCount(result, 3);
-        Assert.Contains(x => x.EndsWith("envfile.txt", StringComparison.Ordinal), result);
-        Assert.Contains(x => x.EndsWith(".secret", StringComparison.Ordinal), result);
+        Assert.Contains(static x => x.EndsWith("envfile.txt", StringComparison.Ordinal), result);
+        Assert.Contains(static x => x.EndsWith(".secret", StringComparison.Ordinal), result);
     }
 
     /// <summary>
@@ -116,9 +116,9 @@ public class DotfileAndHiddenFileTests {
         var result = fileQueryEngine.Execute(new(env.Root, options)).ToList();
 
         TestAssertEx.HasCount(result, 1);
-        Assert.DoesNotContain(x => x.StartsWith(".env", StringComparison.Ordinal), result);
-        Assert.DoesNotContain(x => x.EndsWith(".secret", StringComparison.Ordinal), result);
-        Assert.Contains(x => x.EndsWith("file.txt", StringComparison.Ordinal), result);
+        Assert.DoesNotContain(static x => x.StartsWith(".env", StringComparison.Ordinal), result);
+        Assert.DoesNotContain(static x => x.EndsWith(".secret", StringComparison.Ordinal), result);
+        Assert.Contains(static x => x.EndsWith("file.txt", StringComparison.Ordinal), result);
     }
 
     /// <summary>
@@ -148,9 +148,9 @@ public class DotfileAndHiddenFileTests {
         var result = fileQueryEngine.Execute(new(env.Root, options)).ToList();
 
         TestAssertEx.HasCount(result, 2);
-        Assert.DoesNotContain(x => x.EndsWith(".env", StringComparison.Ordinal), result);
-        Assert.Contains(x => x.EndsWith(".secret", StringComparison.Ordinal), result);
-        Assert.Contains(x => x.EndsWith("file.txt", StringComparison.Ordinal), result);
+        Assert.DoesNotContain(static x => x.EndsWith(".env", StringComparison.Ordinal), result);
+        Assert.Contains(static x => x.EndsWith(".secret", StringComparison.Ordinal), result);
+        Assert.Contains(static x => x.EndsWith("file.txt", StringComparison.Ordinal), result);
     }
 }
 

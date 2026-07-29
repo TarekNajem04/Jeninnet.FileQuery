@@ -63,9 +63,9 @@ public class DirectoryOnlyPatternTests {
 
         var results = fileQueryEngine.Execute(new(env.Root, options)).ToList();
 
-        results.Should().Contain(x => x.EndsWith("inside.txt", StringComparison.Ordinal));   // Included by negation "!sub/*.txt" rule
-        results.Should().Contain(x => x.EndsWith("other.log", StringComparison.Ordinal));    // Excluded by default
-        results.Should().ContainSingle(x => x.EndsWith("x.txt", StringComparison.Ordinal));       // Included by default (not in 'sub/')
+        results.Should().Contain(static x => x.EndsWith("inside.txt", StringComparison.Ordinal));   // Included by negation "!sub/*.txt" rule
+        results.Should().Contain(static x => x.EndsWith("other.log", StringComparison.Ordinal));    // Excluded by default
+        results.Should().ContainSingle(static x => x.EndsWith("x.txt", StringComparison.Ordinal));       // Included by default (not in 'sub/')
     }
 
     /// <summary>
@@ -92,7 +92,7 @@ public class DirectoryOnlyPatternTests {
 
         var results = fileQueryEngine.Execute(new(env.Root, options)).ToList();
 
-        results.Should().ContainSingle(x => x.EndsWith("a.txt", StringComparison.Ordinal));
+        results.Should().ContainSingle(static x => x.EndsWith("a.txt", StringComparison.Ordinal));
     }
 
     /// <summary>
@@ -128,8 +128,8 @@ public class DirectoryOnlyPatternTests {
 
         var results = fileQueryEngine.Execute(new(env.Root, options)).ToList();
 
-        results.Should().NotContain(x => x.StartsWith("temp", StringComparison.Ordinal));
-        results.Should().Contain(x => x.EndsWith("file.log", StringComparison.Ordinal));
+        results.Should().NotContain(static x => x.StartsWith("temp", StringComparison.Ordinal));
+        results.Should().Contain(static x => x.EndsWith("file.log", StringComparison.Ordinal));
         results.Should().HaveCount(1);
     }
 

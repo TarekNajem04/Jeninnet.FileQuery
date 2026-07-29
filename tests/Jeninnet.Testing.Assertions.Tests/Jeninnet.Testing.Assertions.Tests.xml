@@ -25,6 +25,186 @@
         <member name="M:Jeninnet.Testing.Assertions.Tests.Assertions.AssertionInfrastructureSmokeTests.BeNull_OnNonNull_Throws">
             <summary>BeNull throws when the value is non-null.</summary>
         </member>
+        <member name="T:Jeninnet.Testing.Assertions.Tests.Assertions.AsyncActionAssertionTests">
+            <summary>Verifies that <see cref="T:Jeninnet.Testing.Assertions.AsyncActionAssertions"/> correctly handles all ThrowAsync paths.</summary>
+        </member>
+        <member name="M:Jeninnet.Testing.Assertions.Tests.Assertions.AsyncActionAssertionTests.ThrowAsync_WhenActionThrowsExpectedType_ReturnsExceptionAssertionsAsync">
+            <summary>When the async action throws the exact expected exception type, ThrowAsync returns the exception.</summary>
+        </member>
+        <member name="M:Jeninnet.Testing.Assertions.Tests.Assertions.AsyncActionAssertionTests.ThrowAsync_WhenActionThrowsDerivedType_ReturnsExceptionAssertionsAsync">
+            <summary>When the async action throws a derived type, ThrowAsync matches the base type.</summary>
+        </member>
+        <member name="M:Jeninnet.Testing.Assertions.Tests.Assertions.AsyncActionAssertionTests.ThrowAsync_WhenActionThrowsWrongType_ThrowsAssertionFailedExceptionAsync">
+            <summary>When the async action throws a different exception type, ThrowAsync throws AssertionFailedException.</summary>
+        </member>
+        <member name="M:Jeninnet.Testing.Assertions.Tests.Assertions.AsyncActionAssertionTests.ThrowAsync_WhenActionDoesNotThrow_ThrowsAssertionFailedExceptionAsync">
+            <summary>When the async action does not throw, ThrowAsync throws AssertionFailedException.</summary>
+        </member>
+        <member name="M:Jeninnet.Testing.Assertions.Tests.Assertions.AsyncActionAssertionTests.ThrowAsync_WithCustomMessage_WrongType_IncludesMessageAsync">
+            <summary>A custom message appears in the exception when the wrong exception type is thrown.</summary>
+        </member>
+        <member name="M:Jeninnet.Testing.Assertions.Tests.Assertions.AsyncActionAssertionTests.ThrowAsync_WithCustomMessage_NoThrow_IncludesMessageAsync">
+            <summary>A custom message appears in the exception when no exception is thrown.</summary>
+        </member>
+        <member name="T:Jeninnet.Testing.Assertions.Tests.Assertions.BoolAssertionTests">
+            <summary>Verifies the remaining <see cref="T:Jeninnet.Testing.Assertions.BoolAssertions"/> paths including BeFalse and custom messages.</summary>
+        </member>
+        <member name="M:Jeninnet.Testing.Assertions.Tests.Assertions.BoolAssertionTests.BeFalse_WithFalse_Passes">
+            <summary>BeFalse passes when the value is false.</summary>
+        </member>
+        <member name="M:Jeninnet.Testing.Assertions.Tests.Assertions.BoolAssertionTests.BeFalse_WithTrue_Throws">
+            <summary>BeFalse throws when the value is true.</summary>
+        </member>
+        <member name="M:Jeninnet.Testing.Assertions.Tests.Assertions.BoolAssertionTests.BeFalse_WithCustomMessage_IncludesMessage">
+            <summary>A custom message appears in the exception when BeFalse fails.</summary>
+        </member>
+        <member name="M:Jeninnet.Testing.Assertions.Tests.Assertions.BoolAssertionTests.BeTrue_WithCustomMessage_IncludesMessage">
+            <summary>A custom message appears in the exception when BeTrue fails.</summary>
+        </member>
+        <member name="T:Jeninnet.Testing.Assertions.Tests.Assertions.ObjectAssertionEdgeCaseTests">
+            <summary>Verifies error paths and custom message handling in <see cref="T:Jeninnet.Testing.Assertions.ObjectAssertions`1"/>.</summary>
+        </member>
+        <member name="M:Jeninnet.Testing.Assertions.Tests.Assertions.ObjectAssertionEdgeCaseTests.Be_WithNonMatchingValue_WithCustomMessage_IncludesMessage">
+            <summary>A custom message appears in the exception when Be fails.</summary>
+        </member>
+        <member name="M:Jeninnet.Testing.Assertions.Tests.Assertions.ObjectAssertionEdgeCaseTests.Be_WithNullExpected_PassesWhenValueIsNull">
+            <summary>Be passes when both the value and expected are null.</summary>
+        </member>
+        <member name="M:Jeninnet.Testing.Assertions.Tests.Assertions.ObjectAssertionEdgeCaseTests.BeOfType_WithNullValue_Throws">
+            <summary>BeOfType throws when the value is null.</summary>
+        </member>
+        <member name="M:Jeninnet.Testing.Assertions.Tests.Assertions.ObjectAssertionEdgeCaseTests.BeOfType_WithIncorrectType_Throws">
+            <summary>BeOfType throws when the runtime type does not match.</summary>
+        </member>
+        <member name="M:Jeninnet.Testing.Assertions.Tests.Assertions.ObjectAssertionEdgeCaseTests.BeOfType_WithCustomMessage_IncludesMessage">
+            <summary>A custom message appears in the exception when BeOfType fails.</summary>
+        </member>
+        <member name="M:Jeninnet.Testing.Assertions.Tests.Assertions.ObjectAssertionEdgeCaseTests.BeNull_OnNonNull_WithCustomMessage_IncludesMessage">
+            <summary>A custom message appears in the exception when BeNull fails.</summary>
+        </member>
+        <member name="M:Jeninnet.Testing.Assertions.Tests.Assertions.ObjectAssertionEdgeCaseTests.NotBeNull_OnNull_WithCustomMessage_IncludesMessage">
+            <summary>A custom message appears in the exception when NotBeNull fails.</summary>
+        </member>
+        <member name="M:Jeninnet.Testing.Assertions.Tests.Assertions.ObjectAssertionEdgeCaseTests.Be_WithDifferentNumericTypes_Fails">
+            <summary>Be with values of different types (int vs string) throws AssertionFailedException.</summary>
+        </member>
+        <member name="T:Jeninnet.Testing.Assertions.Tests.Assertions.ObjectAssertionPassPathTests">
+            <summary>Verifies the passing paths for each assertion method in <see cref="T:Jeninnet.Testing.Assertions.ObjectAssertions`1"/>.</summary>
+        </member>
+        <member name="M:Jeninnet.Testing.Assertions.Tests.Assertions.ObjectAssertionPassPathTests.Be_WithMatchingValue_Passes">
+            <summary>Be passes when the actual value equals the expected value.</summary>
+        </member>
+        <member name="M:Jeninnet.Testing.Assertions.Tests.Assertions.ObjectAssertionPassPathTests.Be_Typed_WithWrongType_Fails">
+            <summary>The generic Be overload throws when the runtime type does not match.</summary>
+        </member>
+        <member name="M:Jeninnet.Testing.Assertions.Tests.Assertions.ObjectAssertionPassPathTests.BeTyped_WithCustomMessage_IncludesMessage">
+            <summary>A custom message appears in the exception when the typed Be overload fails.</summary>
+        </member>
+        <member name="M:Jeninnet.Testing.Assertions.Tests.Assertions.ObjectAssertionPassPathTests.BeNull_OnNull_Passes">
+            <summary>BeNull passes when the value is null.</summary>
+        </member>
+        <member name="M:Jeninnet.Testing.Assertions.Tests.Assertions.ObjectAssertionPassPathTests.NotBeNull_OnNonNull_Passes">
+            <summary>NotBeNull passes when the value is non-null.</summary>
+        </member>
+        <member name="M:Jeninnet.Testing.Assertions.Tests.Assertions.ObjectAssertionPassPathTests.BeOfType_WithCorrectTypeAndNonNull_Passes">
+            <summary>BeOfType passes when the value is non-null and matches the expected type.</summary>
+        </member>
+        <member name="T:Jeninnet.Testing.Assertions.Tests.Assertions.WhichConstraintTests">
+            <summary>Verifies that <see cref="T:Jeninnet.Testing.Assertions.WhichConstraint`1"/> correctly exposes the matched value.</summary>
+        </member>
+        <member name="M:Jeninnet.Testing.Assertions.Tests.Assertions.WhichConstraintTests.Constructor_StoresValue">
+            <summary>The constructor stores an integer value accessible via the Which property.</summary>
+        </member>
+        <member name="M:Jeninnet.Testing.Assertions.Tests.Assertions.WhichConstraintTests.Constructor_WithStringValue">
+            <summary>The constructor stores a string value accessible via the Which property.</summary>
+        </member>
+        <member name="M:Jeninnet.Testing.Assertions.Tests.Assertions.WhichConstraintTests.Constructor_WithNullValue">
+            <summary>The constructor stores null when null is passed.</summary>
+        </member>
+        <member name="M:Jeninnet.Testing.Assertions.Tests.Assertions.WhichConstraintTests.WhichProperty_ReturnsSameInstance">
+            <summary>The Which property returns the exact same reference passed to the constructor.</summary>
+        </member>
+        <member name="T:Jeninnet.Testing.Assertions.Tests.Collections.CollectionAssertionEdgeCaseTests">
+            <summary>Verifies error paths, edge cases, and custom messages in <see cref="T:Jeninnet.Testing.Assertions.CollectionAssertions`1"/>.</summary>
+        </member>
+        <member name="M:Jeninnet.Testing.Assertions.Tests.Collections.CollectionAssertionEdgeCaseTests.BeEquivalentTo_NullCollection_Throws">
+            <summary>BeEquivalentTo with a null collection throws AssertionFailedException with the standard message.</summary>
+        </member>
+        <member name="M:Jeninnet.Testing.Assertions.Tests.Collections.CollectionAssertionEdgeCaseTests.BeEquivalentTo_NullExpected_Throws">
+            <summary>BeEquivalentTo with null expected throws ArgumentNullException.</summary>
+        </member>
+        <member name="M:Jeninnet.Testing.Assertions.Tests.Collections.CollectionAssertionEdgeCaseTests.BeEquivalentTo_MismatchedLength_Throws">
+            <summary>BeEquivalentTo with mismatched lengths throws AssertionFailedException.</summary>
+        </member>
+        <member name="M:Jeninnet.Testing.Assertions.Tests.Collections.CollectionAssertionEdgeCaseTests.BeEquivalentTo_ValueMismatch_Throws">
+            <summary>BeEquivalentTo with differing values throws AssertionFailedException.</summary>
+        </member>
+        <member name="M:Jeninnet.Testing.Assertions.Tests.Collections.CollectionAssertionEdgeCaseTests.BeEquivalentTo_WithCustomMessage_IncludesMessage">
+            <summary>A custom message appears when BeEquivalentTo fails due to a mismatched length.</summary>
+        </member>
+        <member name="M:Jeninnet.Testing.Assertions.Tests.Collections.CollectionAssertionEdgeCaseTests.ContainSingle_NullCollection_Throws">
+            <summary>ContainSingle with a null collection throws AssertionFailedException with the standard message.</summary>
+        </member>
+        <member name="M:Jeninnet.Testing.Assertions.Tests.Collections.CollectionAssertionEdgeCaseTests.ContainSingle_EmptyCollection_Throws">
+            <summary>ContainSingle with an empty collection throws AssertionFailedException.</summary>
+        </member>
+        <member name="M:Jeninnet.Testing.Assertions.Tests.Collections.CollectionAssertionEdgeCaseTests.ContainSingle_MultipleItems_Throws">
+            <summary>ContainSingle with multiple items throws AssertionFailedException.</summary>
+        </member>
+        <member name="M:Jeninnet.Testing.Assertions.Tests.Collections.CollectionAssertionEdgeCaseTests.ContainSingle_WithCustomMessage_IncludesMessage">
+            <summary>A custom message appears when ContainSingle fails due to multiple items.</summary>
+        </member>
+        <member name="M:Jeninnet.Testing.Assertions.Tests.Collections.CollectionAssertionEdgeCaseTests.ContainSingle_Predicate_NullCollection_Throws">
+            <summary>ContainSingle with a predicate fails when the collection is null.</summary>
+        </member>
+        <member name="M:Jeninnet.Testing.Assertions.Tests.Collections.CollectionAssertionEdgeCaseTests.ContainSingle_Predicate_NoMatch_Throws">
+            <summary>ContainSingle with a predicate fails when no item matches.</summary>
+        </member>
+        <member name="M:Jeninnet.Testing.Assertions.Tests.Collections.CollectionAssertionEdgeCaseTests.ContainSingle_Predicate_MultipleMatches_Throws">
+            <summary>ContainSingle with a predicate fails when multiple items match.</summary>
+        </member>
+        <member name="M:Jeninnet.Testing.Assertions.Tests.Collections.CollectionAssertionEdgeCaseTests.ContainSingle_Predicate_WithCustomMessage_IncludesMessage">
+            <summary>A custom message appears when the predicate overload of ContainSingle fails with no match.</summary>
+        </member>
+        <member name="M:Jeninnet.Testing.Assertions.Tests.Collections.CollectionAssertionEdgeCaseTests.NotBeEmpty_NullCollection_Throws">
+            <summary>NotBeEmpty with a null collection throws AssertionFailedException with the standard message.</summary>
+        </member>
+        <member name="M:Jeninnet.Testing.Assertions.Tests.Collections.CollectionAssertionEdgeCaseTests.NotBeEmpty_EmptyCollection_Throws">
+            <summary>NotBeEmpty with an empty collection throws AssertionFailedException.</summary>
+        </member>
+        <member name="M:Jeninnet.Testing.Assertions.Tests.Collections.CollectionAssertionEdgeCaseTests.NotBeEmpty_WithCustomMessage_IncludesMessage">
+            <summary>A custom message appears when NotBeEmpty fails on an empty collection.</summary>
+        </member>
+        <member name="M:Jeninnet.Testing.Assertions.Tests.Collections.CollectionAssertionEdgeCaseTests.NotContain_NullCollection_Throws">
+            <summary>NotContain with a null collection throws AssertionFailedException with the standard message.</summary>
+        </member>
+        <member name="M:Jeninnet.Testing.Assertions.Tests.Collections.CollectionAssertionEdgeCaseTests.NotContain_ItemPresent_Throws">
+            <summary>NotContain with a matching value throws AssertionFailedException.</summary>
+        </member>
+        <member name="M:Jeninnet.Testing.Assertions.Tests.Collections.CollectionAssertionEdgeCaseTests.NotContain_ItemNotPresent_Passes">
+            <summary>NotContain passes when the value is not in the collection.</summary>
+        </member>
+        <member name="M:Jeninnet.Testing.Assertions.Tests.Collections.CollectionAssertionEdgeCaseTests.NotContain_WithCustomMessage_IncludesMessage">
+            <summary>A custom message appears when NotContain fails due to item present.</summary>
+        </member>
+        <member name="M:Jeninnet.Testing.Assertions.Tests.Collections.CollectionAssertionEdgeCaseTests.ContainSubset_NullSuperset_Throws">
+            <summary>ContainSubset with a null superset throws AssertionFailedException with the standard message.</summary>
+        </member>
+        <member name="M:Jeninnet.Testing.Assertions.Tests.Collections.CollectionAssertionEdgeCaseTests.ContainSubset_NullSubset_Throws">
+            <summary>ContainSubset with a null subset throws ArgumentNullException.</summary>
+        </member>
+        <member name="M:Jeninnet.Testing.Assertions.Tests.Collections.CollectionAssertionEdgeCaseTests.ContainSubset_NotContained_Throws">
+            <summary>ContainSubset fails when the subset is not fully contained in the superset.</summary>
+        </member>
+        <member name="M:Jeninnet.Testing.Assertions.Tests.Collections.CollectionAssertionEdgeCaseTests.ContainSubset_WithCustomMessage_IncludesMessage">
+            <summary>A custom message appears when ContainSubset fails due to a missing item.</summary>
+        </member>
+        <member name="M:Jeninnet.Testing.Assertions.Tests.Collections.CollectionAssertionEdgeCaseTests.BeEmpty_NullCollection_Throws">
+            <summary>BeEmpty throws when the collection is null.</summary>
+        </member>
+        <member name="M:Jeninnet.Testing.Assertions.Tests.Collections.CollectionAssertionEdgeCaseTests.BeEmpty_WithCustomMessage_IncludesMessage">
+            <summary>A custom message appears when BeEmpty fails on a non-empty collection.</summary>
+        </member>
         <member name="T:Jeninnet.Testing.Assertions.Tests.Collections.CollectionAssertionSmokeTests">
             <summary>Smoke tests for collection assertions: emptiness, containment, count, and equivalence.</summary>
         </member>
@@ -52,6 +232,15 @@
         <member name="M:Jeninnet.Testing.Assertions.Tests.Collections.CollectionAssertionSmokeTests.BeEquivalentTo_WithDifferentElements_Throws">
             <summary>BeEquivalentTo throws when element sets differ.</summary>
         </member>
+        <member name="T:Jeninnet.Testing.Assertions.Tests.Exceptions.ExceptionAssertionEdgeCaseTests">
+            <summary>Verifies error paths and edge cases in <see cref="T:Jeninnet.Testing.Assertions.ExceptionAssertions`1"/>.</summary>
+        </member>
+        <member name="M:Jeninnet.Testing.Assertions.Tests.Exceptions.ExceptionAssertionEdgeCaseTests.Constructor_WithNullException_Throws">
+            <summary>The constructor throws AssertionFailedException when given a null exception.</summary>
+        </member>
+        <member name="M:Jeninnet.Testing.Assertions.Tests.Exceptions.ExceptionAssertionEdgeCaseTests.ExceptionProperty_ReturnsOriginalException">
+            <summary>The Exception property returns the instance passed to the constructor.</summary>
+        </member>
         <member name="T:Jeninnet.Testing.Assertions.Tests.Exceptions.ExceptionAssertionSmokeTests">
             <summary>Smoke tests for exception assertions: Throw and AssertionFailedException construction.</summary>
         </member>
@@ -66,6 +255,120 @@
         </member>
         <member name="M:Jeninnet.Testing.Assertions.Tests.Exceptions.ExceptionAssertionSmokeTests.AssertionFailedException_IsException">
             <summary>AssertionFailedException derives from Exception.</summary>
+        </member>
+        <member name="T:Jeninnet.Testing.Assertions.Tests.Extensions.PathExtensionsTests">
+            <summary>Verifies <see cref="T:Jeninnet.Testing.Assertions.Extensions.PathExtensions"/> methods including null guards and edge cases.</summary>
+        </member>
+        <member name="M:Jeninnet.Testing.Assertions.Tests.Extensions.PathExtensionsTests.EndWithNormalized_WithMatchingEnd_ReturnsTrue">
+            <summary>EndWithNormalized returns true when the path ends with the specified suffix.</summary>
+        </member>
+        <member name="M:Jeninnet.Testing.Assertions.Tests.Extensions.PathExtensionsTests.EndWithNormalized_WithNonMatchingEnd_ReturnsFalse">
+            <summary>EndWithNormalized returns false when the path does not end with the specified suffix.</summary>
+        </member>
+        <member name="M:Jeninnet.Testing.Assertions.Tests.Extensions.PathExtensionsTests.EndWithNormalized_NullPath_Throws">
+            <summary>EndWithNormalized with a null path throws ArgumentNullException.</summary>
+        </member>
+        <member name="M:Jeninnet.Testing.Assertions.Tests.Extensions.PathExtensionsTests.EndWithNormalized_NullEnding_Throws">
+            <summary>EndWithNormalized with a null ending throws ArgumentNullException.</summary>
+        </member>
+        <member name="M:Jeninnet.Testing.Assertions.Tests.Extensions.PathExtensionsTests.EndWithNormalized_WithForwardSlashes_ReturnsTrue">
+            <summary>EndWithNormalized normalizes forward slashes before comparing.</summary>
+        </member>
+        <member name="M:Jeninnet.Testing.Assertions.Tests.Extensions.PathExtensionsTests.EndWithPath_WithMatchingEnd_ReturnsTrue">
+            <summary>EndWithPath returns true when the path ends with the specified relative segment.</summary>
+        </member>
+        <member name="M:Jeninnet.Testing.Assertions.Tests.Extensions.PathExtensionsTests.EndWithPath_WithNonMatchingEnd_ReturnsFalse">
+            <summary>EndWithPath returns false when the path does not end with the specified segment.</summary>
+        </member>
+        <member name="M:Jeninnet.Testing.Assertions.Tests.Extensions.PathExtensionsTests.EndWithPath_NullPath_Throws">
+            <summary>EndWithPath with a null path throws ArgumentNullException.</summary>
+        </member>
+        <member name="M:Jeninnet.Testing.Assertions.Tests.Extensions.PathExtensionsTests.EndWithPath_NullRelative_Throws">
+            <summary>EndWithPath with a null relative segment throws ArgumentNullException.</summary>
+        </member>
+        <member name="M:Jeninnet.Testing.Assertions.Tests.Extensions.PathExtensionsTests.EndWithPath_WithForwardSlashes_ReturnsTrue">
+            <summary>EndWithPath normalizes forward slashes before comparing.</summary>
+        </member>
+        <member name="T:Jeninnet.Testing.Assertions.Tests.Extensions.TestEnvironmentExtensionsTests">
+            <summary>Verifies <see cref="T:Jeninnet.Testing.Assertions.Extensions.TestEnvironmentExtensions"/> methods including edge cases and null guards.</summary>
+        </member>
+        <member name="M:Jeninnet.Testing.Assertions.Tests.Extensions.TestEnvironmentExtensionsTests.CreateDeepDirectoryTree_WithPositiveLevels_CreatesTree">
+            <summary>CreateDeepDirectoryTree succeeds with a positive level and default file settings.</summary>
+        </member>
+        <member name="M:Jeninnet.Testing.Assertions.Tests.Extensions.TestEnvironmentExtensionsTests.CreateDeepDirectoryTree_ZeroLevels_DoesNotThrow">
+            <summary>CreateDeepDirectoryTree with zero levels returns immediately without creating anything.</summary>
+        </member>
+        <member name="M:Jeninnet.Testing.Assertions.Tests.Extensions.TestEnvironmentExtensionsTests.CreateDeepDirectoryTree_ZeroFiles_DoesNotThrow">
+            <summary>CreateDeepDirectoryTree with zero files creates directories without files.</summary>
+        </member>
+        <member name="M:Jeninnet.Testing.Assertions.Tests.Extensions.TestEnvironmentExtensionsTests.CreateDeepDirectoryTree_NullEnvironment_Throws">
+            <summary>CreateDeepDirectoryTree with a null environment throws ArgumentNullException.</summary>
+        </member>
+        <member name="M:Jeninnet.Testing.Assertions.Tests.Extensions.TestEnvironmentExtensionsTests.CreateDeepDirectoryTree_OneLevel_CreatesSubdirectory">
+            <summary>CreateDeepDirectoryTree creates the expected directory structure depth.</summary>
+        </member>
+        <member name="M:Jeninnet.Testing.Assertions.Tests.Extensions.TestEnvironmentExtensionsTests.CreateDeepDirectoryTree_FiveLevels_DoesNotThrow">
+            <summary>CreateDeepDirectoryTree with a high level count does not throw.</summary>
+        </member>
+        <member name="M:Jeninnet.Testing.Assertions.Tests.Extensions.TestEnvironmentExtensionsTests.CreateDeepDirectoryTree_WithFileCount_CreatesFiles">
+            <summary>CreateDeepDirectoryTree with a positive file count creates files at the leaf level.</summary>
+        </member>
+        <member name="T:Jeninnet.Testing.Assertions.Tests.IO.InaccessibleDirectorySimulatorTests">
+            <summary>Verifies <see cref="T:Jeninnet.Testing.Assertions.IO.InaccessibleDirectorySimulator"/> methods including null guards.</summary>
+        </member>
+        <member name="M:Jeninnet.Testing.Assertions.Tests.IO.InaccessibleDirectorySimulatorTests.CreatePseudoInaccessibleDir_ReturnsExistingFile">
+            <summary>CreatePseudoInaccessibleDir creates a file that simulates an inaccessible directory.</summary>
+        </member>
+        <member name="M:Jeninnet.Testing.Assertions.Tests.IO.InaccessibleDirectorySimulatorTests.CreatePseudoInaccessibleDir_NullEnvironment_Throws">
+            <summary>CreatePseudoInaccessibleDir with a null environment throws ArgumentNullException.</summary>
+        </member>
+        <member name="M:Jeninnet.Testing.Assertions.Tests.IO.InaccessibleDirectorySimulatorTests.CreatePseudoInaccessibleDir_NullName_Throws">
+            <summary>CreatePseudoInaccessibleDir with a null name throws ArgumentNullException.</summary>
+        </member>
+        <member name="M:Jeninnet.Testing.Assertions.Tests.IO.InaccessibleDirectorySimulatorTests.CreateLockedDir_ReturnsExistingDirectory">
+            <summary>CreateLockedDir creates a directory with a locked file inside.</summary>
+        </member>
+        <member name="M:Jeninnet.Testing.Assertions.Tests.IO.InaccessibleDirectorySimulatorTests.CreateLockedDir_NullEnvironment_Throws">
+            <summary>CreateLockedDir with a null environment throws ArgumentNullException.</summary>
+        </member>
+        <member name="M:Jeninnet.Testing.Assertions.Tests.IO.InaccessibleDirectorySimulatorTests.CreateLockedDir_NullName_Throws">
+            <summary>CreateLockedDir with a null name throws ArgumentNullException.</summary>
+        </member>
+        <member name="T:Jeninnet.Testing.Assertions.Tests.IO.TestEnvironmentEdgeCaseTests">
+            <summary>Verifies edge cases and error paths in <see cref="T:Jeninnet.Testing.Assertions.IO.TestEnvironment"/>.</summary>
+        </member>
+        <member name="M:Jeninnet.Testing.Assertions.Tests.IO.TestEnvironmentEdgeCaseTests.Abs_WithRelativePath_ReturnsRootedPath">
+            <summary>Abs returns a rooted path for a relative path.</summary>
+        </member>
+        <member name="M:Jeninnet.Testing.Assertions.Tests.IO.TestEnvironmentEdgeCaseTests.Abs_WithEmptyPath_ReturnsRoot">
+            <summary>Abs returns the root for an empty relative path.</summary>
+        </member>
+        <member name="M:Jeninnet.Testing.Assertions.Tests.IO.TestEnvironmentEdgeCaseTests.CreateFiles_CreatesAllFiles">
+            <summary>CreateFiles creates the specified files.</summary>
+        </member>
+        <member name="M:Jeninnet.Testing.Assertions.Tests.IO.TestEnvironmentEdgeCaseTests.CreateFile_WithNullContent_CreatesEmptyFile">
+            <summary>CreateFile with null content creates an empty file.</summary>
+        </member>
+        <member name="M:Jeninnet.Testing.Assertions.Tests.IO.TestEnvironmentEdgeCaseTests.CreateFile_WithEmptyContent_CreatesEmptyFile">
+            <summary>CreateFile with empty content creates an empty file.</summary>
+        </member>
+        <member name="M:Jeninnet.Testing.Assertions.Tests.IO.TestEnvironmentEdgeCaseTests.CreateInaccessibleDirectory_ReturnsPath">
+            <summary>CreateInaccessibleDirectory creates a pseudo-inaccessible directory path.</summary>
+        </member>
+        <member name="M:Jeninnet.Testing.Assertions.Tests.IO.TestEnvironmentEdgeCaseTests.SetInaccessible_WithExistingPath_DoesNotThrow">
+            <summary>SetInaccessible on an existing directory does not throw.</summary>
+        </member>
+        <member name="M:Jeninnet.Testing.Assertions.Tests.IO.TestEnvironmentEdgeCaseTests.SetInaccessibleDirectory_WithExistingPath_DoesNotThrow">
+            <summary>SetInaccessibleDirectory on an existing directory does not throw.</summary>
+        </member>
+        <member name="M:Jeninnet.Testing.Assertions.Tests.IO.TestEnvironmentEdgeCaseTests.CreateLockedFile_Default_CreatesFile">
+            <summary>CreateLockedFile creates a locked file on disk.</summary>
+        </member>
+        <member name="M:Jeninnet.Testing.Assertions.Tests.IO.TestEnvironmentEdgeCaseTests.AssertDirectoryInaccessible_WithAccessibleDirectory_Throws">
+            <summary>AssertDirectoryInaccessible throws when the directory is accessible.</summary>
+        </member>
+        <member name="M:Jeninnet.Testing.Assertions.Tests.IO.TestEnvironmentEdgeCaseTests.Dispose_MultipleCalls_DoesNotThrow">
+            <summary>Dispose can be called multiple times without throwing.</summary>
         </member>
         <member name="T:Jeninnet.Testing.Assertions.Tests.IO.TestEnvironmentSmokeTests">
             <summary>Smoke tests for TestEnvironment: creation, disposal, and file/directory operations.</summary>
@@ -84,6 +387,39 @@
         </member>
         <member name="M:Jeninnet.Testing.Assertions.Tests.IO.TestEnvironmentSmokeTests.CreateFile_WithContent_ReturnsPath">
             <summary>CreateFile creates the file with the specified content and returns its path.</summary>
+        </member>
+        <member name="T:Jeninnet.Testing.Assertions.Tests.Strings.StringAssertionEdgeCaseTests">
+            <summary>Verifies error paths, edge cases, and custom messages in <see cref="T:Jeninnet.Testing.Assertions.StringAssertions"/>.</summary>
+        </member>
+        <member name="M:Jeninnet.Testing.Assertions.Tests.Strings.StringAssertionEdgeCaseTests.Contain_NullActual_Throws">
+            <summary>Contain with a null actual string throws AssertionFailedException.</summary>
+        </member>
+        <member name="M:Jeninnet.Testing.Assertions.Tests.Strings.StringAssertionEdgeCaseTests.Contain_NotPresent_Throws">
+            <summary>Contain with a substring not present in the value throws AssertionFailedException.</summary>
+        </member>
+        <member name="M:Jeninnet.Testing.Assertions.Tests.Strings.StringAssertionEdgeCaseTests.Contain_WithCustomMessage_IncludesMessage">
+            <summary>A custom message appears when Contain fails.</summary>
+        </member>
+        <member name="M:Jeninnet.Testing.Assertions.Tests.Strings.StringAssertionEdgeCaseTests.Be_WithCustomMessage_IncludesMessage">
+            <summary>A custom message appears when Be fails on strings.</summary>
+        </member>
+        <member name="M:Jeninnet.Testing.Assertions.Tests.Strings.StringAssertionEdgeCaseTests.EndsWith_WithCustomMessage_IncludesMessage">
+            <summary>A custom message appears when EndsWith fails.</summary>
+        </member>
+        <member name="M:Jeninnet.Testing.Assertions.Tests.Strings.StringAssertionEdgeCaseTests.BeNull_OnNullString_Passes">
+            <summary>BeNull passes when the actual string is null.</summary>
+        </member>
+        <member name="M:Jeninnet.Testing.Assertions.Tests.Strings.StringAssertionEdgeCaseTests.EndsWith_NullActual_Throws">
+            <summary>EndsWith on a null actual string throws AssertionFailedException.</summary>
+        </member>
+        <member name="M:Jeninnet.Testing.Assertions.Tests.Strings.StringAssertionEdgeCaseTests.EndsWith_ShorterActual_Throws">
+            <summary>EndsWith against an actual string shorter than expected throws AssertionFailedException.</summary>
+        </member>
+        <member name="M:Jeninnet.Testing.Assertions.Tests.Strings.StringAssertionEdgeCaseTests.BeNull_WithCustomMessage_IncludesMessage">
+            <summary>A custom message appears when BeNull fails.</summary>
+        </member>
+        <member name="M:Jeninnet.Testing.Assertions.Tests.Strings.StringAssertionEdgeCaseTests.NotBeNull_WithCustomMessage_IncludesMessage">
+            <summary>A custom message appears when NotBeNull fails.</summary>
         </member>
         <member name="T:Jeninnet.Testing.Assertions.Tests.Strings.StringAssertionSmokeTests">
             <summary>Smoke tests for string assertions: equality, containment, suffix, and null checks.</summary>
@@ -111,6 +447,42 @@
         </member>
         <member name="M:Jeninnet.Testing.Assertions.Tests.Strings.StringAssertionSmokeTests.BeNull_OnNull_Passes">
             <summary>BeNull passes on a null string.</summary>
+        </member>
+        <member name="T:Jeninnet.Testing.Assertions.Tests.Utilities.PathHelperTests">
+            <summary>Verifies <see cref="T:Jeninnet.Testing.Assertions.Utilities.PathHelper"/> methods including null guards and edge cases.</summary>
+        </member>
+        <member name="M:Jeninnet.Testing.Assertions.Tests.Utilities.PathHelperTests.Join_TwoSegments_ReturnsCombinedPath">
+            <summary>Join combines path segments correctly.</summary>
+        </member>
+        <member name="M:Jeninnet.Testing.Assertions.Tests.Utilities.PathHelperTests.Join_NullSegments_Throws">
+            <summary>Join with a null segments array throws ArgumentNullException.</summary>
+        </member>
+        <member name="M:Jeninnet.Testing.Assertions.Tests.Utilities.PathHelperTests.Join_SingleSegment_ReturnsSame">
+            <summary>Join with a single segment returns that segment.</summary>
+        </member>
+        <member name="M:Jeninnet.Testing.Assertions.Tests.Utilities.PathHelperTests.Normalize_ForwardSlashes_ConvertsToSeparator">
+            <summary>Normalize replaces forward slashes with the directory separator.</summary>
+        </member>
+        <member name="M:Jeninnet.Testing.Assertions.Tests.Utilities.PathHelperTests.Normalize_NullValue_Throws">
+            <summary>Normalize with a null value throws ArgumentNullException.</summary>
+        </member>
+        <member name="M:Jeninnet.Testing.Assertions.Tests.Utilities.PathHelperTests.Normalize_AlreadyNormalized_ReturnsSame">
+            <summary>Normalize with a path already using the platform separator leaves it unchanged.</summary>
+        </member>
+        <member name="M:Jeninnet.Testing.Assertions.Tests.Utilities.PathHelperTests.Equivalent_IdenticalPaths_ReturnsTrue">
+            <summary>Equivalent with identical paths returns true.</summary>
+        </member>
+        <member name="M:Jeninnet.Testing.Assertions.Tests.Utilities.PathHelperTests.Equivalent_DifferentPaths_ReturnsFalse">
+            <summary>Equivalent with different paths returns false.</summary>
+        </member>
+        <member name="M:Jeninnet.Testing.Assertions.Tests.Utilities.PathHelperTests.Equivalent_NullFirst_Throws">
+            <summary>Equivalent with a null first path throws ArgumentNullException.</summary>
+        </member>
+        <member name="M:Jeninnet.Testing.Assertions.Tests.Utilities.PathHelperTests.Equivalent_NullSecond_Throws">
+            <summary>Equivalent with a null second path throws ArgumentNullException.</summary>
+        </member>
+        <member name="M:Jeninnet.Testing.Assertions.Tests.Utilities.PathHelperTests.Equivalent_CaseDifference_ReturnsTrue">
+            <summary>Equivalent with case-different paths returns true on Windows.</summary>
         </member>
     </members>
 </doc>

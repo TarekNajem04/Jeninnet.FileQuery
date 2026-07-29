@@ -71,8 +71,8 @@ public sealed class BfsTraversalTests {
 
         Assert.HasCount(2, results);
 
-        var rootIndex = results.FindIndex(p => p.EndsWith("root.txt", StringComparison.Ordinal));
-        var deepIndex = results.FindIndex(p => p.EndsWith("deep.txt", StringComparison.Ordinal));
+        var rootIndex = results.FindIndex(static p => p.EndsWith("root.txt", StringComparison.Ordinal));
+        var deepIndex = results.FindIndex(static p => p.EndsWith("deep.txt", StringComparison.Ordinal));
 
         Assert.IsLessThan(
             deepIndex, rootIndex,
@@ -105,9 +105,9 @@ public sealed class BfsTraversalTests {
         Assert.HasCount(2, results,
             "MaxRecursionDepth = 1 must include depth 0 and 1 only.");
 
-        results.Should().Contain(p => p.EndsWith("root.txt", StringComparison.Ordinal), "root.txt at depth 0 must be included.");
-        results.Should().Contain(p => p.EndsWith("a.txt", StringComparison.Ordinal), "a.txt at depth 1 must be included.");
-        results.Should().NotContain(p => p.EndsWith("b.txt", StringComparison.Ordinal), "b.txt at depth 2 must be excluded.");
+        results.Should().Contain(static p => p.EndsWith("root.txt", StringComparison.Ordinal), "root.txt at depth 0 must be included.");
+        results.Should().Contain(static p => p.EndsWith("a.txt", StringComparison.Ordinal), "a.txt at depth 1 must be included.");
+        results.Should().NotContain(static p => p.EndsWith("b.txt", StringComparison.Ordinal), "b.txt at depth 2 must be excluded.");
     }
 
     /// <summary>

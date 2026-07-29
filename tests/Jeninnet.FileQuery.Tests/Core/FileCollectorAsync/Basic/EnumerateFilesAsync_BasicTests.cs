@@ -34,9 +34,9 @@ public class EnumerateFilesAsync_BasicTests {
                                            .ToListAsync(TestContext.CancellationToken);
 
         TestAssertEx.HasCount(results, 3);
-        Assert.Contains(x => x.EndsWith("a.txt", StringComparison.Ordinal), results);
-        Assert.Contains(x => x.EndsWith("b.txt", StringComparison.Ordinal), results);
-        Assert.Contains(x => x.EndsWith(Path.Combine("sub", "d.txt"), StringComparison.Ordinal), results);
+        Assert.Contains(static x => x.EndsWith("a.txt", StringComparison.Ordinal), results);
+        Assert.Contains(static x => x.EndsWith("b.txt", StringComparison.Ordinal), results);
+        Assert.Contains(static x => x.EndsWith(Path.Combine("sub", "d.txt"), StringComparison.Ordinal), results);
     }
 
     /// <summary>

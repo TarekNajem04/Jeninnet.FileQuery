@@ -33,10 +33,10 @@ public class EnumerateFilesAsync_CharacterClassPatternTests {
                                            .ToListAsync(TestContext.CancellationToken);
 
         TestAssertEx.HasCount(results, 3);
-        TestAssertEx.Contains(results, x => x.EndsWith("a.txt", StringComparison.Ordinal));
-        TestAssertEx.Contains(results, x => x.EndsWith("b.txt", StringComparison.Ordinal));
-        TestAssertEx.Contains(results, x => x.EndsWith("c.txt", StringComparison.Ordinal));
-        TestAssertEx.DoesNotContain(results, x => x.EndsWith("d.txt", StringComparison.Ordinal));
+        TestAssertEx.Contains(results, static x => x.EndsWith("a.txt", StringComparison.Ordinal));
+        TestAssertEx.Contains(results, static x => x.EndsWith("b.txt", StringComparison.Ordinal));
+        TestAssertEx.Contains(results, static x => x.EndsWith("c.txt", StringComparison.Ordinal));
+        TestAssertEx.DoesNotContain(results, static x => x.EndsWith("d.txt", StringComparison.Ordinal));
     }
 
     /// <summary>
@@ -88,9 +88,9 @@ public class EnumerateFilesAsync_CharacterClassPatternTests {
         var results = await fileQueryEngine.ExecuteAsync(new(env.Root, options), TestContext.CancellationToken)
                                            .ToListAsync(TestContext.CancellationToken);
 
-        TestAssertEx.DoesNotContain(results, x => x.EndsWith("apple.txt", StringComparison.Ordinal));
-        TestAssertEx.Contains(results, x => x.EndsWith("banana.txt", StringComparison.Ordinal));
-        TestAssertEx.Contains(results, x => x.EndsWith("cherry.txt", StringComparison.Ordinal));
+        TestAssertEx.DoesNotContain(results, static x => x.EndsWith("apple.txt", StringComparison.Ordinal));
+        TestAssertEx.Contains(results, static x => x.EndsWith("banana.txt", StringComparison.Ordinal));
+        TestAssertEx.Contains(results, static x => x.EndsWith("cherry.txt", StringComparison.Ordinal));
     }
 
     /// <summary>

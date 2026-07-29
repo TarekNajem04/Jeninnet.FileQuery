@@ -36,7 +36,7 @@ public class EnumerateFilesAsync_PathEdgeCaseTests {
         var results = await fileQueryEngine.ExecuteAsync(new(rootWithSlash, options), TestContext.CancellationToken)
                                            .ToListAsync(TestContext.CancellationToken);
 
-        TestAssertEx.ContainsSingle(results, x => x.EndsWith("file.txt", StringComparison.Ordinal));
+        TestAssertEx.ContainsSingle(results, static x => x.EndsWith("file.txt", StringComparison.Ordinal));
     }
 
     /// <summary>
@@ -64,14 +64,14 @@ public class EnumerateFilesAsync_PathEdgeCaseTests {
         var results = await fileQueryEngine.ExecuteAsync(new(env.Root, options), TestContext.CancellationToken)
                                            .ToListAsync(TestContext.CancellationToken);
 
-        TestAssertEx.ContainsSingle(results, x => x.Contains("Test测试.txt", StringComparison.Ordinal));
-        TestAssertEx.ContainsSingle(results, x => x.Contains("file😍.txt", StringComparison.Ordinal));
-        TestAssertEx.ContainsSingle(results, x => x.Contains("Test😁.txt", StringComparison.Ordinal));
-        TestAssertEx.ContainsSingle(results, x => x.Contains("Test07😅.txt", StringComparison.Ordinal));
+        TestAssertEx.ContainsSingle(results, static x => x.Contains("Test测试.txt", StringComparison.Ordinal));
+        TestAssertEx.ContainsSingle(results, static x => x.Contains("file😍.txt", StringComparison.Ordinal));
+        TestAssertEx.ContainsSingle(results, static x => x.Contains("Test😁.txt", StringComparison.Ordinal));
+        TestAssertEx.ContainsSingle(results, static x => x.Contains("Test07😅.txt", StringComparison.Ordinal));
 
-        TestAssertEx.DoesNotContain(results, x => x.Contains("Test测试.log", StringComparison.Ordinal));
-        TestAssertEx.DoesNotContain(results, x => x.Contains("file1😀.txT", StringComparison.Ordinal));
-        TestAssertEx.DoesNotContain(results, x => x.Contains("file2👍.TXT", StringComparison.Ordinal));
+        TestAssertEx.DoesNotContain(results, static x => x.Contains("Test测试.log", StringComparison.Ordinal));
+        TestAssertEx.DoesNotContain(results, static x => x.Contains("file1😀.txT", StringComparison.Ordinal));
+        TestAssertEx.DoesNotContain(results, static x => x.Contains("file2👍.TXT", StringComparison.Ordinal));
     }
 
     /// <summary>

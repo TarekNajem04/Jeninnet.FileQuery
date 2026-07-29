@@ -34,9 +34,9 @@ public class EnumerateFilesAsync_NegationAndPrecedenceTests {
         var results = await fileQueryEngine.ExecuteAsync(new(env.Root, options), TestContext.CancellationToken)
                                            .ToListAsync(TestContext.CancellationToken);
 
-        TestAssertEx.DoesNotContain(results, x => x.EndsWith("a.txt", StringComparison.Ordinal));
-        TestAssertEx.Contains(results, x => x.EndsWith("b.txt", StringComparison.Ordinal));
-        TestAssertEx.DoesNotContain(results, x => x.EndsWith("c.log", StringComparison.Ordinal));
+        TestAssertEx.DoesNotContain(results, static x => x.EndsWith("a.txt", StringComparison.Ordinal));
+        TestAssertEx.Contains(results, static x => x.EndsWith("b.txt", StringComparison.Ordinal));
+        TestAssertEx.DoesNotContain(results, static x => x.EndsWith("c.log", StringComparison.Ordinal));
     }
 
     /// <summary>
@@ -65,7 +65,7 @@ public class EnumerateFilesAsync_NegationAndPrecedenceTests {
                                            .ToListAsync(TestContext.CancellationToken);
 
         // Because last rule wins, file.txt *must* be included
-        TestAssertEx.ContainsSingle(results, x => x.EndsWith("file.txt", StringComparison.Ordinal));
+        TestAssertEx.ContainsSingle(results, static x => x.EndsWith("file.txt", StringComparison.Ordinal));
     }
 
     /// <summary>
@@ -100,10 +100,10 @@ public class EnumerateFilesAsync_NegationAndPrecedenceTests {
         var results = await fileQueryEngine.ExecuteAsync(new(env.Root, options), TestContext.CancellationToken)
                                            .ToListAsync(TestContext.CancellationToken);
 
-        TestAssertEx.Contains(results, x => x.EndsWith(Path.Combine("x", "a.txt"), StringComparison.Ordinal));
-        TestAssertEx.Contains(results, x => x.EndsWith(Path.Combine("x", "b.txt"), StringComparison.Ordinal));  // re-included
-        TestAssertEx.DoesNotContain(results, x => x.EndsWith(Path.Combine("y", "b.txt"), StringComparison.Ordinal));
-        TestAssertEx.DoesNotContain(results, x => x.EndsWith(Path.Combine("x", "c.tmp"), StringComparison.Ordinal));
+        TestAssertEx.Contains(results, static x => x.EndsWith(Path.Combine("x", "a.txt"), StringComparison.Ordinal));
+        TestAssertEx.Contains(results, static x => x.EndsWith(Path.Combine("x", "b.txt"), StringComparison.Ordinal));  // re-included
+        TestAssertEx.DoesNotContain(results, static x => x.EndsWith(Path.Combine("y", "b.txt"), StringComparison.Ordinal));
+        TestAssertEx.DoesNotContain(results, static x => x.EndsWith(Path.Combine("x", "c.tmp"), StringComparison.Ordinal));
     }
 
     /// <summary>

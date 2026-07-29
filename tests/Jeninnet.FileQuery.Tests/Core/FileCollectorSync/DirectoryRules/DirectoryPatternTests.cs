@@ -56,7 +56,7 @@ public class DirectoryPatternTests {
         TestAssertEx.Contains(result, env.Abs("src", "main.cs"));
         TestAssertEx.Contains(result, env.Abs("b.cs"));
         // src/util/helpers.cs must be excluded due to pruning.
-        TestAssertEx.DoesNotContain(result, x => x.Contains(Path.Combine("src", "util")));
+        TestAssertEx.DoesNotContain(result, static x => x.Contains(Path.Combine("src", "util")));
     }
 
     /// <summary>Tests DirectoryPattern_ShouldMatchMultipleLevels.</summary>
@@ -135,8 +135,8 @@ public class DirectoryPatternTests {
         TestAssertEx.Contains(result, env.Abs("b.cs"));
         TestAssertEx.Contains(result, env.Abs("src", "main.cs"));
         // Check both excluded directories
-        TestAssertEx.DoesNotContain(result, x => x.Contains(Path.Combine("src", "util")));
-        TestAssertEx.DoesNotContain(result, x => x.Contains(Path.Combine("src", "other")));
+        TestAssertEx.DoesNotContain(result, static x => x.Contains(Path.Combine("src", "util")));
+        TestAssertEx.DoesNotContain(result, static x => x.Contains(Path.Combine("src", "other")));
     }
 }
 

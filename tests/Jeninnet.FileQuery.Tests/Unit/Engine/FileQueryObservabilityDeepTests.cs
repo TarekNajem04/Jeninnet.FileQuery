@@ -10,7 +10,7 @@ public sealed class FileQueryObservabilityDeepTests {
     /// </summary>
     [TestMethod]
     public void Should_Throw_When_RetryAttemptsAreNegative() =>
-        ((Action)(() => {
+        ((Action)(static () => {
             var options = new FileQueryErrorRecoveryOptions(FileQueryErrorAction.Retry, -1);
             options.Validate();
         }

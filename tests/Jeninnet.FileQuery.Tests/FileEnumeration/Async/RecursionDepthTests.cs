@@ -39,7 +39,7 @@ public class EnumerateFilesAsync_RecursionDepthTests {
         var results = await fileQueryEngine.ExecuteAsync(new(env.Root, options), TestContext.CancellationToken)
                                            .ToListAsync(TestContext.CancellationToken);
 
-        results.Should().ContainSingle(x => x.EndsWith("root.txt", StringComparison.Ordinal));
+        results.Should().ContainSingle(static x => x.EndsWith("root.txt", StringComparison.Ordinal));
         results.Should().HaveCount(1);
     }
 
@@ -74,9 +74,9 @@ public class EnumerateFilesAsync_RecursionDepthTests {
                                            .ToListAsync(TestContext.CancellationToken);
 
         results.Should().HaveCount(2);
-        results.Should().Contain(x => x.EndsWith("a.txt", StringComparison.Ordinal));
-        results.Should().Contain(x => x.EndsWith(Path.Combine("sub", "b.txt"), StringComparison.Ordinal));
-        results.Should().NotContain(x => x.EndsWith(Path.Combine("deeper", "c.txt"), StringComparison.Ordinal));
+        results.Should().Contain(static x => x.EndsWith("a.txt", StringComparison.Ordinal));
+        results.Should().Contain(static x => x.EndsWith(Path.Combine("sub", "b.txt"), StringComparison.Ordinal));
+        results.Should().NotContain(static x => x.EndsWith(Path.Combine("deeper", "c.txt"), StringComparison.Ordinal));
     }
 
     /// <summary>
@@ -113,8 +113,8 @@ public class EnumerateFilesAsync_RecursionDepthTests {
                                            .ToListAsync(TestContext.CancellationToken);
 
         results.Should().HaveCount(4); // 2 root + 2 at depth 1
-        results.Should().NotContain(x => x.Contains("A2", StringComparison.Ordinal));
-        results.Should().NotContain(x => x.Contains("B2", StringComparison.Ordinal));
+        results.Should().NotContain(static x => x.Contains("A2", StringComparison.Ordinal));
+        results.Should().NotContain(static x => x.Contains("B2", StringComparison.Ordinal));
     }
 
     /// <summary>

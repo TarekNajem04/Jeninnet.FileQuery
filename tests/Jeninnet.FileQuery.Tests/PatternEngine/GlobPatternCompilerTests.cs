@@ -13,7 +13,7 @@ public class GlobPatternCompilerTests {
         TestAssertEx.HasCount(compiledPatternSets, 1, "because we compiled a single pattern string");
         var compiledPattern = compiledPatternSets[0];
 
-        TestAssertEx.ContainsSingle(compiledPattern.Segments[0], x => x is WildcardToken);
+        TestAssertEx.ContainsSingle(compiledPattern.Segments[0], static x => x is WildcardToken);
     }
 
     /// <summary>Tests DoubleStar_ShouldProduceRecursiveWildcardToken.</summary>
@@ -24,7 +24,7 @@ public class GlobPatternCompilerTests {
         TestAssertEx.HasCount(compiledPatternSets, 1, "because we compiled a single pattern string");
         var compiledPattern = compiledPatternSets[0];
 
-        TestAssertEx.ContainsSingle(compiledPattern.Segments[0], x => x is RecursiveWildcardToken);
+        TestAssertEx.ContainsSingle(compiledPattern.Segments[0], static x => x is RecursiveWildcardToken);
     }
 }
 

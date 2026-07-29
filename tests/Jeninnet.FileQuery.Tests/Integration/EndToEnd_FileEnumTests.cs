@@ -74,8 +74,8 @@ public class EndToEnd_FileEnumTests {
             PathUtilities.Normalize(env.Abs("src", "main.cs")),
             PathUtilities.Normalize(env.Abs("src", "util", "helpers.cs"))
         ]);
-        TestAssertEx.DoesNotContain(result, x => x.Contains("/bin/", StringComparison.Ordinal));
-        TestAssertEx.DoesNotContain(result, x => x.Contains("/obj/", StringComparison.Ordinal));
+        TestAssertEx.DoesNotContain(result, static x => x.Contains("/bin/", StringComparison.Ordinal));
+        TestAssertEx.DoesNotContain(result, static x => x.Contains("/obj/", StringComparison.Ordinal));
     }
 
     /// <summary>Tests Complex_GitIgnoreScenario.</summary>
@@ -109,9 +109,9 @@ public class EndToEnd_FileEnumTests {
 
         TestAssertEx.Contains(result, env.Abs("b.cs"));
         TestAssertEx.Contains(result, env.Abs("src", "main.cs"));
-        TestAssertEx.DoesNotContain(result, x => x.EndsWith("helpers.cs", StringComparison.Ordinal));
-        TestAssertEx.DoesNotContain(result, x => x.Contains($"{Path.DirectorySeparatorChar}bin{Path.DirectorySeparatorChar}", StringComparison.Ordinal));
-        TestAssertEx.DoesNotContain(result, x => x.Contains($"{Path.DirectorySeparatorChar}obj{Path.DirectorySeparatorChar}", StringComparison.Ordinal));
+        TestAssertEx.DoesNotContain(result, static x => x.EndsWith("helpers.cs", StringComparison.Ordinal));
+        TestAssertEx.DoesNotContain(result, static x => x.Contains($"{Path.DirectorySeparatorChar}bin{Path.DirectorySeparatorChar}", StringComparison.Ordinal));
+        TestAssertEx.DoesNotContain(result, static x => x.Contains($"{Path.DirectorySeparatorChar}obj{Path.DirectorySeparatorChar}", StringComparison.Ordinal));
         TestAssertEx.HasCount(result, 2);
     }
 
@@ -200,7 +200,7 @@ public class EndToEnd_FileEnumTests {
 
         var result = FileQueryRuntime.Create().Execute(new(env.Root, options)).ToList();
 
-        TestAssertEx.DoesNotContain(result, x => x.Contains($"{Path.DirectorySeparatorChar}src{Path.DirectorySeparatorChar}util{Path.DirectorySeparatorChar}", StringComparison.Ordinal));
+        TestAssertEx.DoesNotContain(result, static x => x.Contains($"{Path.DirectorySeparatorChar}src{Path.DirectorySeparatorChar}util{Path.DirectorySeparatorChar}", StringComparison.Ordinal));
         TestAssertEx.Contains(result, env.Abs("src", "main.cs"));
     }
 

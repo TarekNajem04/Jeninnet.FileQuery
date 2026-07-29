@@ -346,8 +346,8 @@ public sealed class FileQueryBuilder {
         var patternInput = new PatternInput(
             Patterns: [],
             TypedPatterns: _patternStorage.ToDictionary(
-                kvp => kvp.Key,
-                kvp => (IEnumerable<string>)kvp.Value),
+                static kvp => kvp.Key,
+                static kvp => (IEnumerable<string>)kvp.Value),
             InterpretationMode: _interpretationMode
         );
 
@@ -371,8 +371,8 @@ public sealed class FileQueryBuilder {
         var patternInput = new PatternInput(
             Patterns: [],
             TypedPatterns: _patternStorage.ToDictionary(
-                kvp => kvp.Key,
-                kvp => (IEnumerable<string>)kvp.Value),
+                static kvp => kvp.Key,
+                static kvp => (IEnumerable<string>)kvp.Value),
             InterpretationMode: _interpretationMode
         );
 

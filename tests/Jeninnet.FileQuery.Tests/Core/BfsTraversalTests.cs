@@ -76,8 +76,8 @@ public sealed class BfsTraversalTests {
 
         Assert.HasCount(2, results);
 
-        var rootIndex = results.FindIndex(p => p.EndsWith("root.txt", StringComparison.Ordinal));
-        var deepIndex = results.FindIndex(p => p.EndsWith("deep.txt", StringComparison.Ordinal));
+        var rootIndex = results.FindIndex(static p => p.EndsWith("root.txt", StringComparison.Ordinal));
+        var deepIndex = results.FindIndex(static p => p.EndsWith("deep.txt", StringComparison.Ordinal));
 
         Assert.IsLessThan(
             deepIndex, rootIndex,
@@ -111,9 +111,9 @@ public sealed class BfsTraversalTests {
         Assert.HasCount(2, results,
             "MaxRecursionDepth = 1 must include depth 0 and 1 only.");
 
-        Assert.Contains(p => p.EndsWith("root.txt", StringComparison.Ordinal), results, "root.txt at depth 0 must be included.");
-        Assert.Contains(p => p.EndsWith("a.txt", StringComparison.Ordinal), results, "a.txt at depth 1 must be included.");
-        Assert.DoesNotContain(p => p.EndsWith("b.txt", StringComparison.Ordinal), results, "b.txt at depth 2 must be excluded.");
+        Assert.Contains(static p => p.EndsWith("root.txt", StringComparison.Ordinal), results, "root.txt at depth 0 must be included.");
+        Assert.Contains(static p => p.EndsWith("a.txt", StringComparison.Ordinal), results, "a.txt at depth 1 must be included.");
+        Assert.DoesNotContain(static p => p.EndsWith("b.txt", StringComparison.Ordinal), results, "b.txt at depth 2 must be excluded.");
     }
 
     /// <summary>
@@ -315,8 +315,8 @@ public sealed class PathUtilitiesUncTests {
     /// <summary>Tests Normalize_NullOrEmpty_ThrowsArgumentException.</summary>
     [TestMethod]
     public void Normalize_NullOrEmpty_ThrowsArgumentException() {
-        Assert.ThrowsExactly<ArgumentNullException>(() => PathUtilities.Normalize(null));
-        Assert.ThrowsExactly<ArgumentException>(() => PathUtilities.Normalize(""));
+        Assert.ThrowsExactly<ArgumentNullException>(static () => PathUtilities.Normalize(null));
+        Assert.ThrowsExactly<ArgumentException>(static () => PathUtilities.Normalize(""));
     }
 }
 

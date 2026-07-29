@@ -9,11 +9,11 @@ internal sealed class PatternInvariantRegistry {
     private readonly IPatternInvariant[] _semantic;
 
     public PatternInvariantRegistry(IEnumerable<IPatternInvariant> invariants) {
-        var grouped = invariants.GroupBy(i => i.Phase);
+        var grouped = invariants.GroupBy(static i => i.Phase);
 
-        _lexical = grouped.FirstOrDefault(g => g.Key == PatternInvariantPhase.Lexical)?.ToArray() ?? [];
-        _structural = grouped.FirstOrDefault(g => g.Key == PatternInvariantPhase.Structural)?.ToArray() ?? [];
-        _semantic = grouped.FirstOrDefault(g => g.Key == PatternInvariantPhase.Semantic)?.ToArray() ?? [];
+        _lexical = grouped.FirstOrDefault(static g => g.Key == PatternInvariantPhase.Lexical)?.ToArray() ?? [];
+        _structural = grouped.FirstOrDefault(static g => g.Key == PatternInvariantPhase.Structural)?.ToArray() ?? [];
+        _semantic = grouped.FirstOrDefault(static g => g.Key == PatternInvariantPhase.Semantic)?.ToArray() ?? [];
     }
 
     public void ValidateLexical(PatternCompilationContext context) => Validate(_lexical, context);

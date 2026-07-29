@@ -41,7 +41,7 @@ public class PatternPipelineAllocationBenchmark {
     [Benchmark]
     public void Compile_MixedKinds() {
         var classified = new ClassifiedPatternSet {
-            Patterns = [.. _mixedPatterns.Select(p => new ClassifiedPattern(p, PatternClassifier.Classify(p)))]
+            Patterns = [.. _mixedPatterns.Select(static p => new ClassifiedPattern(p, PatternClassifier.Classify(p)))]
         };
 
         _ = CompiledPatternFactory.Compile(classified);

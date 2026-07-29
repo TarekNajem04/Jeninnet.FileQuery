@@ -33,10 +33,10 @@ public class EnumerateFilesAsync_CharacterClassPatternTests {
                                            .ToListAsync(TestContext.CancellationToken);
 
         results.Should().HaveCount(3);
-        results.Should().Contain(x => x.EndsWith("a.txt", StringComparison.Ordinal));
-        results.Should().Contain(x => x.EndsWith("b.txt", StringComparison.Ordinal));
-        results.Should().Contain(x => x.EndsWith("c.txt", StringComparison.Ordinal));
-        results.Should().NotContain(x => x.EndsWith("d.txt", StringComparison.Ordinal));
+        results.Should().Contain(static x => x.EndsWith("a.txt", StringComparison.Ordinal));
+        results.Should().Contain(static x => x.EndsWith("b.txt", StringComparison.Ordinal));
+        results.Should().Contain(static x => x.EndsWith("c.txt", StringComparison.Ordinal));
+        results.Should().NotContain(static x => x.EndsWith("d.txt", StringComparison.Ordinal));
     }
 
     /// <summary>
@@ -88,9 +88,9 @@ public class EnumerateFilesAsync_CharacterClassPatternTests {
         var results = await fileQueryEngine.ExecuteAsync(new(env.Root, options), TestContext.CancellationToken)
                                            .ToListAsync(TestContext.CancellationToken);
 
-        results.Should().NotContain(x => x.EndsWith("apple.txt", StringComparison.Ordinal));
-        results.Should().Contain(x => x.EndsWith("banana.txt", StringComparison.Ordinal));
-        results.Should().Contain(x => x.EndsWith("cherry.txt", StringComparison.Ordinal));
+        results.Should().NotContain(static x => x.EndsWith("apple.txt", StringComparison.Ordinal));
+        results.Should().Contain(static x => x.EndsWith("banana.txt", StringComparison.Ordinal));
+        results.Should().Contain(static x => x.EndsWith("cherry.txt", StringComparison.Ordinal));
     }
 
     /// <summary>

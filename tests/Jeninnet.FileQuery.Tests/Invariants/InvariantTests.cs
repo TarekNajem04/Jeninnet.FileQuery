@@ -20,25 +20,25 @@ public sealed class InvariantTests {
     public void GitIgnore_StarStarLiteral_SegmentMixed_IsRejected() =>
         // "**a" produces [RecursiveWildcardToken, LiteralToken("a")] in one segment.
         Assert.ThrowsExactly<PatternException>(
-            () => CompiledPatternFactory.Compile(PatternKind.GitIgnore, "**a"),
+            static () => CompiledPatternFactory.Compile(PatternKind.GitIgnore, "**a"),
             "A mixed segment '**a' must be rejected for GitIgnore patterns.");
 
     /// <summary>Tests Glob_DoubleStarMixedSegment_IsRejected.</summary>
     [TestMethod]
     public void Glob_DoubleStarMixedSegment_IsRejected() => Assert.ThrowsExactly<PatternException>(
-            () => CompiledPatternFactory.Compile(PatternKind.Glob, "**a"),
+            static () => CompiledPatternFactory.Compile(PatternKind.Glob, "**a"),
             "In Glob patterns, '**' must appear as a standalone segment.");
 
     /// <summary>Tests GitIgnore_LiteralStarStar_SegmentMixed_IsRejected.</summary>
     [TestMethod]
     public void GitIgnore_LiteralStarStar_SegmentMixed_IsRejected() => Assert.ThrowsExactly<PatternException>(
-            () => CompiledPatternFactory.Compile(PatternKind.GitIgnore, "a**"),
+            static () => CompiledPatternFactory.Compile(PatternKind.GitIgnore, "a**"),
             "A mixed segment 'a**' must be rejected for GitIgnore patterns.");
 
     /// <summary>Tests GitIgnore_LiteralStarStarLiteral_IsRejected.</summary>
     [TestMethod]
     public void GitIgnore_LiteralStarStarLiteral_IsRejected() => Assert.ThrowsExactly<PatternException>(
-            () => CompiledPatternFactory.Compile(PatternKind.GitIgnore, "a**b"),
+            static () => CompiledPatternFactory.Compile(PatternKind.GitIgnore, "a**b"),
             "A mixed segment 'a**b' must be rejected.");
 
     /// <summary>Tests GitIgnore_StandaloneDoubleStar_IsAccepted.</summary>
@@ -62,7 +62,7 @@ public sealed class InvariantTests {
     public void RegexSyntaxInvariant_InvalidRegex_RejectsCorrectly() =>
         // "[invalid" is not valid regex — unclosed bracket.
         Assert.ThrowsExactly<PatternException>(
-            () => CompiledPatternFactory.Compile(PatternKind.Regex, "r:[invalid"),
+            static () => CompiledPatternFactory.Compile(PatternKind.Regex, "r:[invalid"),
             "An invalid regex pattern must be rejected.");
 
     /// <summary>Tests RegexSyntaxInvariant_ValidRegex_IsAccepted.</summary>
@@ -78,7 +78,7 @@ public sealed class InvariantTests {
     public void RegexSyntaxInvariant_ErrorMessageShowsExpressionNotPrefix() {
         // The error message must reference the expression ("[invalid"),
         // not the full raw string ("r:[invalid").
-        var ex = Assert.ThrowsExactly<PatternException>(() =>
+        var ex = Assert.ThrowsExactly<PatternException>(static () =>
             CompiledPatternFactory.Compile(PatternKind.Regex, "r:[invalid")
         );
 
@@ -105,13 +105,13 @@ public sealed class InvariantTests {
     /// <summary>Tests GitIgnore_BareSlash_IsRejected.</summary>
     [TestMethod]
     public void GitIgnore_BareSlash_IsRejected() => Assert.ThrowsExactly<PatternException>(
-            () => CompiledPatternFactory.Compile(PatternKind.GitIgnore, "/"),
+            static () => CompiledPatternFactory.Compile(PatternKind.GitIgnore, "/"),
             "A bare '/' must be rejected as a GitIgnore pattern.");
 
     /// <summary>Tests GitIgnore_MultipleSlashes_IsRejected.</summary>
     [TestMethod]
     public void GitIgnore_MultipleSlashes_IsRejected() => Assert.ThrowsExactly<PatternException>(
-            () => CompiledPatternFactory.Compile(PatternKind.GitIgnore, "///"),
+            static () => CompiledPatternFactory.Compile(PatternKind.GitIgnore, "///"),
             "A pattern of only '/' separators must be rejected.");
 
     /// <summary>Tests GitIgnore_RootAnchoredWithBody_IsAccepted.</summary>
@@ -176,7 +176,7 @@ public sealed class InvariantTests {
             .Single();
 
         var doubleStarCount = compiled.Segments
-            .Count(seg => seg.Count == 1 && seg[0] is RecursiveWildcardToken);
+            .Count(static seg => seg.Count == 1 && seg[0] is RecursiveWildcardToken);
 
         Assert.AreEqual(1, doubleStarCount,
             "'**/*.cs' must contain exactly one '**' segment — not two.");

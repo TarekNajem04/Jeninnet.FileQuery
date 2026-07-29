@@ -11,7 +11,7 @@ public sealed class FileQueryObservabilityDeepTests {
     [TestMethod]
     public void FileQueryErrorRecoveryOptions_Validation_ShouldThrowWhenNegativeRetryAttempts() =>
         TestAssertEx.Throws<ArgumentOutOfRangeException>(
-            () => {
+            static () => {
                 var options = new FileQueryErrorRecoveryOptions(FileQueryErrorAction.Retry, -1);
                 options.Validate();
             }

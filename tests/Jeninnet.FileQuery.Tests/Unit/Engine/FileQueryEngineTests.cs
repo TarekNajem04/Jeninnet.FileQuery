@@ -64,8 +64,8 @@ public class FileQueryEngineTests {
     /// </summary>
     [TestMethod]
     public void Should_Throw_When_NormalizedWithNullOrEmpty() {
-        ((Action)(() => PathUtilities.Normalize(null))).Should().Throw<ArgumentException>();
-        ((Action)(() => PathUtilities.Normalize(""))).Should().Throw<ArgumentException>();
+        ((Action)(static () => PathUtilities.Normalize(null))).Should().Throw<ArgumentException>();
+        ((Action)(static () => PathUtilities.Normalize(""))).Should().Throw<ArgumentException>();
     }
 
     /// <summary>
@@ -81,8 +81,8 @@ public class FileQueryEngineTests {
         Assert.IsTrue(compiled.IsNegated);
         Assert.IsTrue(compiled.DirectoryOnly);
         compiled.Segments.Should().HaveCount(2);
-        compiled.Segments[0].Should().ContainSingle(token => token is RecursiveWildcardToken);
-        compiled.Segments[1].Should().ContainSingle(token => token is LiteralToken literal && literal.Text == "bin");
+        compiled.Segments[0].Should().ContainSingle(static token => token is RecursiveWildcardToken);
+        compiled.Segments[1].Should().ContainSingle(static token => token is LiteralToken literal && literal.Text == "bin");
         Assert.IsTrue(compiled.IsNegated);
         Assert.IsTrue(compiled.DirectoryOnly);
     }
@@ -101,10 +101,10 @@ public class FileQueryEngineTests {
         Assert.IsFalse(compiled.DirectoryOnly);
         Assert.IsTrue(compiled.AnchoredToRoot);
         compiled.Segments.Should().HaveCount(3);
-        compiled.Segments[0].Should().ContainSingle(token => token is LiteralToken literal && literal.Text == "obj");
-        compiled.Segments[1].Should().ContainSingle(token => token is RecursiveWildcardToken);
-        compiled.Segments[2].Should().Contain(token => token is WildcardToken);
-        compiled.Segments[2].Should().Contain(token => token is LiteralToken literal && literal.Text == ".tmp");
+        compiled.Segments[0].Should().ContainSingle(static token => token is LiteralToken literal && literal.Text == "obj");
+        compiled.Segments[1].Should().ContainSingle(static token => token is RecursiveWildcardToken);
+        compiled.Segments[2].Should().Contain(static token => token is WildcardToken);
+        compiled.Segments[2].Should().Contain(static token => token is LiteralToken literal && literal.Text == ".tmp");
     }
 
     /// <summary>
@@ -118,7 +118,7 @@ public class FileQueryEngineTests {
             .Single();
 
         compiled.Segments.Should().HaveCount(1);
-        compiled.Segments[0].Should().ContainSingle(token => token is WildcardToken);
+        compiled.Segments[0].Should().ContainSingle(static token => token is WildcardToken);
     }
 
     /// <summary>
@@ -132,7 +132,7 @@ public class FileQueryEngineTests {
             .Single();
 
         compiled.Segments.Should().HaveCount(2);
-        compiled.Segments[0].Should().ContainSingle(token => token is RecursiveWildcardToken);
+        compiled.Segments[0].Should().ContainSingle(static token => token is RecursiveWildcardToken);
     }
 
     /// <summary>

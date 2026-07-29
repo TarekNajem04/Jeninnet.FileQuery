@@ -31,7 +31,7 @@ public class AnchoredPatternTests {
 
         var result = fileQueryEngine.Execute(new(env.Root, options)).ToList();
 
-        TestAssertEx.ContainsSingle(result, x => x.EndWithPath("file.txt"));
+        TestAssertEx.ContainsSingle(result, static x => x.EndWithPath("file.txt"));
         Assert.DoesNotContain(static x => x.EndWithPath("sub/file.txt"), result);
     }
 

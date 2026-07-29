@@ -6,7 +6,7 @@ public sealed class ExceptionAssertionSmokeTests {
     /// <summary>Throw passes when the action throws the expected type.</summary>
     [TestMethod]
     public void Throw_WhenActionThrows_Passes() {
-        Action throws = () => throw new InvalidOperationException("fail");
+        Action throws = static () => throw new InvalidOperationException("fail");
         var thrown = throws.Should().Throw<InvalidOperationException>();
         Assert.IsNotNull(thrown);
         Assert.IsInstanceOfType<InvalidOperationException>(thrown.Exception);

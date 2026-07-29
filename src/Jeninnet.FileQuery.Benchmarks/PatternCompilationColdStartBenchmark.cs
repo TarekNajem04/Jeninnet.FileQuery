@@ -40,7 +40,7 @@ public class PatternCompilationColdStartBenchmark {
     [Benchmark(Baseline = true)]
     public void CompileHybrid() => CompiledPatternFactory.Compile(
                                             new ClassifiedPatternSet {
-                                                Patterns = [.. _hybridPatterns.Select(p => new ClassifiedPattern(p, PatternClassifier.Classify(p)))]
+                                                Patterns = [.. _hybridPatterns.Select(static p => new ClassifiedPattern(p, PatternClassifier.Classify(p)))]
                                             }
                                         );
 

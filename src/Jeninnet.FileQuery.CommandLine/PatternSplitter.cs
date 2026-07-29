@@ -40,8 +40,8 @@ public static class PatternSplitter {
         ArgumentException.ThrowIfNullOrEmpty(input);
 
         return input.Split(separator, StringSplitOptions.RemoveEmptyEntries)
-                    .Select(p => p.Trim())
-                    .Where(p => p.Length > 0);
+                    .Select(static p => p.Trim())
+                    .Where(static p => p.Length > 0);
     }
 
     /// <summary>
@@ -64,7 +64,7 @@ public static class PatternSplitter {
         ArgumentNullException.ThrowIfNull(separators);
 
         return input.Split(separators, StringSplitOptions.RemoveEmptyEntries)
-                    .Select(p => p.Trim())
-                    .Where(p => p.Length > 0);
+                    .Select(static p => p.Trim())
+                    .Where(static p => p.Length > 0);
     }
 }

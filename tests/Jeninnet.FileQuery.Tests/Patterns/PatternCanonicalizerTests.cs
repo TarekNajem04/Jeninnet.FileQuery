@@ -9,7 +9,7 @@ public sealed class PatternCanonicalizerTests {
     /// Verifies that the <see cref="PatternCanonicalizer.Canonicalize(CanonicalPatternInput)"/> method throws <see cref="ArgumentNullException"/> when input is null.
     /// </summary>
     [TestMethod]
-    public void Canonicalize_NullInput_ThrowsArgumentNullException() => TestAssertEx.Throws<ArgumentNullException>(() => PatternCanonicalizer.Canonicalize(null!));
+    public void Canonicalize_NullInput_ThrowsArgumentNullException() => TestAssertEx.Throws<ArgumentNullException>(static () => PatternCanonicalizer.Canonicalize(null!));
 
     /// <summary>
     /// Verifies that the <see cref="PatternCanonicalizer.Canonicalize(CanonicalPatternInput)"/> method returns an empty set when the input is empty.

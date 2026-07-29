@@ -85,8 +85,8 @@ public class BasicMatchingTests {
                                     .ToList();
 
         TestAssertEx.HasCount(result, 2);
-        Assert.Contains(x => x.EndsWith("fileA.txt", StringComparison.Ordinal), result);
-        Assert.Contains(x => x.EndsWith("fileB.txt", StringComparison.Ordinal), result);
+        Assert.Contains(static x => x.EndsWith("fileA.txt", StringComparison.Ordinal), result);
+        Assert.Contains(static x => x.EndsWith("fileB.txt", StringComparison.Ordinal), result);
     }
 }
 

@@ -12,7 +12,7 @@ public class HybridPathMatcherTests {
     private static ICompiledPatternSet Compile(IEnumerable<string> patterns) =>
         Compile(
             new ClassifiedPatternSet() {
-                Patterns = [.. patterns.Select(pattern => new ClassifiedPattern(Text: pattern, Type: PatternClassifier.Classify(pattern)))]
+                Patterns = [.. patterns.Select(static pattern => new ClassifiedPattern(Text: pattern, Type: PatternClassifier.Classify(pattern)))]
             }
         );
 

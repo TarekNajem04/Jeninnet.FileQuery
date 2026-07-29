@@ -39,7 +39,7 @@ public class EnumerateFilesAsync_RecursionDepthTests {
         var results = await fileQueryEngine.ExecuteAsync(new(env.Root, options), TestContext.CancellationToken)
                                            .ToListAsync(TestContext.CancellationToken);
 
-        TestAssertEx.ContainsSingle(results, x => x.EndsWith("root.txt", StringComparison.Ordinal));
+        TestAssertEx.ContainsSingle(results, static x => x.EndsWith("root.txt", StringComparison.Ordinal));
         TestAssertEx.HasCount(results, 1);
     }
 
@@ -74,9 +74,9 @@ public class EnumerateFilesAsync_RecursionDepthTests {
                                            .ToListAsync(TestContext.CancellationToken);
 
         TestAssertEx.HasCount(results, 2);
-        TestAssertEx.Contains(results, x => x.EndsWith("a.txt", StringComparison.Ordinal));
-        TestAssertEx.Contains(results, x => x.EndsWith(Path.Combine("sub", "b.txt"), StringComparison.Ordinal));
-        Assert.DoesNotContain(x => x.EndsWith(Path.Combine("deeper", "c.txt"), StringComparison.Ordinal), results);
+        TestAssertEx.Contains(results, static x => x.EndsWith("a.txt", StringComparison.Ordinal));
+        TestAssertEx.Contains(results, static x => x.EndsWith(Path.Combine("sub", "b.txt"), StringComparison.Ordinal));
+        Assert.DoesNotContain(static x => x.EndsWith(Path.Combine("deeper", "c.txt"), StringComparison.Ordinal), results);
     }
 
     /// <summary>
@@ -113,8 +113,8 @@ public class EnumerateFilesAsync_RecursionDepthTests {
                                            .ToListAsync(TestContext.CancellationToken);
 
         TestAssertEx.HasCount(results, 4); // 2 root + 2 at depth 1
-        Assert.DoesNotContain(x => x.Contains("A2", StringComparison.Ordinal), results);
-        Assert.DoesNotContain(x => x.Contains("B2", StringComparison.Ordinal), results);
+        Assert.DoesNotContain(static x => x.Contains("A2", StringComparison.Ordinal), results);
+        Assert.DoesNotContain(static x => x.Contains("B2", StringComparison.Ordinal), results);
     }
 
     /// <summary>

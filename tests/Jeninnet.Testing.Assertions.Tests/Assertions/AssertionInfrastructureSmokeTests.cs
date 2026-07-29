@@ -22,7 +22,7 @@ public sealed class AssertionInfrastructureSmokeTests {
     /// <summary>A failing assertion throws AssertionFailedException with a non-empty message.</summary>
     [TestMethod]
     public void FailingAssertion_ThrowsAssertionFailedException() {
-        var ex = Assert.ThrowsExactly<AssertionFailedException>(() => false.Should().BeTrue());
+        var ex = Assert.ThrowsExactly<AssertionFailedException>(static () => false.Should().BeTrue());
         Assert.IsNotNull(ex);
         Assert.IsFalse(string.IsNullOrWhiteSpace(ex.Message));
     }
@@ -37,9 +37,9 @@ public sealed class AssertionInfrastructureSmokeTests {
 
     /// <summary>NotBeNull throws when the value is null.</summary>
     [TestMethod]
-    public void NotBeNull_OnNull_Throws() => Assert.ThrowsExactly<AssertionFailedException>(() => ((string?)null).Should().NotBeNull());
+    public void NotBeNull_OnNull_Throws() => Assert.ThrowsExactly<AssertionFailedException>(static () => ((string?)null).Should().NotBeNull());
 
     /// <summary>BeNull throws when the value is non-null.</summary>
     [TestMethod]
-    public void BeNull_OnNonNull_Throws() => Assert.ThrowsExactly<AssertionFailedException>(() => "not null".Should().BeNull());
+    public void BeNull_OnNonNull_Throws() => Assert.ThrowsExactly<AssertionFailedException>(static () => "not null".Should().BeNull());
 }

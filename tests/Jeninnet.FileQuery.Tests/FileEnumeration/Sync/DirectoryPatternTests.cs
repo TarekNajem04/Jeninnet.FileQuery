@@ -59,7 +59,7 @@ public class DirectoryPatternTests {
         result.Should().Contain(env.Abs("src", "main.cs"));
         result.Should().Contain(env.Abs("b.cs"));
         // src/util/helpers.cs must be excluded due to pruning.
-        result.Should().NotContain(x => x.Contains(Path.Combine("src", "util")));
+        result.Should().NotContain(static x => x.Contains(Path.Combine("src", "util")));
     }
 
     /// <summary>
@@ -143,8 +143,8 @@ public class DirectoryPatternTests {
         result.Should().Contain(env.Abs("b.cs"));
         result.Should().Contain(env.Abs("src", "main.cs"));
         // Check both excluded directories
-        result.Should().NotContain(x => x.Contains(Path.Combine("src", "util")));
-        result.Should().NotContain(x => x.Contains(Path.Combine("src", "other")));
+        result.Should().NotContain(static x => x.Contains(Path.Combine("src", "util")));
+        result.Should().NotContain(static x => x.Contains(Path.Combine("src", "other")));
     }
 }
 

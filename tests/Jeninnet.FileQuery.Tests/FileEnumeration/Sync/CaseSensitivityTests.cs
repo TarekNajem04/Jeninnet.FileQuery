@@ -82,10 +82,10 @@ public class CaseSensitivityTests {
         var result = fileQueryEngine.Execute(new(env.Root, options)).ToList();
 
         if(RuntimeInformation.IsOSPlatform(OSPlatform.Linux)) {
-            result.Should().ContainSingle(x => x.EndsWith("sample.txt", StringComparison.Ordinal));
+            result.Should().ContainSingle(static x => x.EndsWith("sample.txt", StringComparison.Ordinal));
         } else {
             // The Windows operating system is not case-sensitive, so both files are identical, and the second operation is to replace the first file.
-            result.Should().ContainSingle(x => x.EndsWith("sample.txt", StringComparison.OrdinalIgnoreCase));
+            result.Should().ContainSingle(static x => x.EndsWith("sample.txt", StringComparison.OrdinalIgnoreCase));
         }
     }
 }

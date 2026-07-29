@@ -37,8 +37,8 @@ public class EnumerateFilesAsync_DirectoryOnlyPatternTests {
         var results = await fileQueryEngine.ExecuteAsync(new(env.Root, options), TestContext.CancellationToken)
                                            .ToListAsync(TestContext.CancellationToken);
 
-        results.Should().ContainSingle(x => x.EndsWith("visible.txt", StringComparison.Ordinal));
-        results.Should().NotContain(x => x.Contains("secret", StringComparison.Ordinal));
+        results.Should().ContainSingle(static x => x.EndsWith("visible.txt", StringComparison.Ordinal));
+        results.Should().NotContain(static x => x.Contains("secret", StringComparison.Ordinal));
     }
 
     /// <summary>
@@ -75,7 +75,7 @@ public class EnumerateFilesAsync_DirectoryOnlyPatternTests {
                                            .ToListAsync(TestContext.CancellationToken);
 
         // Only the recovered file is expected to be present.
-        results.Should().ContainSingle(x => x.EndsWith(Path.Combine("recover", "file.txt"), StringComparison.Ordinal));
+        results.Should().ContainSingle(static x => x.EndsWith(Path.Combine("recover", "file.txt"), StringComparison.Ordinal));
     }
 
     /// <summary>
@@ -107,7 +107,7 @@ public class EnumerateFilesAsync_DirectoryOnlyPatternTests {
         var results = await fileQueryEngine.ExecuteAsync(new(env.Root, options), TestContext.CancellationToken)
                                            .ToListAsync(TestContext.CancellationToken);
 
-        results.Should().ContainSingle(x => x.EndWithNormalized("visible.txt"));
+        results.Should().ContainSingle(static x => x.EndWithNormalized("visible.txt"));
         results.Should().HaveCount(1);
     }
 

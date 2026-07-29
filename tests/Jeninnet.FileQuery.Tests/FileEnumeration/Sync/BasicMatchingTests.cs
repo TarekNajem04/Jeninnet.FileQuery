@@ -85,8 +85,8 @@ public class BasicMatchingTests {
                                     .ToList();
 
         result.Should().HaveCount(2);
-        result.Should().Contain(x => x.EndsWith("fileA.txt", StringComparison.Ordinal));
-        result.Should().Contain(x => x.EndsWith("fileB.txt", StringComparison.Ordinal));
+        result.Should().Contain(static x => x.EndsWith("fileA.txt", StringComparison.Ordinal));
+        result.Should().Contain(static x => x.EndsWith("fileB.txt", StringComparison.Ordinal));
     }
 }
 

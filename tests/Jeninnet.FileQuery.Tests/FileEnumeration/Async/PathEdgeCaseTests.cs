@@ -36,7 +36,7 @@ public class EnumerateFilesAsync_PathEdgeCaseTests {
         var results = await fileQueryEngine.ExecuteAsync(new(rootWithSlash, options), TestContext.CancellationToken)
                                            .ToListAsync(TestContext.CancellationToken);
 
-        results.Should().ContainSingle(x => x.EndsWith("file.txt", StringComparison.Ordinal));
+        results.Should().ContainSingle(static x => x.EndsWith("file.txt", StringComparison.Ordinal));
     }
 
     /// <summary>
@@ -64,14 +64,14 @@ public class EnumerateFilesAsync_PathEdgeCaseTests {
         var results = await fileQueryEngine.ExecuteAsync(new(env.Root, options), TestContext.CancellationToken)
                                            .ToListAsync(TestContext.CancellationToken);
 
-        results.Should().ContainSingle(x => x.Contains("Test测试.txt", StringComparison.Ordinal));
-        results.Should().ContainSingle(x => x.Contains("file😍.txt", StringComparison.Ordinal));
-        results.Should().ContainSingle(x => x.Contains("Test😁.txt", StringComparison.Ordinal));
-        results.Should().ContainSingle(x => x.Contains("Test07😅.txt", StringComparison.Ordinal));
+        results.Should().ContainSingle(static x => x.Contains("Test测试.txt", StringComparison.Ordinal));
+        results.Should().ContainSingle(static x => x.Contains("file😍.txt", StringComparison.Ordinal));
+        results.Should().ContainSingle(static x => x.Contains("Test😁.txt", StringComparison.Ordinal));
+        results.Should().ContainSingle(static x => x.Contains("Test07😅.txt", StringComparison.Ordinal));
 
-        results.Should().NotContain(x => x.Contains("Test测试.log", StringComparison.Ordinal));
-        results.Should().NotContain(x => x.Contains("file1😀.txT", StringComparison.Ordinal));
-        results.Should().NotContain(x => x.Contains("file2👍.TXT", StringComparison.Ordinal));
+        results.Should().NotContain(static x => x.Contains("Test测试.log", StringComparison.Ordinal));
+        results.Should().NotContain(static x => x.Contains("file1😀.txT", StringComparison.Ordinal));
+        results.Should().NotContain(static x => x.Contains("file2👍.TXT", StringComparison.Ordinal));
     }
 
     /// <summary>

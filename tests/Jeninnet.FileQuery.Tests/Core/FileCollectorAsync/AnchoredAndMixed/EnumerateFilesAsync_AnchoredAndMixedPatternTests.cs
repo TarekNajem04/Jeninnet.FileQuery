@@ -36,8 +36,8 @@ public class EnumerateFilesAsync_AnchoredAndMixedPatternTests {
                                            .ToListAsync(TestContext.CancellationToken);
 
         // Must include only root.txt at top-level
-        TestAssertEx.ContainsSingle(results, x => x.EndsWith("root.txt", StringComparison.Ordinal));
-        TestAssertEx.DoesNotContain(results, x => x.Contains("sub/root.txt", StringComparison.Ordinal));
+        TestAssertEx.ContainsSingle(results, static x => x.EndsWith("root.txt", StringComparison.Ordinal));
+        TestAssertEx.DoesNotContain(results, static x => x.Contains("sub/root.txt", StringComparison.Ordinal));
     }
 
     /// <summary>
@@ -71,11 +71,11 @@ public class EnumerateFilesAsync_AnchoredAndMixedPatternTests {
         var results = await fileQueryEngine.ExecuteAsync(new(env.Root, options), TestContext.CancellationToken)
                                            .ToListAsync(TestContext.CancellationToken);
         TestAssertEx.HasCount(results, 3);
-        TestAssertEx.Contains(results, x => x.Contains("abc1", StringComparison.Ordinal));
-        TestAssertEx.Contains(results, x => x.Contains("abc9", StringComparison.Ordinal));
-        TestAssertEx.Contains(results, x => x.Contains("axcZZ", StringComparison.Ordinal));
-        TestAssertEx.DoesNotContain(results, x => x.Contains("axxc12", StringComparison.Ordinal));
-        TestAssertEx.DoesNotContain(results, x => x.EndsWith("not.txt", StringComparison.Ordinal));
+        TestAssertEx.Contains(results, static x => x.Contains("abc1", StringComparison.Ordinal));
+        TestAssertEx.Contains(results, static x => x.Contains("abc9", StringComparison.Ordinal));
+        TestAssertEx.Contains(results, static x => x.Contains("axcZZ", StringComparison.Ordinal));
+        TestAssertEx.DoesNotContain(results, static x => x.Contains("axxc12", StringComparison.Ordinal));
+        TestAssertEx.DoesNotContain(results, static x => x.EndsWith("not.txt", StringComparison.Ordinal));
     }
 
     /// <summary>

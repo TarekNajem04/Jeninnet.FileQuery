@@ -15,7 +15,7 @@ public class GlobPatternCompilerTests {
         compiledPatternSets.Should().HaveCount(1, "because we compiled a single pattern string");
         var compiledPattern = compiledPatternSets[0];
 
-        compiledPattern.Segments[0].Should().ContainSingle(x => x is WildcardToken);
+        compiledPattern.Segments[0].Should().ContainSingle(static x => x is WildcardToken);
     }
 
     /// <summary>
@@ -28,7 +28,7 @@ public class GlobPatternCompilerTests {
         compiledPatternSets.Should().HaveCount(1, "because we compiled a single pattern string");
         var compiledPattern = compiledPatternSets[0];
 
-        compiledPattern.Segments[0].Should().ContainSingle(x => x is RecursiveWildcardToken);
+        compiledPattern.Segments[0].Should().ContainSingle(static x => x is RecursiveWildcardToken);
     }
 }
 

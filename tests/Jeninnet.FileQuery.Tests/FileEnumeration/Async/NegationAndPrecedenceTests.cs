@@ -34,9 +34,9 @@ public class EnumerateFilesAsync_NegationAndPrecedenceTests {
         var results = await fileQueryEngine.ExecuteAsync(new(env.Root, options), TestContext.CancellationToken)
                                            .ToListAsync(TestContext.CancellationToken);
 
-        results.Should().NotContain(x => x.EndsWith("a.txt", StringComparison.Ordinal));
-        results.Should().Contain(x => x.EndsWith("b.txt", StringComparison.Ordinal));
-        results.Should().NotContain(x => x.EndsWith("c.log", StringComparison.Ordinal));
+        results.Should().NotContain(static x => x.EndsWith("a.txt", StringComparison.Ordinal));
+        results.Should().Contain(static x => x.EndsWith("b.txt", StringComparison.Ordinal));
+        results.Should().NotContain(static x => x.EndsWith("c.log", StringComparison.Ordinal));
     }
 
     /// <summary>
@@ -65,7 +65,7 @@ public class EnumerateFilesAsync_NegationAndPrecedenceTests {
                                            .ToListAsync(TestContext.CancellationToken);
 
         // Because last rule wins, file.txt *must* be included
-        results.Should().ContainSingle(x => x.EndsWith("file.txt", StringComparison.Ordinal));
+        results.Should().ContainSingle(static x => x.EndsWith("file.txt", StringComparison.Ordinal));
     }
 
     /// <summary>
@@ -100,10 +100,10 @@ public class EnumerateFilesAsync_NegationAndPrecedenceTests {
         var results = await fileQueryEngine.ExecuteAsync(new(env.Root, options), TestContext.CancellationToken)
                                            .ToListAsync(TestContext.CancellationToken);
 
-        results.Should().Contain(x => x.EndsWith(Path.Combine("x", "a.txt"), StringComparison.Ordinal));
-        results.Should().Contain(x => x.EndsWith(Path.Combine("x", "b.txt"), StringComparison.Ordinal));  // re-included
-        results.Should().NotContain(x => x.EndsWith(Path.Combine("y", "b.txt"), StringComparison.Ordinal));
-        results.Should().NotContain(x => x.EndsWith(Path.Combine("x", "c.tmp"), StringComparison.Ordinal));
+        results.Should().Contain(static x => x.EndsWith(Path.Combine("x", "a.txt"), StringComparison.Ordinal));
+        results.Should().Contain(static x => x.EndsWith(Path.Combine("x", "b.txt"), StringComparison.Ordinal));  // re-included
+        results.Should().NotContain(static x => x.EndsWith(Path.Combine("y", "b.txt"), StringComparison.Ordinal));
+        results.Should().NotContain(static x => x.EndsWith(Path.Combine("x", "c.tmp"), StringComparison.Ordinal));
     }
 
     /// <summary>

@@ -59,7 +59,7 @@ public class NegationAndOrderTests {
         var result = fileQueryEngine.Execute(new(env.Root, options))
                                     .ToList();
 
-        result.Should().ContainSingle(x => x.EndsWith("data.log", StringComparison.Ordinal));
+        result.Should().ContainSingle(static x => x.EndsWith("data.log", StringComparison.Ordinal));
     }
 
     /// <summary>
@@ -89,8 +89,8 @@ public class NegationAndOrderTests {
         var result = fileQueryEngine.Execute(new(env.Root, options))
                                     .ToList();
 
-        result.Should().Contain(x => x.EndsWith(Path.Combine("sub", "file.txt"), StringComparison.Ordinal));
-        result.Should().Contain(x => x.EndsWith("file.txt", StringComparison.Ordinal));
+        result.Should().Contain(static x => x.EndsWith(Path.Combine("sub", "file.txt"), StringComparison.Ordinal));
+        result.Should().Contain(static x => x.EndsWith("file.txt", StringComparison.Ordinal));
     }
 }
 

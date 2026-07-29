@@ -58,8 +58,8 @@ public sealed class FileQueryObservabilityTests {
         var results = FileQueryRuntime.Create().Execute(query).ToList();
 
         TestAssertEx.HasCount(results, 1);
-        var included = diagnostics.Values.Single(d => d.RelativePath == "keep.txt");
-        var excluded = diagnostics.Values.Single(d => d.RelativePath == "drop.log");
+        var included = diagnostics.Values.Single(static d => d.RelativePath == "keep.txt");
+        var excluded = diagnostics.Values.Single(static d => d.RelativePath == "drop.log");
 
         Assert.AreEqual("Include", included.Outcome);
         Assert.AreEqual("!**/*.txt", included.Pattern);

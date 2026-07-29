@@ -92,9 +92,9 @@ public class RecursiveWildcardTests {
         var result = fileQueryEngine.Execute(new(env.Root, options))
                                     .ToList();
 
-        TestAssertEx.Contains(result, x => x.EndsWith("a.txt", StringComparison.Ordinal));
-        TestAssertEx.Contains(result, x => x.EndsWith("c.txt", StringComparison.Ordinal));
-        TestAssertEx.DoesNotContain(result, x => x.EndsWith("b.log", StringComparison.Ordinal));
+        TestAssertEx.Contains(result, static x => x.EndsWith("a.txt", StringComparison.Ordinal));
+        TestAssertEx.Contains(result, static x => x.EndsWith("c.txt", StringComparison.Ordinal));
+        TestAssertEx.DoesNotContain(result, static x => x.EndsWith("b.log", StringComparison.Ordinal));
     }
 }
 

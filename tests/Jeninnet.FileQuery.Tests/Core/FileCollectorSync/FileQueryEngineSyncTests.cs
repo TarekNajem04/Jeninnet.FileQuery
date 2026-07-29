@@ -24,7 +24,7 @@ public class FileQueryEngineSyncTests {
     /// </summary>
     [TestMethod]
     public void ShouldEnumerateMatchingFiles() {
-        var tempDir = CreateTempDir(dir => {
+        var tempDir = CreateTempDir(static dir => {
             File.WriteAllText(Path.Combine(dir, "file1.txt"), "data");
             File.WriteAllText(Path.Combine(dir, "file2.txt"), "data");
             File.WriteAllText(Path.Combine(dir, "ignore.me"), "data");
@@ -61,7 +61,7 @@ public class FileQueryEngineSyncTests {
     /// </summary>
     [TestMethod]
     public void IgnoreInaccessibleFalse_ShouldEnumerateAccessibleFiles() {
-        var tempDir = CreateTempDir(dir => {
+        var tempDir = CreateTempDir(static dir => {
             File.WriteAllText(Path.Combine(dir, "file1.txt"), "data");
             File.WriteAllText(Path.Combine(dir, "file2.txt"), "data");
         });
@@ -96,7 +96,7 @@ public class FileQueryEngineSyncTests {
     /// </summary>
     [TestMethod]
     public void RespectMaxDepth() {
-        var tempDir = CreateTempDir(dir => {
+        var tempDir = CreateTempDir(static dir => {
             Directory.CreateDirectory(Path.Combine(dir, "sub"));
             File.WriteAllText(Path.Combine(dir, "root.txt"), "data");
             File.WriteAllText(Path.Combine(dir, "sub", "subfile.txt"), "data");

@@ -76,7 +76,7 @@ public sealed class ArchitectureTests {
         var engineMethods =
             typeof(Engine.FileQueryEngine)
                 .GetMethods()
-                .Where(m => m.Name == "ExecuteAsync");
+                .Where(static m => m.Name == "ExecuteAsync");
 
         Assert.IsNotEmpty(engineMethods);
     }
@@ -92,16 +92,16 @@ public sealed class ArchitectureTests {
 
         // Select only types in the Engine layer
         var engineTypes = engineAssembly.GetTypes()
-                                        .Where(t => t.Namespace?.StartsWith("Jeninnet.FileQuery.Engine", StringComparison.Ordinal) == true)
+                                        .Where(static t => t.Namespace?.StartsWith("Jeninnet.FileQuery.Engine", StringComparison.Ordinal) == true)
                                         .ToList();
 
         // Collect all referenced types for each Engine type
         var forbiddenReferences = engineTypes
-            .Select(t => new {
+            .Select(static t => new {
                 EngineType = t,
                 ReferencedTypes = GetAllReferencedTypes(t) // Get referenced types for each Engine type
             })
-            .Where(x => x.ReferencedTypes.Any(rt =>
+            .Where(static x => x.ReferencedTypes.Any(static rt =>
                 rt.Namespace?.StartsWith("Jeninnet.FileQuery.Patterns", StringComparison.Ordinal) == true
             //&& !rt.Namespace.StartsWith("System", StringComparison.Ordinal) // Filter out system types like String, Void, etc.
             ))
@@ -113,10 +113,10 @@ public sealed class ArchitectureTests {
             $"""
             Engine / Traversal layer must not reference Patterns namespace.
             Violating classes:
-            {string.Join(Environment.NewLine, forbiddenReferences.Select(x =>
+            {string.Join(Environment.NewLine, forbiddenReferences.Select(static x =>
                     $"{x.EngineType.FullName} references: {string.Join(", ", x.ReferencedTypes
-                        .Where(rt => rt.Namespace?.StartsWith("Jeninnet.FileQuery.Patterns", StringComparison.Ordinal) == true) // Only show references to the Patterns namespace
-                        .Select(rt => rt.FullName))}")
+                        .Where(static rt => rt.Namespace?.StartsWith("Jeninnet.FileQuery.Patterns", StringComparison.Ordinal) == true) // Only show references to the Patterns namespace
+                        .Select(static rt => rt.FullName))}")
             )}
             """
         );
@@ -137,7 +137,7 @@ public sealed class ArchitectureTests {
         var referencedNames = coreAssembly
             .GetReferencedAssemblies()
             .Select(static name => name.Name)
-            .Where(name => name is not null)
+            .Where(static name => name is not null)
             .ToHashSet(StringComparer.Ordinal);
 
         var forbiddenAssemblyReferences = optionalAssemblyNames
@@ -317,7 +317,7 @@ public sealed class ArchitectureTests {
             typeof(PatternCompilerBase)
                 .Assembly
                 .GetTypes()
-                .Single(t => t.Name == "PatternScanner");
+                .Single(static t => t.Name == "PatternScanner");
 
         Assert.IsFalse(
             scannerType.IsPublic,
@@ -327,13 +327,13 @@ public sealed class ArchitectureTests {
 
     private static IEnumerable<Type> GetAllReferencedTypes(Type type) =>
         type.GetFields(ALL_BINDINGS)
-            .Select(f => f.FieldType)
-            .Concat(type.GetProperties(ALL_BINDINGS).Select(p => p.PropertyType))
-            .Concat(type.GetMethods(ALL_BINDINGS).Select(m => m.ReturnType))
+            .Select(static f => f.FieldType)
+            .Concat(type.GetProperties(ALL_BINDINGS).Select(static p => p.PropertyType))
+            .Concat(type.GetMethods(ALL_BINDINGS).Select(static m => m.ReturnType))
             .Concat(
                 type.GetMethods(ALL_BINDINGS)
-                    .SelectMany(m => m.GetParameters())
-                    .Select(p => p.ParameterType)
+                    .SelectMany(static m => m.GetParameters())
+                    .Select(static p => p.ParameterType)
             );
 
     private static IEnumerable<(string ApiOwner, Type ReferencedType)> GetPublicApiReferences(Assembly assembly) {

@@ -31,7 +31,7 @@ public class NegationRuleTests {
         var result = fileQueryEngine.Execute(new(env.Root, options)).Order().ToList();
 
         result.Should().HaveCount(2);
-        result.Should().NotContain(x => x.EndsWith("b.txt", StringComparison.Ordinal));
+        result.Should().NotContain(static x => x.EndsWith("b.txt", StringComparison.Ordinal));
     }
 
     /// <summary>
@@ -58,9 +58,9 @@ public class NegationRuleTests {
         var result = fileQueryEngine.Execute(new(env.Root, options)).Order().ToList();
 
         result.Should().HaveCount(1);
-        result.Should().NotContain(x => x.EndsWith("a.txt", StringComparison.Ordinal));
-        result.Should().Contain(x => x.EndsWith("b.txt", StringComparison.Ordinal));
-        result.Should().NotContain(x => x.EndsWith("c.txt", StringComparison.Ordinal));
+        result.Should().NotContain(static x => x.EndsWith("a.txt", StringComparison.Ordinal));
+        result.Should().Contain(static x => x.EndsWith("b.txt", StringComparison.Ordinal));
+        result.Should().NotContain(static x => x.EndsWith("c.txt", StringComparison.Ordinal));
     }
 
     /// <summary>
@@ -87,7 +87,7 @@ public class NegationRuleTests {
 
         var result = fileQueryEngine.Execute(new(env.Root, options)).ToList();
 
-        result.Should().ContainSingle(x => x.EndsWith("keep.txt", StringComparison.Ordinal));
+        result.Should().ContainSingle(static x => x.EndsWith("keep.txt", StringComparison.Ordinal));
     }
 
     /// <summary>
@@ -116,7 +116,7 @@ public class NegationRuleTests {
 
         var result = fileQueryEngine.Execute(new(env.Root, options)).ToList();
 
-        result.Should().ContainSingle(x => x.EndsWith("revive.txt", StringComparison.Ordinal));
+        result.Should().ContainSingle(static x => x.EndsWith("revive.txt", StringComparison.Ordinal));
     }
 }
 
