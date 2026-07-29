@@ -1,4 +1,4 @@
-﻿namespace Jeninnet.FileQuery.Tests.Core.FileCollectorAsync.NegationAndPrecedence;
+namespace Jeninnet.FileQuery.Tests.Core.FileCollectorAsync.NegationAndPrecedence;
 
 /// <summary>
 /// Async tests that validate hybrid GitIgnore-style precedence rules:
@@ -106,6 +106,8 @@ public class EnumerateFilesAsync_NegationAndPrecedenceTests {
         TestAssertEx.DoesNotContain(results, x => x.EndsWith(Path.Combine("x", "c.tmp"), StringComparison.Ordinal));
     }
 
+    /// <summary>
+    /// Gets or sets the test context.
+    /// </summary>
     public TestContext TestContext { get; set; } = null!;
 }
-

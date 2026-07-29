@@ -1,7 +1,13 @@
-﻿namespace Jeninnet.FileQuery.Tests.Invariants;
+namespace Jeninnet.FileQuery.Tests.Invariants;
 
+/// <summary>
+/// Provides test data for pattern invariant validation tests.
+/// </summary>
 internal static class PatternInvariantTestCases {
     // Patterns that fail **during scanning/tokenization**
+    /// <summary>
+    /// Gets the collection of patterns that fail during scanning or tokenization.
+    /// </summary>
     public static IEnumerable<object[]> InvalidScanPatterns =>
     [
         // Malformed character classes
@@ -18,6 +24,9 @@ internal static class PatternInvariantTestCases {
     ];
 
     // Patterns that scan successfully but violate semantic invariants
+    /// <summary>
+    /// Gets the collection of patterns that fail semantic invariant validation.
+    /// </summary>
     public static IEnumerable<object[]> InvalidInvariantPatterns =>
     [
         // Recursive wildcard misuse
@@ -25,6 +34,9 @@ internal static class PatternInvariantTestCases {
         ["a**", new PatternSyntaxProfile() { SupportsRecursiveWildcard = true}],
         ["**/**", new PatternSyntaxProfile() { SupportsRecursiveWildcard = true}],
     ];
+    /// <summary>
+    /// Gets the collection of valid patterns that should compile successfully.
+    /// </summary>
     public static IEnumerable<object[]> ValidPatterns =>
     [
         ["**/*.cs"],
@@ -35,6 +47,9 @@ internal static class PatternInvariantTestCases {
     ];
 }
 
+/// <summary>
+/// Contains unit tests for validating pattern structural and semantic invariants.
+/// </summary>
 [TestClass]
 public sealed class PatternInvariantTests {
     private readonly PatternInvariantRegistry _invariants = new([
@@ -56,6 +71,11 @@ public sealed class PatternInvariantTests {
         new GlobPatternInvariant()
     ]);
 
+    /// <summary>
+    /// Tests that patterns failing structural validation throw a PatternException.
+    /// </summary>
+    /// <param name="pattern">The pattern to test.</param>
+    /// <param name="syntax">The syntax profile to use.</param>
     [TestMethod]
     [DynamicData(
         nameof(PatternInvariantTestCases.InvalidScanPatterns),
@@ -74,6 +94,11 @@ public sealed class PatternInvariantTests {
         }
     }
 
+    /// <summary>
+    /// Tests that patterns failing semantic invariant validation throw a PatternException.
+    /// </summary>
+    /// <param name="pattern">The pattern to test.</param>
+    /// <param name="syntax">The syntax profile to use.</param>
     [TestMethod]
     [DynamicData(
         nameof(PatternInvariantTestCases.InvalidInvariantPatterns),
@@ -91,6 +116,10 @@ public sealed class PatternInvariantTests {
         );
     }
 
+    /// <summary>
+    /// Tests that valid patterns compile successfully without exceptions.
+    /// </summary>
+    /// <param name="pattern">The pattern to test.</param>
     [TestMethod]
     [DynamicData(
         nameof(PatternInvariantTestCases.ValidPatterns),
@@ -108,3 +137,4 @@ public sealed class PatternInvariantTests {
         // If we reach here, no exception was thrown → success
     }
 }
+

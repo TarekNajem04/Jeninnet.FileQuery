@@ -1,4 +1,4 @@
-﻿namespace Jeninnet.FileQuery.Tests.Core.FileCollectorSync.Inaccessible;
+namespace Jeninnet.FileQuery.Tests.Core.FileCollectorSync.Inaccessible;
 
 /// <summary>
 /// Tests behavior when encountering directories that cannot be read.

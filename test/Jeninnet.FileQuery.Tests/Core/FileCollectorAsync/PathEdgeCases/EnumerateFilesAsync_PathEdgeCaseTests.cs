@@ -1,4 +1,4 @@
-﻿namespace Jeninnet.FileQuery.Tests.Core.FileCollectorAsync.PathEdgeCases;
+namespace Jeninnet.FileQuery.Tests.Core.FileCollectorAsync.PathEdgeCases;
 
 /// <summary>
 /// Async tests verifying behavior on tricky or unusual paths.
@@ -102,6 +102,8 @@ public class EnumerateFilesAsync_PathEdgeCaseTests {
         TestAssertEx.HasCount(results, 3);
     }
 
+    /// <summary>
+    /// Gets or sets the test context.
+    /// </summary>
     public TestContext TestContext { get; set; } = null!;
 }
-

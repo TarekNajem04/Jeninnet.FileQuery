@@ -1,7 +1,11 @@
-﻿namespace Jeninnet.FileQuery.Tests.IO;
+namespace Jeninnet.FileQuery.Tests.IO;
 
+/// <summary>
+/// Contains unit tests for the <see cref="FileSystemEntry"/> class.
+/// </summary>
 [TestClass]
 public class FileSystemEntryTests {
+    /// <summary>Tests FileSystemEntry_Properties_TestAllAttributes.</summary>
     [TestMethod]
     public void FileSystemEntry_Properties_TestAllAttributes() {
         var entry = new FileSystemEntry("test", FileAttributes.ReadOnly | FileAttributes.Hidden | FileAttributes.Directory);
@@ -13,6 +17,7 @@ public class FileSystemEntryTests {
         Assert.IsFalse(entry.IsArchive);
     }
 
+    /// <summary>Tests FileSystemEntry_HasAttribute_Test.</summary>
     [TestMethod]
     public void FileSystemEntry_HasAttribute_Test() {
         var entry = new FileSystemEntry("test", FileAttributes.Encrypted);
@@ -21,6 +26,7 @@ public class FileSystemEntryTests {
         Assert.IsFalse(entry.HasAttribute(FileAttributes.ReadOnly));
     }
 
+    /// <summary>Tests FileSystemEntry_ActiveAttributes_Test.</summary>
     [TestMethod]
     public void FileSystemEntry_ActiveAttributes_Test() {
         var entry = new FileSystemEntry("test", FileAttributes.ReadOnly | FileAttributes.Hidden);
@@ -31,3 +37,4 @@ public class FileSystemEntryTests {
         Assert.HasCount(2, active);
     }
 }
+

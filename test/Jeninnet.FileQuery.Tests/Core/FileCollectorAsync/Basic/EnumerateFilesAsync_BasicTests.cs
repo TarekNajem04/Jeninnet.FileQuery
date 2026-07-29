@@ -1,4 +1,4 @@
-﻿namespace Jeninnet.FileQuery.Tests.Core.FileCollectorAsync.Basic;
+namespace Jeninnet.FileQuery.Tests.Core.FileCollectorAsync.Basic;
 
 /// <summary>
 /// Basic async enumeration tests:
@@ -66,7 +66,7 @@ public class EnumerateFilesAsync_BasicTests {
         var asyncResults = await fileQueryEngine.ExecuteAsync(new(env.Root, options), TestContext.CancellationToken)
                                                 .ToListAsync(TestContext.CancellationToken);
 
-        Assert.AreSequenceEqual(syncResults, asyncResults.Order().ToList());
+        Assert.AreSequenceEqual(syncResults, [.. asyncResults.Order()]);
     }
 
     /// <summary>
@@ -97,5 +97,8 @@ public class EnumerateFilesAsync_BasicTests {
         TestAssertEx.IsEmpty(results);
     }
 
+    /// <summary>
+    /// Gets or sets the test context.
+    /// </summary>
     public TestContext TestContext { get; set; } = null!;
 }

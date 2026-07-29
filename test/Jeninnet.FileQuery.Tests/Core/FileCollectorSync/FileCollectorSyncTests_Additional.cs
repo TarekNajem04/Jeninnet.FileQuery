@@ -1,13 +1,17 @@
-﻿namespace Jeninnet.FileQuery.Tests.Core.FileCollectorSync;
+namespace Jeninnet.FileQuery.Tests.Core.FileCollectorSync;
 
+/// <summary>
+/// Provides additional synchronous tests for the <see cref="IFileQueryEngine"/>.
+/// </summary>
 [TestClass]
-public class FileQueryEngineSyncTests_Additional {
+public class FileCollectorSyncTests_Additional {
 
     /// <summary>
     /// Creates a temporary directory with the given subpaths and returns its path.
     /// Used to simplify test setup.
     /// </summary>
     /// <param name="files">A dictionary mapping file paths to their content, or null for directories.</param>
+    /// <returns>The path to the created temporary directory.</returns>
     private static string CreateTree(Dictionary<string, string?> files) {
         var root = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
         Directory.CreateDirectory(root);
@@ -29,8 +33,8 @@ public class FileQueryEngineSyncTests_Additional {
     }
 
     /// <summary>
-    /// A pattern ending with '/' must match directories ONLY.
-    /// FileQueryEngine must allow files *inside* matched directories to pass through.
+    /// Verifies that a pattern ending with '/' matches directories ONLY,
+    /// allowing files *inside* matched directories to pass through.
     /// </summary>
     [TestMethod]
     public void DirectoryPattern_ShouldMatchDirectoriesOnly() {
@@ -60,7 +64,7 @@ public class FileQueryEngineSyncTests_Additional {
     }
 
     /// <summary>
-    /// Negation should restore a previously-excluded directory.
+    /// Verifies that negation restores a previously-excluded directory.
     /// </summary>
     [TestMethod]
     public void DirectoryNegation_ShouldRestoreFiles() {
@@ -89,7 +93,7 @@ public class FileQueryEngineSyncTests_Additional {
     }
 
     /// <summary>
-    /// Leading slash means "match only at root".
+    /// Verifies that a leading slash matches only at the root level.
     /// </summary>
     [TestMethod]
     public void AnchoredPattern_ShouldMatchOnlyAtRoot() {
@@ -118,7 +122,7 @@ public class FileQueryEngineSyncTests_Additional {
     }
 
     /// <summary>
-    /// Unanchored patterns match anywhere.
+    /// Verifies that unanchored patterns match anywhere.
     /// </summary>
     [TestMethod]
     public void UnanchoredPattern_ShouldMatchAnywhere() {
@@ -145,6 +149,9 @@ public class FileQueryEngineSyncTests_Additional {
         TestAssertEx.HasCount(result, 2);
     }
 
+    /// <summary>
+    /// Verifies that negation overrides previous exclusion patterns.
+    /// </summary>
     [TestMethod]
     public void Negation_ShouldOverridePrevious() {
         var root = CreateTree(new() {
@@ -171,7 +178,7 @@ public class FileQueryEngineSyncTests_Additional {
     }
 
     /// <summary>
-    /// GitIgnore semantics allow restoring files inside an ignored parent directory.
+    /// Verifies that negation allows files inside an ignored parent directory.
     /// </summary>
     [TestMethod]
     public void NegationInsideIgnoredDirectory_ShouldBeIncluded() {
@@ -198,6 +205,9 @@ public class FileQueryEngineSyncTests_Additional {
         TestAssertEx.EndsWith(onlyResult, Path.Combine("logs", "hidden", "keep.txt"));
     }
 
+    /// <summary>
+    /// Verifies that character classes are matched correctly.
+    /// </summary>
     [TestMethod]
     public void CharacterClass_ShouldMatchCorrectly() {
         var root = CreateTree(new() {
@@ -221,6 +231,9 @@ public class FileQueryEngineSyncTests_Additional {
         TestAssertEx.HasCount(result, 2);
     }
 
+    /// <summary>
+    /// Verifies that negated character classes are matched correctly.
+    /// </summary>
     [TestMethod]
     public void NegatedCharacterClass_ShouldMatchCorrectly() {
         var root = CreateTree(new() {
@@ -244,6 +257,9 @@ public class FileQueryEngineSyncTests_Additional {
         TestAssertEx.EndsWith(onlyResult, "file1.txt");
     }
 
+    /// <summary>
+    /// Verifies that multi-wildcards match complex file layouts.
+    /// </summary>
     [TestMethod]
     public void MultiWildcard_ShouldMatchComplexLayout() {
         var root = CreateTree(new() {
@@ -268,6 +284,9 @@ public class FileQueryEngineSyncTests_Additional {
         TestAssertEx.HasCount(result, 3);
     }
 
+    /// <summary>
+    /// Verifies that dotfiles do not match with a standard star pattern.
+    /// </summary>
     [TestMethod]
     public void Dotfile_ShouldNotMatchWithStar() {
         var root = CreateTree(new() {
@@ -288,6 +307,9 @@ public class FileQueryEngineSyncTests_Additional {
         TestAssertEx.IsNotEmpty(result);
     }
 
+    /// <summary>
+    /// Verifies that dotfiles match when explicitly included.
+    /// </summary>
     [TestMethod]
     public void Dotfile_ShouldMatchWhenExplicit() {
         var root = CreateTree(new() {
@@ -309,6 +331,9 @@ public class FileQueryEngineSyncTests_Additional {
         TestAssertEx.ContainsSingle(result);
     }
 
+    /// <summary>
+    /// Verifies that the recursion depth limit correctly restricts traversal.
+    /// </summary>
     [TestMethod]
     public void MaxDepth_ShouldLimitTraversal() {
         var root = CreateTree(new() {
@@ -332,6 +357,9 @@ public class FileQueryEngineSyncTests_Additional {
         TestAssertEx.IsEmpty(result);
     }
 
+    /// <summary>
+    /// Verifies that returned paths use the OS-specific separator.
+    /// </summary>
     [TestMethod]
     public void ReturnedPath_ShouldUseOSSeparator() {
         var root = CreateTree(new() {

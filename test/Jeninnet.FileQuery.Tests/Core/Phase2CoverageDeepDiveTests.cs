@@ -1,11 +1,17 @@
-﻿namespace Jeninnet.FileQuery.Tests.Core;
+namespace Jeninnet.FileQuery.Tests.Core;
 
+/// <summary>
+/// Contains in-depth unit tests covering various components of the file query engine, focusing on edge cases and complex functionality.
+/// </summary>
 [TestClass]
 public sealed class Phase2CoverageDeepDiveTests {
+    /// <summary>
+    /// Verifies that <see cref="SegmentInstructionMatcher"/> correctly matches various POSIX character classes.
+    /// </summary>
     [TestMethod]
     public void SegmentInstructionMatcher_PosixClasses_ShouldMatchCorrectly() {
         static void AssertPosix(string className, char match, char noMatch) {
-            var tokens = new List<IPatternToken> { new CharacterClassToken(new CharacterClass(false, new[] { new PosixClass(className) })) };
+            var tokens = new List<IPatternToken> { new CharacterClassToken(new CharacterClass(false, [new PosixClass(className)])) };
             Assert.IsTrue(SegmentInstructionMatcher.MatchSegment(match.ToString().AsSpan(), tokens, StringComparison.Ordinal), $"Expected {match} to match {className}");
             Assert.IsFalse(SegmentInstructionMatcher.MatchSegment(noMatch.ToString().AsSpan(), tokens, StringComparison.Ordinal), $"Expected {noMatch} NOT to match {className}");
         }
@@ -24,19 +30,25 @@ public sealed class Phase2CoverageDeepDiveTests {
         AssertPosix("xdigit", 'f', 'g');
 
         // Unknown class should never match anything
-        var unknownTokens = new List<IPatternToken> { new CharacterClassToken(new CharacterClass(false, new[] { new PosixClass("unknown") })) };
+        var unknownTokens = new List<IPatternToken> { new CharacterClassToken(new CharacterClass(false, [new PosixClass("unknown")])) };
         Assert.IsFalse(SegmentInstructionMatcher.MatchSegment("a".AsSpan(), unknownTokens, StringComparison.Ordinal));
     }
 
+    /// <summary>
+    /// Verifies that <see cref="SegmentInstructionMatcher"/> correctly handles character range matches.
+    /// </summary>
     [TestMethod]
     public void SegmentInstructionMatcher_CharRange_ShouldMatchCorrectly() {
-        var tokens = new List<IPatternToken> { new CharacterClassToken(new CharacterClass(false, new[] { new CharRange('a', 'c') })) };
+        var tokens = new List<IPatternToken> { new CharacterClassToken(new CharacterClass(false, [new CharRange('a', 'c')])) };
         Assert.IsTrue(SegmentInstructionMatcher.MatchSegment("a".AsSpan(), tokens, StringComparison.Ordinal));
         Assert.IsTrue(SegmentInstructionMatcher.MatchSegment("b".AsSpan(), tokens, StringComparison.Ordinal));
         Assert.IsTrue(SegmentInstructionMatcher.MatchSegment("c".AsSpan(), tokens, StringComparison.Ordinal));
         Assert.IsFalse(SegmentInstructionMatcher.MatchSegment("d".AsSpan(), tokens, StringComparison.Ordinal));
     }
 
+    /// <summary>
+    /// Verifies that <see cref="TraversalFrontier"/> correctly handles internal buffer resizing when capacity is exceeded.
+    /// </summary>
     [TestMethod]
     public void TraversalFrontier_BufferResizing_ShouldWorkCorrectly() {
         using var frontier = new TraversalFrontier(initialCapacity: 2);
@@ -61,6 +73,9 @@ public sealed class Phase2CoverageDeepDiveTests {
         Assert.AreEqual("/3", frontier.Dequeue().Directory);
     }
 
+    /// <summary>
+    /// Verifies that <see cref="TraversalFrontier"/> throws an <see cref="InvalidOperationException"/> when attempting to pop or dequeue from an empty frontier.
+    /// </summary>
     [TestMethod]
     public void TraversalFrontier_EmptyPopDequeue_ShouldThrow() {
         using var frontier = new TraversalFrontier();
@@ -68,10 +83,13 @@ public sealed class Phase2CoverageDeepDiveTests {
         TestAssertEx.Throws<InvalidOperationException>(() => frontier.Dequeue());
     }
 
+    /// <summary>
+    /// Verifies that <see cref="CompiledPatternSet"/> provides expected functionality for pattern management and querying.
+    /// </summary>
     [TestMethod]
     public void CompiledPatternSet_VariousMethods_ShouldWorkCorrectly() {
         var mockPattern = new MockCompiledPattern(PatternKind.Glob, isNegated: true, directoryOnly: true, anchoredToRoot: true);
-        var set = new CompiledPatternSet(new[] { mockPattern });
+        var set = new CompiledPatternSet([mockPattern]);
 
         Assert.AreEqual(1, set.Count);
         Assert.IsNotNull(set[0]);
@@ -97,6 +115,9 @@ public sealed class Phase2CoverageDeepDiveTests {
         Assert.AreNotEqual(0, set.GetHashCode());
     }
 
+    /// <summary>
+    /// Verifies that <see cref="MatchResult.Include(Func{bool})"/> correctly delegates inclusion logic.
+    /// </summary>
     [TestMethod]
     public void MatchResult_DelegateInclusion_ShouldWorkCorrectly() {
         TestInclusion(true);
@@ -119,6 +140,9 @@ public sealed class Phase2CoverageDeepDiveTests {
         Assert.AreEqual(value, result.IsIncluded);
     }
 
+    /// <summary>
+    /// Verifies that <see cref="MatchResult.Match(Func{bool})"/> correctly delegates matching logic.
+    /// </summary>
     [TestMethod]
     public void MatchResult_DelegateMatch_ShouldWorkCorrectly() {
         TestMatch(true);
@@ -140,6 +164,9 @@ public sealed class Phase2CoverageDeepDiveTests {
         Assert.AreEqual(value, result.IsMatched);
     }
 
+    /// <summary>
+    /// Verifies that <see cref="FileQueryBuilder"/> correctly configures semantic pattern matching modes.
+    /// </summary>
     [TestMethod]
     public void FileQueryBuilder_SemanticModes_ShouldSetCorrectOptions() {
         using var env = new TestEnvironment();
@@ -158,6 +185,9 @@ public sealed class Phase2CoverageDeepDiveTests {
         Assert.IsNotNull(hybridQuery);
     }
 
+    /// <summary>
+    /// Verifies that <see cref="FileQueryBuilder"/> throws an <see cref="InvalidOperationException"/> when conflicting pattern kinds are added.
+    /// </summary>
     [TestMethod]
     public void FileQueryBuilder_WhereTyped_ShouldThrowOnConflict() {
         using var env = new TestEnvironment();
@@ -167,6 +197,9 @@ public sealed class Phase2CoverageDeepDiveTests {
         TestAssertEx.Throws<InvalidOperationException>(() => builder.Where(PatternKind.GitIgnore, ["/out/"]));
     }
 
+    /// <summary>
+    /// Verifies that <see cref="FileQueryBuilder"/> correctly merges pattern dictionaries.
+    /// </summary>
     [TestMethod]
     public void FileQueryBuilder_WhereDictionary_ShouldMergeCorrectly() {
         using var env = new TestEnvironment();
@@ -180,6 +213,9 @@ public sealed class Phase2CoverageDeepDiveTests {
         Assert.IsTrue(query.Options.PatternInput.TypedPatterns.ContainsKey(PatternKind.GitIgnore));
     }
 
+    /// <summary>
+    /// Verifies that <see cref="FileQueryBuilder"/> correctly configures error recovery options.
+    /// </summary>
     [TestMethod]
     public void FileQueryBuilder_WithErrorRecovery_ShouldSetOption() {
         using var env = new TestEnvironment();
@@ -189,6 +225,9 @@ public sealed class Phase2CoverageDeepDiveTests {
         Assert.AreEqual(3, query.Options.ErrorRecovery.MaxRetryAttempts);
     }
 
+    /// <summary>
+    /// Verifies that <see cref="FileQueryBuilder.ExecuteAsync(CancellationToken)"/> works correctly, supporting synchronous execution, asynchronous execution, and progress reporting.
+    /// </summary>
     [TestMethod]
     public async Task FileQueryBuilder_Execute_ShouldWorkAsync() {
         using var env = new TestEnvironment();
@@ -211,12 +250,20 @@ public sealed class Phase2CoverageDeepDiveTests {
         Assert.HasCount(1, resultsProgress);
     }
 
+    /// <summary>
+    /// Verifies that <see cref="FileQueryBuilder.Build"/> throws an <see cref="InvalidOperationException"/> when the root path is missing or invalid.
+    /// </summary>
     [TestMethod]
     public void FileQueryBuilder_Build_ShouldThrowOnMissingRoot() {
         using var env = new TestEnvironment();
         var builder = new FileQueryBuilder("   ", FileSystem.Instance);
         TestAssertEx.Throws<InvalidOperationException>(() => builder.Build());
     }
+
+    /// <summary>
+    /// Gets or sets the test context for this test class.
+    /// </summary>
+    public TestContext? TestContext { get; set; }
 
     private sealed class MockProgress<T> : IProgress<T> {
         public void Report(T value) { }
@@ -239,6 +286,5 @@ public sealed class Phase2CoverageDeepDiveTests {
         public string ConcretePathAnchor => string.Empty;
         public string? RegexText => null;
     }
-
-    public TestContext? TestContext { get; set; }
 }
+

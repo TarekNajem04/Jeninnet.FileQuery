@@ -1,4 +1,4 @@
-﻿namespace Jeninnet.FileQuery.Tests.Core;
+namespace Jeninnet.FileQuery.Tests.Core;
 
 /// <summary>
 /// Tests the functional impact of configurable options in <see cref="FileQueryOptions"/>
@@ -6,7 +6,10 @@
 /// </summary>
 [TestClass]
 public class FileQueryEngineOptionTests {
-    // The TestContext is necessary for CancellationToken access and required by MSTest.
+    /// <summary>
+    /// Gets or sets the test context, which provides information about the current test run.
+    /// Used here primarily for accessing the <see cref="CancellationToken"/>.
+    /// </summary>
     public TestContext TestContext { get; set; } = null!;
 
     // --- Core Options Tests ---
@@ -42,9 +45,9 @@ public class FileQueryEngineOptionTests {
 
         // ASSERT
         Assert.AreSequenceEqual(
-            new[] {
+            [
                 env.Abs("file_root.txt")
-            },
+            ],
             results,
             SequenceOrder.InAnyOrder,
             "Only files in the root directory should be returned when recursion is disabled."
@@ -82,10 +85,10 @@ public class FileQueryEngineOptionTests {
 
         // ASSERT
         Assert.AreSequenceEqual(
-            new[] {
+            [
                 env.Abs("file_depth0.txt"),
                 env.Abs("level1","file_depth1.txt")
-            },
+            ],
             results,
             SequenceOrder.InAnyOrder,
             "Should only return files at depth 0 and 1."

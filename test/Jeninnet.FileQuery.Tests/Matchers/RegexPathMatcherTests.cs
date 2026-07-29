@@ -1,5 +1,8 @@
-﻿namespace Jeninnet.FileQuery.Tests.Matchers;
+namespace Jeninnet.FileQuery.Tests.Matchers;
 
+/// <summary>
+/// Provides test cases for <see cref="RegexInstructionMatcher"/>.
+/// </summary>
 [TestClass]
 public class RegexPathMatcherTests {
     private static RegexInstructionMatcher CreateMatcher() => new();
@@ -10,6 +13,9 @@ public class RegexPathMatcherTests {
 
     private static PathMatchContext CreateDirectoryContext(ReadOnlySpan<char> path, CaseSensitivity caseSensitivity = CaseSensitivity.Sensitive) => new(path, PathKind.Directory, caseSensitivity);
 
+    /// <summary>
+    /// Verifies that basic regex patterns correctly match paths.
+    /// </summary>
     [TestMethod]
     public void IsMatch_ShouldMatchBasicRegexPattern() {
         // Arrange: Matches paths starting with 'src/' and ending with '.cs'
@@ -23,6 +29,9 @@ public class RegexPathMatcherTests {
         Assert.IsFalse(matcher.Match(patterns, CreateFileContext(path: "root/src/file.cs")).IsSuccess(), "because of ^ anchoring");
     }
 
+    /// <summary>
+    /// Verifies that no match returns a failing result.
+    /// </summary>
     [TestMethod]
     public void IsMatch_ShouldReturnFailForNoMatch() {
         // Arrange
@@ -33,6 +42,9 @@ public class RegexPathMatcherTests {
         Assert.IsFalse(matcher.Match(patterns, CreateFileContext(path: "some/random/path.log")).IsSuccess());
     }
 
+    /// <summary>
+    /// Verifies that regex syntax is handled correctly.
+    /// </summary>
     [TestMethod]
     public void IsMatch_ShouldHandleRegexSyntaxCorrectly() {
         // Arrange: Regex matches any path containing 'data' followed by 1 or more digits.
@@ -45,6 +57,9 @@ public class RegexPathMatcherTests {
         Assert.IsFalse(matcher.Match(patterns, CreateFileContext(path: "data")).IsSuccess(), "Regex requires at least one digit");
     }
 
+    /// <summary>
+    /// Verifies that matches are case-sensitive by default.
+    /// </summary>
     [TestMethod]
     public void IsMatch_ShouldBeCaseSensitiveByDefault() {
         // Arrange
@@ -56,6 +71,9 @@ public class RegexPathMatcherTests {
         Assert.IsTrue(matcher.Match(patterns, CreateFileContext(path: "file.txt")).IsUnmatched());
     }
 
+    /// <summary>
+    /// Verifies that case-insensitivity works when explicitly requested.
+    /// </summary>
     [TestMethod]
     public void IsMatch_ShouldBeCaseInsensitiveWhenRequested() {
         // Arrange
@@ -67,6 +85,9 @@ public class RegexPathMatcherTests {
         Assert.IsTrue(matcher.Match(patterns, CreateFileContext(path: "file.txt", caseSensitivity: CaseSensitivity.Insensitive)).IsSuccess());
     }
 
+    /// <summary>
+    /// Verifies that the first matching pattern in a list is chosen.
+    /// </summary>
     [TestMethod]
     public void IsMatch_ShouldMatchFirstMatchingPatternInList() {
         // Arrange
@@ -82,6 +103,9 @@ public class RegexPathMatcherTests {
         Assert.IsFalse(matcher.Match(patterns, CreateFileContext(path: "no.match")).IsSuccess());
     }
 
+    /// <summary>
+    /// Verifies that directory status is ignored by the regex matcher.
+    /// </summary>
     [TestMethod]
     public void IsMatch_ShouldIgnoreDirectoryStatus() {
         // Arrange: Flat matchers are designed to match the full string, ignoring file system type.
@@ -94,6 +118,9 @@ public class RegexPathMatcherTests {
         Assert.IsTrue(matcher.Match(patterns, CreateDirectoryContext(path: "project/data")).IsSuccess());
     }
 
+    /// <summary>
+    /// Verifies that the regex matcher always returns true for IsIncluded, ignoring pattern negation.
+    /// </summary>
     [TestMethod]
     public void IsMatch_ShouldAlwaysReturnIsIncludedTrue_IgnoringNegation() {
         // Arrange
@@ -127,3 +154,4 @@ public class RegexPathMatcherTests {
         Assert.IsTrue(result.IsSuccess(), "because RegexPathMatcher hardcodes IsIncluded=true and ignores the pattern's IsNegated property.");
     }
 }
+

@@ -1,7 +1,13 @@
-﻿namespace Jeninnet.FileQuery.Tests.Core.Observability;
+namespace Jeninnet.FileQuery.Tests.Core.Observability;
 
+/// <summary>
+/// Provides deep observation and validation tests for <see cref="FileQuery"/> operations.
+/// </summary>
 [TestClass]
 public sealed class FileQueryObservabilityDeepTests {
+    /// <summary>
+    /// Verifies that <see cref="FileQueryErrorRecoveryOptions"/> validation throws when retry attempts are negative.
+    /// </summary>
     [TestMethod]
     public void FileQueryErrorRecoveryOptions_Validation_ShouldThrowWhenNegativeRetryAttempts() =>
         TestAssertEx.Throws<ArgumentOutOfRangeException>(
@@ -11,12 +17,18 @@ public sealed class FileQueryObservabilityDeepTests {
             }
         );
 
+    /// <summary>
+    /// Verifies that <see cref="FileQueryErrorRecoveryOptions"/> validation succeeds for non-negative retry attempts.
+    /// </summary>
     [TestMethod]
     public void FileQueryErrorRecoveryOptions_Validation_ShouldSucceedWhenZeroOrPositiveRetryAttempts() {
         new FileQueryErrorRecoveryOptions(FileQueryErrorAction.Retry, 0).Validate();
         new FileQueryErrorRecoveryOptions(FileQueryErrorAction.Retry, 5).Validate();
     }
 
+    /// <summary>
+    /// Verifies that <see cref="FileQueryOptions"/> validation propagates error recovery validation.
+    /// </summary>
     [TestMethod]
     public void FileQueryOptions_Validation_ShouldPropagateErrorRecoveryValidation() {
         var options = new FileQueryOptions(
@@ -29,6 +41,9 @@ public sealed class FileQueryObservabilityDeepTests {
         TestAssertEx.Throws<ArgumentOutOfRangeException>(options.Validate);
     }
 
+    /// <summary>
+    /// Verifies that <see cref="FileQueryOptions"/> constructor sets sensible defaults for error recovery.
+    /// </summary>
     [TestMethod]
     public void FileQueryOptions_Constructor_ShouldSetSensibleDefaultsForErrorRecovery() {
         // When ignoreInaccessible is true (default)
@@ -40,6 +55,9 @@ public sealed class FileQueryObservabilityDeepTests {
         Assert.AreEqual(FileQueryErrorAction.Abort, optionsWithoutIgnore.ErrorRecovery.Action);
     }
 
+    /// <summary>
+    /// Verifies that <see cref="FileQueryDiagnostic"/> stores properties correctly.
+    /// </summary>
     [TestMethod]
     public void FileQueryDiagnostic_ShouldStorePropertiesCorrectly() {
         var diagnostic = new FileQueryDiagnostic(
@@ -63,6 +81,9 @@ public sealed class FileQueryObservabilityDeepTests {
         Assert.AreEqual(5, diagnostic.PatternIndex);
     }
 
+    /// <summary>
+    /// Verifies that <see cref="FileQueryProgress"/> stores properties correctly.
+    /// </summary>
     [TestMethod]
     public void FileQueryProgress_ShouldStorePropertiesCorrectly() {
         var progress = new FileQueryProgress(1, 2, 3, "/root/a.txt");
@@ -73,4 +94,3 @@ public sealed class FileQueryObservabilityDeepTests {
         Assert.AreEqual("/root/a.txt", progress.CurrentPath);
     }
 }
-

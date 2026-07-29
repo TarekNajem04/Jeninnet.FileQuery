@@ -1,4 +1,4 @@
-﻿namespace Jeninnet.FileQuery.Tests.Core.FileCollectorSync.DirectoryRules;
+namespace Jeninnet.FileQuery.Tests.Core.FileCollectorSync.DirectoryRules;
 
 /// <summary>
 /// Tests directory patterns ("dir/", "dir/**") in synchronous file enumeration.
@@ -22,6 +22,7 @@ public class DirectoryPatternTests {
 
     // --- Test Methods ---
 
+    /// <summary>Tests DirectoryOnlyPattern_ShouldExcludeFilesCorrectly.</summary>
     [TestMethod]
     public void DirectoryOnlyPattern_ShouldExcludeFilesCorrectly() {
         // ARRANGE
@@ -58,6 +59,7 @@ public class DirectoryPatternTests {
         TestAssertEx.DoesNotContain(result, x => x.Contains(Path.Combine("src", "util")));
     }
 
+    /// <summary>Tests DirectoryPattern_ShouldMatchMultipleLevels.</summary>
     [TestMethod]
     public void DirectoryPattern_ShouldMatchMultipleLevels() {
         // ARRANGE
@@ -94,6 +96,7 @@ public class DirectoryPatternTests {
         TestAssertEx.DoesNotContain(result, env.Abs("src", "util", "helpers.cs"));
     }
 
+    /// <summary>Tests MultipleDirectoryPatterns_ShouldStack.</summary>
     [TestMethod]
     public void MultipleDirectoryPatterns_ShouldStack() {
         // ARRANGE
@@ -136,3 +139,4 @@ public class DirectoryPatternTests {
         TestAssertEx.DoesNotContain(result, x => x.Contains(Path.Combine("src", "other")));
     }
 }
+

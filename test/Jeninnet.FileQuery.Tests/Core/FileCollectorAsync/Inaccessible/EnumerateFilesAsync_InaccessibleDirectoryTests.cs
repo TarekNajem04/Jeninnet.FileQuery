@@ -1,4 +1,4 @@
-﻿namespace Jeninnet.FileQuery.Tests.Core.FileCollectorAsync.Inaccessible;
+namespace Jeninnet.FileQuery.Tests.Core.FileCollectorAsync.Inaccessible;
 
 /// <summary>
 /// Async tests validating behavior when encountering directories
@@ -121,5 +121,9 @@ public class EnumerateFilesAsync_InaccessibleDirectoryTests {
         TestAssertEx.HasCount(results, 3);
     }
 
+    /// <summary>
+    /// Gets or sets the test context.
+    /// </summary>
     public TestContext TestContext { get; set; } = null!;
 }
+

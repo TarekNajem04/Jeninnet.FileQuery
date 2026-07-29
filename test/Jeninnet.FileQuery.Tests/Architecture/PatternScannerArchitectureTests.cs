@@ -1,5 +1,8 @@
-﻿namespace Jeninnet.FileQuery.Tests.Architecture;
+namespace Jeninnet.FileQuery.Tests.Architecture;
 
+/// <summary>
+/// Contains architectural tests for the <see cref="PatternScanner"/> class, focusing on pattern validation.
+/// </summary>
 [TestClass]
 public sealed class PatternScannerArchitectureTests {
     private static readonly PatternSyntaxProfile[] _profiles =
@@ -27,6 +30,10 @@ public sealed class PatternScannerArchitectureTests {
         "r:["
     ];
 
+    /// <summary>
+    /// Verifies that <see cref="PatternScanner.Scan"/> does not throw <see cref="PatternException"/> for known invalid pattern strings.
+    /// </summary>
+    /// <exception cref="AssertFailedException">Thrown when the assertion fails.</exception>
     [TestMethod]
     public void PatternScanner_MustNotThrow_PatternException() {
         foreach(var syntax in _profiles) {
@@ -57,3 +64,4 @@ public sealed class PatternScannerArchitectureTests {
         }
     }
 }
+

@@ -1,7 +1,11 @@
-﻿namespace Jeninnet.FileQuery.Tests.Core.FileCollectorSync.Symlinks;
+namespace Jeninnet.FileQuery.Tests.Core.FileCollectorSync.Symlinks;
 
+/// <summary>
+/// Contains tests for cycle detection when following symbolic links.
+/// </summary>
 [TestClass]
 public class SymlinkCycleTests {
+    /// <summary>Tests ShouldDetectCycle_AndStop_WhenFollowWithCycleDetectionEnabled.</summary>
     [TestMethod]
     public void ShouldDetectCycle_AndStop_WhenFollowWithCycleDetectionEnabled() {
         if(!RuntimeInformation.IsOSPlatform(OSPlatform.Windows)) {
@@ -39,6 +43,7 @@ public class SymlinkCycleTests {
         Assert.EndsWith("file1.txt", results[0]);
     }
 
+    /// <summary>Tests method.</summary>
     [TestMethod]
     public async Task ShouldDetectCycle_AndStop_WhenFollowWithCycleDetectionEnabledAsync() {
         using var env = new TestEnvironment();
@@ -67,6 +72,9 @@ public class SymlinkCycleTests {
         Assert.EndsWith("file1.txt", results[0]);
     }
 
+    /// <summary>
+    /// Gets or sets the test context for the current test.
+    /// </summary>
+    /// <value>The test context.</value>
     public TestContext TestContext { get; set; } = null!;
 }
-

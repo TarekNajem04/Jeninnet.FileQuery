@@ -1,4 +1,4 @@
-﻿namespace Jeninnet.FileQuery.Tests.Architecture;
+namespace Jeninnet.FileQuery.Tests.Architecture;
 
 /// <summary>
 /// <para>
@@ -12,6 +12,9 @@
 /// </summary>
 [TestClass]
 public sealed class ArchitectureTests {
+    /// <summary>
+    /// Verifies that matching a pattern does not allocate memory.
+    /// </summary>
     [TestMethod]
     public void Matching_Must_Not_Allocate() {
         const string pattern = "**/*.cs";
@@ -41,6 +44,7 @@ public sealed class ArchitectureTests {
         );
     }
 
+    /// <summary>Tests Scan_Does_Not_Allocate_Per_Invocation.</summary>
     [TestMethod]
     public void Scan_Does_Not_Allocate_Per_Invocation() {
         const string pattern = "**/*.cs";
@@ -66,6 +70,7 @@ public sealed class ArchitectureTests {
         Assert.IsLessThan(1024, after - before);
     }
 
+    /// <summary>Tests No_Public_Method_Performs_Blocking_IO.</summary>
     [TestMethod]
     public void No_Public_Method_Performs_Blocking_IO() {
         var engineMethods =
@@ -80,6 +85,7 @@ public sealed class ArchitectureTests {
     //  Traversal / Engine Layer
     // ---------------------------------------------------------------------
 
+    /// <summary>Tests EngineLayer_Must_Not_Reference_Patterns_Namespace.</summary>
     [TestMethod]
     public void EngineLayer_Must_Not_Reference_Patterns_Namespace() {
         var engineAssembly = typeof(FileQueryRuntime).Assembly;
@@ -116,6 +122,7 @@ public sealed class ArchitectureTests {
         );
     }
 
+    /// <summary>Tests CoreProject_Must_Not_Reference_Optional_Integration_Packages.</summary>
     [TestMethod]
     public void CoreProject_Must_Not_Reference_Optional_Integration_Packages() {
         var coreAssembly = typeof(FileQueryRuntime).Assembly;
@@ -151,6 +158,7 @@ public sealed class ArchitectureTests {
         );
     }
 
+    /// <summary>Tests OptionalPackages_Must_Not_Expose_Core_Internal_Types_Through_Public_Api.</summary>
     [TestMethod]
     public void OptionalPackages_Must_Not_Expose_Core_Internal_Types_Through_Public_Api() {
         var coreAssembly = typeof(FileQueryRuntime).Assembly;
@@ -178,6 +186,7 @@ public sealed class ArchitectureTests {
         );
     }
 
+    /// <summary>Tests ProductionCode_Must_Not_Construct_FileInfo_Or_DirectoryInfo.</summary>
     [TestMethod]
     public void ProductionCode_Must_Not_Construct_FileInfo_Or_DirectoryInfo() {
         var sourceRoot = Path.Combine(FindRepositoryRoot(), "src");
@@ -204,6 +213,7 @@ public sealed class ArchitectureTests {
         );
     }
 
+    /// <summary>Tests ProductionCode_Must_Not_Use_Path_GetFullPath.</summary>
     [TestMethod]
     public void ProductionCode_Must_Not_Use_Path_GetFullPath() {
         var sourceRoot = Path.Combine(FindRepositoryRoot(), "src", "Jeninnet.FileQuery");
@@ -230,6 +240,7 @@ public sealed class ArchitectureTests {
         );
     }
 
+    /// <summary>Tests ProductionFileSystem_Must_Not_Use_PerEntry_TaskRun.</summary>
     [TestMethod]
     public void ProductionFileSystem_Must_Not_Use_PerEntry_TaskRun() {
         var sourceRoot = Path.Combine(FindRepositoryRoot(), "src");
@@ -242,6 +253,7 @@ public sealed class ArchitectureTests {
         );
     }
 
+    /// <summary>Tests CompiledPattern_Constructors_Must_Not_Be_Public.</summary>
     [TestMethod]
     public void CompiledPattern_Constructors_Must_Not_Be_Public() {
         var type = typeof(CompiledPattern);
@@ -253,6 +265,7 @@ public sealed class ArchitectureTests {
         );
     }
 
+    /// <summary>Tests Matchers_Must_Not_Have_Public_Constructors.</summary>
     [TestMethod]
     public void Matchers_Must_Not_Have_Public_Constructors() {
         var matcherTypes = new[]
@@ -272,6 +285,7 @@ public sealed class ArchitectureTests {
         }
     }
 
+    /// <summary>Tests IPathMatcher_Implementations_Must_Not_Expose_Public_Constructors.</summary>
     [TestMethod]
     public void IPathMatcher_Implementations_Must_Not_Expose_Public_Constructors() {
         var matcherInterface = typeof(IPathMatcher);
@@ -295,6 +309,7 @@ public sealed class ArchitectureTests {
         }
     }
 
+    /// <summary>Tests PatternScanner_Must_Not_Be_Public.</summary>
     [TestMethod]
     public void PatternScanner_Must_Not_Be_Public() {
         var scannerType =
@@ -433,3 +448,4 @@ public sealed class ArchitectureTests {
         BindingFlags.Instance |
         BindingFlags.Static;
 }
+

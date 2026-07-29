@@ -1,7 +1,11 @@
-﻿namespace Jeninnet.FileQuery.Tests.Core;
+namespace Jeninnet.FileQuery.Tests.Core;
 
+/// <summary>
+/// Contains coverage tests for the <see cref="PathUtilities"/> class.
+/// </summary>
 [TestClass]
 public class PathUtilitiesCoverageTests {
+    /// <summary>Tests PathUtilities_Normalize_NullOrEmpty_Throws.</summary>
     [TestMethod]
     public void PathUtilities_Normalize_NullOrEmpty_Throws() {
         try {
@@ -17,9 +21,11 @@ public class PathUtilitiesCoverageTests {
         catch(ArgumentException) { /* Ignore */ }
     }
 
+    /// <summary>Tests PathUtilities_ToForward_Works.</summary>
     [TestMethod]
     public void PathUtilities_ToForward_Works() => Assert.AreEqual("a/b/c", PathUtilities.ToForward("a\\b\\c"));
 
+    /// <summary>Tests PathUtilities_UncRoot_EdgeCases.</summary>
     [TestMethod]
     public void PathUtilities_UncRoot_EdgeCases() {
         // UNC roots should keep their trailing slash
@@ -33,6 +39,7 @@ public class PathUtilitiesCoverageTests {
         Assert.AreEqual("//server", PathUtilities.Normalize("//server", true));
     }
 
+    /// <summary>Tests PathUtilities_CountSegments_EdgeCases.</summary>
     [TestMethod]
     public void PathUtilities_CountSegments_EdgeCases() {
         Assert.AreEqual(0, PathUtilities.CountSegments("".AsSpan(), false));
@@ -41,6 +48,7 @@ public class PathUtilitiesCoverageTests {
         Assert.AreEqual(2, PathUtilities.CountSegments("a/b/".AsSpan(), true));
     }
 
+    /// <summary>Tests PathUtilities_SplitNormalizedPath_EdgeCases.</summary>
     [TestMethod]
     public void PathUtilities_SplitNormalizedPath_EdgeCases() {
         var empty = PathUtilities.SplitNormalizedPath("".AsSpan(), false);
@@ -60,6 +68,7 @@ public class PathUtilitiesCoverageTests {
         Assert.AreEqual("c", multi[2]);
     }
 
+    /// <summary>Tests PathUtilities_BuildRelativePath_LargeBuffer.</summary>
     [TestMethod]
     public void PathUtilities_BuildRelativePath_LargeBuffer() {
         // Create a path longer than 256 chars to trigger the heap allocation path
@@ -72,3 +81,4 @@ public class PathUtilitiesCoverageTests {
         Assert.AreEqual($"{longSegment}/file.txt", relative);
     }
 }
+

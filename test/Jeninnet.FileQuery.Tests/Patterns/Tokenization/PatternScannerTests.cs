@@ -1,7 +1,13 @@
-﻿namespace Jeninnet.FileQuery.Tests.Patterns.Tokenization;
+namespace Jeninnet.FileQuery.Tests.Patterns.Tokenization;
 
+/// <summary>
+/// Contains unit tests for the <see cref="PatternScanner"/> class, focusing on pattern tokenization.
+/// </summary>
 [TestClass]
 public sealed class PatternScannerTests {
+    /// <summary>
+    /// Verifies that <see cref="PatternScanner.Scan"/> correctly tokenizes a simple literal pattern string.
+    /// </summary>
     [TestMethod]
     public void Scan_ShouldTokenizeSimpleLiteral() {
         var pattern = new ClassifiedPattern("foo/bar", PatternKind.GitIgnore);
@@ -14,3 +20,4 @@ public sealed class PatternScannerTests {
         Assert.HasCount(2, context.Tokens); // foo, bar
     }
 }
+

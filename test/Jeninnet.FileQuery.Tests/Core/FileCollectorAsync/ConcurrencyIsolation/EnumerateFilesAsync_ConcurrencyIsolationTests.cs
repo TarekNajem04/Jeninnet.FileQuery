@@ -1,4 +1,4 @@
-﻿namespace Jeninnet.FileQuery.Tests.Core.FileCollectorAsync.ConcurrencyIsolation;
+namespace Jeninnet.FileQuery.Tests.Core.FileCollectorAsync.ConcurrencyIsolation;
 
 /// <summary>
 /// Ensures async enumeration instances do not interfere with each other
@@ -118,6 +118,8 @@ public class EnumerateFilesAsync_ConcurrencyIsolationTests {
                                  .ToListAsync(TestContext.CancellationToken);
     }
 
+    /// <summary>
+    /// Gets or sets the test context.
+    /// </summary>
     public TestContext TestContext { get; set; } = null!;
 }
-

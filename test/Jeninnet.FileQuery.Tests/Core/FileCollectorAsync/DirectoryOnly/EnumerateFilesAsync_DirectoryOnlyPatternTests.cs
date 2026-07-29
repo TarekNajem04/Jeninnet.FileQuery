@@ -1,4 +1,4 @@
-﻿namespace Jeninnet.FileQuery.Tests.Core.FileCollectorAsync.DirectoryOnly;
+namespace Jeninnet.FileQuery.Tests.Core.FileCollectorAsync.DirectoryOnly;
 
 /// <summary>
 /// Async tests validating patterns that apply *only to directories*.
@@ -111,6 +111,8 @@ public class EnumerateFilesAsync_DirectoryOnlyPatternTests {
         TestAssertEx.HasCount(results, 1);
     }
 
+    /// <summary>
+    /// Gets or sets the test context.
+    /// </summary>
     public TestContext TestContext { get; set; } = null!;
 }
-

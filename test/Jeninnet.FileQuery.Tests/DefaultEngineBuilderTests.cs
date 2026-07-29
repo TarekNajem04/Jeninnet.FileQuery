@@ -1,7 +1,13 @@
-﻿namespace Jeninnet.FileQuery.Tests;
+namespace Jeninnet.FileQuery.Tests;
 
+/// <summary>
+/// Contains tests for the default engine builder.
+/// </summary>
 [TestClass]
 public sealed class DefaultEngineBuilderTests {
+    /// <summary>
+    /// Tests that the default engine builder creates a working engine.
+    /// </summary>
     [TestMethod]
     public void Create_ShouldReturnWorkingEngine() {
         using var env = new TestEnvironment();
@@ -37,4 +43,3 @@ public sealed class DefaultEngineBuilderTests {
         Assert.AreSequenceEqual(expected, actual);
     }
 }
-

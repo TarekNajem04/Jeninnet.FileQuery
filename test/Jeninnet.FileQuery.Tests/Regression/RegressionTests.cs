@@ -1,4 +1,4 @@
-﻿namespace Jeninnet.FileQuery.Tests.Regression;
+namespace Jeninnet.FileQuery.Tests.Regression;
 
 /// <summary>
 /// Regression tests covering bugs fixed in v1.0.
@@ -39,8 +39,8 @@ public sealed class RegressionTests {
         );
 
         Assert.AreSequenceEqual(
-            new List<string>() { "**", "!*.log" },
-            typedPatterns[PatternKind.GitIgnore].ToArray(), SequenceOrder.InAnyOrder,
+            ["**", "!*.log"],
+            [.. typedPatterns[PatternKind.GitIgnore]], SequenceOrder.InAnyOrder,
             "GitIgnore bucket must contain patterns from both Where() calls."
         );
 
@@ -51,8 +51,8 @@ public sealed class RegressionTests {
         );
 
         Assert.AreSequenceEqual(
-            new List<string>() { "*.cs" },
-            typedPatterns[PatternKind.Glob].ToArray(),
+            ["*.cs"],
+            [.. typedPatterns[PatternKind.Glob]],
             SequenceOrder.InAnyOrder,
             "Glob bucket must be unchanged."
         );
@@ -64,8 +64,8 @@ public sealed class RegressionTests {
         );
 
         Assert.AreSequenceEqual(
-            new List<string>() { "r:^data.*" },
-            typedPatterns[PatternKind.Regex].ToArray(),
+            ["r:^data.*"],
+            [.. typedPatterns[PatternKind.Regex]],
             SequenceOrder.InAnyOrder,
             "Regex bucket must contain the pattern from the second Where() call."
         );
@@ -93,11 +93,11 @@ public sealed class RegressionTests {
         // Assert: all three keys must be present.
         Assert.HasCount(3, typedPatterns,
             "All three pattern-kind buckets must be created from a single Where() call.");
-        Assert.AreSequenceEqual(new List<string>() { "**", "!*.cs" }, typedPatterns[PatternKind.GitIgnore].ToArray(), SequenceOrder.InAnyOrder);
+        Assert.AreSequenceEqual(["**", "!*.cs"], [.. typedPatterns[PatternKind.GitIgnore]], SequenceOrder.InAnyOrder);
 
-        Assert.AreSequenceEqual(new List<string>() { "src/**/*.ts" }, typedPatterns[PatternKind.Glob].ToArray(), SequenceOrder.InAnyOrder);
+        Assert.AreSequenceEqual(["src/**/*.ts"], [.. typedPatterns[PatternKind.Glob]], SequenceOrder.InAnyOrder);
 
-        Assert.AreSequenceEqual(new List<string>() { "r:^temp_.*\\.txt$" }, typedPatterns[PatternKind.Regex].ToArray(), SequenceOrder.InAnyOrder);
+        Assert.AreSequenceEqual(["r:^temp_.*\\.txt$"], [.. typedPatterns[PatternKind.Regex]], SequenceOrder.InAnyOrder);
     }
 
     /// <summary>
@@ -222,3 +222,4 @@ public sealed class RegressionTests {
         );
     }
 }
+

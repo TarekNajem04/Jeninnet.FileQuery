@@ -1,4 +1,4 @@
-﻿namespace Jeninnet.FileQuery.Tests.Core.FileCollectorAsync.StressAndEdges;
+namespace Jeninnet.FileQuery.Tests.Core.FileCollectorAsync.StressAndEdges;
 
 /// <summary>
 /// Stress and edge-case tests designed to detect rare async bugs:
@@ -108,6 +108,8 @@ public class EnumerateFilesAsync_StressAndEdgeCaseTests {
         Assert.AreSequenceEqual(syncResults, asyncResults, SequenceOrder.InAnyOrder);
     }
 
+    /// <summary>
+    /// Gets or sets the test context.
+    /// </summary>
     public TestContext TestContext { get; set; } = null!;
 }
-

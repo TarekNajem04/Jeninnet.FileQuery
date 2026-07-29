@@ -1,4 +1,4 @@
-﻿namespace Jeninnet.FileQuery.Tests.Invariants;
+namespace Jeninnet.FileQuery.Tests.Invariants;
 
 /// <summary>
 /// Regression tests for the four invariant gaps identified during the v1.0 freeze audit.
@@ -15,6 +15,7 @@ public sealed class InvariantTests {
     // RecursiveWildcardInSegmentInvariant (new) catches this for all dialects.
     // ======================================================================
 
+    /// <summary>Tests GitIgnore_StarStarLiteral_SegmentMixed_IsRejected.</summary>
     [TestMethod]
     public void GitIgnore_StarStarLiteral_SegmentMixed_IsRejected() =>
         // "**a" produces [RecursiveWildcardToken, LiteralToken("a")] in one segment.
@@ -22,21 +23,25 @@ public sealed class InvariantTests {
             () => CompiledPatternFactory.Compile(PatternKind.GitIgnore, "**a"),
             "A mixed segment '**a' must be rejected for GitIgnore patterns.");
 
+    /// <summary>Tests Glob_DoubleStarMixedSegment_IsRejected.</summary>
     [TestMethod]
     public void Glob_DoubleStarMixedSegment_IsRejected() => Assert.ThrowsExactly<PatternException>(
             () => CompiledPatternFactory.Compile(PatternKind.Glob, "**a"),
             "In Glob patterns, '**' must appear as a standalone segment.");
 
+    /// <summary>Tests GitIgnore_LiteralStarStar_SegmentMixed_IsRejected.</summary>
     [TestMethod]
     public void GitIgnore_LiteralStarStar_SegmentMixed_IsRejected() => Assert.ThrowsExactly<PatternException>(
             () => CompiledPatternFactory.Compile(PatternKind.GitIgnore, "a**"),
             "A mixed segment 'a**' must be rejected for GitIgnore patterns.");
 
+    /// <summary>Tests GitIgnore_LiteralStarStarLiteral_IsRejected.</summary>
     [TestMethod]
     public void GitIgnore_LiteralStarStarLiteral_IsRejected() => Assert.ThrowsExactly<PatternException>(
             () => CompiledPatternFactory.Compile(PatternKind.GitIgnore, "a**b"),
             "A mixed segment 'a**b' must be rejected.");
 
+    /// <summary>Tests GitIgnore_StandaloneDoubleStar_IsAccepted.</summary>
     [TestMethod]
     public void GitIgnore_StandaloneDoubleStar_IsAccepted() {
         // A standalone ** in its own segment must still be valid.
@@ -52,6 +57,7 @@ public sealed class InvariantTests {
     // After the fix, "r:" is stripped before compilation.
     // ======================================================================
 
+    /// <summary>Tests RegexSyntaxInvariant_InvalidRegex_RejectsCorrectly.</summary>
     [TestMethod]
     public void RegexSyntaxInvariant_InvalidRegex_RejectsCorrectly() =>
         // "[invalid" is not valid regex — unclosed bracket.
@@ -59,6 +65,7 @@ public sealed class InvariantTests {
             () => CompiledPatternFactory.Compile(PatternKind.Regex, "r:[invalid"),
             "An invalid regex pattern must be rejected.");
 
+    /// <summary>Tests RegexSyntaxInvariant_ValidRegex_IsAccepted.</summary>
     [TestMethod]
     public void RegexSyntaxInvariant_ValidRegex_IsAccepted() {
         // "r:^src/.*\.cs$" is a valid .NET regex expression.
@@ -66,6 +73,7 @@ public sealed class InvariantTests {
         Assert.IsNotEmpty(compiled, "A valid regex pattern must compile successfully.");
     }
 
+    /// <summary>Tests RegexSyntaxInvariant_ErrorMessageShowsExpressionNotPrefix.</summary>
     [TestMethod]
     public void RegexSyntaxInvariant_ErrorMessageShowsExpressionNotPrefix() {
         // The error message must reference the expression ("[invalid"),
@@ -94,16 +102,19 @@ public sealed class InvariantTests {
     // GitIgnorePatternInvariant now detects this case.
     // ======================================================================
 
+    /// <summary>Tests GitIgnore_BareSlash_IsRejected.</summary>
     [TestMethod]
     public void GitIgnore_BareSlash_IsRejected() => Assert.ThrowsExactly<PatternException>(
             () => CompiledPatternFactory.Compile(PatternKind.GitIgnore, "/"),
             "A bare '/' must be rejected as a GitIgnore pattern.");
 
+    /// <summary>Tests GitIgnore_MultipleSlashes_IsRejected.</summary>
     [TestMethod]
     public void GitIgnore_MultipleSlashes_IsRejected() => Assert.ThrowsExactly<PatternException>(
             () => CompiledPatternFactory.Compile(PatternKind.GitIgnore, "///"),
             "A pattern of only '/' separators must be rejected.");
 
+    /// <summary>Tests GitIgnore_RootAnchoredWithBody_IsAccepted.</summary>
     [TestMethod]
     public void GitIgnore_RootAnchoredWithBody_IsAccepted() {
         // "/src" is a valid root-anchored GitIgnore pattern.
@@ -117,6 +128,7 @@ public sealed class InvariantTests {
     // correctly inserts ** for unanchored non-negated patterns too.
     // ======================================================================
 
+    /// <summary>Tests GitIgnoreImplicitRecursive_UnanchoredNonNegated_ReceivesImplicitDoubleStar.</summary>
     [TestMethod]
     public void GitIgnoreImplicitRecursive_UnanchoredNonNegated_ReceivesImplicitDoubleStar() {
         // "*.txt" should compile to [**, *.txt] — the matcher must slide across depths.
@@ -136,6 +148,7 @@ public sealed class InvariantTests {
             "First segment of '*.txt' must be the implicit '**'.");
     }
 
+    /// <summary>Tests GitIgnoreImplicitRecursive_RootAnchored_DoesNotReceiveImplicitDoubleStar.</summary>
     [TestMethod]
     public void GitIgnoreImplicitRecursive_RootAnchored_DoesNotReceiveImplicitDoubleStar() {
         // "/src/*.cs" is root-anchored — no implicit ** must be prepended.
@@ -153,6 +166,7 @@ public sealed class InvariantTests {
             "Root-anchored pattern must not have an implicit '**' prepended.");
     }
 
+    /// <summary>Tests GitIgnoreImplicitRecursive_AlreadyStartsWithDoubleStar_NotDuplicated.</summary>
     [TestMethod]
     public void GitIgnoreImplicitRecursive_AlreadyStartsWithDoubleStar_NotDuplicated() {
         // "**/*.cs" already begins with ** — must not have another ** inserted.
@@ -168,3 +182,4 @@ public sealed class InvariantTests {
             "'**/*.cs' must contain exactly one '**' segment — not two.");
     }
 }
+

@@ -1,7 +1,13 @@
-﻿namespace Jeninnet.FileQuery.Tests.Integration;
+namespace Jeninnet.FileQuery.Tests.Integration;
 
+/// <summary>
+/// Contains tests verifying parity between dependency injection and default runtime.
+/// </summary>
 [TestClass]
 public sealed class DependencyInjectionParityTests {
+    /// <summary>
+    /// Tests that AddFileQuery resolves a singleton engine equivalent to the default runtime.
+    /// </summary>
     [TestMethod]
     public void AddFileQuery_ShouldResolveSingletonEngineEquivalentToDefaultRuntime() {
         using var env = new TestEnvironment();
@@ -25,6 +31,9 @@ public sealed class DependencyInjectionParityTests {
         Assert.AreSequenceEqual(expected, actual);
     }
 
+    /// <summary>
+    /// Tests that AddFileQuery resolves an async engine equivalent to the default runtime.
+    /// </summary>
     [TestMethod]
     public async Task AddFileQuery_ShouldResolveAsyncEngineEquivalentToDefaultRuntimeAsync() {
         using var env = new TestEnvironment();
@@ -52,8 +61,14 @@ public sealed class DependencyInjectionParityTests {
         Assert.AreSequenceEqual(expected, actual);
     }
 
+    /// <summary>
+    /// Gets or sets the test context.
+    /// </summary>
     public TestContext TestContext { get; set; } = null!;
 
+    /// <summary>
+    /// Creates a service provider for testing dependency injection.
+    /// </summary>
     private static ServiceProvider CreateProvider() {
         var services = new ServiceCollection();
         services.AddFileQuery();
@@ -61,6 +76,11 @@ public sealed class DependencyInjectionParityTests {
         return services.BuildServiceProvider();
     }
 
+    /// <summary>
+    /// Creates a parity query for testing.
+    /// </summary>
+    /// <param name="root">The root path.</param>
+    /// <returns>A new <see cref="FileQuery"/> instance.</returns>
     private static FileQuery CreateParityQuery(string root) {
         var options = new FileQueryOptions(
             new FileQueryOptionsConfig(
@@ -79,4 +99,3 @@ public sealed class DependencyInjectionParityTests {
         return new(root, options);
     }
 }
-

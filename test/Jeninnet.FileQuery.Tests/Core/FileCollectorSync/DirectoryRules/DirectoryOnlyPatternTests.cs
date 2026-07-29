@@ -1,4 +1,4 @@
-﻿namespace Jeninnet.FileQuery.Tests.Core.FileCollectorSync.DirectoryRules;
+namespace Jeninnet.FileQuery.Tests.Core.FileCollectorSync.DirectoryRules;
 
 /// <summary>
 /// Tests directory-only GitIgnore patterns:
@@ -95,6 +95,7 @@ public class DirectoryOnlyPatternTests {
         TestAssertEx.ContainsSingle(results, x => x.EndsWith("a.txt", StringComparison.Ordinal));
     }
 
+    /// <summary>Tests DirectoryOnly_Inclusion_ShouldNotReturnFilesInsideFolder.</summary>
     [TestMethod]
     public void DirectoryOnly_Inclusion_ShouldNotReturnFilesInsideFolder() {
         using var env = new TestEnvironment();
@@ -129,6 +130,7 @@ public class DirectoryOnlyPatternTests {
         TestAssertEx.HasCount(results, 1);
     }
 
+    /// <summary>Tests DirectoryOnly_Inclusion_ShouldReturnFilesInsideSubdirectories.</summary>
     [TestMethod]
     public void DirectoryOnly_Inclusion_ShouldReturnFilesInsideSubdirectories() {
         using var env = new TestEnvironment();
@@ -169,6 +171,7 @@ public class DirectoryOnlyPatternTests {
         TestAssertEx.HasCount(results, 3);
     }
 
+    /// <summary>Tests DirectoryOnly_LastRuleWins_HierarchyAndSpecificNegation0.</summary>
     [TestMethod]
     public void DirectoryOnly_LastRuleWins_HierarchyAndSpecificNegation0() {
         using var env = new TestEnvironment();
@@ -208,3 +211,4 @@ public class DirectoryOnlyPatternTests {
         TestAssertEx.DoesNotContain(results, env.Abs("tmp", "sub", "x.txt"), "File 'b.txt' inside nested 'tmp/sub' must be excluded by '*/sub/*'.");
     }
 }
+

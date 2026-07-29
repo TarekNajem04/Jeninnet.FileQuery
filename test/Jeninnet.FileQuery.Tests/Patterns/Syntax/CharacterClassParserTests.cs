@@ -1,4 +1,4 @@
-﻿namespace Jeninnet.FileQuery.Tests.Patterns.Syntax;
+namespace Jeninnet.FileQuery.Tests.Patterns.Syntax;
 
 /// <summary>
 /// Tests for the redesigned character class system.
@@ -6,6 +6,9 @@
 /// </summary>
 [TestClass]
 public sealed class CharacterClassParserTests {
+    /// <summary>
+    /// Verifies that CharacterClassParser can parse various valid character class patterns successfully.
+    /// </summary>
     [TestMethod]
     public void CharacterClassParser_ShouldSuccess() {
         string[] _patterns =
@@ -28,6 +31,9 @@ public sealed class CharacterClassParserTests {
         }
     }
 
+    /// <summary>
+    /// Verifies that Parse_LiteralSet produces correct CharLiterals.
+    /// </summary>
     [TestMethod]
     public void Parse_LiteralSet_ProducesCharLiterals() {
         var input = "[abc]".AsSpan();
@@ -44,6 +50,9 @@ public sealed class CharacterClassParserTests {
         Assert.AreEqual(5, i, "Index must be positioned after the closing ']'.");
     }
 
+    /// <summary>
+    /// Verifies that Parse_Range produces correct CharRange.
+    /// </summary>
     [TestMethod]
     public void Parse_Range_ProducesCharRange() {
         var input = "[a-z]".AsSpan();
@@ -57,6 +66,9 @@ public sealed class CharacterClassParserTests {
         Assert.AreEqual('z', range.End);
     }
 
+    /// <summary>
+    /// Verifies that Parse_NegatedClass sets the IsNegated flag correctly.
+    /// </summary>
     [TestMethod]
     public void Parse_NegatedClass_SetsIsNegated() {
         var input = "[!abc]".AsSpan();
@@ -69,6 +81,9 @@ public sealed class CharacterClassParserTests {
         Assert.IsTrue(result.Elements.All(e => e is CharLiteral));
     }
 
+    /// <summary>
+    /// Verifies that Parse_CaretNegation sets the IsNegated flag correctly.
+    /// </summary>
     [TestMethod]
     public void Parse_CaretNegation_SetsIsNegated() {
         var input = "[^abc]".AsSpan();
@@ -80,6 +95,9 @@ public sealed class CharacterClassParserTests {
             "'^' must be treated as a negation prefix, identical to '!'.");
     }
 
+    /// <summary>
+    /// Verifies that Parse_DashAsFirstElement treats dash as a literal.
+    /// </summary>
     [TestMethod]
     public void Parse_DashAsFirstElement_IsLiteral() {
         // "-" as the first element is a literal, not a range delimiter.
@@ -93,6 +111,9 @@ public sealed class CharacterClassParserTests {
             "'-' at the start of a class must be treated as a literal.");
     }
 
+    /// <summary>
+    /// Verifies that Parse_ClosingBracketAsFirstElement treats the bracket as a literal.
+    /// </summary>
     [TestMethod]
     public void Parse_ClosingBracketAsFirstElement_IsLiteral() {
         // ']' as the first element is a literal, not the class terminator.
@@ -109,6 +130,9 @@ public sealed class CharacterClassParserTests {
         Assert.HasCount(4, result.Elements, "']', 'a', 'b', 'c'.");
     }
 
+    /// <summary>
+    /// Verifies that Parse_DashBeforeClosingBracket treats the dash as a literal.
+    /// </summary>
     [TestMethod]
     public void Parse_DashBeforeClosingBracket_IsLiteral() {
         // "[a-]" ? 'a' literal, '-' literal (not a range delimiter before ']').
@@ -124,6 +148,9 @@ public sealed class CharacterClassParserTests {
             "'-' immediately before ']' must be a literal, not a range delimiter.");
     }
 
+    /// <summary>
+    /// Verifies that Parse_MixedElements correctly parses a mix of literals and ranges.
+    /// </summary>
     [TestMethod]
     public void Parse_MixedElements_LiteralsAndRange() {
         var input = "[a-z0-9_]".AsSpan();
@@ -137,6 +164,9 @@ public sealed class CharacterClassParserTests {
         Assert.IsInstanceOfType<CharLiteral>(result.Elements[2]); // _
     }
 
+    /// <summary>
+    /// Verifies that Parse_PosixDigit produces a correct PosixClass.
+    /// </summary>
     [TestMethod]
     public void Parse_PosixDigit_ProducesPosixClass() {
         var input = "[[:digit:]]".AsSpan();
@@ -150,6 +180,9 @@ public sealed class CharacterClassParserTests {
         Assert.AreEqual(11, i);
     }
 
+    /// <summary>
+    /// Verifies that Parse_PosixAlpha produces a correct PosixClass.
+    /// </summary>
     [TestMethod]
     public void Parse_PosixAlpha_ProducesPosixClass() {
         var input = "[[:alpha:]]".AsSpan();
@@ -161,6 +194,9 @@ public sealed class CharacterClassParserTests {
         Assert.AreEqual("alpha", posix.Name);
     }
 
+    /// <summary>
+    /// Verifies that Parse_PosixMixedWithLiteral produces correct elements.
+    /// </summary>
     [TestMethod]
     public void Parse_PosixMixedWithLiteral_ProducesCorrectElements() {
         // [[:digit:]_] ? PosixClass("digit") + CharLiteral('_')
@@ -175,6 +211,9 @@ public sealed class CharacterClassParserTests {
         Assert.AreEqual('_', lit.Value);
     }
 
+    /// <summary>
+    /// Verifies that Parse_Unterminated produces a CharacterClassParseError.
+    /// </summary>
     [TestMethod]
     public void Parse_Unterminated_ProducesErrorSentinel_DoesNotThrow() {
         // "[abc" — no closing bracket
@@ -191,6 +230,9 @@ public sealed class CharacterClassParserTests {
             "Index must be at end-of-input after an unterminated class.");
     }
 
+    /// <summary>
+    /// Verifies that Parse_EmptyBrackets produces a CharacterClassParseError.
+    /// </summary>
     [TestMethod]
     public void Parse_EmptyBrackets_TreatsClosingBracketAsLiteral() {
         // "[]" — the ']' at position 0 is a literal, then no closing ']' ? unterminated
@@ -205,6 +247,9 @@ public sealed class CharacterClassParserTests {
             "'[]' produces an unterminated sentinel because ']' is consumed as a literal.");
     }
 
+    /// <summary>
+    /// Verifies that Parse_UnterminatedPosix produces a CharacterClassParseError.
+    /// </summary>
     [TestMethod]
     public void Parse_UnterminatedPosix_ProducesErrorSentinel() {
         var input = "[[:digit]".AsSpan(); // missing ':' before the second ']'
@@ -217,6 +262,9 @@ public sealed class CharacterClassParserTests {
             "An unterminated POSIX class must produce a CharacterClassParseError.");
     }
 
+    /// <summary>
+    /// Verifies that Parse_TrailingEscape produces a CharacterClassParseError.
+    /// </summary>
     [TestMethod]
     public void Parse_TrailingEscape_ProducesErrorSentinel() {
         var input = @"[a\".AsSpan(); // backslash at end of input
@@ -229,6 +277,9 @@ public sealed class CharacterClassParserTests {
             "An incomplete escape at end of input must produce a CharacterClassParseError.");
     }
 
+    /// <summary>
+    /// Verifies that Parse_InMiddleOfSegment advances index correctly.
+    /// </summary>
     [TestMethod]
     public void Parse_InMiddleOfSegment_AdvancesIndexCorrectly() {
         // The class is embedded in a larger segment; the index must advance
@@ -242,6 +293,9 @@ public sealed class CharacterClassParserTests {
         Assert.AreEqual(8, i, "Index must point at 'b' (first char after ']').");
     }
 
+    /// <summary>
+    /// Verifies that Invariant_UnterminatedClass reports a failure.
+    /// </summary>
     [TestMethod]
     public void Invariant_UnterminatedClass_ReportsFailure() {
         var (HasException, _) = TryCompile("[abc");
@@ -249,6 +303,9 @@ public sealed class CharacterClassParserTests {
         Assert.IsTrue(HasException, "Unterminated class must fail invariant.");
     }
 
+    /// <summary>
+    /// Verifies that Invariant_ValidClass passes.
+    /// </summary>
     [TestMethod]
     public void Invariant_ValidClass_Passes() {
         var (HasException, ExceptionMessage) = TryCompile("[c-z]");
@@ -256,6 +313,9 @@ public sealed class CharacterClassParserTests {
         Assert.IsFalse(HasException, ExceptionMessage);
     }
 
+    /// <summary>
+    /// Verifies that Invariant_InvertedRange reports a failure.
+    /// </summary>
     [TestMethod]
     public void Invariant_InvertedRange_ReportsFailure() {
         var (HasException, _) = TryCompile("[z-a]");
@@ -264,6 +324,9 @@ public sealed class CharacterClassParserTests {
             "An inverted range 'z-a' must fail the range invariant.");
     }
 
+    /// <summary>
+    /// Verifies that Invariant_ValidRange passes.
+    /// </summary>
     [TestMethod]
     public void Invariant_ValidRange_Passes() {
         // "a-z" is a valid range, so it should pass the invariant.
@@ -272,6 +335,9 @@ public sealed class CharacterClassParserTests {
         Assert.IsFalse(HasException, ExceptionMessage);
     }
 
+    /// <summary>
+    /// Verifies that EndToEnd_LiteralSet matches correctly.
+    /// </summary>
     [TestMethod]
     public void EndToEnd_LiteralSet_MatchesCorrectly() {
         var engine = FileQueryRuntime.Create();
@@ -293,6 +359,9 @@ public sealed class CharacterClassParserTests {
         Assert.DoesNotContain(p => p.EndsWith("d.txt", StringComparison.Ordinal), results);
     }
 
+    /// <summary>
+    /// Verifies that EndToEnd_CharacterRange matches correctly.
+    /// </summary>
     [TestMethod]
     public void EndToEnd_CharacterRange_MatchesCorrectly() {
         var engine = FileQueryRuntime.Create();
@@ -311,6 +380,9 @@ public sealed class CharacterClassParserTests {
         Assert.DoesNotContain(p => p.EndsWith("fileX.txt", StringComparison.Ordinal), results);
     }
 
+    /// <summary>
+    /// Verifies that EndToEnd_NegatedClass matches correctly.
+    /// </summary>
     [TestMethod]
     public void EndToEnd_NegatedClass_MatchesCorrectly() {
         var engine = FileQueryRuntime.Create();
@@ -331,6 +403,9 @@ public sealed class CharacterClassParserTests {
         Assert.Contains(p => p.EndsWith("e.txt", StringComparison.Ordinal), results);
     }
 
+    /// <summary>
+    /// Verifies that EndToEnd_PosixDigitClass matches correctly.
+    /// </summary>
     [TestMethod]
     public void EndToEnd_PosixDigitClass_MatchesCorrectly() {
         var engine = FileQueryRuntime.Create();

@@ -1,9 +1,12 @@
-﻿namespace Jeninnet.FileQuery.Tests.Core.FileCollectorSync.Basic;
+namespace Jeninnet.FileQuery.Tests.Core.FileCollectorSync.Basic;
 
+/// <summary>
+/// Provides test cases for verifying the behavior of the recursive wildcard (**) path matching.
+/// </summary>
 [TestClass]
 public class RecursiveWildcardTests {
     /// <summary>
-    /// Ensures ** recurses into subdirectories.
+    /// Verifies that the recursive wildcard (**) operator correctly matches files within all levels of subdirectories.
     /// </summary>
     [TestMethod]
     public void DoubleStar_ShouldMatchFilesInAllSubfolders() {
@@ -34,7 +37,7 @@ public class RecursiveWildcardTests {
     }
 
     /// <summary>
-    /// Ensures ** combined with prefix works.
+    /// Verifies that the recursive wildcard (**) operator correctly works when combined with a specific directory prefix.
     /// </summary>
     [TestMethod]
     public void DoubleStar_WithPrefix() {
@@ -65,7 +68,7 @@ public class RecursiveWildcardTests {
     }
 
     /// <summary>
-    /// Ensures ** behaves like * in a simple, single-segment directory.
+    /// Verifies that the recursive wildcard (**) behaves consistently with a standard asterisk (*) when no subdirectories are present.
     /// </summary>
     [TestMethod]
     public void DoubleStar_AppliesLikeStar_WhenNoSubfolders() {

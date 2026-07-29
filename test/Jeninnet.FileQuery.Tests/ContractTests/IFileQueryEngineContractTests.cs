@@ -1,4 +1,4 @@
-﻿namespace Jeninnet.FileQuery.Tests.ContractTests;
+namespace Jeninnet.FileQuery.Tests.ContractTests;
 
 /// <summary>
 /// Contract tests for <see cref="IFileQueryEngine"/>.
@@ -8,9 +8,11 @@
 public class IFileQueryEngineContractTests {
     private readonly IFileQueryEngine _engine = FileQueryRuntime.Create();
 
+    /// <summary>Tests Execute_NullQuery_ShouldThrow.</summary>
     [TestMethod]
     public void Execute_NullQuery_ShouldThrow() => TestAssertEx.Throws<ArgumentNullException>(() => _engine.Execute(null!));
 
+    /// <summary>Tests Execute_NonExistentDirectory_ShouldThrowDirectoryNotFoundException.</summary>
     [TestMethod]
     public async Task ExecuteAsync_NullQuery_ShouldThrowAsync() => await TestAssertEx.ThrowsAsync<ArgumentNullException>(async () => {
         await foreach(var _ in _engine.ExecuteAsync(null!, TestContext.CancellationToken)) {
@@ -20,6 +22,7 @@ public class IFileQueryEngineContractTests {
         }
     });
 
+    /// <summary>Tests Execute_NonExistentDirectory_ShouldThrowDirectoryNotFoundException.</summary>
     [TestMethod]
     public void Execute_NonExistentDirectory_ShouldThrowDirectoryNotFoundException() {
         var query = new FileQuery(
@@ -35,6 +38,7 @@ public class IFileQueryEngineContractTests {
         TestAssertEx.Throws<DirectoryNotFoundException>(Act);
     }
 
+    /// <summary>Tests Execute_ShouldReturnEmpty_WhenExcludeAllPatternIsUsed.</summary>
     [TestMethod]
     public async Task ExecuteAsync_NonExistentDirectory_ShouldThrowDirectoryNotFoundExceptionAsync() {
         var query = new FileQuery(
@@ -56,6 +60,7 @@ public class IFileQueryEngineContractTests {
         await TestAssertEx.ThrowsAsync<DirectoryNotFoundException>(ActAsync);
     }
 
+    /// <summary>Tests Execute_ShouldReturnEmpty_WhenExcludeAllPatternIsUsed.</summary>
     [TestMethod]
     public async Task ExecuteAsync_ShouldRespectCancellationTokenAsync() {
         using var env = new TestEnvironment();
@@ -76,6 +81,7 @@ public class IFileQueryEngineContractTests {
         });
     }
 
+    /// <summary>Tests Execute_ShouldReturnEmpty_WhenExcludeAllPatternIsUsed.</summary>
     [TestMethod]
     public void Execute_ShouldReturnEmpty_WhenExcludeAllPatternIsUsed() {
         using var env = new TestEnvironment();
@@ -90,5 +96,9 @@ public class IFileQueryEngineContractTests {
         Assert.IsEmpty(results);
     }
 
+    /// <summary>
+    /// Gets or sets the test context which provides information about and functionality for the current test run.
+    /// </summary>
     public TestContext TestContext { get; set; } = null!;
 }
+

@@ -1,9 +1,13 @@
-﻿namespace Jeninnet.FileQuery.Tests.Patterns.Tokenization;
+namespace Jeninnet.FileQuery.Tests.Patterns.Tokenization;
 
+/// <summary>
+/// Contains unit tests for the <see cref="LiteralReader"/> class.
+/// </summary>
 [TestClass]
 public sealed class LiteralReaderTests {
     private readonly LiteralReader _reader = new();
 
+    /// <summary>Tests TryRead_Empty_ReturnsFalse.</summary>
     [TestMethod]
     public void TryRead_Empty_ReturnsFalse() {
         var pattern = "".AsSpan();
@@ -11,6 +15,7 @@ public sealed class LiteralReaderTests {
         Assert.IsFalse(_reader.TryRead(pattern, ref i, out _));
     }
 
+    /// <summary>Tests TryRead_StartsWildcard_ReturnsFalse.</summary>
     [TestMethod]
     public void TryRead_StartsWildcard_ReturnsFalse() {
         var pattern = "*abc".AsSpan();
@@ -18,6 +23,7 @@ public sealed class LiteralReaderTests {
         Assert.IsFalse(_reader.TryRead(pattern, ref i, out _));
     }
 
+    /// <summary>Tests TryRead_Literal_ReturnsTrueAndToken.</summary>
     [TestMethod]
     public void TryRead_Literal_ReturnsTrueAndToken() {
         var pattern = "abc".AsSpan();
@@ -28,6 +34,7 @@ public sealed class LiteralReaderTests {
         Assert.AreEqual("abc", ((LiteralToken)token).Text);
     }
 
+    /// <summary>Tests TryRead_LiteralWithWildcard_StopsAtWildcard.</summary>
     [TestMethod]
     public void TryRead_LiteralWithWildcard_StopsAtWildcard() {
         var pattern = "abc*def".AsSpan();
@@ -38,3 +45,4 @@ public sealed class LiteralReaderTests {
         Assert.AreEqual("abc", ((LiteralToken)token).Text);
     }
 }
+

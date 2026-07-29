@@ -1,7 +1,11 @@
-﻿namespace Jeninnet.FileQuery.Tests.IO;
+namespace Jeninnet.FileQuery.Tests.IO;
 
+/// <summary>
+/// Contains unit tests for the <see cref="FileSystemGuards"/> class.
+/// </summary>
 [TestClass]
 public sealed class FileSystemGuardsTests {
+    /// <summary>Tests EnsureAccessible_ShouldNotThrow_WhenDirectoryIsAccessible.</summary>
     [TestMethod]
     public void EnsureAccessible_ShouldNotThrow_WhenDirectoryIsAccessible() {
         var tempDir = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
@@ -16,3 +20,4 @@ public sealed class FileSystemGuardsTests {
         }
     }
 }
+

@@ -1,4 +1,4 @@
-﻿namespace Jeninnet.FileQuery.Tests.Core.FileCollectorAsync.AnchoredAndMixed;
+namespace Jeninnet.FileQuery.Tests.Core.FileCollectorAsync.AnchoredAndMixed;
 
 /// <summary>
 /// Tests complex glob rule combinations:
@@ -108,5 +108,8 @@ public class EnumerateFilesAsync_AnchoredAndMixedPatternTests {
         TestAssertEx.ContainsSingle(results, x => x.EndsWith(expected, StringComparison.Ordinal));
     }
 
+    /// <summary>
+    /// Gets or sets the test context.
+    /// </summary>
     public TestContext TestContext { get; set; } = null!;
 }

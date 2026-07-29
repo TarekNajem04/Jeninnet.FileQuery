@@ -1,4 +1,4 @@
-﻿namespace Jeninnet.FileQuery.Tests.Core.FileCollectorAsync.CharacterClasses;
+namespace Jeninnet.FileQuery.Tests.Core.FileCollectorAsync.CharacterClasses;
 
 /// <summary>
 /// Async tests covering character-class patterns such as:
@@ -93,5 +93,9 @@ public class EnumerateFilesAsync_CharacterClassPatternTests {
         TestAssertEx.Contains(results, x => x.EndsWith("cherry.txt", StringComparison.Ordinal));
     }
 
+    /// <summary>
+    /// Gets or sets the test context.
+    /// </summary>
     public TestContext TestContext { get; set; } = null!;
 }
+

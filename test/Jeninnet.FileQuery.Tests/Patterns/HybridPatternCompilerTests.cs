@@ -1,5 +1,8 @@
-﻿namespace Jeninnet.FileQuery.Tests.Patterns;
+namespace Jeninnet.FileQuery.Tests.Patterns;
 
+/// <summary>
+/// Provides unit tests for the <see cref="HybridPatternCompiler"/> class.
+/// </summary>
 [TestClass]
 public sealed class HybridPatternCompilerTests {
     private sealed class FakeCompiler(PatternKind kind) : IPatternCompiler {
@@ -11,6 +14,7 @@ public sealed class HybridPatternCompilerTests {
     private readonly IPatternCompiler _glob = new FakeCompiler(PatternKind.Glob);
     private readonly IPatternCompiler _regex = new FakeCompiler(PatternKind.Regex);
 
+    /// <summary>Tests Select_Glob_ReturnsGlobCompiler.</summary>
     [TestMethod]
     public void Select_Glob_ReturnsGlobCompiler() {
         var compiler = new HybridPatternCompiler(_git, _glob, _regex);
@@ -21,6 +25,7 @@ public sealed class HybridPatternCompilerTests {
         Assert.AreEqual(PatternKind.Glob, selected.PatternKind);
     }
 
+    /// <summary>Tests Select_Regex_ReturnsRegexCompiler.</summary>
     [TestMethod]
     public void Select_Regex_ReturnsRegexCompiler() {
         var compiler = new HybridPatternCompiler(_git, _glob, _regex);
@@ -31,6 +36,7 @@ public sealed class HybridPatternCompilerTests {
         Assert.AreEqual(PatternKind.Regex, selected.PatternKind);
     }
 
+    /// <summary>Tests Select_GitIgnore_ReturnsGitCompiler.</summary>
     [TestMethod]
     public void Select_GitIgnore_ReturnsGitCompiler() {
         var compiler = new HybridPatternCompiler(_git, _glob, _regex);
@@ -41,6 +47,7 @@ public sealed class HybridPatternCompilerTests {
         Assert.AreEqual(PatternKind.GitIgnore, selected.PatternKind);
     }
 
+    /// <summary>Tests Select_Unknown_ReturnsGitCompilerAsDefault.</summary>
     [TestMethod]
     public void Select_Unknown_ReturnsGitCompilerAsDefault() {
         var compiler = new HybridPatternCompiler(_git, _glob, _regex);
@@ -51,3 +58,4 @@ public sealed class HybridPatternCompilerTests {
         Assert.AreEqual(PatternKind.GitIgnore, selected.PatternKind);
     }
 }
+

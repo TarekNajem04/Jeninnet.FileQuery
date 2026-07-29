@@ -1,7 +1,13 @@
-﻿namespace Jeninnet.FileQuery.Tests.CommandLine;
+namespace Jeninnet.FileQuery.Tests.CommandLine;
 
+/// <summary>
+/// Contains unit tests for the <see cref="PatternBuilder"/> class, verifying its ability to correctly build and categorize patterns.
+/// </summary>
 [TestClass]
 public sealed class PatternBuilderTests {
+    /// <summary>
+    /// Verifies that the <see cref="PatternBuilder.Build(string?, string?, string?, string?)"/> method returns a default pattern when no input is provided.
+    /// </summary>
     [TestMethod]
     public void Build_ShouldReturnDefaultPattern_WhenInputIsEmpty() {
         var result = PatternBuilder.Build();
@@ -11,6 +17,9 @@ public sealed class PatternBuilderTests {
         Assert.AreEqual("!**", result[PatternKind.GitIgnore][0]);
     }
 
+    /// <summary>
+    /// Verifies that the <see cref="PatternBuilder.Build(string?, string?, string?, string?)"/> method correctly categorizes input patterns.
+    /// </summary>
     [TestMethod]
     public void Build_ShouldCategorizePatternsCorrectly() {
         const string patterns = "r:.*\\.txt;*.log";
@@ -20,6 +29,9 @@ public sealed class PatternBuilderTests {
         Assert.IsTrue(result.ContainsKey(PatternKind.GitIgnore), $"Result keys: {string.Join(", ", result.Keys)}");
     }
 
+    /// <summary>
+    /// Verifies that the <see cref="PatternBuilder.Build(string?, string?, string?, string?)"/> method merges patterns of the same type.
+    /// </summary>
     [TestMethod]
     public void Build_ShouldMergeSameTypePatterns() {
         var result = PatternBuilder.Build("a.txt;b.txt");
@@ -28,6 +40,9 @@ public sealed class PatternBuilderTests {
         Assert.HasCount(2, result[PatternKind.GitIgnore]);
     }
 
+    /// <summary>
+    /// Verifies that the <see cref="PatternBuilder.Build(string?, string?, string?, string?)"/> method handles specific inputs for different pattern types.
+    /// </summary>
     [TestMethod]
     public void Build_ShouldHandleSpecificInputs() {
         var result = PatternBuilder.Build(
@@ -46,6 +61,9 @@ public sealed class PatternBuilderTests {
         Assert.HasCount(1, result[PatternKind.Regex]);
     }
 
+    /// <summary>
+    /// Verifies that the <see cref="PatternBuilder.Build(ParseResult, CommandLinePatternOptions)"/> method correctly calls the parser.
+    /// </summary>
     [TestMethod]
     public void Build_ParseResult_ShouldCallParser() {
         var options = new TestOptions();
@@ -61,6 +79,6 @@ public sealed class PatternBuilderTests {
     }
 
     private sealed class TestOptions : CommandLinePatternOptions {
-        public TestOptions() : base() { }
+        public string Param1 { get; set; } = string.Empty;
     }
 }

@@ -1,7 +1,11 @@
-﻿namespace Jeninnet.FileQuery.Tests.Core;
+namespace Jeninnet.FileQuery.Tests.Core;
 
+/// <summary>
+/// Contains tests for extension methods in the Core project.
+/// </summary>
 [TestClass]
 public sealed class ExtensionTests {
+    /// <summary>Tests MatchOutcomeExtensions_ShouldReturnCorrectBooleans.</summary>
     [TestMethod]
     public void MatchOutcomeExtensions_ShouldReturnCorrectBooleans() {
         Assert.IsTrue(MatchOutcome.Include.IsSuccess());
@@ -20,6 +24,7 @@ public sealed class ExtensionTests {
         Assert.IsTrue(MatchOutcome.NoMatch.IsUnmatched());
     }
 
+    /// <summary>Tests MatchResultExtensions_ShouldReturnCorrectBooleans.</summary>
     [TestMethod]
     public void MatchResultExtensions_ShouldReturnCorrectBooleans() {
         var includeResult = MatchResult.Included().Match();
@@ -44,3 +49,4 @@ public sealed class ExtensionTests {
         Assert.AreEqual("Matched: False, Included: False", noMatchResult.ToDebugString());
     }
 }
+

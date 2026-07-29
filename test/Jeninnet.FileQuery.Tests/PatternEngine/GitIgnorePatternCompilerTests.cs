@@ -1,7 +1,13 @@
-﻿namespace Jeninnet.FileQuery.Tests.PatternEngine;
+namespace Jeninnet.FileQuery.Tests.PatternEngine;
 
+/// <summary>
+/// Provides unit tests for the <c>GitIgnorePatternCompiler</c> class.
+/// </summary>
 [TestClass]
 public class GitIgnorePatternCompilerTests {
+    /// <summary>
+    /// Verifies that a negated pattern string is correctly compiled and marked as negated.
+    /// </summary>
     [TestMethod]
     public void NegatedPattern_ShouldSetIsNegated() {
         var compiledPatternSets = CompiledPatternFactory.Compile(PatternKind.GitIgnore, "!bin/");
@@ -20,6 +26,9 @@ public class GitIgnorePatternCompilerTests {
         TestAssertEx.HasCount(compiledPattern.Segments, 2);
     }
 
+    /// <summary>
+    /// Verifies that an anchored pattern is correctly compiled into the expected segments.
+    /// </summary>
     [TestMethod]
     public void AnchoredPattern_ShouldProduceSegments() {
         var compiledPatternSets = CompiledPatternFactory.Compile(PatternKind.GitIgnore, "/obj/**/*.tmp");
@@ -32,6 +41,9 @@ public class GitIgnorePatternCompilerTests {
         TestAssertEx.HasCount(compiledPattern.Segments, 3);
     }
 
+    /// <summary>
+    /// Verifies that a double star pattern is correctly compiled into a <see cref="RecursiveWildcardToken"/>.
+    /// </summary>
     [TestMethod]
     public void DoubleStar_ShouldProduceRecursiveToken() {
         var compiledPatternSets = CompiledPatternFactory.Compile(PatternKind.GitIgnore, "**/test");
@@ -42,9 +54,13 @@ public class GitIgnorePatternCompilerTests {
         TestAssertEx.ContainsSingle(compiledPattern.Segments[0], t => t is RecursiveWildcardToken);
     }
 
+    /// <summary>
+    /// Verifies that an empty pattern string is handled gracefully, resulting in no compiled patterns.
+    /// </summary>
     [TestMethod]
     public void GitIgnore_EmptyPattern_ShouldHandleCorrectly() {
         var compiledPatternSets = CompiledPatternFactory.Compile(PatternKind.GitIgnore, "");
         Assert.IsEmpty(compiledPatternSets);
     }
 }
+

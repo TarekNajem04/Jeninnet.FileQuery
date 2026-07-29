@@ -1,15 +1,24 @@
-﻿namespace Jeninnet.FileQuery.Tests.Core;
+namespace Jeninnet.FileQuery.Tests.Core;
 
+/// <summary>
+/// Contains tests for the <see cref="FileQueryBuilder"/> class.
+/// </summary>
 [TestClass]
 public class FileQueryBuilderTests {
     private string _tempRoot = string.Empty;
 
+    /// <summary>
+    /// Initializes the test environment.
+    /// </summary>
     [TestInitialize]
     public void Init() {
         _tempRoot = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
         Directory.CreateDirectory(_tempRoot);
     }
 
+    /// <summary>
+    /// Cleans up the test environment.
+    /// </summary>
     [TestCleanup]
     public void Cleanup() {
         if(Directory.Exists(_tempRoot)) {
@@ -17,6 +26,7 @@ public class FileQueryBuilderTests {
         }
     }
 
+    /// <summary>Tests Where_ShouldAddPatterns_WhenPatternKindAndListProvided.</summary>
     [TestMethod]
     public void Where_ShouldAddPatterns_WhenPatternKindAndListProvided() {
         // Arrange
@@ -30,9 +40,10 @@ public class FileQueryBuilderTests {
         // Assert
         Assert.IsNotNull(query.Options.PatternInput.TypedPatterns);
         Assert.IsTrue(query.Options.PatternInput.TypedPatterns.ContainsKey(PatternKind.Glob));
-        Assert.AreSequenceEqual(patterns, query.Options.PatternInput.TypedPatterns[PatternKind.Glob].ToList(), SequenceOrder.InAnyOrder);
+        Assert.AreSequenceEqual(patterns, [.. query.Options.PatternInput.TypedPatterns[PatternKind.Glob]], SequenceOrder.InAnyOrder);
     }
 
+    /// <summary>Tests UsingHybrid_ShouldSetMatchingModeToHybrid_WhenCalled.</summary>
     [TestMethod]
     public void UsingHybrid_ShouldSetMatchingModeToHybrid_WhenCalled() {
         // Arrange
@@ -46,6 +57,7 @@ public class FileQueryBuilderTests {
         Assert.AreEqual(PatternInterpretationMode.Hybrid, query.Options.PatternInput.InterpretationMode);
     }
 
+    /// <summary>Tests UsingGitIgnore_ShouldSetMatchingModeToGitIgnore_WhenCalled.</summary>
     [TestMethod]
     public void UsingGitIgnore_ShouldSetMatchingModeToGitIgnore_WhenCalled() {
         // Arrange
@@ -59,6 +71,7 @@ public class FileQueryBuilderTests {
         Assert.AreEqual(PatternMatchingMode.GitIgnore, query.Options.PatternMatchingMode);
     }
 
+    /// <summary>Tests UsingGlob_ShouldSetMatchingModeToGlob_WhenCalled.</summary>
     [TestMethod]
     public void UsingGlob_ShouldSetMatchingModeToGlob_WhenCalled() {
         // Arrange
@@ -72,6 +85,7 @@ public class FileQueryBuilderTests {
         Assert.AreEqual(PatternMatchingMode.Glob, query.Options.PatternMatchingMode);
     }
 
+    /// <summary>Tests UsingRegex_ShouldSetMatchingModeToRegex_WhenCalled.</summary>
     [TestMethod]
     public void UsingRegex_ShouldSetMatchingModeToRegex_WhenCalled() {
         // Arrange
@@ -85,6 +99,7 @@ public class FileQueryBuilderTests {
         Assert.AreEqual(PatternMatchingMode.Regex, query.Options.PatternMatchingMode);
     }
 
+    /// <summary>Tests WithRecursion_ShouldUpdateRecurseSubdirectories_WhenValueProvided.</summary>
     [TestMethod]
     public void WithRecursion_ShouldUpdateRecurseSubdirectories_WhenValueProvided() {
         // Arrange
@@ -98,6 +113,7 @@ public class FileQueryBuilderTests {
         Assert.IsFalse(query.Options.RecurseSubdirectories);
     }
 
+    /// <summary>Tests WithoutRecursion_ShouldSetRecurseSubdirectoriesToFalse_WhenCalled.</summary>
     [TestMethod]
     public void WithoutRecursion_ShouldSetRecurseSubdirectoriesToFalse_WhenCalled() {
         // Arrange
@@ -111,6 +127,7 @@ public class FileQueryBuilderTests {
         Assert.IsFalse(query.Options.RecurseSubdirectories);
     }
 
+    /// <summary>Tests IgnoreCase_ShouldUpdateCaseSensitivity_WhenValueProvided.</summary>
     [TestMethod]
     public void IgnoreCase_ShouldUpdateCaseSensitivity_WhenValueProvided() {
         // Arrange
@@ -124,6 +141,7 @@ public class FileQueryBuilderTests {
         Assert.AreEqual(CaseSensitivity.Insensitive, query.Options.CaseSensitivity);
     }
 
+    /// <summary>Tests ValidatePatternType_ShouldThrowInvalidOperationException_WhenModeAndKindConflict_AllCases.</summary>
     [TestMethod]
     public void ValidatePatternType_ShouldThrowInvalidOperationException_WhenModeAndKindConflict_AllCases() {
         // Test GitIgnore mode conflicts
@@ -148,6 +166,7 @@ public class FileQueryBuilderTests {
         Assert.Throws<InvalidOperationException>(() => builder6.Where(PatternKind.Glob, ["*.txt"]));
     }
 
+    /// <summary>Tests ValidatePatternType_ShouldHandleAllPatternKinds_WhenHybrid.</summary>
     [TestMethod]
 #pragma warning disable S2699
     public void ValidatePatternType_ShouldHandleAllPatternKinds_WhenHybrid() {
@@ -156,21 +175,24 @@ public class FileQueryBuilderTests {
         builder.UsingHybrid();
 
         // Act & Assert
-        builder.Where(PatternKind.Glob, new List<string> { "*" });
-        builder.Where(PatternKind.Regex, new List<string> { ".*" });
-        builder.Where(PatternKind.GitIgnore, new List<string> { "node_modules/" });
+        builder.Where(PatternKind.Glob, ["*"]);
+        builder.Where(PatternKind.Regex, [".*"]);
+        builder.Where(PatternKind.GitIgnore, ["node_modules/"]);
     }
 #pragma warning restore S2699
 
+    /// <summary>Tests Build_ShouldThrow_WhenRootPathIsNullOrEmpty.</summary>
     [TestMethod]
     public void Build_ShouldThrow_WhenRootPathIsNullOrEmpty() {
         var builder = new FileQueryBuilder("   ", FileSystem.Instance);
         Assert.Throws<InvalidOperationException>(builder.Build);
     }
 
+    /// <summary>Tests Build_ShouldThrow_WhenRootPathDoesNotExist.</summary>
     [TestMethod]
     public void Build_ShouldThrow_WhenRootPathDoesNotExist() {
         var builder = FileQuery.From(Path.Combine(_tempRoot, "does-not-exist"));
         Assert.Throws<DirectoryNotFoundException>(builder.Build);
     }
 }
+

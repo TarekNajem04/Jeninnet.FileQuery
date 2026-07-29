@@ -1,7 +1,13 @@
-﻿namespace Jeninnet.FileQuery.Tests.Core;
+namespace Jeninnet.FileQuery.Tests.Core;
 
+/// <summary>
+/// Contains unit tests for the PatternsMerger functionality.
+/// </summary>
 [TestClass]
 public class PatternMergingTests {
+    /// <summary>
+    /// Verifies the debugging output of the classifier for a sample pattern.
+    /// </summary>
     [TestMethod]
     public void Debug_Classifier_Output() {
         var result = PatternClassifier.Classify(@"src\**\*.cs");
@@ -9,6 +15,9 @@ public class PatternMergingTests {
         Assert.AreEqual(PatternKind.Glob, result);
     }
 
+    /// <summary>
+    /// Verifies that Merge correctly classifies and groups raw input patterns.
+    /// </summary>
     [TestMethod]
     public void MergePatterns_WithOnlyRawPatterns_ClassifiesAndGroupsCorrectly() {
         // Arrange
@@ -38,6 +47,9 @@ public class PatternMergingTests {
         Assert.AreEqual(@"src\**\*.cs", result[PatternKind.Glob][0]);
     }
 
+    /// <summary>
+    /// Verifies that Merge preserves structure when only typed patterns are provided.
+    /// </summary>
     [TestMethod]
     public void MergePatterns_WithOnlyTypedPatterns_PreservesStructure() {
         // Arrange
@@ -56,6 +68,9 @@ public class PatternMergingTests {
         Assert.AreEqual("LICENSE", result[PatternKind.Regex][0]);
     }
 
+    /// <summary>
+    /// Verifies that Merge correctly merges raw and typed patterns of the same type.
+    /// </summary>
     [TestMethod]
     public void MergePatterns_WithOverlappingTypes_MergesListsSafely() {
         // Arrange
@@ -63,7 +78,7 @@ public class PatternMergingTests {
             new FileQueryOptionsConfig(
                 // Raw pattern that will be classified as GitIgnore
                 PatternInput: new(
-                    Patterns: new List<string> { "node_modules/" },
+                    Patterns: ["node_modules/"],
                     // Explicitly typed GitIgnore pattern
                     TypedPatterns: PatternHelpers.Create(PatternKind.GitIgnore, ".env")
                 )
@@ -83,6 +98,9 @@ public class PatternMergingTests {
         Assert.AreEqual("node_modules/", gitIgnoreList[1]);
     }
 
+    /// <summary>
+    /// Verifies that Merge handles null collections by returning an empty dictionary.
+    /// </summary>
     [TestMethod]
     public void MergePatterns_WithNullCollections_ReturnsEmptyDictionary() {
         // Arrange
@@ -96,6 +114,9 @@ public class PatternMergingTests {
         Assert.IsEmpty(result);
     }
 
+    /// <summary>
+    /// Verifies that Merge does not mutate the original options.
+    /// </summary>
     [TestMethod]
     public void MergePatterns_DoesNotMutateOriginalOptions() {
         // Arrange

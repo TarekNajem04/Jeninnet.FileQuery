@@ -1,5 +1,8 @@
-﻿namespace Jeninnet.FileQuery.Tests.Core.FileCollectorSync.Basic;
+namespace Jeninnet.FileQuery.Tests.Core.FileCollectorSync.Basic;
 
+/// <summary>
+/// Contains tests for basic file matching scenarios.
+/// </summary>
 [TestClass]
 public class BasicMatchingTests {
     /// <summary>
@@ -28,7 +31,7 @@ public class BasicMatchingTests {
                                     .ToList();
 
         TestAssertEx.ContainsSingle(result);
-        Assert.IsTrue(TestPathUtils.Equivalent(result[0], env.Abs("file1.txt")));
+        Assert.IsTrue(PathHelper.Equivalent(result[0], env.Abs("file1.txt")));
     }
 
     /// <summary>

@@ -1,5 +1,8 @@
-﻿namespace Jeninnet.FileQuery.Tests.Architecture;
+namespace Jeninnet.FileQuery.Tests.Architecture;
 
+/// <summary>
+/// Contains architectural tests for pattern tokenizers.
+/// </summary>
 [TestClass]
 public sealed class TokenizerArchitectureTests {
     private static readonly IPatternTokenizer[] _tokenizers =
@@ -15,6 +18,7 @@ public sealed class TokenizerArchitectureTests {
     private static readonly PatternSyntaxProfile _syntax =
         PatternSyntaxProfile.GitIgnore;
 
+    /// <summary>Tests Tokenizers_MustAdvanceIndex_OrDecline.</summary>
     [TestMethod]
     public void Tokenizers_MustAdvanceIndex_OrDecline() {
         const string input = "*?[abc]\\x**foo";

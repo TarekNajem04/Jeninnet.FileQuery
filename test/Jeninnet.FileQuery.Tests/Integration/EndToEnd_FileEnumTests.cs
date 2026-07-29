@@ -1,7 +1,11 @@
-﻿namespace Jeninnet.FileQuery.Tests.Integration;
+namespace Jeninnet.FileQuery.Tests.Integration;
 
+/// <summary>
+/// Contains end-to-end tests for file enumeration scenarios.
+/// </summary>
 [TestClass]
 public class EndToEnd_FileEnumTests {
+    /// <summary>Tests ShouldEnumerate_AllCsFiles.</summary>
     [TestMethod]
     public void ShouldEnumerate_AllCsFiles() {
         using var env = new TestEnvironment();
@@ -31,6 +35,7 @@ public class EndToEnd_FileEnumTests {
         ]);
     }
 
+    /// <summary>Tests ShouldRespect_IgnoreDirectories.</summary>
     [TestMethod]
     public void ShouldRespect_IgnoreDirectories() {
         using var env = new TestEnvironment();
@@ -73,6 +78,7 @@ public class EndToEnd_FileEnumTests {
         TestAssertEx.DoesNotContain(result, x => x.Contains("/obj/", StringComparison.Ordinal));
     }
 
+    /// <summary>Tests Complex_GitIgnoreScenario.</summary>
     [TestMethod]
     public void Complex_GitIgnoreScenario() {
         using var env = new TestEnvironment();
@@ -109,6 +115,7 @@ public class EndToEnd_FileEnumTests {
         TestAssertEx.HasCount(result, 2);
     }
 
+    /// <summary>Tests ShouldLimit_Depth.</summary>
     [TestMethod]
     public void ShouldLimit_Depth() {
         using var env = new TestEnvironment();
@@ -140,6 +147,7 @@ public class EndToEnd_FileEnumTests {
         TestAssertEx.AreEquivalent(result, [PathUtilities.Normalize(env.Abs("b.cs"))]);
     }
 
+    /// <summary>Tests DoubleStar_ShouldMatchNested.</summary>
     [TestMethod]
     public void DoubleStar_ShouldMatchNested() {
         using var env = new TestEnvironment();
@@ -170,6 +178,7 @@ public class EndToEnd_FileEnumTests {
         TestAssertEx.AreEquivalent(result, [PathUtilities.Normalize(env.Abs("a.txt"))]);
     }
 
+    /// <summary>Tests DirectoryOnlyPattern_ShouldExcludeFilesCorrectly.</summary>
     [TestMethod]
     public void DirectoryOnlyPattern_ShouldExcludeFilesCorrectly() {
         using var env = new TestEnvironment();
@@ -195,6 +204,7 @@ public class EndToEnd_FileEnumTests {
         TestAssertEx.Contains(result, env.Abs("src", "main.cs"));
     }
 
+    /// <summary>Tests CaseSensitivity_ShouldFollow_Options.</summary>
     [TestMethod]
     public void CaseSensitivity_ShouldFollow_Options() {
         using var env = new TestEnvironment();

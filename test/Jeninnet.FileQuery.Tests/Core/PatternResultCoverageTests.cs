@@ -1,7 +1,13 @@
-﻿namespace Jeninnet.FileQuery.Tests.Core;
+namespace Jeninnet.FileQuery.Tests.Core;
 
+/// <summary>
+/// Contains unit tests for the <see cref="PatternResult{T}"/> class and related exception types.
+/// </summary>
 [TestClass]
 public class PatternResultCoverageTests {
+    /// <summary>
+    /// Verifies that the <see cref="PatternResult{T}.Success(T)"/> factory method correctly sets the success state and value.
+    /// </summary>
     [TestMethod]
     public void PatternResult_Success_Properties() {
         var result = PatternResult<string>.Success("ok");
@@ -10,6 +16,9 @@ public class PatternResultCoverageTests {
         Assert.IsNull(result.Error);
     }
 
+    /// <summary>
+    /// Verifies that the <see cref="PatternResult{T}.Fail(string)"/> factory method correctly sets the failure state and error message.
+    /// </summary>
     [TestMethod]
     public void PatternResult_Failure_Properties() {
         const string error = "something went wrong";
@@ -24,6 +33,9 @@ public class PatternResultCoverageTests {
         catch(InvalidOperationException) { /* Ignore */ }
     }
 
+    /// <summary>
+    /// Verifies that <see cref="PatternException"/> correctly preserves the error message and inner exception.
+    /// </summary>
     [TestMethod]
     public void PatternException_Message_Preserved() {
         const string msg = "error msg";
@@ -36,6 +48,9 @@ public class PatternResultCoverageTests {
         Assert.AreEqual(inner, ex2.InnerException);
     }
 
+    /// <summary>
+    /// Verifies that <see cref="PatternSyntaxException"/> correctly preserves the error message and pattern.
+    /// </summary>
     [TestMethod]
     public void PatternSyntaxException_Message_Preserved() {
         const string msg = "syntax error";
@@ -44,3 +59,4 @@ public class PatternResultCoverageTests {
         Assert.AreEqual("*.txt", ex.Pattern);
     }
 }
+

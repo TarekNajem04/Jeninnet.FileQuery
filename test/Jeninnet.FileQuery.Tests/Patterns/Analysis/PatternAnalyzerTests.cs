@@ -1,7 +1,11 @@
-﻿namespace Jeninnet.FileQuery.Tests.Patterns.Analysis;
+namespace Jeninnet.FileQuery.Tests.Patterns.Analysis;
 
+/// <summary>
+/// Contains unit tests for the <see cref="PatternAnalyzer"/> class.
+/// </summary>
 [TestClass]
 public class PatternAnalyzerTests {
+    /// <summary>Tests Analyze_ShouldDetectRecursiveWildcard.</summary>
     [TestMethod]
     public void Analyze_ShouldDetectRecursiveWildcard() {
         var analyzer = new PatternAnalyzer();
@@ -12,6 +16,7 @@ public class PatternAnalyzerTests {
         Assert.AreEqual(2, result.SegmentCount);
     }
 
+    /// <summary>Tests Analyze_ShouldDetectTrailingSlash.</summary>
     [TestMethod]
     public void Analyze_ShouldDetectTrailingSlash() {
         var analyzer = new PatternAnalyzer();
@@ -19,3 +24,4 @@ public class PatternAnalyzerTests {
         Assert.IsTrue(result.HasGitIgnoreSyntax);
     }
 }
+

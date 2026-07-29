@@ -1,4 +1,4 @@
-﻿namespace Jeninnet.FileQuery.Tests.Core.FileCollectorAsync.RecursionDepth;
+namespace Jeninnet.FileQuery.Tests.Core.FileCollectorAsync.RecursionDepth;
 
 /// <summary>
 /// Async-focused tests validating recursion depth enforcement.
@@ -117,6 +117,8 @@ public class EnumerateFilesAsync_RecursionDepthTests {
         Assert.DoesNotContain(x => x.Contains("B2", StringComparison.Ordinal), results);
     }
 
+    /// <summary>
+    /// Gets or sets the test context.
+    /// </summary>
     public TestContext TestContext { get; set; } = null!;
 }
-

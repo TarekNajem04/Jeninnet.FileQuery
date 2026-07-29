@@ -1,4 +1,4 @@
-﻿namespace Jeninnet.FileQuery.Tests.Core.FileCollectorAsync.Cancellation;
+namespace Jeninnet.FileQuery.Tests.Core.FileCollectorAsync.Cancellation;
 
 /// <summary>
 /// Tests behavior when the caller cancels asynchronous enumeration.
@@ -116,5 +116,9 @@ public class EnumerateFilesAsync_CancellationTests {
         Assert.AreEqual(1, count);
     }
 
+    /// <summary>
+    /// Gets or sets the test context.
+    /// </summary>
     public TestContext TestContext { get; set; } = null!;
 }
+

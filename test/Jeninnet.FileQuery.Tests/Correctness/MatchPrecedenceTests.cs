@@ -1,7 +1,11 @@
-﻿namespace Jeninnet.FileQuery.Tests.Correctness;
+namespace Jeninnet.FileQuery.Tests.Correctness;
 
+/// <summary>
+/// Contains tests for validating the precedence rules of patterns in the matcher engine.
+/// </summary>
 [TestClass]
 public sealed class MatchPrecedenceTests {
+    /// <summary>Tests LaterPatternOverridesEarlier.</summary>
     [TestMethod]
     public void LaterPatternOverridesEarlier() {
         var matcher = TestMatcher.Create();
@@ -18,6 +22,7 @@ public sealed class MatchPrecedenceTests {
         Assert.AreEqual(result_1, result_2);
     }
 
+    /// <summary>Tests NegatedPatternOverridesPreviousInclude.</summary>
     [TestMethod]
     public void NegatedPatternOverridesPreviousInclude() {
         var matcher = TestMatcher.Create();
@@ -33,3 +38,4 @@ public sealed class MatchPrecedenceTests {
         Assert.AreEqual(MatchOutcome.Exclude, resultExclude);
     }
 }
+

@@ -1,4 +1,4 @@
-﻿namespace Jeninnet.FileQuery.Tests.Core.FileCollectorSync.Anchored;
+namespace Jeninnet.FileQuery.Tests.Core.FileCollectorSync.Anchored;
 
 /// <summary>
 /// Tests GitIgnore anchored patterns:
@@ -93,4 +93,3 @@ public class AnchoredPatternTests {
         TestAssertEx.EndsWith(onlyResult, Path.Combine("sub", "a.txt"), "Only the file inside the root-level 'sub' directory should be included.");
     }
 }
-

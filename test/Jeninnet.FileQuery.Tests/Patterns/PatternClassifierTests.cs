@@ -1,7 +1,13 @@
-﻿namespace Jeninnet.FileQuery.Tests.Patterns;
+namespace Jeninnet.FileQuery.Tests.Patterns;
 
+/// <summary>
+/// Contains unit tests for the PatternClassifier functionality.
+/// </summary>
 [TestClass]
 public sealed class PatternClassifierTests {
+    /// <summary>
+    /// Verifies that the Classify method correctly identifies various pattern types across different input scenarios.
+    /// </summary>
     [TestMethod]
     public void Classify_ShouldHandleAllBranches() {
         // Unknown (Malformed)
@@ -38,3 +44,4 @@ public sealed class PatternClassifierTests {
         Assert.AreEqual(PatternKind.GitIgnore, PatternClassifier.Classify("foo"));
     }
 }
+

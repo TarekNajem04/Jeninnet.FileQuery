@@ -1,7 +1,11 @@
-﻿namespace Jeninnet.FileQuery.Tests.Core;
+namespace Jeninnet.FileQuery.Tests.Core;
 
+/// <summary>
+/// Contains unit tests for verifying coverage of the <see cref="FileSystem"/> class.
+/// </summary>
 [TestClass]
 public class FileSystemCoverageTests {
+    /// <summary>Tests FileSystemEntry_Properties_Covered.</summary>
     [TestMethod]
     public void FileSystemEntry_Properties_Covered() {
         const string path = "C:\\temp\\file.txt";
@@ -12,6 +16,7 @@ public class FileSystemCoverageTests {
         Assert.AreEqual(attributes, entry.Attributes);
     }
 
+    /// <summary>Tests FileSystem_DirectoryExists_CallsStandardIO.</summary>
     [TestMethod]
     public void FileSystem_DirectoryExists_CallsStandardIO() {
         using var env = new TestEnvironment();
@@ -19,6 +24,7 @@ public class FileSystemCoverageTests {
         Assert.IsFalse(FileSystem.Instance.DirectoryExists(Path.Combine(env.Root, "non-existent")));
     }
 
+    /// <summary>Tests FileSystem_GetAttributes_ReturnsAttributes.</summary>
     [TestMethod]
     public void FileSystem_GetAttributes_ReturnsAttributes() {
         using var env = new TestEnvironment();
@@ -27,6 +33,7 @@ public class FileSystemCoverageTests {
         Assert.IsTrue(attr.HasFlag(FileAttributes.Archive) || attr.HasFlag(FileAttributes.Normal));
     }
 
+    /// <summary>Tests FileSystem_ResolveRealPath_NonReparsePoint_ReturnsSamePath.</summary>
     [TestMethod]
     public void FileSystem_ResolveRealPath_NonReparsePoint_ReturnsSamePath() {
         using var env = new TestEnvironment();
@@ -35,6 +42,7 @@ public class FileSystemCoverageTests {
         Assert.AreEqual(file, resolved);
     }
 
+    /// <summary>Tests FileSystem_Enumerate_HandlesRetry.</summary>
     [TestMethod]
     public void FileSystem_Enumerate_HandlesRetry() {
         using var env = new TestEnvironment();
@@ -49,6 +57,7 @@ public class FileSystemCoverageTests {
         Assert.HasCount(1, results);
     }
 
+    /// <summary>Tests FileSystem_Enumerate_SkipOnInaccessible.</summary>
     [TestMethod]
     public async Task FileSystem_EnumerateAsync_HandlesRetryAsync() {
         using var env = new TestEnvironment();
@@ -67,6 +76,7 @@ public class FileSystemCoverageTests {
         Assert.HasCount(1, results);
     }
 
+    /// <summary>Tests FileSystem_Enumerate_SkipOnInaccessible.</summary>
     [TestMethod]
     public void FileSystem_Enumerate_SkipOnInaccessible() {
         using var env = new TestEnvironment();
@@ -85,6 +95,7 @@ public class FileSystemCoverageTests {
         Assert.IsNotNull(results);
     }
 
+    /// <summary>Tests FileSystem_GetFullPath_Works.</summary>
     [TestMethod]
     public void FileSystem_GetFullPath_Works() {
         const string path = "test.txt";
@@ -96,6 +107,8 @@ public class FileSystemCoverageTests {
         Assert.AreEqual(Path.GetFullPath(Path.Combine(baseDir, path)), full2);
     }
 
+    /// <summary>Tests FileSystem_DirectorySeparator_IsChar.</summary>
     [TestMethod]
     public void FileSystem_DirectorySeparator_IsChar() => Assert.AreEqual(Path.DirectorySeparatorChar, FileSystem.Instance.DirectorySeparator);
 }
+

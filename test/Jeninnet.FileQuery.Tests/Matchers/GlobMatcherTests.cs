@@ -1,5 +1,8 @@
-﻿namespace Jeninnet.FileQuery.Tests.Matchers;
+namespace Jeninnet.FileQuery.Tests.Matchers;
 
+/// <summary>
+/// Provides unit tests for the <see cref="GlobInstructionMatcher"/> class.
+/// </summary>
 [TestClass]
 public class GlobMatcherTests {
     private static GlobInstructionMatcher CreateMatcher() => new();
@@ -8,6 +11,7 @@ public class GlobMatcherTests {
 
     private static PathMatchContext CreateFileContext(ReadOnlySpan<char> path, CaseSensitivity caseSensitivity = CaseSensitivity.Sensitive) => new(path, PathKind.File, caseSensitivity);
 
+    /// <summary>Tests AnchoredMatch_ShouldNotBeUnanchored.</summary>
     [TestMethod]
     public void AnchoredMatch_ShouldNotBeUnanchored() {
         // Glob is implicitly anchored to the root unless '**/'' is used.
@@ -20,6 +24,7 @@ public class GlobMatcherTests {
         Assert.IsFalse(matcher.Match(patterns, CreateFileContext(path: "other/src/File.cs", caseSensitivity: CaseSensitivity.Insensitive)).IsSuccess());
     }
 
+    /// <summary>Tests RecursiveWildcard_ShouldMatchDeeply_WhenAnchoredToRoot.</summary>
     [TestMethod]
     public void RecursiveWildcard_ShouldMatchDeeply_WhenAnchoredToRoot() {
         // Pattern `**/` at the start provides the unanchored-like behavior
@@ -31,6 +36,7 @@ public class GlobMatcherTests {
         Assert.IsTrue(matcher.Match(patterns, CreateFileContext(path: "src/main/config.json", caseSensitivity: CaseSensitivity.Insensitive)).IsSuccess());
     }
 
+    /// <summary>Tests ComplexGlobbing.</summary>
     [TestMethod]
     public void ComplexGlobbing() {
         var matcher = CreateMatcher();
@@ -41,6 +47,7 @@ public class GlobMatcherTests {
         Assert.IsFalse(matcher.Match(patterns, CreateFileContext(path: "other/data/01.log", caseSensitivity: CaseSensitivity.Insensitive)).IsSuccess(), "Not anchored.");
     }
 
+    /// <summary>Tests Wildcard_CharacterSet_Digits.</summary>
     [TestMethod]
     public void Wildcard_CharacterSet_Digits() {
         var matcher = CreateMatcher();
@@ -51,6 +58,7 @@ public class GlobMatcherTests {
         Assert.IsFalse(matcher.Match(patterns, CreateFileContext(path: "example.b", caseSensitivity: CaseSensitivity.Insensitive)).IsSuccess(), "The category includes only digits, therefore it does not include the letter b.");
     }
 
+    /// <summary>Tests Wildcard_CharacterSet_Characters.</summary>
     [TestMethod]
     public void Wildcard_CharacterSet_Characters() {
         var matcher = CreateMatcher();
@@ -62,6 +70,7 @@ public class GlobMatcherTests {
         Assert.IsFalse(matcher.Match(patterns, CreateFileContext(path: "example.h", caseSensitivity: CaseSensitivity.Insensitive)).IsSuccess(), "The category includes only letters a, b, and c.");
     }
 
+    /// <summary>Tests Wildcard_CharacterSet_Complex_2.</summary>
     [TestMethod]
     public void Wildcard_CharacterSet_Complex_2() {
         var matcher = CreateMatcher();
@@ -73,6 +82,7 @@ public class GlobMatcherTests {
         Assert.IsFalse(matcher.Match(patterns, CreateFileContext(path: "example.rat")).IsSuccess(), "The category includes only letters C and B, followed by 'at'.");
     }
 
+    /// <summary>Tests Wildcard_CharacterSet_Negate.</summary>
     [TestMethod]
     public void Wildcard_CharacterSet_Negate() {
         var matcher = CreateMatcher();
@@ -83,6 +93,7 @@ public class GlobMatcherTests {
         Assert.IsFalse(matcher.Match(patterns, CreateFileContext(path: "example.9")).IsSuccess(), "The category excludes digits.");
     }
 
+    /// <summary>Tests Wildcard_CharacterSet_Asterix.</summary>
     [TestMethod]
     public void Wildcard_CharacterSet_Asterix() {
         var matcher = CreateMatcher();
@@ -101,6 +112,7 @@ public class GlobMatcherTests {
         Assert.IsFalse(matcher1.Match(patterns1, CreateFileContext(path: "example.aw")).IsSuccess(), "Asterix only matches letters before 'Law' and after 'Law'.");
     }
 
+    /// <summary>Tests MultiPattern_SecondPatternShouldMatch.</summary>
     [TestMethod]
     public void MultiPattern_SecondPatternShouldMatch() {
         var matcher = CreateMatcher();
@@ -110,3 +122,4 @@ public class GlobMatcherTests {
         Assert.AreEqual(MatchOutcome.Include, matcher.Match(patterns, ctx));
     }
 }
+

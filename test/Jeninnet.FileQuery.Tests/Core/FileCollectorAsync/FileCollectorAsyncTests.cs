@@ -1,4 +1,4 @@
-﻿namespace Jeninnet.FileQuery.Tests.Core.FileCollectorAsync;
+namespace Jeninnet.FileQuery.Tests.Core.FileCollectorAsync;
 
 /// <summary>
 /// Async file enumeration tests for <see cref="FileQueryRuntime"/>.
@@ -8,7 +8,10 @@
 public class FileQueryEngineAsyncTests {
     // Remove _tempDir field, Setup, and Cleanup methods.
 
-    // The TestContext is retained as it is necessary for CancellationToken access.
+    /// <summary>
+    /// Gets or sets the test context, which provides information about the current test run.
+    /// Used here primarily for accessing the <see cref="CancellationToken"/>.
+    /// </summary>
     public TestContext TestContext { get; set; } = null!;
 
     // --- Test Methods ---
@@ -52,11 +55,10 @@ public class FileQueryEngineAsyncTests {
         // Both file1.txt and file3.txt are at the root and match "*.txt". Expected count is 2.
         Assert.HasCount(2, results, "Should only return top-level matching files (file1.txt and file3.txt).");
         Assert.AreSequenceEqual(
-            new[]
-            {
+            [
                 env.Abs("file1.txt"),
                 env.Abs("file3.txt")
-            },
+            ],
             results,
             SequenceOrder.InAnyOrder
         );
@@ -100,13 +102,12 @@ public class FileQueryEngineAsyncTests {
         // ASSERT
         // The pattern "**/*.txt" matches all four .txt files in the hierarchy. Expected count is 4.
         Assert.AreSequenceEqual(
-            new[]
-            {
+            [
                 env.Abs("file1.txt"),
                 env.Abs("file3.txt"),
                 env.Abs("subdir", "file3.txt"),
                 env.Abs("bin", "file3.txt")
-            },
+            ],
             results,
             SequenceOrder.InAnyOrder
         );
@@ -190,18 +191,17 @@ public class FileQueryEngineAsyncTests {
 
         // ASSERT
         Assert.AreSequenceEqual(
-            new[] {
+            [
                 // 1. file1.txt is included by !file1.txt
                 env.Abs("file1.txt"),
                 // 2. file3.txt is included by ![fF]ile3.txt (at root)
                 env.Abs("file3.txt"),
                 // 3. bin/file3.txt is included by ![fF]ile3.txt (recursively) and is NOT pruned
                 env.Abs("bin","file3.txt") // This file MUST be included
-            },
+            ],
             results,
             SequenceOrder.InAnyOrder
         );
         Assert.HasCount(3, results, "Should return file1.txt, file3.txt (root) and bin/file3.txt after exclusions/pruning.");
     }
 }
-

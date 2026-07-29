@@ -1,4 +1,4 @@
-﻿namespace Jeninnet.FileQuery.Tests.Patterns.Validation;
+namespace Jeninnet.FileQuery.Tests.Patterns.Validation;
 
 /// <summary>
 /// Tests for <see cref="PatternValidator.IsMalformed"/>.
@@ -17,12 +17,15 @@ public sealed class PatternValidatorTests {
     [TestMethod]
     public void IsMalformed_PosixDigitClass_IsNotMalformed() => AssertNotMalformed("[[:digit:]]");
 
+    /// <summary>Tests IsMalformed_PosixAlphaClass_IsNotMalformed.</summary>
     [TestMethod]
     public void IsMalformed_PosixAlphaClass_IsNotMalformed() => AssertNotMalformed("[[:alpha:]]");
 
+    /// <summary>Tests IsMalformed_PosixAlnumClass_IsNotMalformed.</summary>
     [TestMethod]
     public void IsMalformed_PosixAlnumClass_IsNotMalformed() => AssertNotMalformed("[[:alnum:]]");
 
+    /// <summary>Tests IsMalformed_PosixUpperClass_IsNotMalformed.</summary>
     [TestMethod]
     public void IsMalformed_PosixUpperClass_IsNotMalformed() => AssertNotMalformed("[[:upper:]]");
 
@@ -52,41 +55,53 @@ public sealed class PatternValidatorTests {
     [TestMethod]
     public void IsMalformed_GenuinelyNestedBracket_IsMalformed() => AssertMalformed("[[a-z]]");
 
+    /// <summary>Tests IsMalformed_DoublyNestedBracket_IsMalformed.</summary>
     [TestMethod]
     public void IsMalformed_DoublyNestedBracket_IsMalformed() => AssertMalformed("[[[abc]]]");
 
+    /// <summary>Tests IsMalformed_EmptyPattern_IsNotMalformed.</summary>
     [TestMethod]
     public void IsMalformed_EmptyPattern_IsNotMalformed() => AssertNotMalformed("");
 
+    /// <summary>Tests IsMalformed_PatternWithoutBracket_IsNotMalformed.</summary>
     [TestMethod]
     public void IsMalformed_PatternWithoutBracket_IsNotMalformed() => AssertNotMalformed("*.txt");
 
+    /// <summary>Tests IsMalformed_ValidLiteralSet_IsNotMalformed.</summary>
     [TestMethod]
     public void IsMalformed_ValidLiteralSet_IsNotMalformed() => AssertNotMalformed("[abc]");
 
+    /// <summary>Tests IsMalformed_ValidRange_IsNotMalformed.</summary>
     [TestMethod]
     public void IsMalformed_ValidRange_IsNotMalformed() => AssertNotMalformed("[a-z]");
 
+    /// <summary>Tests IsMalformed_TrailingEscape_IsMalformed.</summary>
     [TestMethod]
     public void IsMalformed_TrailingEscape_IsMalformed() => AssertMalformed(@"\");
 
+    /// <summary>Tests IsMalformed_UnterminatedBracket_IsMalformed.</summary>
     [TestMethod]
     public void IsMalformed_UnterminatedBracket_IsMalformed() => AssertMalformed("[abc");
 
+    /// <summary>Tests IsMalformed_EmptyBrackets_IsMalformed.</summary>
     [TestMethod]
     public void IsMalformed_EmptyBrackets_IsMalformed() => AssertMalformed("[]");
 
+    /// <summary>Tests IsMalformed_InvalidRange_DashBeforeClosing_IsMalformed.</summary>
     [TestMethod]
     public void IsMalformed_InvalidRange_DashBeforeClosing_IsMalformed() =>
         // "[a-]" — dash immediately before ']' is not a valid range.
         AssertMalformed("[a-]");
 
+    /// <summary>Tests IsMalformed_MissingLeftOperand_IsMalformed.</summary>
     [TestMethod]
     public void IsMalformed_MissingLeftOperand_IsMalformed() => AssertMalformed("[-z]");
 
+    /// <summary>Tests IsMalformed_DoubleDash_IsMalformed.</summary>
     [TestMethod]
     public void IsMalformed_DoubleDash_IsMalformed() => AssertMalformed("[--x]");
 
+    /// <summary>Tests IsMalformed_StrayClosingBracket_ReturnedByHasStrayClosingBracket.</summary>
     [TestMethod]
     public void IsMalformed_StrayClosingBracket_ReturnedByHasStrayClosingBracket() =>
         Assert.IsTrue(
@@ -113,6 +128,7 @@ public sealed class PatternValidatorTests {
         );
     }
 
+    /// <summary>Tests Classifier_PurePosixClass_DoesNotReturnUnknown.</summary>
     [TestMethod]
     public void Classifier_PurePosixClass_DoesNotReturnUnknown() {
         var kind = PatternClassifier.Classify("[[:alpha:]]");
@@ -132,3 +148,4 @@ public sealed class PatternValidatorTests {
             $"Pattern '{pattern}' must not be reported as malformed."
         );
 }
+

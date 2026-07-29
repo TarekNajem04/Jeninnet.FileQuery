@@ -1,7 +1,13 @@
-﻿namespace Jeninnet.FileQuery.Tests.Core.Observability;
+namespace Jeninnet.FileQuery.Tests.Core.Observability;
 
+/// <summary>
+/// Provides observation and diagnostic tests for <see cref="FileQuery"/> operations.
+/// </summary>
 [TestClass]
 public sealed class FileQueryObservabilityTests {
+    /// <summary>
+    /// Verifies that <see cref="FileQueryRuntime"/> reports correct traversal statistics when progress is monitored.
+    /// </summary>
     [TestMethod]
     public async Task ExecuteAsync_WithProgress_ShouldReportTraversalStatisticsAsync() {
         using var env = new TestEnvironment();
@@ -29,6 +35,9 @@ public sealed class FileQueryObservabilityTests {
         Assert.AreEqual(2, progress.Values[^1].FilesMatched);
     }
 
+    /// <summary>
+    /// Verifies that execution with diagnostics reports the responsible pattern.
+    /// </summary>
     [TestMethod]
     public void Execute_WithDiagnostics_ShouldReportResponsiblePattern() {
         using var env = new TestEnvironment();
@@ -60,6 +69,9 @@ public sealed class FileQueryObservabilityTests {
         Assert.AreEqual(0, excluded.PatternIndex);
     }
 
+    /// <summary>
+    /// Verifies that cancellation is propagated through filesystem enumeration in asynchronous execution.
+    /// </summary>
     [TestMethod]
     public async Task ExecuteAsync_ShouldPropagateCancellationThroughFilesystemEnumerationAsync() {
         var fileSystem = new CancellationObservingFileSystem();
@@ -84,6 +96,9 @@ public sealed class FileQueryObservabilityTests {
         await TestAssertEx.ThrowsAsync<OperationCanceledException>(ActAsync);
     }
 
+    /// <summary>
+    /// Verifies that directory failures are skipped when using <see cref="FileQueryErrorAction.Skip"/>.
+    /// </summary>
     [TestMethod]
     public void Execute_WithSkipRecovery_ShouldSkipFailingDirectory() {
         var fileSystem = new RecoverableFailureFileSystem(failLockedDirectoryAttempts: 1);
@@ -96,6 +111,9 @@ public sealed class FileQueryObservabilityTests {
         Assert.DoesNotContain(fileSystem.RetryFile, results);
     }
 
+    /// <summary>
+    /// Verifies that directory failures are propagated when using <see cref="FileQueryErrorAction.Abort"/>.
+    /// </summary>
     [TestMethod]
     public void Execute_WithAbortRecovery_ShouldPropagateFailingDirectory() {
         var fileSystem = new RecoverableFailureFileSystem(failLockedDirectoryAttempts: 1);
@@ -107,6 +125,9 @@ public sealed class FileQueryObservabilityTests {
         });
     }
 
+    /// <summary>
+    /// Verifies that directory failures are retried when using <see cref="FileQueryErrorAction.Retry"/>.
+    /// </summary>
     [TestMethod]
     public void Execute_WithRetryRecovery_ShouldRetryFailingDirectory() {
         var fileSystem = new RecoverableFailureFileSystem(failLockedDirectoryAttempts: 1);
@@ -119,6 +140,9 @@ public sealed class FileQueryObservabilityTests {
         Assert.Contains(fileSystem.RetryFile, results);
     }
 
+    /// <summary>
+    /// Gets or sets the test context.
+    /// </summary>
     public TestContext TestContext { get; set; } = null!;
 
     private static Engine.FileQueryEngine CreateEngine(IFileSystem fileSystem) => new(
@@ -245,4 +269,3 @@ public sealed class FileQueryObservabilityTests {
         public string GetFullPath(string path, string basePath) => Path.Combine(basePath, path);
     }
 }
-

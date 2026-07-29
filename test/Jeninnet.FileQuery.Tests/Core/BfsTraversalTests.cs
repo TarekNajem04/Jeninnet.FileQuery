@@ -1,4 +1,4 @@
-﻿namespace Jeninnet.FileQuery.Tests.Core;
+namespace Jeninnet.FileQuery.Tests.Core;
 
 /// <summary>
 /// Tests for breadth-first traversal strategy.
@@ -143,6 +143,9 @@ public sealed class BfsTraversalTests {
         Assert.AreSequenceEqual(syncResults, asyncResults, "BFS async must match BFS sync when both results are sorted.");
     }
 
+    /// <summary>
+    /// Gets or sets the test context which provides information about and functionality for the current test run.
+    /// </summary>
     public TestContext TestContext { get; set; } = null!;
 }
 
@@ -187,6 +190,7 @@ public sealed class PathUtilitiesUncTests {
     /// <c>IsUncRoot</c> returned <see langword="false"/> and <c>TrimTrailingSlash</c>
     /// removed the final slash. This test failed before the structural-parsing fix.
     /// </remarks>
+    /// <summary>Tests Normalize_UncRoot_WithTrailingSlash_SlashPreserved.</summary>
     [TestMethod]
     public void Normalize_UncRoot_WithTrailingSlash_SlashPreserved() {
         const string input = @"\\server\share\";
@@ -289,25 +293,30 @@ public sealed class PathUtilitiesUncTests {
             "Default behavior (trimTrailingSlash: true) must not be altered by adding the optional parameter.");
     }
 
+    /// <summary>Tests Normalize_WindowsPath_BackslashesToForwardSlashes.</summary>
     [TestMethod]
     public void Normalize_WindowsPath_BackslashesToForwardSlashes() =>
         Assert.AreEqual(
             "C:/Users/Test/file.txt",
             PathUtilities.Normalize(@"C:\Users\Test\file.txt"));
 
+    /// <summary>Tests Normalize_LocalPath_DuplicateSlashesCollapsed.</summary>
     [TestMethod]
     public void Normalize_LocalPath_DuplicateSlashesCollapsed() =>
         Assert.AreEqual(
             "C:/Users/Test/file.txt",
             PathUtilities.Normalize(@"C:\\Users//Test\\file.txt"));
 
+    /// <summary>Tests Normalize_DriveRoot_TrailingSlashPreserved.</summary>
     [TestMethod]
     public void Normalize_DriveRoot_TrailingSlashPreserved() =>
         Assert.AreEqual("C:/", PathUtilities.Normalize("C:/"));
 
+    /// <summary>Tests Normalize_NullOrEmpty_ThrowsArgumentException.</summary>
     [TestMethod]
     public void Normalize_NullOrEmpty_ThrowsArgumentException() {
         Assert.ThrowsExactly<ArgumentNullException>(() => PathUtilities.Normalize(null));
         Assert.ThrowsExactly<ArgumentException>(() => PathUtilities.Normalize(""));
     }
 }
+

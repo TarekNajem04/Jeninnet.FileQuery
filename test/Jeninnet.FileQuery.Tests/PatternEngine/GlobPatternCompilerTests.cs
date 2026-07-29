@@ -1,7 +1,11 @@
-﻿namespace Jeninnet.FileQuery.Tests.PatternEngine;
+namespace Jeninnet.FileQuery.Tests.PatternEngine;
 
+/// <summary>
+/// Provides unit tests for the <c>GlobPatternCompiler</c> class.
+/// </summary>
 [TestClass]
 public class GlobPatternCompilerTests {
+    /// <summary>Tests SingleStar_ShouldProduceWildcardToken.</summary>
     [TestMethod]
     public void SingleStar_ShouldProduceWildcardToken() {
         var compiledPatternSets = CompiledPatternFactory.Compile(PatternKind.Glob, "*.cs");
@@ -12,6 +16,7 @@ public class GlobPatternCompilerTests {
         TestAssertEx.ContainsSingle(compiledPattern.Segments[0], x => x is WildcardToken);
     }
 
+    /// <summary>Tests DoubleStar_ShouldProduceRecursiveWildcardToken.</summary>
     [TestMethod]
     public void DoubleStar_ShouldProduceRecursiveWildcardToken() {
         var compiledPatternSets = CompiledPatternFactory.Compile(PatternKind.Glob, "**/*.cs");
@@ -22,3 +27,4 @@ public class GlobPatternCompilerTests {
         TestAssertEx.ContainsSingle(compiledPattern.Segments[0], x => x is RecursiveWildcardToken);
     }
 }
+

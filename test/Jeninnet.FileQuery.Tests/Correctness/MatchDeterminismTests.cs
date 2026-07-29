@@ -1,7 +1,11 @@
-﻿namespace Jeninnet.FileQuery.Tests.Correctness;
+namespace Jeninnet.FileQuery.Tests.Correctness;
 
+/// <summary>
+/// Contains tests for ensuring consistent matching behavior of the matcher engine.
+/// </summary>
 [TestClass]
 public sealed class MatchDeterminismTests {
+    /// <summary>Tests SameInput_YieldsSameOutcome.</summary>
     [TestMethod]
     public void SameInput_YieldsSameOutcome() {
         // Arrange
@@ -17,6 +21,7 @@ public sealed class MatchDeterminismTests {
         Assert.AreEqual(first, second);
     }
 
+    /// <summary>Tests NoMatchingPattern_YieldsNoMatch.</summary>
     [TestMethod]
     public void NoMatchingPattern_YieldsNoMatch() {
         var pattern = TestPattern.Glob("*.md");
@@ -28,3 +33,4 @@ public sealed class MatchDeterminismTests {
         Assert.AreEqual(MatchOutcome.NoMatch, result);
     }
 }
+

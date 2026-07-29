@@ -1,5 +1,8 @@
-﻿namespace Jeninnet.FileQuery.Tests.Core.FileCollectorSync;
+namespace Jeninnet.FileQuery.Tests.Core.FileCollectorSync;
 
+/// <summary>
+/// Provides synchronous tests for the <see cref="IFileQueryEngine"/>.
+/// </summary>
 [TestClass]
 public class FileQueryEngineSyncTests {
     private readonly IFileQueryEngine _fileQueryEngine = FileQueryRuntime.Create();
@@ -16,6 +19,9 @@ public class FileQueryEngineSyncTests {
         return tempDir;
     }
 
+    /// <summary>
+    /// Verifies that the engine correctly enumerates files based on provided patterns.
+    /// </summary>
     [TestMethod]
     public void ShouldEnumerateMatchingFiles() {
         var tempDir = CreateTempDir(dir => {
@@ -50,6 +56,9 @@ public class FileQueryEngineSyncTests {
         }
     }
 
+    /// <summary>
+    /// Verifies that when IgnoreInaccessible is false, the engine enumerates accessible files.
+    /// </summary>
     [TestMethod]
     public void IgnoreInaccessibleFalse_ShouldEnumerateAccessibleFiles() {
         var tempDir = CreateTempDir(dir => {
@@ -82,6 +91,9 @@ public class FileQueryEngineSyncTests {
         }
     }
 
+    /// <summary>
+    /// Verifies that the engine respects the configured maximum recursion depth.
+    /// </summary>
     [TestMethod]
     public void RespectMaxDepth() {
         var tempDir = CreateTempDir(dir => {

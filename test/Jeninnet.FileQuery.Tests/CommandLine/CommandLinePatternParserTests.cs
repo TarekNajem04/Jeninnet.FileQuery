@@ -1,11 +1,23 @@
-﻿namespace Jeninnet.FileQuery.Tests.CommandLine;
+namespace Jeninnet.FileQuery.Tests.CommandLine;
 
+/// <summary>
+/// Contains tests for the <see cref="CommandLinePatternParser"/> class.
+/// </summary>
 [TestClass]
 public sealed class CommandLinePatternParserTests {
+    /// <summary>
+    /// Represents test options for command line parsing.
+    /// </summary>
     private sealed class TestOptions : CommandLinePatternOptions {
-        public TestOptions() : base() { }
+        /// <summary>
+        /// Initializes a new instance of the <see cref="TestOptions"/> class.
+        /// </summary>
+        public TestOptions() { }
     }
 
+    /// <summary>
+    /// Tests that Parse correctly extracts options.
+    /// </summary>
     [TestMethod]
     public void Parse_ShouldExtractOptionsCorrectly() {
         var options = new TestOptions();

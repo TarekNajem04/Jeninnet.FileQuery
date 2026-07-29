@@ -1,7 +1,11 @@
-﻿namespace Jeninnet.FileQuery.Tests.Core;
+namespace Jeninnet.FileQuery.Tests.Core;
 
+/// <summary>
+/// Contains unit tests for the <see cref="FileQueryOptions"/> class.
+/// </summary>
 [TestClass]
 public class FileQueryOptionsTests {
+    /// <summary>Tests Validate_ShouldThrowArgumentOutOfRangeException_WhenMaxRecursionDepthIsInvalid.</summary>
     [TestMethod]
     public void Validate_ShouldThrowArgumentOutOfRangeException_WhenMaxRecursionDepthIsInvalid() {
         // Arrange

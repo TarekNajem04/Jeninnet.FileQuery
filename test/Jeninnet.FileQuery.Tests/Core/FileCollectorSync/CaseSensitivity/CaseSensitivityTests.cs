@@ -1,4 +1,4 @@
-﻿namespace Jeninnet.FileQuery.Tests.Core.FileCollectorSync.CaseSensitivity;
+namespace Jeninnet.FileQuery.Tests.Core.FileCollectorSync.CaseSensitivity;
 
 /// <summary>
 /// Tests handling of IgnoreCase and OS defaults.

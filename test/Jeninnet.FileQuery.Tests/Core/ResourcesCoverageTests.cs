@@ -1,7 +1,13 @@
-﻿namespace Jeninnet.FileQuery.Tests.Core;
+namespace Jeninnet.FileQuery.Tests.Core;
 
+/// <summary>
+/// Provides test cases to ensure coverage for auto-generated resource classes.
+/// </summary>
 [TestClass]
 public class ResourcesCoverageTests {
+    /// <summary>
+    /// Verifies that static properties on the <see cref="Strings"/> resource class can be accessed.
+    /// </summary>
     [TestMethod]
     public void Strings_Properties_Accessed() {
         // Access static properties to get coverage on the auto-generated class.
@@ -14,6 +20,9 @@ public class ResourcesCoverageTests {
         Strings.Culture = culture; // Restore
     }
 
+    /// <summary>
+    /// Verifies that the internal constructor of the <see cref="Strings"/> resource class is reachable.
+    /// </summary>
     [TestMethod]
     public void Strings_Constructor_Covered() {
         // Use reflection to call the internal constructor.
@@ -28,3 +37,4 @@ public class ResourcesCoverageTests {
         Assert.IsNotNull(instance);
     }
 }
+

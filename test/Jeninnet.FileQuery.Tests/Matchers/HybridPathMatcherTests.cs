@@ -1,5 +1,8 @@
-﻿namespace Jeninnet.FileQuery.Tests.Matchers;
+namespace Jeninnet.FileQuery.Tests.Matchers;
 
+/// <summary>
+/// Provides unit tests for the <see cref="HybridPathMatcher"/> class.
+/// </summary>
 [TestClass]
 public class HybridPathMatcherTests {
     private static HybridPathMatcher CreateMatcher() => new();
@@ -9,8 +12,7 @@ public class HybridPathMatcherTests {
     private static ICompiledPatternSet Compile(IEnumerable<string> patterns) =>
         Compile(
             new ClassifiedPatternSet() {
-                Patterns = patterns.Select(pattern => new ClassifiedPattern(Text: pattern, Type: PatternClassifier.Classify(pattern)))
-                                   .ToArray()
+                Patterns = [.. patterns.Select(pattern => new ClassifiedPattern(Text: pattern, Type: PatternClassifier.Classify(pattern)))]
             }
         );
 
@@ -18,6 +20,7 @@ public class HybridPathMatcherTests {
 
     private static PathMatchContext CreateDirectoryContext(ReadOnlySpan<char> path, CaseSensitivity caseSensitivity = CaseSensitivity.Sensitive) => new(path, PathKind.Directory, caseSensitivity);
 
+    /// <summary>Tests ShouldMatchSingleLiteral.</summary>
     [TestMethod]
     public void ShouldMatchSingleLiteral() {
         var matcher = CreateMatcher();
@@ -27,6 +30,7 @@ public class HybridPathMatcherTests {
         Assert.IsFalse(matcher.Match(patterns, CreateFileContext(path: "bar.txt")).IsSuccess());
     }
 
+    /// <summary>Tests ShouldSupportNegation.</summary>
     [TestMethod]
     public void ShouldSupportNegation() {
         var matcher = CreateMatcher();
@@ -36,6 +40,7 @@ public class HybridPathMatcherTests {
         Assert.IsFalse(matcher.Match(patterns, CreateFileContext(path: "Program.cs")).IsSuccess());
     }
 
+    /// <summary>Tests ShouldSupportDirectoryOnlyRules.</summary>
     [TestMethod]
     public void ShouldSupportDirectoryOnlyRules() {
         var matcher = CreateMatcher();
@@ -45,6 +50,7 @@ public class HybridPathMatcherTests {
         Assert.IsFalse(matcher.Match(patterns, CreateFileContext(path: "obj")).IsSuccess(), "the file 'obj' should not be matched excluded by pattern '**'"); // file
     }
 
+    /// <summary>Tests ShouldMatchWildcardPatterns.</summary>
     [TestMethod]
     public void ShouldMatchWildcardPatterns() {
         var matcher = CreateMatcher();
@@ -54,6 +60,7 @@ public class HybridPathMatcherTests {
         Assert.IsFalse(matcher.Match(patterns, CreateFileContext(path: "Program.txt")).IsSuccess());
     }
 
+    /// <summary>Tests ShouldMatchRecursiveWildcardPatterns.</summary>
     [TestMethod]
     public void ShouldMatchRecursiveWildcardPatterns() {
         var matcher = CreateMatcher();
@@ -64,6 +71,7 @@ public class HybridPathMatcherTests {
         Assert.IsFalse(matcher.Match(patterns, CreateFileContext(path: "src/utils/Helper.txt")).IsSuccess());
     }
 
+    /// <summary>Tests ShouldHandleMultiPatternCliInput.</summary>
     [TestMethod]
     public void ShouldHandleMultiPatternCliInput() {
         // Simulate CLI input: "*.cs;!/bin/**;src/**/*.txt"
@@ -82,6 +90,7 @@ public class HybridPathMatcherTests {
         Assert.IsFalse(matcher.Match(patterns, CreateFileContext(path: "src/data/file.md")).IsSuccess());
     }
 
+    /// <summary>Tests ShouldSupportIgnoreCase.</summary>
     [TestMethod]
     public void ShouldSupportIgnoreCase() {
         var matcher = CreateMatcher();
@@ -92,6 +101,7 @@ public class HybridPathMatcherTests {
         Assert.IsFalse(matcher.Match(patterns, CreateFileContext(path: "bar.txt", caseSensitivity: CaseSensitivity.Insensitive)).IsSuccess());
     }
 
+    /// <summary>Tests ShouldReturnFalseForEmptyOrNullPath.</summary>
     [TestMethod]
     public void ShouldReturnFalseForEmptyOrNullPath() {
         var matcher = CreateMatcher();
@@ -150,6 +160,7 @@ public class HybridPathMatcherTests {
         Assert.IsFalse(matcher.Match(patterns, CreateDirectoryContext(path: binDir)).IsSuccess(), $"Another excluded subdirectory '{binDir}' path must be excluded by pattern [\"ignore_me/**\"].");
     }
 
+    /// <summary>Tests HybridPathMatcher_SimpleNegated.</summary>
     [TestMethod]
     public void HybridPathMatcher_SimpleNegated() {
         var files = new[] {
@@ -175,6 +186,7 @@ public class HybridPathMatcherTests {
         TestAssertEx.DoesNotContain(result, x => x.EndsWith("file2.txt", StringComparison.Ordinal));
     }
 
+    /// <summary>Tests DirectoryOnly_Inclusion_ShouldReturnFilesInsideSubdirectories.</summary>
     [TestMethod]
     public void DirectoryOnly_Inclusion_ShouldReturnFilesInsideSubdirectories() {
         var matcher = CreateMatcher();
@@ -212,3 +224,4 @@ public class HybridPathMatcherTests {
         Assert.IsTrue(nestedFileResult.IsSuccess(), "File inside non-matching nested 'src/temp' should be Included by default.");
     }
 }
+

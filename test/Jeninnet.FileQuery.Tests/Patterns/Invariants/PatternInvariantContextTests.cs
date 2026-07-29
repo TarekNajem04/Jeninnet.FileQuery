@@ -1,7 +1,13 @@
-﻿namespace Jeninnet.FileQuery.Tests.Patterns.Invariants;
+namespace Jeninnet.FileQuery.Tests.Patterns.Invariants;
 
+/// <summary>
+/// Contains unit tests for the PatternInvariantContext model.
+/// </summary>
 [TestClass]
 public sealed class PatternInvariantContextTests {
+    /// <summary>
+    /// Verifies that the parameterless constructor initializes all properties to null.
+    /// </summary>
     [TestMethod]
     public void Constructor_AllNull_SetsNulls() {
         var context = new PatternInvariantContext();
@@ -12,6 +18,9 @@ public sealed class PatternInvariantContextTests {
         Assert.IsNull(context.Compiled);
     }
 
+    /// <summary>
+    /// Verifies that the constructor with a text argument initializes the Text property correctly.
+    /// </summary>
     [TestMethod]
     public void Constructor_WithText_SetsText() {
         var context = new PatternInvariantContext { Text = "test" };
@@ -19,6 +28,9 @@ public sealed class PatternInvariantContextTests {
         Assert.AreEqual("test", context.Text);
     }
 
+    /// <summary>
+    /// Verifies that the constructor correctly initializes all properties when provided.
+    /// </summary>
     [TestMethod]
     public void Constructor_FullInitialization_SetsAllProperties() {
         var classified = new ClassifiedPattern("a", PatternKind.Glob);
@@ -37,3 +49,4 @@ public sealed class PatternInvariantContextTests {
         Assert.AreEqual(compiled, context.Compiled);
     }
 }
+

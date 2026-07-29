@@ -1,4 +1,4 @@
-﻿namespace Jeninnet.FileQuery.Tests.Matchers;
+namespace Jeninnet.FileQuery.Tests.Matchers;
 
 /// <summary>
 /// NOTE: We use GitIgnorePatternCompiler for all tests to ensure the IsNegated and DirectoryOnly flags
@@ -15,6 +15,7 @@ public class GitIgnoreMatcherTests {
 
     private static PathMatchContext CreateDirectoryContext(ReadOnlySpan<char> path, CaseSensitivity caseSensitivity = CaseSensitivity.Sensitive) => new(path, PathKind.Directory, caseSensitivity);
 
+    /// <summary>Tests Negation_ShouldOverridePreviousMatch.</summary>
     [TestMethod]
     public void Negation_ShouldOverridePreviousMatch() {
         var matcher = CreateMatcher();
@@ -24,6 +25,7 @@ public class GitIgnoreMatcherTests {
         Assert.IsFalse(matcher.Match(patterns, CreateFileContext(path: "Program.cs")).IsSuccess());
     }
 
+    /// <summary>Tests DirectoryOnlyRule_ShouldApplyCorrectly.</summary>
     [TestMethod]
     public void DirectoryOnlyRule_ShouldApplyCorrectly() {
         var matcher = CreateMatcher();
@@ -33,6 +35,7 @@ public class GitIgnoreMatcherTests {
         Assert.IsFalse(matcher.Match(patterns, CreateFileContext(path: "bin")).IsSuccess());
     }
 
+    /// <summary>Tests RecursiveWildcard_ShouldMatchDeepPaths.</summary>
     [TestMethod]
     public void RecursiveWildcard_ShouldMatchDeepPaths() {
         var matcher = CreateMatcher();
@@ -41,6 +44,7 @@ public class GitIgnoreMatcherTests {
         Assert.IsTrue(matcher.Match(patterns, CreateFileContext(path: "a/b/c/temp/d.txt")).IsSuccess());
     }
 
+    /// <summary>Tests BasicExclusion_ShouldMatchUnanchored.</summary>
     [TestMethod]
     public void BasicExclusion_ShouldMatchUnanchored() {
         // Unanchored pattern (matches anywhere)
@@ -52,6 +56,7 @@ public class GitIgnoreMatcherTests {
         Assert.IsFalse(matcher.Match(patterns, CreateFileContext(path: "README.md")).IsSuccess(), "Unrelated file should not match.");
     }
 
+    /// <summary>Tests AnchoredExclusion_ShouldMatchOnlyFromRoot.</summary>
     [TestMethod]
     public void AnchoredExclusion_ShouldMatchOnlyFromRoot() {
         // Pattern anchored to root by '/'
@@ -66,6 +71,7 @@ public class GitIgnoreMatcherTests {
         Assert.IsTrue(matcher.Match(patterns, CreateFileContext(path: "other/src/file.txt")).IsSuccess(), "File should not match if prefix is present.");
     }
 
+    /// <summary>Tests DirectoryOnlyExclusion_ShouldMatchDirectory.</summary>
     [TestMethod]
     public void DirectoryOnlyExclusion_ShouldMatchDirectory() {
         // Directory-only pattern "logs/"
@@ -89,6 +95,7 @@ public class GitIgnoreMatcherTests {
             "Nested directory 'src/logs' should be matched by default.");
     }
 
+    /// <summary>Tests DirectoryReInclusionSemantics.</summary>
     [TestMethod]
     public void DirectoryReInclusionSemantics() {
         // Standard GitIgnore pattern set for re-inclusion: exclude folder, include file inside.
@@ -108,6 +115,7 @@ public class GitIgnoreMatcherTests {
         Assert.IsTrue(matcher.Match(patterns, CreateFileContext(path: "ignored_dir/dump.txt")).IsSuccess(), "File 'dump.txt' should be included by default.");
     }
 
+    /// <summary>Tests RecursiveWildcard_ShouldMatchDeeply.</summary>
     [TestMethod]
     public void RecursiveWildcard_ShouldMatchDeeply() {
         var matcher = CreateMatcher();
@@ -118,6 +126,7 @@ public class GitIgnoreMatcherTests {
         Assert.IsTrue(matcher.Match(patterns, CreateFileContext(path: "dir/subdir/a.txt")).IsSuccess());
     }
 
+    /// <summary>Tests Negation_LastRuleWins.</summary>
     [TestMethod]
     public void Negation_LastRuleWins() {
         // *.tmp is exclusion. !important.tmp is inclusion.
@@ -158,6 +167,7 @@ public class GitIgnoreMatcherTests {
         Assert.IsTrue(matcher.Match(patterns, CreateDirectoryContext(path: "src")).IsSuccess(), "A normal subdirectory should be included by default.");
     }
 
+    /// <summary>Tests EdgeCase_EmptyPathShouldThrowForBareRootPattern.</summary>
     [TestMethod]
     public void EdgeCase_EmptyPathShouldThrowForBareRootPattern() {
         // Arrange
@@ -170,6 +180,7 @@ public class GitIgnoreMatcherTests {
         Assert.Contains("bare '/' is not a valid pattern", exception.Message);
     }
 
+    /// <summary>Tests EmptyPathShouldBeExcludedByDefault.</summary>
     [TestMethod]
     public void EmptyPathShouldBeExcludedByDefault() {
         var matcher = CreateMatcher();
@@ -289,3 +300,4 @@ public class GitIgnoreMatcherTests {
         Assert.IsTrue(matcher.Match(patterns, CreateDirectoryContext(path: "bin/file3.txt")).IsSuccess(), "The 'bin' directory should be INCLUDED by the global '!**/*.txt' rule.");
     }
 }
+

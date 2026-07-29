@@ -1,4 +1,4 @@
-﻿namespace Jeninnet.FileQuery.Tests.Patterns.Invariants;
+namespace Jeninnet.FileQuery.Tests.Patterns.Invariants;
 
 internal sealed class FakeCompiledPattern : ICompiledPattern {
     public bool IsNegated => false;
@@ -12,3 +12,4 @@ internal sealed class FakeCompiledPattern : ICompiledPattern {
     public string ConcretePathAnchor => "";
     public string? RegexText => null;
 }
+

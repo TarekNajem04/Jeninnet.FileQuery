@@ -1,4 +1,4 @@
-﻿namespace Jeninnet.FileQuery.Tests.Core.FileCollectorAsync.DirectoryOnly;
+namespace Jeninnet.FileQuery.Tests.Core.FileCollectorAsync.DirectoryOnly;
 
 /// <summary>
 /// Async tests for the recursive wildcard **.
@@ -72,6 +72,8 @@ public class EnumerateFilesAsync_RecursiveWildcardTests {
         TestAssertEx.HasCount(results, 2);
     }
 
+    /// <summary>
+    /// Gets or sets the test context.
+    /// </summary>
     public TestContext TestContext { get; set; } = null!;
 }
-
