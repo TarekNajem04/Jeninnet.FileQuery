@@ -8,7 +8,7 @@ on:
       - main
     paths:
       - 'src/**'
-      - 'test/**'
+      - 'tests/**'
       - '**.csproj'
       - 'Directory.Packages.props'
       - 'Directory.Build.props'
@@ -19,7 +19,7 @@ on:
       - main
     paths:
       - 'src/**'
-      - 'test/**'
+      - 'tests/**'
       - '**.csproj'
       - 'Directory.Packages.props'
       - 'Directory.Build.props'
