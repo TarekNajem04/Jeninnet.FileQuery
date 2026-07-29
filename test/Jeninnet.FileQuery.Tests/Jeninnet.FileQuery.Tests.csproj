@@ -32,7 +32,7 @@
         <ProjectReference Include="..\..\src\Jeninnet.FileQuery\Jeninnet.FileQuery.csproj" />
         <ProjectReference Include="..\..\src\Jeninnet.FileQuery.CommandLine\Jeninnet.FileQuery.CommandLine.csproj" />
         <ProjectReference Include="..\..\src\Jeninnet.FileQuery.DependencyInjection\Jeninnet.FileQuery.DependencyInjection.csproj" />
-        <ProjectReference Include="..\Jeninnet.Testing.Assertions\Jeninnet.Testing.Assertions.csproj" />
+        <ProjectReference Include="..\..\src\Jeninnet.Testing.Assertions\Jeninnet.Testing.Assertions.csproj" />
     </ItemGroup>
 
 </Project>

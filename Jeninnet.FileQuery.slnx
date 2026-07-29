@@ -139,10 +139,10 @@
         <Project Path="src/Jeninnet.FileQuery.CommandLine/Jeninnet.FileQuery.CommandLine.csproj" />
         <Project Path="src/Jeninnet.FileQuery.DependencyInjection/Jeninnet.FileQuery.DependencyInjection.csproj" Id="005c5625-30f9-468a-96d1-da623b25435c" />
         <Project Path="src/Jeninnet.FileQuery/Jeninnet.FileQuery.csproj" />
+        <Project Path="src/Jeninnet.Testing.Assertions/Jeninnet.Testing.Assertions.csproj" />
     </Folder>
     <Folder Name="/test/">
         <Project Path="test/Jeninnet.FileQuery.Tests/Jeninnet.FileQuery.Tests.csproj" />
-        <Project Path="test/Jeninnet.Testing.Assertions/Jeninnet.Testing.Assertions.csproj" />
     </Folder>
 
 </Solution>
