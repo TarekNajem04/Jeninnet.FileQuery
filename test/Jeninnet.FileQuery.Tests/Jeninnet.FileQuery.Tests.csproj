@@ -4,7 +4,6 @@
         <OutputType>Exe</OutputType>
         <IsTestProject>true</IsTestProject>
         <IsPackable>false</IsPackable>
-        <NoWarn>$(NoWarn);1591;RS1036</NoWarn>
     </PropertyGroup>
 
     <PropertyGroup>
@@ -33,6 +32,7 @@
         <ProjectReference Include="..\..\src\Jeninnet.FileQuery\Jeninnet.FileQuery.csproj" />
         <ProjectReference Include="..\..\src\Jeninnet.FileQuery.CommandLine\Jeninnet.FileQuery.CommandLine.csproj" />
         <ProjectReference Include="..\..\src\Jeninnet.FileQuery.DependencyInjection\Jeninnet.FileQuery.DependencyInjection.csproj" />
+        <ProjectReference Include="..\Jeninnet.Testing.Assertions\Jeninnet.Testing.Assertions.csproj" />
     </ItemGroup>
 
 </Project>

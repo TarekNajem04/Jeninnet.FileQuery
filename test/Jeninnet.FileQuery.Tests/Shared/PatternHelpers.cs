@@ -1,4 +1,4 @@
-﻿namespace Jeninnet.FileQuery.Tests.Shared;
+namespace Jeninnet.FileQuery.Tests.Shared;
 
 /// <summary>
 /// Provides helper methods for creating pattern dictionaries used to associate pattern types with collections of pattern strings.
@@ -23,3 +23,4 @@ public static class PatternHelpers {
         [patternKind] = patterns.Where(p => !string.IsNullOrWhiteSpace(p))
     };
 }
+

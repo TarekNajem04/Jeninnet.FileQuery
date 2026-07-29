@@ -1,4 +1,4 @@
-﻿namespace Jeninnet.FileQuery.Tests;
+namespace Jeninnet.FileQuery.Tests;
 
 internal static class TestAssertEx {
     public static T Throws<T>(Action action) where T : Exception {
@@ -35,11 +35,11 @@ internal static class TestAssertEx {
 
     public static void Contains<T>(IEnumerable<T> actual, Func<T, bool> predicate, string? message = null) => Assert.Contains(predicate, actual, message);
 
-    public static void Contains<T>(IEnumerable<T> actual, T expected, string? message = null) => Assert.Contains(expected, actual.ToList(), message);
+    public static void Contains<T>(IEnumerable<T> actual, T expected, string? message = null) => Assert.Contains(expected, [.. actual], message);
 
     public static void DoesNotContain<T>(IEnumerable<T> actual, Func<T, bool> predicate, string? message = null) => Assert.DoesNotContain(predicate, actual, message);
 
-    public static void DoesNotContain<T>(IEnumerable<T> actual, T expected, string? message = null) => Assert.DoesNotContain(expected, actual.ToList(), message);
+    public static void DoesNotContain<T>(IEnumerable<T> actual, T expected, string? message = null) => Assert.DoesNotContain(expected, [.. actual], message);
 
     public static void ContainsSubset<T>(IEnumerable<T> actual, IEnumerable<T> expectedSubset, string? message = null) => CollectionAssert.IsSubsetOf(expectedSubset.ToList(), actual.ToList(), message);
 
@@ -49,7 +49,8 @@ internal static class TestAssertEx {
         return matches[0];
     }
 
-    public static void AreEquivalent<T>(IEnumerable<T> actual, IEnumerable<T> expected, string? message = null) => Assert.AreSequenceEqual(expected.ToList(), actual.ToList(), SequenceOrder.InAnyOrder, message);
+    public static void AreEquivalent<T>(IEnumerable<T> actual, IEnumerable<T> expected, string? message = null) => Assert.AreSequenceEqual([.. expected], [.. actual], SequenceOrder.InAnyOrder, message);
 
     public static void EndsWith(string actual, string suffix, string? message = null) => Assert.EndsWith(suffix, actual, message);
 }
+

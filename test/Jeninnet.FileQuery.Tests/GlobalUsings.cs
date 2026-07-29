@@ -1,6 +1,5 @@
 ﻿global using System.Collections.Concurrent;
 global using System.CommandLine;
-global using System.Diagnostics;
 global using System.Globalization;
 global using System.Linq;
 global using System.Reflection;
@@ -10,6 +9,7 @@ global using System.Text.RegularExpressions;
 global using Jeninnet.FileQuery.CommandLine;
 global using Jeninnet.FileQuery.Composition;
 global using Jeninnet.FileQuery.DependencyInjection.Extensions;
+global using Jeninnet.FileQuery.Engine;
 global using Jeninnet.FileQuery.Enums;
 global using Jeninnet.FileQuery.Extensions;
 global using Jeninnet.FileQuery.Internal;
@@ -33,10 +33,15 @@ global using Jeninnet.FileQuery.Patterns.Syntax.CharacterClasses;
 global using Jeninnet.FileQuery.Patterns.Tokenization;
 global using Jeninnet.FileQuery.Patterns.Validation;
 global using Jeninnet.FileQuery.Resources;
-global using Jeninnet.FileQuery.Tests.Infrastructure;
 global using Jeninnet.FileQuery.Tests.Shared;
 global using Jeninnet.FileQuery.Traversal;
 global using Jeninnet.FileQuery.Validation;
+global using Jeninnet.Testing.Assertions;
+global using Jeninnet.Testing.Assertions.IO;
+global using Jeninnet.Testing.Assertions.Extensions;
+global using Jeninnet.Testing.Assertions.Utilities;
+
 global using Microsoft.Extensions.DependencyInjection;
 global using Microsoft.VisualStudio.TestTools.UnitTesting;
 global using Moq;
+
