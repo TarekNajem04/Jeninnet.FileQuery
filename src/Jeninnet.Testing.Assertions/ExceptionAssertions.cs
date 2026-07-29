@@ -1,4 +1,4 @@
-namespace Jeninnet.Testing.Assertions;
+﻿namespace Jeninnet.Testing.Assertions;
 
 /// <summary>
 /// Provides access to a caught exception after a <c>Throw</c> or <c>ThrowAsync</c> assertion succeeds,

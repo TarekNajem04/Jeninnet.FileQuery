@@ -1,4 +1,4 @@
-namespace Jeninnet.FileQuery.Tests.Unit.Matchers;
+﻿namespace Jeninnet.FileQuery.Tests.Unit.Matchers;
 
 /// <summary>
 /// Tests that match operations are deterministic, producing the same outcome for identical inputs

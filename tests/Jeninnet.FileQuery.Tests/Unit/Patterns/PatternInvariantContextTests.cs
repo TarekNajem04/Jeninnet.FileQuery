@@ -1,4 +1,4 @@
-namespace Jeninnet.FileQuery.Tests.Unit.Patterns;
+﻿namespace Jeninnet.FileQuery.Tests.Unit.Patterns;
 
 /// <summary>
 /// Tests for <see cref="PatternInvariantContext"/>.

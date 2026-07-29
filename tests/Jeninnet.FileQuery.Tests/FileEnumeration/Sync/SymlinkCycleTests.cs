@@ -1,4 +1,4 @@
-namespace Jeninnet.FileQuery.Tests.FileEnumeration.Sync;
+﻿namespace Jeninnet.FileQuery.Tests.FileEnumeration.Sync;
 
 /// <summary>
 /// Tests symlink cycle detection behavior to ensure traversal stops when a cycle is detected.

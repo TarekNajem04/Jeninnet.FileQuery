@@ -1,4 +1,4 @@
-namespace Jeninnet.FileQuery.Tests.Unit.Matchers;
+﻿namespace Jeninnet.FileQuery.Tests.Unit.Matchers;
 
 /// <summary>
 /// Tests for the GitIgnore instruction matcher, validating negation, anchoring, directory-only rules,

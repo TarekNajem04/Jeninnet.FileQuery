@@ -1,4 +1,4 @@
-namespace Jeninnet.FileQuery.Tests.Core.FileCollectorAsync;
+﻿namespace Jeninnet.FileQuery.Tests.Core.FileCollectorAsync;
 
 /// <summary>
 /// Async file enumeration tests for <see cref="FileQueryRuntime"/>.

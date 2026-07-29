@@ -1,4 +1,4 @@
-namespace Jeninnet.FileQuery.Tests.Core.FileCollectorSync;
+﻿namespace Jeninnet.FileQuery.Tests.Core.FileCollectorSync;
 
 /// <summary>
 /// Provides synchronous tests for the <see cref="IFileQueryEngine"/>.

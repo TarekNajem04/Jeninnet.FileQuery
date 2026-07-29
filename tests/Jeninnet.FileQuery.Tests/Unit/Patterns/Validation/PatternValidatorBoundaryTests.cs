@@ -1,4 +1,4 @@
-namespace Jeninnet.FileQuery.Tests.Unit.Patterns.Validation;
+﻿namespace Jeninnet.FileQuery.Tests.Unit.Patterns.Validation;
 
 /// <summary>
 /// Boundary tests for <see cref="PatternValidator"/> verifying resilience against

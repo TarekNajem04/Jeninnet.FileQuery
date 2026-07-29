@@ -1,4 +1,4 @@
-namespace Jeninnet.FileQuery.Tests.Unit.Engine;
+﻿namespace Jeninnet.FileQuery.Tests.Unit.Engine;
 
 /// <summary>
 /// Tests for code coverage of the auto-generated resource Strings class.

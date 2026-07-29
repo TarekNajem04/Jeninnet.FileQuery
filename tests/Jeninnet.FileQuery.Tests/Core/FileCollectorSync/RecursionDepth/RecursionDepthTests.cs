@@ -1,4 +1,4 @@
-namespace Jeninnet.FileQuery.Tests.Core.FileCollectorSync.RecursionDepth;
+﻿namespace Jeninnet.FileQuery.Tests.Core.FileCollectorSync.RecursionDepth;
 
 /// <summary>
 /// Tests for MaxRecursionDepth behavior during synchronous file enumeration.

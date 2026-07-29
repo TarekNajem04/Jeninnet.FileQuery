@@ -1,4 +1,4 @@
-namespace Jeninnet.FileQuery.Tests.FileEnumeration.Sync;
+﻿namespace Jeninnet.FileQuery.Tests.FileEnumeration.Sync;
 
 /// <summary>
 /// Tests handling of IgnoreCase and OS defaults.

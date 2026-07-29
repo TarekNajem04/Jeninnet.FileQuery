@@ -1,4 +1,4 @@
-namespace Jeninnet.Testing.Assertions.Extensions;
+﻿namespace Jeninnet.Testing.Assertions.Extensions;
 
 /// <summary>Provides extension methods for path-related string comparisons.</summary>
 public static class PathExtensions {

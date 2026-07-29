@@ -1,4 +1,4 @@
-namespace Jeninnet.FileQuery.Tests.Core.FileCollectorAsync.RecursionDepth;
+﻿namespace Jeninnet.FileQuery.Tests.Core.FileCollectorAsync.RecursionDepth;
 
 /// <summary>
 /// Async-focused tests validating recursion depth enforcement.

@@ -1,4 +1,4 @@
-namespace Jeninnet.FileQuery.Tests.ContractTests;
+﻿namespace Jeninnet.FileQuery.Tests.ContractTests;
 
 /// <summary>
 /// Contract tests for <see cref="IFileQueryEngine"/>.

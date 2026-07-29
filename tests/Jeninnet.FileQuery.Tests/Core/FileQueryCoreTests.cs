@@ -1,4 +1,4 @@
-namespace Jeninnet.FileQuery.Tests.Core;
+﻿namespace Jeninnet.FileQuery.Tests.Core;
 
 /// <summary>
 /// Contains unit tests for the <see cref="FileQuery"/> class.

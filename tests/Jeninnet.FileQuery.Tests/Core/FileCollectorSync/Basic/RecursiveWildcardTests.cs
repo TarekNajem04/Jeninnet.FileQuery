@@ -1,4 +1,4 @@
-namespace Jeninnet.FileQuery.Tests.Core.FileCollectorSync.Basic;
+﻿namespace Jeninnet.FileQuery.Tests.Core.FileCollectorSync.Basic;
 
 /// <summary>
 /// Provides test cases for verifying the behavior of the recursive wildcard (**) path matching.

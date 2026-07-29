@@ -1,4 +1,4 @@
-namespace Jeninnet.FileQuery.Tests.Patterns;
+﻿namespace Jeninnet.FileQuery.Tests.Patterns;
 
 /// <summary>
 /// Contains unit tests for the <see cref="CanonicalPatternInput"/> class, ensuring correct initialization

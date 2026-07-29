@@ -1,4 +1,4 @@
-namespace Jeninnet.FileQuery.Tests.PatternEngine;
+﻿namespace Jeninnet.FileQuery.Tests.PatternEngine;
 
 /// <summary>
 /// Contains unit tests for verifying the correct creation and behavior of various pattern tokens.

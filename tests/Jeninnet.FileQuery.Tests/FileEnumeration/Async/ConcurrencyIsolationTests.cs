@@ -1,4 +1,4 @@
-namespace Jeninnet.FileQuery.Tests.FileEnumeration.Async;
+﻿namespace Jeninnet.FileQuery.Tests.FileEnumeration.Async;
 
 /// <summary>
 /// Ensures async enumeration instances do not interfere with each other

@@ -1,4 +1,4 @@
-namespace Jeninnet.FileQuery.Tests.Unit.Patterns.Parsing;
+﻿namespace Jeninnet.FileQuery.Tests.Unit.Patterns.Parsing;
 
 /// <summary>
 /// Tests for the redesigned character class system.

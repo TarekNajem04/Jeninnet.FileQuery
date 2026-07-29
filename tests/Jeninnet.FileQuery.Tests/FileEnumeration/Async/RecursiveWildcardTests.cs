@@ -1,4 +1,4 @@
-namespace Jeninnet.FileQuery.Tests.FileEnumeration.Async;
+﻿namespace Jeninnet.FileQuery.Tests.FileEnumeration.Async;
 
 /// <summary>
 /// Async tests for the recursive wildcard **.

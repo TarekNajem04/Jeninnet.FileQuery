@@ -1,4 +1,4 @@
-namespace Jeninnet.Testing.Assertions.Tests.IO;
+﻿namespace Jeninnet.Testing.Assertions.Tests.IO;
 
 /// <summary>Smoke tests for TestEnvironment: creation, disposal, and file/directory operations.</summary>
 [TestClass]

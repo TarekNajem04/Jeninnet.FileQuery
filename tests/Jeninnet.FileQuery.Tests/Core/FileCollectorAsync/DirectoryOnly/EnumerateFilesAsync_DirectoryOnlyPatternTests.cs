@@ -1,4 +1,4 @@
-namespace Jeninnet.FileQuery.Tests.Core.FileCollectorAsync.DirectoryOnly;
+﻿namespace Jeninnet.FileQuery.Tests.Core.FileCollectorAsync.DirectoryOnly;
 
 /// <summary>
 /// Async tests validating patterns that apply *only to directories*.

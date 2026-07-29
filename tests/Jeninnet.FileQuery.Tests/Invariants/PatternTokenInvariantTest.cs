@@ -1,4 +1,4 @@
-namespace Jeninnet.FileQuery.Tests.Invariants;
+﻿namespace Jeninnet.FileQuery.Tests.Invariants;
 
 /// <summary>
 /// Provides test data for pattern invariant validation tests.

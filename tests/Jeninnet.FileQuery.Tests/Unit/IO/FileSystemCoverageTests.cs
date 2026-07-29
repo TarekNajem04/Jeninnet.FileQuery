@@ -1,4 +1,4 @@
-namespace Jeninnet.FileQuery.Tests.Unit.IO;
+﻿namespace Jeninnet.FileQuery.Tests.Unit.IO;
 
 /// <summary>
 /// Tests for code coverage of the FileSystem and FileSystemEntry types.

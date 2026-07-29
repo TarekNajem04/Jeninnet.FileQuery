@@ -1,4 +1,4 @@
-namespace Jeninnet.FileQuery.Tests.Core.FileCollectorSync.DirectoryRules;
+﻿namespace Jeninnet.FileQuery.Tests.Core.FileCollectorSync.DirectoryRules;
 
 /// <summary>
 /// Tests directory patterns ("dir/", "dir/**") in synchronous file enumeration.

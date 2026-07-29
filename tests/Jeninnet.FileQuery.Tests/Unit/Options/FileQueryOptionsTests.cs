@@ -1,4 +1,4 @@
-namespace Jeninnet.FileQuery.Tests.Unit.Options;
+﻿namespace Jeninnet.FileQuery.Tests.Unit.Options;
 
 /// <summary>
 /// Tests for FileQueryOptionsTests.

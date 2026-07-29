@@ -1,4 +1,4 @@
-namespace Jeninnet.FileQuery.Tests.Shared;
+﻿namespace Jeninnet.FileQuery.Tests.Shared;
 
 /// <summary>
 /// Helper factory for building path match contexts.

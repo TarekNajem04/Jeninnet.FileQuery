@@ -1,4 +1,4 @@
-namespace Jeninnet.FileQuery.Tests.IO;
+﻿namespace Jeninnet.FileQuery.Tests.IO;
 
 /// <summary>
 /// Contains unit tests for the <see cref="FileSystemGuards"/> class.

@@ -14,7 +14,7 @@ public class ObjectAssertions<T>(T? value) {
     /// </param>
     /// <exception cref="AssertionFailedException">The values are not equal.</exception>
     public void Be(T? expected, string? message = null) {
-        if (!EqualityComparer<T?>.Default.Equals(_value, expected)) {
+        if(!EqualityComparer<T?>.Default.Equals(_value, expected)) {
             throw new AssertionFailedException(message ?? $"Expected '{expected}', but got '{_value}'.");
         }
     }
@@ -27,7 +27,7 @@ public class ObjectAssertions<T>(T? value) {
     /// </param>
     /// <exception cref="AssertionFailedException">The run-time type does not match <typeparamref name="TExpected"/>.</exception>
     public void Be<TExpected>(string? message = null) {
-        if (typeof(TExpected) != (_value?.GetType() ?? typeof(T))) {
+        if(typeof(TExpected) != (_value?.GetType() ?? typeof(T))) {
             throw new AssertionFailedException(
                 message ?? $"Expected type {typeof(TExpected).Name}, but got {_value?.GetType().Name ?? "null"}.");
         }
@@ -40,7 +40,7 @@ public class ObjectAssertions<T>(T? value) {
     /// </param>
     /// <exception cref="AssertionFailedException">The value is not <see langword="null"/>.</exception>
     public void BeNull(string? message = null) {
-        if (_value is not null) {
+        if(_value is not null) {
             throw new AssertionFailedException(message ?? "Expected null, but was not null.");
         }
     }
@@ -52,7 +52,7 @@ public class ObjectAssertions<T>(T? value) {
     /// </param>
     /// <exception cref="AssertionFailedException">The value is <see langword="null"/>.</exception>
     public void NotBeNull(string? message = null) {
-        if (_value is null) {
+        if(_value is null) {
             throw new AssertionFailedException(message ?? "Expected non-null, but was null.");
         }
     }
@@ -65,11 +65,11 @@ public class ObjectAssertions<T>(T? value) {
     /// </param>
     /// <exception cref="AssertionFailedException">The value is <see langword="null"/> or is not of the expected type.</exception>
     public void BeOfType<TExpected>(string? message = null) {
-        if (_value is null) {
+        if(_value is null) {
             throw new AssertionFailedException(message ?? "Expected non-null value of compatible type.");
         }
 
-        if (_value is not TExpected) {
+        if(_value is not TExpected) {
             throw new AssertionFailedException(
                 message ?? $"Expected object of type {typeof(TExpected).Name}, but got {_value.GetType().Name}.");
         }

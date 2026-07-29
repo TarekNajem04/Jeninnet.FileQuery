@@ -1,4 +1,4 @@
-namespace Jeninnet.FileQuery.Tests.Unit.Patterns.Tokens;
+﻿namespace Jeninnet.FileQuery.Tests.Unit.Patterns.Tokens;
 
 /// <summary>
 /// Tests for PatternScannerTests.

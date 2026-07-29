@@ -1,4 +1,4 @@
-namespace Jeninnet.Testing.Assertions;
+﻿namespace Jeninnet.Testing.Assertions;
 
 /// <summary>Provides assertion methods for verifying that synchronous delegates throw expected exceptions.</summary>
 /// <param name="action">The synchronous delegate to invoke and verify.</param>
@@ -17,10 +17,10 @@ public class ActionAssertions(Action action) {
         try {
             _action();
         }
-        catch (TException ex) {
+        catch(TException ex) {
             return new ExceptionAssertions<TException>(ex);
         }
-        catch (Exception ex) {
+        catch(Exception ex) {
             throw new AssertionFailedException(
                 message ?? $"Expected exception of type {typeof(TException).Name}, but got {ex.GetType().Name}.", ex);
         }

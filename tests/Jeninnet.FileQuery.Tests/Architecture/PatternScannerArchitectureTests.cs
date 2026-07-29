@@ -1,4 +1,4 @@
-namespace Jeninnet.FileQuery.Tests.Architecture;
+﻿namespace Jeninnet.FileQuery.Tests.Architecture;
 
 /// <summary>
 /// Contains architectural tests for the <see cref="PatternScanner"/> class, focusing on pattern validation.

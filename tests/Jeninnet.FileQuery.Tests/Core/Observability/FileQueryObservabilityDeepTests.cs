@@ -1,4 +1,4 @@
-namespace Jeninnet.FileQuery.Tests.Core.Observability;
+﻿namespace Jeninnet.FileQuery.Tests.Core.Observability;
 
 /// <summary>
 /// Provides deep observation and validation tests for <see cref="FileQuery"/> operations.

@@ -1,4 +1,4 @@
-namespace Jeninnet.FileQuery.Tests.Unit.Engine;
+﻿namespace Jeninnet.FileQuery.Tests.Unit.Engine;
 
 /// <summary>
 /// Tests for FileQuery observability features including progress reporting, diagnostics, and error recovery.

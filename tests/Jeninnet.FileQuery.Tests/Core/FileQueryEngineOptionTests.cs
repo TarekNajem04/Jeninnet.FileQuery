@@ -1,4 +1,4 @@
-namespace Jeninnet.FileQuery.Tests.Core;
+﻿namespace Jeninnet.FileQuery.Tests.Core;
 
 /// <summary>
 /// Tests the functional impact of configurable options in <see cref="FileQueryOptions"/>

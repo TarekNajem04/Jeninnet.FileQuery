@@ -1,4 +1,4 @@
-namespace Jeninnet.FileQuery.Tests.Correctness;
+﻿namespace Jeninnet.FileQuery.Tests.Correctness;
 
 /// <summary>
 /// Contains tests for validating the precedence rules of patterns in the matcher engine.

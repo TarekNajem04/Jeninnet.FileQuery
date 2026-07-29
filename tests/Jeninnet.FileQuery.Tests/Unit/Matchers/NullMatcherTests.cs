@@ -1,4 +1,4 @@
-namespace Jeninnet.FileQuery.Tests.Unit.Matchers;
+﻿namespace Jeninnet.FileQuery.Tests.Unit.Matchers;
 
 /// <summary>
 /// Tests for the null matcher, validating that it matches everything and supports all pattern kinds.

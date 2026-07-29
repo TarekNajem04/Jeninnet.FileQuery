@@ -1,4 +1,4 @@
-namespace Jeninnet.FileQuery.Tests.Unit.Matchers;
+﻿namespace Jeninnet.FileQuery.Tests.Unit.Matchers;
 
 /// <summary>
 /// Tests for the segment instruction matcher, validating POSIX character classes, unknown classes,

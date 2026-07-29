@@ -1,4 +1,4 @@
-namespace Jeninnet.Testing.Assertions;
+﻿namespace Jeninnet.Testing.Assertions;
 
 /// <summary>
 /// Provides access to a matched value after an assertion succeeds.

@@ -1,4 +1,4 @@
-namespace Jeninnet.FileQuery.Tests.CommandLine;
+﻿namespace Jeninnet.FileQuery.Tests.CommandLine;
 
 /// <summary>
 /// Contains unit tests for the <see cref="PatternBuilder"/> class, verifying its ability to correctly build and categorize patterns.

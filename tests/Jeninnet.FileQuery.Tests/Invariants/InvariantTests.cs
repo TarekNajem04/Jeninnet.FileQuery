@@ -1,4 +1,4 @@
-namespace Jeninnet.FileQuery.Tests.Invariants;
+﻿namespace Jeninnet.FileQuery.Tests.Invariants;
 
 /// <summary>
 /// Regression tests for the four invariant gaps identified during the v1.0 freeze audit.

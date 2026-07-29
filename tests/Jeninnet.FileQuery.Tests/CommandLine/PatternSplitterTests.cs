@@ -1,4 +1,4 @@
-namespace Jeninnet.FileQuery.Tests.CommandLine;
+﻿namespace Jeninnet.FileQuery.Tests.CommandLine;
 
 /// <summary>
 /// Contains unit tests for the <see cref="PatternSplitter"/> class, focusing on splitting input strings.

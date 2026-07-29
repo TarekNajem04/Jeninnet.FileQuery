@@ -37,10 +37,9 @@ global using Jeninnet.FileQuery.Tests.Shared;
 global using Jeninnet.FileQuery.Traversal;
 global using Jeninnet.FileQuery.Validation;
 global using Jeninnet.Testing.Assertions;
-global using Jeninnet.Testing.Assertions.IO;
 global using Jeninnet.Testing.Assertions.Extensions;
+global using Jeninnet.Testing.Assertions.IO;
 global using Jeninnet.Testing.Assertions.Utilities;
-
 global using Microsoft.Extensions.DependencyInjection;
 global using Microsoft.VisualStudio.TestTools.UnitTesting;
 global using Moq;

@@ -1,4 +1,4 @@
-namespace Jeninnet.FileQuery.Tests.Patterns;
+﻿namespace Jeninnet.FileQuery.Tests.Patterns;
 
 /// <summary>
 /// Contains unit tests for the <see cref="PatternCanonicalizer"/> class, verifying its ability to correctly canonicalize pattern inputs.

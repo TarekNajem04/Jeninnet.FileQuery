@@ -1,4 +1,4 @@
-namespace Jeninnet.FileQuery.Tests.Unit.Patterns.Parsing;
+﻿namespace Jeninnet.FileQuery.Tests.Unit.Patterns.Parsing;
 
 /// <summary>
 /// Tests for <see cref="PatternSyntaxProfile"/>.

@@ -1,4 +1,4 @@
-namespace Jeninnet.Testing.Assertions;
+﻿namespace Jeninnet.Testing.Assertions;
 
 /// <summary>Provides assertion methods for verifying <see cref="string"/> values.</summary>
 /// <param name="value">The string value to assert on.</param>
@@ -13,7 +13,7 @@ public class StringAssertions(string? value) {
     /// </param>
     /// <exception cref="AssertionFailedException">The string does not match <paramref name="expected"/>.</exception>
     public void Be(string? expected, string? message = null) {
-        if (!string.Equals(_value, expected, StringComparison.Ordinal)) {
+        if(!string.Equals(_value, expected, StringComparison.Ordinal)) {
             throw new AssertionFailedException(message ?? $"Expected string to be '{expected}', but was '{_value}'.");
         }
     }
@@ -25,7 +25,7 @@ public class StringAssertions(string? value) {
     /// </param>
     /// <exception cref="AssertionFailedException">The string is not <see langword="null"/>.</exception>
     public void BeNull(string? message = null) {
-        if (_value is not null) {
+        if(_value is not null) {
             throw new AssertionFailedException(message ?? "Expected null, but was not null.");
         }
     }
@@ -37,7 +37,7 @@ public class StringAssertions(string? value) {
     /// </param>
     /// <exception cref="AssertionFailedException">The string is <see langword="null"/>.</exception>
     public void NotBeNull(string? message = null) {
-        if (_value is null) {
+        if(_value is null) {
             throw new AssertionFailedException(message ?? "Expected non-null, but was null.");
         }
     }
@@ -50,11 +50,11 @@ public class StringAssertions(string? value) {
     /// </param>
     /// <exception cref="AssertionFailedException">The underlying string is <see langword="null"/> or does not contain <paramref name="expected"/>.</exception>
     public void Contain(string expected, string? message = null) {
-        if (_value is null) {
+        if(_value is null) {
             throw new AssertionFailedException("Cannot assert on a null string.");
         }
 
-        if (!_value.Contains(expected, StringComparison.Ordinal)) {
+        if(!_value.Contains(expected, StringComparison.Ordinal)) {
             throw new AssertionFailedException(message ?? $"Expected string to contain '{expected}', but was '{_value}'.");
         }
     }
@@ -67,11 +67,11 @@ public class StringAssertions(string? value) {
     /// </param>
     /// <exception cref="AssertionFailedException">The underlying string is <see langword="null"/> or does not end with <paramref name="expected"/>.</exception>
     public void EndsWith(string expected, string? message = null) {
-        if (_value is null) {
+        if(_value is null) {
             throw new AssertionFailedException("Cannot assert on a null string.");
         }
 
-        if (!_value.EndsWith(expected, StringComparison.Ordinal)) {
+        if(!_value.EndsWith(expected, StringComparison.Ordinal)) {
             throw new AssertionFailedException(message ?? $"Expected string to end with '{expected}', but was '{_value}'.");
         }
     }

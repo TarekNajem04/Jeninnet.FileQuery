@@ -1,4 +1,4 @@
-namespace Jeninnet.FileQuery.Tests.Core.Observability;
+﻿namespace Jeninnet.FileQuery.Tests.Core.Observability;
 
 /// <summary>
 /// Provides observation and diagnostic tests for <see cref="FileQuery"/> operations.

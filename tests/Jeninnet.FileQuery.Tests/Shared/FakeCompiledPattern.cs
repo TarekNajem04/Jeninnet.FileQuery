@@ -1,4 +1,4 @@
-namespace Jeninnet.FileQuery.Tests.Shared;
+﻿namespace Jeninnet.FileQuery.Tests.Shared;
 
 internal sealed class FakeCompiledPattern : ICompiledPattern {
     public bool IsNegated => false;

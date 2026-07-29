@@ -1,4 +1,4 @@
-namespace Jeninnet.FileQuery.Tests.Unit.Patterns.Compilation;
+﻿namespace Jeninnet.FileQuery.Tests.Unit.Patterns.Compilation;
 
 /// <summary>
 /// Tests for GlobPatternCompilerTests.

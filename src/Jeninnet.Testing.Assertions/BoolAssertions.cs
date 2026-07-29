@@ -1,4 +1,4 @@
-namespace Jeninnet.Testing.Assertions;
+﻿namespace Jeninnet.Testing.Assertions;
 
 /// <summary>Provides assertion methods for verifying <see cref="bool"/> values.</summary>
 /// <param name="value">The boolean value to assert on.</param>
@@ -12,7 +12,7 @@ public class BoolAssertions(bool value) {
     /// </param>
     /// <exception cref="AssertionFailedException">The value is <see langword="false"/>.</exception>
     public void BeTrue(string? message = null) {
-        if (!_value) {
+        if(!_value) {
             throw new AssertionFailedException(message ?? "Expected true, but got false.");
         }
     }
@@ -24,7 +24,7 @@ public class BoolAssertions(bool value) {
     /// </param>
     /// <exception cref="AssertionFailedException">The value is <see langword="true"/>.</exception>
     public void BeFalse(string? message = null) {
-        if (_value) {
+        if(_value) {
             throw new AssertionFailedException(message ?? "Expected false, but got true.");
         }
     }

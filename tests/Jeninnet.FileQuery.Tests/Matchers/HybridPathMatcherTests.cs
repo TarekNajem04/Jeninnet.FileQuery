@@ -1,4 +1,4 @@
-namespace Jeninnet.FileQuery.Tests.Matchers;
+﻿namespace Jeninnet.FileQuery.Tests.Matchers;
 
 /// <summary>
 /// Provides unit tests for the <see cref="HybridPathMatcher"/> class.

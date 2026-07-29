@@ -1,4 +1,4 @@
-namespace Jeninnet.FileQuery.Tests.Shared;
+﻿namespace Jeninnet.FileQuery.Tests.Shared;
 
 /// <summary>
 /// Helper for building a HybridPathMatcher from compiled patterns.

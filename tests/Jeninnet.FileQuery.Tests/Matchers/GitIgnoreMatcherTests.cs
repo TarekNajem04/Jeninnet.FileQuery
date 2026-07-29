@@ -1,4 +1,4 @@
-namespace Jeninnet.FileQuery.Tests.Matchers;
+﻿namespace Jeninnet.FileQuery.Tests.Matchers;
 
 /// <summary>
 /// NOTE: We use GitIgnorePatternCompiler for all tests to ensure the IsNegated and DirectoryOnly flags

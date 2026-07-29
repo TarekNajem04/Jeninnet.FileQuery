@@ -1,4 +1,4 @@
-namespace Jeninnet.FileQuery.Tests.Core.FileCollectorAsync.AnchoredAndMixed;
+﻿namespace Jeninnet.FileQuery.Tests.Core.FileCollectorAsync.AnchoredAndMixed;
 
 /// <summary>
 /// Tests complex glob rule combinations:

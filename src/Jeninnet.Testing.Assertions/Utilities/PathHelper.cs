@@ -1,4 +1,4 @@
-namespace Jeninnet.Testing.Assertions.Utilities;
+﻿namespace Jeninnet.Testing.Assertions.Utilities;
 
 /// <summary>Provides utility methods for path manipulation and comparison in test code.</summary>
 public static class PathHelper {

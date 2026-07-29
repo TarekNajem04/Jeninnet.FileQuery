@@ -1,4 +1,4 @@
-namespace Jeninnet.FileQuery.Tests.Core;
+﻿namespace Jeninnet.FileQuery.Tests.Core;
 
 /// <summary>
 /// Provides test cases to ensure coverage for auto-generated resource classes.

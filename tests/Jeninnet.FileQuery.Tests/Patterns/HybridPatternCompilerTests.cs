@@ -1,4 +1,4 @@
-namespace Jeninnet.FileQuery.Tests.Patterns;
+﻿namespace Jeninnet.FileQuery.Tests.Patterns;
 
 /// <summary>
 /// Provides unit tests for the <see cref="HybridPatternCompiler"/> class.

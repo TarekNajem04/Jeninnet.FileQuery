@@ -1,4 +1,4 @@
-namespace Jeninnet.FileQuery.Tests.Patterns;
+﻿namespace Jeninnet.FileQuery.Tests.Patterns;
 
 /// <summary>
 /// Contains additional unit tests for the <see cref="PatternClassifier"/> class, verifying its behavior with various pattern prefixes.

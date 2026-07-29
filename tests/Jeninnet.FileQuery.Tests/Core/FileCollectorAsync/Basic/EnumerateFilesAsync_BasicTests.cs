@@ -1,4 +1,4 @@
-namespace Jeninnet.FileQuery.Tests.Core.FileCollectorAsync.Basic;
+﻿namespace Jeninnet.FileQuery.Tests.Core.FileCollectorAsync.Basic;
 
 /// <summary>
 /// Basic async enumeration tests:

@@ -1,4 +1,4 @@
-namespace Jeninnet.FileQuery.Tests.Integration;
+﻿namespace Jeninnet.FileQuery.Tests.Integration;
 
 /// <summary>
 /// Core tests for the file query creation and configuration.

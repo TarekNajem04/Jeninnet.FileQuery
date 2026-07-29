@@ -18,22 +18,21 @@ public static class TestEnvironmentExtensions {
     ) {
         ArgumentNullException.ThrowIfNull(env);
 
-        if (levels <= 0 || fileCount <= 0) {
+        if(levels <= 0 || fileCount <= 0) {
             return;
         }
 
         var current = "";
-        for (var i = 0; i < levels; i++) {
+        for(var i = 0; i < levels; i++) {
             current = Path.Combine(current, $"dir{i}");
             env.CreateDirectory(current);
         }
 
-        if (fileCount > 1) {
-            for (var i = 0; i < fileCount; i++) {
+        if(fileCount > 1) {
+            for(var i = 0; i < fileCount; i++) {
                 env.CreateFiles(Path.Combine(current, $"{fileName}_{i}.{fileExt}"));
             }
-        }
-        else {
+        } else {
             env.CreateFiles(Path.Combine(current, $"{fileName}.{fileExt}"));
         }
     }

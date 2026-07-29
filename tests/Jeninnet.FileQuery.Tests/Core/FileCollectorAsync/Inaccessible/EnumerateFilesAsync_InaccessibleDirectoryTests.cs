@@ -1,4 +1,4 @@
-namespace Jeninnet.FileQuery.Tests.Core.FileCollectorAsync.Inaccessible;
+﻿namespace Jeninnet.FileQuery.Tests.Core.FileCollectorAsync.Inaccessible;
 
 /// <summary>
 /// Async tests validating behavior when encountering directories

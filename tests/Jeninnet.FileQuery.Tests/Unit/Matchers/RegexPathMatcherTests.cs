@@ -1,4 +1,4 @@
-namespace Jeninnet.FileQuery.Tests.Unit.Matchers;
+﻿namespace Jeninnet.FileQuery.Tests.Unit.Matchers;
 
 /// <summary>
 /// Tests for the regex path matcher, validating regex pattern matching, case sensitivity,

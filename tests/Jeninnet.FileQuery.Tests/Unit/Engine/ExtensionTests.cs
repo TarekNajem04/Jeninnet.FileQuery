@@ -1,4 +1,4 @@
-namespace Jeninnet.FileQuery.Tests.Unit.Engine;
+﻿namespace Jeninnet.FileQuery.Tests.Unit.Engine;
 
 /// <summary>
 /// Tests for extension methods on MatchOutcome and MatchResult types.

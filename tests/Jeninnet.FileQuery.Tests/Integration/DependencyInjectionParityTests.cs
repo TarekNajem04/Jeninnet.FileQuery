@@ -1,4 +1,4 @@
-namespace Jeninnet.FileQuery.Tests.Integration;
+﻿namespace Jeninnet.FileQuery.Tests.Integration;
 
 /// <summary>
 /// Contains tests verifying parity between dependency injection and default runtime.

@@ -1,4 +1,4 @@
-namespace Jeninnet.FileQuery.Tests.Validation;
+﻿namespace Jeninnet.FileQuery.Tests.Validation;
 
 /// <summary>
 /// Contains unit tests for the <see cref="FileQueryValidator"/> class.

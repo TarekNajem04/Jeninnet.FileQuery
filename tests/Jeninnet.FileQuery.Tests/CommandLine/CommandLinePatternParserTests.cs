@@ -1,4 +1,4 @@
-namespace Jeninnet.FileQuery.Tests.CommandLine;
+﻿namespace Jeninnet.FileQuery.Tests.CommandLine;
 
 /// <summary>
 /// Contains tests for the <see cref="CommandLinePatternParser"/> class.

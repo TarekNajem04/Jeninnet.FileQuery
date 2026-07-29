@@ -1,4 +1,4 @@
-namespace Jeninnet.FileQuery.Tests.Core;
+﻿namespace Jeninnet.FileQuery.Tests.Core;
 
 /// <summary>
 /// Tests for breadth-first traversal strategy.

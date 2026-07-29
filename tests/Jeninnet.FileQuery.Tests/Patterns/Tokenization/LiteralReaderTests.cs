@@ -1,4 +1,4 @@
-namespace Jeninnet.FileQuery.Tests.Patterns.Tokenization;
+﻿namespace Jeninnet.FileQuery.Tests.Patterns.Tokenization;
 
 /// <summary>
 /// Contains unit tests for the <see cref="LiteralReader"/> class.

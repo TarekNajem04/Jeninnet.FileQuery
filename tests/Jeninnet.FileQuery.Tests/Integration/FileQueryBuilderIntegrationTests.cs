@@ -1,4 +1,4 @@
-namespace Jeninnet.FileQuery.Tests.Integration;
+﻿namespace Jeninnet.FileQuery.Tests.Integration;
 
 /// <summary>
 /// In-depth coverage tests for internal pattern matching, traversal, and builder integration.

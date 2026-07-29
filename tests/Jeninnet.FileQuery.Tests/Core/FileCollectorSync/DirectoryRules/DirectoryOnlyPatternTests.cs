@@ -1,4 +1,4 @@
-namespace Jeninnet.FileQuery.Tests.Core.FileCollectorSync.DirectoryRules;
+﻿namespace Jeninnet.FileQuery.Tests.Core.FileCollectorSync.DirectoryRules;
 
 /// <summary>
 /// Tests directory-only GitIgnore patterns:

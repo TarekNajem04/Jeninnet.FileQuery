@@ -1,4 +1,4 @@
-namespace Jeninnet.FileQuery.Tests;
+﻿namespace Jeninnet.FileQuery.Tests;
 
 /// <summary>
 /// Provides tests for the <see cref="FileQueryEngine"/> and its associated components.

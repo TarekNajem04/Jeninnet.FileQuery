@@ -1,4 +1,4 @@
-namespace Jeninnet.FileQuery.Tests.Unit.Patterns.Canonical;
+﻿namespace Jeninnet.FileQuery.Tests.Unit.Patterns.Canonical;
 
 /// <summary>
 /// Tests for CanonicalPatternInputTests.

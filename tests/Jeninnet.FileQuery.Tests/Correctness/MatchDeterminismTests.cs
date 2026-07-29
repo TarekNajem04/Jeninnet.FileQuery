@@ -1,4 +1,4 @@
-namespace Jeninnet.FileQuery.Tests.Correctness;
+﻿namespace Jeninnet.FileQuery.Tests.Correctness;
 
 /// <summary>
 /// Contains tests for ensuring consistent matching behavior of the matcher engine.

@@ -1,4 +1,4 @@
-namespace Jeninnet.FileQuery.Tests.Core;
+﻿namespace Jeninnet.FileQuery.Tests.Core;
 
 /// <summary>
 /// Contains in-depth unit tests covering various components of the file query engine, focusing on edge cases and complex functionality.

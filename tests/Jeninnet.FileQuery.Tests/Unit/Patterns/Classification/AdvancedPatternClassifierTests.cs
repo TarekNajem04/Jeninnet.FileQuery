@@ -1,4 +1,4 @@
-namespace Jeninnet.FileQuery.Tests.Unit.Patterns.Classification;
+﻿namespace Jeninnet.FileQuery.Tests.Unit.Patterns.Classification;
 
 /// <summary>
 /// Unit tests for AdvancedPatternClassifier using MSTest.

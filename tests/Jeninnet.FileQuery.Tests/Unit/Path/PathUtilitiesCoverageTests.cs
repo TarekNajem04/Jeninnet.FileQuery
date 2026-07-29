@@ -1,4 +1,4 @@
-namespace Jeninnet.FileQuery.Tests.Unit.Path;
+﻿namespace Jeninnet.FileQuery.Tests.Unit.Path;
 
 /// <summary>
 /// Tests for PathUtilitiesCoverageTests.

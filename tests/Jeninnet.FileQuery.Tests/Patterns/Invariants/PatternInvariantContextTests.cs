@@ -1,4 +1,4 @@
-namespace Jeninnet.FileQuery.Tests.Patterns.Invariants;
+﻿namespace Jeninnet.FileQuery.Tests.Patterns.Invariants;
 
 /// <summary>
 /// Contains unit tests for the PatternInvariantContext model.

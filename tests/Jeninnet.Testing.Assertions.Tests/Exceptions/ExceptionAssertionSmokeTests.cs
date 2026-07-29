@@ -1,4 +1,4 @@
-namespace Jeninnet.Testing.Assertions.Tests.Exceptions;
+﻿namespace Jeninnet.Testing.Assertions.Tests.Exceptions;
 
 /// <summary>Smoke tests for exception assertions: Throw and AssertionFailedException construction.</summary>
 [TestClass]

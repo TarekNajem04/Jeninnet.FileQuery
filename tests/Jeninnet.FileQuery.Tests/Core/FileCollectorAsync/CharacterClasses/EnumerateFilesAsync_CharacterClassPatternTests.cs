@@ -1,4 +1,4 @@
-namespace Jeninnet.FileQuery.Tests.Core.FileCollectorAsync.CharacterClasses;
+﻿namespace Jeninnet.FileQuery.Tests.Core.FileCollectorAsync.CharacterClasses;
 
 /// <summary>
 /// Async tests covering character-class patterns such as:

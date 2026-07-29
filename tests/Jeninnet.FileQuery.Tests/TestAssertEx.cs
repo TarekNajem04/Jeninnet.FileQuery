@@ -1,4 +1,4 @@
-namespace Jeninnet.FileQuery.Tests;
+﻿namespace Jeninnet.FileQuery.Tests;
 
 internal static class TestAssertEx {
     public static T Throws<T>(Action action) where T : Exception {

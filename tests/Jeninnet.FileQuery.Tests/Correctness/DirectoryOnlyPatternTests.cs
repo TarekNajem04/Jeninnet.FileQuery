@@ -1,4 +1,4 @@
-namespace Jeninnet.FileQuery.Tests.Correctness;
+﻿namespace Jeninnet.FileQuery.Tests.Correctness;
 
 /// <summary>
 /// Contains tests for directory-only pattern matching correctness.

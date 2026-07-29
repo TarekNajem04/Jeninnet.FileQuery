@@ -1,4 +1,4 @@
-namespace Jeninnet.FileQuery.Tests.Patterns.Validation;
+﻿namespace Jeninnet.FileQuery.Tests.Patterns.Validation;
 
 /// <summary>
 /// Tests for <see cref="PatternValidator.IsMalformed"/>.

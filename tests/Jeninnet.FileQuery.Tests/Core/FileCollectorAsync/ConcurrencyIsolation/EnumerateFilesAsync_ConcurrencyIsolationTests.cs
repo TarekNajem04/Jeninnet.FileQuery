@@ -1,4 +1,4 @@
-namespace Jeninnet.FileQuery.Tests.Core.FileCollectorAsync.ConcurrencyIsolation;
+﻿namespace Jeninnet.FileQuery.Tests.Core.FileCollectorAsync.ConcurrencyIsolation;
 
 /// <summary>
 /// Ensures async enumeration instances do not interfere with each other

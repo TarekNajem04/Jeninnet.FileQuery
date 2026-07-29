@@ -1,4 +1,4 @@
-namespace Jeninnet.FileQuery.Tests.PatternEngine;
+﻿namespace Jeninnet.FileQuery.Tests.PatternEngine;
 
 /// <summary>
 /// Provides unit tests for the <c>GlobPatternCompiler</c> class.

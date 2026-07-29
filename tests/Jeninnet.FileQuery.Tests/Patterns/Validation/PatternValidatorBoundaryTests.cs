@@ -1,4 +1,4 @@
-namespace Jeninnet.FileQuery.Tests.Patterns.Validation;
+﻿namespace Jeninnet.FileQuery.Tests.Patterns.Validation;
 
 /// <summary>
 /// Contains boundary unit tests for the <see cref="PatternValidator"/>, ensuring robust behavior for edge cases like null inputs, unicode, and extreme lengths.

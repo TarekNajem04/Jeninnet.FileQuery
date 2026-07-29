@@ -1,4 +1,4 @@
-namespace Jeninnet.FileQuery.Tests.Unit.Patterns.Analysis;
+﻿namespace Jeninnet.FileQuery.Tests.Unit.Patterns.Analysis;
 
 /// <summary>
 /// Tests for PatternAnalyzerTests.

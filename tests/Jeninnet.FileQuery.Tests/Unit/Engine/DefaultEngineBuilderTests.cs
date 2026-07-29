@@ -1,4 +1,4 @@
-namespace Jeninnet.FileQuery.Tests.Unit.Engine;
+﻿namespace Jeninnet.FileQuery.Tests.Unit.Engine;
 
 /// <summary>
 /// Tests for the default engine builder ensuring it produces a working FileQuery engine.

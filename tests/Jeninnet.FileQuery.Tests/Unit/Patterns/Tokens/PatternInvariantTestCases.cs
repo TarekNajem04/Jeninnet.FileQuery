@@ -1,4 +1,4 @@
-namespace Jeninnet.FileQuery.Tests.Unit.Patterns.Tokens;
+﻿namespace Jeninnet.FileQuery.Tests.Unit.Patterns.Tokens;
 
 internal static class PatternInvariantTestCases {
     /// <summary>

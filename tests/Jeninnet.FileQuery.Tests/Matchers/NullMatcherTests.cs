@@ -1,4 +1,4 @@
-namespace Jeninnet.FileQuery.Tests.Matchers;
+﻿namespace Jeninnet.FileQuery.Tests.Matchers;
 
 /// <summary>
 /// Contains unit tests for the <see cref="NullMatcher"/> class.

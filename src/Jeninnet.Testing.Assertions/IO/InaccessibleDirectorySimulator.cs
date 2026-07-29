@@ -1,4 +1,4 @@
-namespace Jeninnet.Testing.Assertions.IO;
+﻿namespace Jeninnet.Testing.Assertions.IO;
 
 /// <summary>Provides helper methods to simulate inaccessible or locked directories for testing error-handling paths.</summary>
 public static class InaccessibleDirectorySimulator {

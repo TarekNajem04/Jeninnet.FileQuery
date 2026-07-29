@@ -1,4 +1,4 @@
-namespace Jeninnet.FileQuery.Tests.Shared;
+﻿namespace Jeninnet.FileQuery.Tests.Shared;
 
 /// <summary>
 /// Factory helpers for constructing compiled patterns for testing.

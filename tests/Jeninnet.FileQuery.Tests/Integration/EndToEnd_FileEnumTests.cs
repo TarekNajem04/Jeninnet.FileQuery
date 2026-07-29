@@ -1,4 +1,4 @@
-namespace Jeninnet.FileQuery.Tests.Integration;
+﻿namespace Jeninnet.FileQuery.Tests.Integration;
 
 /// <summary>
 /// Contains end-to-end tests for file enumeration scenarios.

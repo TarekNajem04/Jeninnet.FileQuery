@@ -1,4 +1,4 @@
-namespace Jeninnet.FileQuery.Tests.Integration;
+﻿namespace Jeninnet.FileQuery.Tests.Integration;
 
 /// <summary>
 /// Tests for the file query builder configuration and option-setting methods.

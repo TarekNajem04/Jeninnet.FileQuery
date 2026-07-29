@@ -1,4 +1,4 @@
-namespace Jeninnet.FileQuery.Tests.Patterns.Syntax;
+﻿namespace Jeninnet.FileQuery.Tests.Patterns.Syntax;
 
 /// <summary>
 /// Contains unit tests for the <see cref="PatternSyntaxProfile"/> class, focusing on profile resolution.

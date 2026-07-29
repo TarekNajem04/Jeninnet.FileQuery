@@ -1,4 +1,4 @@
-namespace Jeninnet.FileQuery.Tests.Unit.Engine;
+﻿namespace Jeninnet.FileQuery.Tests.Unit.Engine;
 
 /// <summary>
 /// In-depth tests for FileQuery observability including error recovery options, diagnostics, and progress reporting.
@@ -11,9 +11,9 @@ public sealed class FileQueryObservabilityDeepTests {
     [TestMethod]
     public void Should_Throw_When_RetryAttemptsAreNegative() =>
         ((Action)(() => {
-                var options = new FileQueryErrorRecoveryOptions(FileQueryErrorAction.Retry, -1);
-                options.Validate();
-            }
+            var options = new FileQueryErrorRecoveryOptions(FileQueryErrorAction.Retry, -1);
+            options.Validate();
+        }
         )).Should().Throw<ArgumentOutOfRangeException>();
 
     /// <summary>

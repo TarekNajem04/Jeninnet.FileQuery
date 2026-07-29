@@ -1,4 +1,4 @@
-namespace Jeninnet.FileQuery.Tests.Core.FileCollectorSync.Symlinks;
+﻿namespace Jeninnet.FileQuery.Tests.Core.FileCollectorSync.Symlinks;
 
 /// <summary>
 /// Contains tests for cycle detection when following symbolic links.

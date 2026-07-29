@@ -1,4 +1,4 @@
-namespace Jeninnet.FileQuery.Tests.Unit.Traversal;
+﻿namespace Jeninnet.FileQuery.Tests.Unit.Traversal;
 
 /// <summary>
 /// Tests for breadth-first traversal strategy.

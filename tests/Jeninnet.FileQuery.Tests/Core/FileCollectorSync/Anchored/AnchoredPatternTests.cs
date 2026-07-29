@@ -1,4 +1,4 @@
-namespace Jeninnet.FileQuery.Tests.Core.FileCollectorSync.Anchored;
+﻿namespace Jeninnet.FileQuery.Tests.Core.FileCollectorSync.Anchored;
 
 /// <summary>
 /// Tests GitIgnore anchored patterns:

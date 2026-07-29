@@ -1,4 +1,4 @@
-namespace Jeninnet.FileQuery.Tests.Regression;
+﻿namespace Jeninnet.FileQuery.Tests.Regression;
 
 /// <summary>
 /// Regression tests covering bugs fixed in v1.0.
