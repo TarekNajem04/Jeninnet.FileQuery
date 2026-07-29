@@ -14,7 +14,9 @@ namespace Jeninnet.FileQuery.Benchmarks;
 [MemoryDiagnoser]
 public class PatternCompilationColdStartBenchmark {
 
-    // Realistic pattern set: a mix of GitIgnore, Regex, and typed patterns.
+    /// <summary>
+    /// Realistic pattern set: a mix of GitIgnore, Regex, and typed patterns.
+    /// </summary>
     private static readonly string[] _hybridPatterns = [
         "**",
         "!*.cs",
@@ -38,9 +40,7 @@ public class PatternCompilationColdStartBenchmark {
     [Benchmark(Baseline = true)]
     public void CompileHybrid() => CompiledPatternFactory.Compile(
                                             new ClassifiedPatternSet {
-                                                Patterns = _hybridPatterns
-                                                    .Select(p => new ClassifiedPattern(p, PatternClassifier.Classify(p)))
-                                                    .ToArray()
+                                                Patterns = [.. _hybridPatterns.Select(p => new ClassifiedPattern(p, PatternClassifier.Classify(p)))]
                                             }
                                         );
 

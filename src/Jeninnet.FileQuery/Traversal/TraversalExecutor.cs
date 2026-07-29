@@ -230,6 +230,19 @@ internal sealed class TraversalExecutor : ITraversalExecutor {
             // A broad wildcard (e.g. !** or !**/*.txt) has no concrete anchor
             // and can match inside any directory.
             if(anchor.Length == 0) {
+                // For directory-only negated patterns (e.g. !*.github/), the last
+                // segment constrains which directories can match via its literal
+                // suffix.  Extract that suffix and verify at least one path
+                // segment of the candidate directory ends with it, so we don't
+                // unnecessarily traverse unrelated excluded directories.
+                if(pattern.DirectoryOnly &&
+                    pattern.Segments.Count > 0 &&
+                    TryGetLiteralSuffix(pattern.Segments[^1], out var suffix)) {
+                    return dirPath.Split('/').Any(part => part.EndsWith(suffix, comparison));
+                }
+
+                // Non-directory-only patterns (e.g. !**/*.txt) or patterns
+                // without a literal suffix — can't narrow down, traverse all.
                 return true;
             }
 
@@ -362,6 +375,31 @@ internal sealed class TraversalExecutor : ITraversalExecutor {
                 }
             }
         }
+    }
+
+    /// <summary>
+    /// Attempts to extract the trailing literal suffix from a pattern segment.
+    /// For example, the segment <c>[Wildcard(*), Literal(".github")]</c>
+    /// yields <c>".github"</c>.
+    /// </summary>
+    /// <param name="segment">The pattern segment to inspect.</param>
+    /// <param name="suffix">The extracted literal suffix, or <see cref="string.Empty"/>.</param>
+    /// <returns><see langword="true"/> when a non-empty literal suffix was found.</returns>
+    private static bool TryGetLiteralSuffix(IReadOnlyList<IPatternToken> segment, out string suffix) {
+        var sb = new StringBuilder();
+
+        for(var i = segment.Count - 1; i >= 0; i--) {
+            if(segment[i] is LiteralToken lit) {
+                sb.Insert(0, lit.Text);
+            } else if(segment[i] is EscapeToken esc) {
+                sb.Insert(0, esc.Escaped);
+            } else {
+                break;
+            }
+        }
+
+        suffix = sb.ToString();
+        return suffix.Length > 0;
     }
 
     /// <summary>

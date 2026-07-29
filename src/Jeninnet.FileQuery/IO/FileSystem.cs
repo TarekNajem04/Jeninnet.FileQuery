@@ -117,7 +117,7 @@ internal sealed class FileSystem : IFileSystem {
 
     private static int GetMaxAttempts(FileQueryErrorRecoveryOptions errorRecovery) => errorRecovery.Action is FileQueryErrorAction.Retry ? errorRecovery.MaxRetryAttempts + 1 : 1;
 
-    private enum EnumerationResult { Success, Break, Continue }
+    private enum EnumerationResult { Success = 0, Break = 1, Continue = 2 }
 
     private static EnumerationResult TryMoveNext(
         string directory,
