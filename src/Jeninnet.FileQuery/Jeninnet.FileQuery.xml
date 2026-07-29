@@ -857,12 +857,6 @@
             </para>
             </remarks>
         </member>
-        <member name="F:Jeninnet.FileQuery.FileQueryOptions.UNLIMITED">
-            <summary>
-            Represents an unlimited value for numeric limits such as
-            <see cref="P:Jeninnet.FileQuery.FileQueryOptions.MaxRecursionDepth"/>.
-            </summary>
-        </member>
         <member name="F:Jeninnet.FileQuery.FileQueryOptions.UNLIMITED_RECURSION_DEPTH">
             <summary>
             Represents an unlimited recursion depth.

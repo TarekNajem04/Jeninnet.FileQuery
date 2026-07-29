@@ -4,7 +4,6 @@
         <OutputType>Exe</OutputType>
         <IsTestProject>true</IsTestProject>
         <IsPackable>false</IsPackable>
-        <NoWarn>$(NoWarn);CS1591;S2699;S2701;MSTEST0032</NoWarn>
     </PropertyGroup>
 
     <ItemGroup>

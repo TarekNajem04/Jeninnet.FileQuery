@@ -4,5 +4,113 @@
         <name>Jeninnet.Testing.Assertions.Tests</name>
     </assembly>
     <members>
+        <member name="T:Jeninnet.Testing.Assertions.Tests.Assertions.AssertionInfrastructureSmokeTests">
+            <summary>Verifies the core assertion infrastructure: discoverability, passing/failing assertions, and type checks.</summary>
+        </member>
+        <member name="M:Jeninnet.Testing.Assertions.Tests.Assertions.AssertionInfrastructureSmokeTests.Should_IsDiscoverable">
+            <summary>The Should() extension is discoverable and BeTrue() accepts a true value.</summary>
+        </member>
+        <member name="M:Jeninnet.Testing.Assertions.Tests.Assertions.AssertionInfrastructureSmokeTests.PassingAssertion_DoesNotThrow">
+            <summary>A passing fluent assertion completes without throwing.</summary>
+        </member>
+        <member name="M:Jeninnet.Testing.Assertions.Tests.Assertions.AssertionInfrastructureSmokeTests.FailingAssertion_ThrowsAssertionFailedException">
+            <summary>A failing assertion throws AssertionFailedException with a non-empty message.</summary>
+        </member>
+        <member name="M:Jeninnet.Testing.Assertions.Tests.Assertions.AssertionInfrastructureSmokeTests.BeOfType_WithCorrectType">
+            <summary>BeOfType correctly identifies the runtime type of a value.</summary>
+        </member>
+        <member name="M:Jeninnet.Testing.Assertions.Tests.Assertions.AssertionInfrastructureSmokeTests.NotBeNull_OnNull_Throws">
+            <summary>NotBeNull throws when the value is null.</summary>
+        </member>
+        <member name="M:Jeninnet.Testing.Assertions.Tests.Assertions.AssertionInfrastructureSmokeTests.BeNull_OnNonNull_Throws">
+            <summary>BeNull throws when the value is non-null.</summary>
+        </member>
+        <member name="T:Jeninnet.Testing.Assertions.Tests.Collections.CollectionAssertionSmokeTests">
+            <summary>Smoke tests for collection assertions: emptiness, containment, count, and equivalence.</summary>
+        </member>
+        <member name="M:Jeninnet.Testing.Assertions.Tests.Collections.CollectionAssertionSmokeTests.BeEmpty_OnEmptyCollection_Passes">
+            <summary>BeEmpty passes on an empty collection.</summary>
+        </member>
+        <member name="M:Jeninnet.Testing.Assertions.Tests.Collections.CollectionAssertionSmokeTests.BeEmpty_OnNonEmptyCollection_Throws">
+            <summary>BeEmpty throws on a non-empty collection.</summary>
+        </member>
+        <member name="M:Jeninnet.Testing.Assertions.Tests.Collections.CollectionAssertionSmokeTests.Contain_Item_Passes">
+            <summary>Contain passes when the item is present.</summary>
+        </member>
+        <member name="M:Jeninnet.Testing.Assertions.Tests.Collections.CollectionAssertionSmokeTests.Contain_MissingItem_Throws">
+            <summary>Contain throws when the item is missing.</summary>
+        </member>
+        <member name="M:Jeninnet.Testing.Assertions.Tests.Collections.CollectionAssertionSmokeTests.HaveCount_WithMatchingCount_Passes">
+            <summary>HaveCount passes when counts match.</summary>
+        </member>
+        <member name="M:Jeninnet.Testing.Assertions.Tests.Collections.CollectionAssertionSmokeTests.HaveCount_WithNonMatchingCount_Throws">
+            <summary>HaveCount throws when counts differ.</summary>
+        </member>
+        <member name="M:Jeninnet.Testing.Assertions.Tests.Collections.CollectionAssertionSmokeTests.BeEquivalentTo_WithSameElements_Passes">
+            <summary>BeEquivalentTo passes for permutations of the same elements.</summary>
+        </member>
+        <member name="M:Jeninnet.Testing.Assertions.Tests.Collections.CollectionAssertionSmokeTests.BeEquivalentTo_WithDifferentElements_Throws">
+            <summary>BeEquivalentTo throws when element sets differ.</summary>
+        </member>
+        <member name="T:Jeninnet.Testing.Assertions.Tests.Exceptions.ExceptionAssertionSmokeTests">
+            <summary>Smoke tests for exception assertions: Throw and AssertionFailedException construction.</summary>
+        </member>
+        <member name="M:Jeninnet.Testing.Assertions.Tests.Exceptions.ExceptionAssertionSmokeTests.Throw_WhenActionThrows_Passes">
+            <summary>Throw passes when the action throws the expected type.</summary>
+        </member>
+        <member name="M:Jeninnet.Testing.Assertions.Tests.Exceptions.ExceptionAssertionSmokeTests.Throw_WhenActionDoesNotThrow_Throws">
+            <summary>Throw throws AssertionFailedException when the action does not throw.</summary>
+        </member>
+        <member name="M:Jeninnet.Testing.Assertions.Tests.Exceptions.ExceptionAssertionSmokeTests.AssertionFailedException_ContainsMessage">
+            <summary>AssertionFailedException stores and exposes the provided message.</summary>
+        </member>
+        <member name="M:Jeninnet.Testing.Assertions.Tests.Exceptions.ExceptionAssertionSmokeTests.AssertionFailedException_IsException">
+            <summary>AssertionFailedException derives from Exception.</summary>
+        </member>
+        <member name="T:Jeninnet.Testing.Assertions.Tests.IO.TestEnvironmentSmokeTests">
+            <summary>Smoke tests for TestEnvironment: creation, disposal, and file/directory operations.</summary>
+        </member>
+        <member name="M:Jeninnet.Testing.Assertions.Tests.IO.TestEnvironmentSmokeTests.CreateAndDispose_DoesNotThrow">
+            <summary>Creating and disposing a TestEnvironment does not throw; the root directory is removed.</summary>
+        </member>
+        <member name="M:Jeninnet.Testing.Assertions.Tests.IO.TestEnvironmentSmokeTests.Root_ExistsAfterCreation">
+            <summary>After creation, the root directory exists on disk.</summary>
+        </member>
+        <member name="M:Jeninnet.Testing.Assertions.Tests.IO.TestEnvironmentSmokeTests.Root_DeletedAfterDispose">
+            <summary>After disposal, the root directory is deleted.</summary>
+        </member>
+        <member name="M:Jeninnet.Testing.Assertions.Tests.IO.TestEnvironmentSmokeTests.CreateDirectory_ReturnsExistingPath">
+            <summary>CreateDirectory creates the directory and returns its path.</summary>
+        </member>
+        <member name="M:Jeninnet.Testing.Assertions.Tests.IO.TestEnvironmentSmokeTests.CreateFile_WithContent_ReturnsPath">
+            <summary>CreateFile creates the file with the specified content and returns its path.</summary>
+        </member>
+        <member name="T:Jeninnet.Testing.Assertions.Tests.Strings.StringAssertionSmokeTests">
+            <summary>Smoke tests for string assertions: equality, containment, suffix, and null checks.</summary>
+        </member>
+        <member name="M:Jeninnet.Testing.Assertions.Tests.Strings.StringAssertionSmokeTests.Be_WithMatchingString_Passes">
+            <summary>Be passes when strings match exactly.</summary>
+        </member>
+        <member name="M:Jeninnet.Testing.Assertions.Tests.Strings.StringAssertionSmokeTests.Be_WithNonMatchingString_Throws">
+            <summary>Be throws when strings differ.</summary>
+        </member>
+        <member name="M:Jeninnet.Testing.Assertions.Tests.Strings.StringAssertionSmokeTests.Contain_Substring_Passes">
+            <summary>Contain passes when the substring is found.</summary>
+        </member>
+        <member name="M:Jeninnet.Testing.Assertions.Tests.Strings.StringAssertionSmokeTests.Contain_MissingSubstring_Throws">
+            <summary>Contain throws when the substring is absent.</summary>
+        </member>
+        <member name="M:Jeninnet.Testing.Assertions.Tests.Strings.StringAssertionSmokeTests.EndsWith_Passes">
+            <summary>EndsWith passes when the string has the expected suffix.</summary>
+        </member>
+        <member name="M:Jeninnet.Testing.Assertions.Tests.Strings.StringAssertionSmokeTests.NotBeNull_OnNonNull_Passes">
+            <summary>NotBeNull passes on a non-null string.</summary>
+        </member>
+        <member name="M:Jeninnet.Testing.Assertions.Tests.Strings.StringAssertionSmokeTests.NotBeNull_OnNull_Throws">
+            <summary>NotBeNull throws on a null string.</summary>
+        </member>
+        <member name="M:Jeninnet.Testing.Assertions.Tests.Strings.StringAssertionSmokeTests.BeNull_OnNull_Passes">
+            <summary>BeNull passes on a null string.</summary>
+        </member>
     </members>
 </doc>

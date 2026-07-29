@@ -141,8 +141,8 @@
         <Project Path="src/Jeninnet.FileQuery/Jeninnet.FileQuery.csproj" />
         <Project Path="src/Jeninnet.Testing.Assertions/Jeninnet.Testing.Assertions.csproj" />
     </Folder>
-    <Folder Name="/test/">
-        <Project Path="test/Jeninnet.FileQuery.Tests/Jeninnet.FileQuery.Tests.csproj" />
+    <Folder Name="/tests/">
+        <Project Path="tests/Jeninnet.FileQuery.Tests/Jeninnet.FileQuery.Tests.csproj" />
         <Project Path="tests/Jeninnet.Testing.Assertions.Tests/Jeninnet.Testing.Assertions.Tests.csproj" />
     </Folder>
 
