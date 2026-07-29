@@ -143,6 +143,7 @@
     </Folder>
     <Folder Name="/test/">
         <Project Path="test/Jeninnet.FileQuery.Tests/Jeninnet.FileQuery.Tests.csproj" />
+        <Project Path="tests/Jeninnet.Testing.Assertions.Tests/Jeninnet.Testing.Assertions.Tests.csproj" />
     </Folder>
 
 </Solution>
