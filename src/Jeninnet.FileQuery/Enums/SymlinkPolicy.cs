@@ -8,15 +8,15 @@ public enum SymlinkPolicy : byte {
     /// <summary>
     /// Do not follow symbolic links.
     /// </summary>
-    Ignore,
+    Ignore = 0,
 
     /// <summary>
     /// Follow symbolic links.
     /// </summary>
-    Follow,
+    Follow = 1,
 
     /// <summary>
     /// Follow symbolic links, but prevent cycles.
     /// </summary>
-    FollowWithCycleDetection
+    FollowWithCycleDetection = 2
 }

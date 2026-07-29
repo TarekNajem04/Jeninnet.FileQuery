@@ -11,20 +11,20 @@ public enum PatternKind {
     /// <summary>
     /// GitIgnore‑style pattern syntax (anchoring, directory‑only, <c>**</c>).
     /// </summary>
-    GitIgnore,
+    GitIgnore = 0,
 
     /// <summary>
     /// Classic glob syntax (<c>*</c>, <c>?</c>) applied to the full path.
     /// </summary>
-    Glob,
+    Glob = 1,
 
     /// <summary>
     /// Regular expression pattern applied to the full normalized path.
     /// </summary>
-    Regex,
+    Regex = 2,
 
     /// <summary>
     /// Indicates that the pattern could not be parsed or recognized.
     /// </summary>
-    Unknown
+    Unknown = 3
 }

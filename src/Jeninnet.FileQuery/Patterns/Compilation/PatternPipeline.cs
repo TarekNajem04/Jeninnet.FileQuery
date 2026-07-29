@@ -44,6 +44,7 @@ internal sealed class PatternPipeline {
     /// Compiles a single classified pattern through the full pipeline.
     /// </summary>
     /// <param name="pattern">The classified pattern to compile.</param>
+    /// <exception cref="PatternException">Thrown when the pattern is invalid.</exception>
     public ICompiledPattern Compile(ClassifiedPattern pattern) {
         ArgumentNullException.ThrowIfNull(pattern);
 

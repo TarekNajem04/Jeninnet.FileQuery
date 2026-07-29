@@ -12,7 +12,7 @@ public enum TokenKind {
     /// <summary>
     /// Represents a constant value in an expression or syntax tree.
     /// </summary>
-    Literal,
+    Literal = 0,
 
     /// <summary>
     /// Represents a wildcard pattern that can be used to match multiple values or strings according to specific matching rules.
@@ -21,60 +21,60 @@ public enum TokenKind {
     /// Use this type to define patterns that match a range of values, such as file names or identifiers, where exact matches are not required.
     /// The specific matching behavior depends on the implementation and may support characters like '*'.
     /// </remarks>
-    Wildcard,           // *
+    Wildcard = 1,           // *
 
     /// <summary>
     /// Indicates whether the operation or process should be performed recursively.
     /// </summary>
-    RecursiveWildcard,  // **
+    RecursiveWildcard = 2,  // **
 
     /// <summary>
     /// Represents a value that encapsulates a single character.
     /// </summary>
-    SingleChar,         // ?
+    SingleChar = 3,         // ?
 
     /// <summary>
     /// Represents a set of characters used for encoding or validation operations.
     /// </summary>
-    CharacterSet,       // [a-z]
+    CharacterSet = 4,       // [a-z]
 
     /// <summary>
     /// Represents a regular expression pattern used for matching and validating text.
     /// </summary>
-    RegularExpression,  // r:regex
+    RegularExpression = 5,  // r:regex
 
     /// <summary>
     /// Represents a directory separator (e.g. forward slash or backslash).
     /// </summary>
-    DirectorySeparator,  // / or \
+    DirectorySeparator = 6,  // / or \
 
     /// <summary>
     /// Represents a segment separator character.
     /// </summary>
-    Separator,         // /
+    Separator = 7,         // /
 
     /// <summary>
     /// Represents an escape character prefix.
     /// </summary>
-    Escape,
+    Escape = 8,
 
     /// <summary>
     /// Represents the starting bracket of a character class range.
     /// </summary>
-    RangeStart,        // [
+    RangeStart = 9,        // [
 
     /// <summary>
     /// Represents the ending bracket of a character class range.
     /// </summary>
-    RangeEnd,          // ]
+    RangeEnd = 10,          // ]
 
     /// <summary>
     /// Represents a pattern negation character (e.g. <c>!</c>).
     /// </summary>
-    Negation,          // !
+    Negation = 11,          // !
 
     /// <summary>
     /// Represents a pattern comment symbol (e.g. <c>#</c>).
     /// </summary>
-    Comment,           // #
+    Comment = 12,           // #
 }
