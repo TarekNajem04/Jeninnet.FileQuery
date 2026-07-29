@@ -3095,6 +3095,7 @@
             Compiles a single classified pattern through the full pipeline.
             </summary>
             <param name="pattern">The classified pattern to compile.</param>
+            <exception cref="T:Jeninnet.FileQuery.Patterns.Exceptions.PatternException">Thrown when the pattern is invalid.</exception>
         </member>
         <member name="M:Jeninnet.FileQuery.Patterns.Compilation.PatternPipeline.Compile(Jeninnet.FileQuery.Patterns.Classification.ClassifiedPatternSet)">
             <summary>
@@ -4705,6 +4706,13 @@
             </para>
             </remarks>
         </member>
+        <member name="F:Jeninnet.FileQuery.Patterns.Tokenization.PatternScanner.SEGMENT_INITIAL_TOKEN_CAPACITY">
+            <summary>
+            Most pattern segments contain 1–3 tokens (e.g., "*.cs" → [Wildcard, Literal(".cs")]).
+            Initial capacity 3 avoids the first internal array resize for the vast
+            majority of segments without over-allocating for single-token segments.
+            </summary>
+        </member>
         <member name="M:Jeninnet.FileQuery.Patterns.Tokenization.PatternScanner.Scan(Jeninnet.FileQuery.Patterns.Compilation.PatternCompilationContext,Jeninnet.FileQuery.Patterns.Syntax.PatternSyntaxProfile)">
             <summary>
             Scans the pattern in <paramref name="context"/> and populates
@@ -5088,6 +5096,16 @@
             </summary>
             <param name="pattern">The compiled pattern.</param>
         </member>
+        <member name="M:Jeninnet.FileQuery.Traversal.TraversalExecutor.TryGetLiteralSuffix(System.Collections.Generic.IReadOnlyList{Jeninnet.FileQuery.Matching.IPatternToken},System.String@)">
+            <summary>
+            Attempts to extract the trailing literal suffix from a pattern segment.
+            For example, the segment <c>[Wildcard(*), Literal(".github")]</c>
+            yields <c>".github"</c>.
+            </summary>
+            <param name="segment">The pattern segment to inspect.</param>
+            <param name="suffix">The extracted literal suffix, or <see cref="F:System.String.Empty"/>.</param>
+            <returns><see langword="true"/> when a non-empty literal suffix was found.</returns>
+        </member>
         <member name="M:Jeninnet.FileQuery.Traversal.TraversalExecutor.IsIgnoredSymlink(Jeninnet.FileQuery.IO.FileSystemEntry,Jeninnet.FileQuery.Traversal.TraversalConfiguration)">
             <summary>
             Determines if a filesystem entry is a symlink that should be ignored based on configuration.
@@ -5157,6 +5175,7 @@
             <summary>
             Pop a frame from the stack (DFS).
             </summary>
+            <exception cref="T:System.InvalidOperationException">Thrown when the buffer is empty.</exception>
         </member>
         <member name="M:Jeninnet.FileQuery.Traversal.TraversalFrontier.Enqueue(Jeninnet.FileQuery.Traversal.TraversalFrame)">
             <summary>
@@ -5168,6 +5187,7 @@
             <summary>
             Dequeue a frame from the queue (BFS).
             </summary>
+            <exception cref="T:System.InvalidOperationException">Thrown when the buffer is empty.</exception>
         </member>
         <member name="M:Jeninnet.FileQuery.Traversal.TraversalFrontier.Add(Jeninnet.FileQuery.Traversal.TraversalFrame)">
             <summary> Adds a frame to the buffer according to strategy </summary>
@@ -5293,6 +5313,8 @@
             <param name="options">The execution options.</param>
             <exception cref="T:System.ArgumentNullException">Thrown if rootPath or options are null.</exception>
             <exception cref="T:System.ArgumentException">Thrown if configuration is invalid.</exception>
+            <exception cref="T:System.InvalidOperationException">Thrown if the root path is invalid.</exception>
+            <exception cref="T:System.IO.DirectoryNotFoundException">Thrown if the root path does not exist.</exception>
         </member>
         <member name="T:System.Text.RegularExpressions.Generated.DetectEscapedCharacters_0">
             <summary>Custom <see cref="T:System.Text.RegularExpressions.Regex"/>-derived type for the DetectEscapedCharacters method.</summary>

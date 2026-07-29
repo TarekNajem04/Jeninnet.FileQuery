@@ -1,0 +1,550 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Jeninnet.Testing.Assertions</name>
+    </assembly>
+    <members>
+        <member name="T:Jeninnet.Testing.Assertions.ActionAssertions">
+            <summary>Provides assertion methods for verifying that synchronous delegates throw expected exceptions.</summary>
+            <param name="action">The synchronous delegate to invoke and verify.</param>
+        </member>
+        <member name="M:Jeninnet.Testing.Assertions.ActionAssertions.#ctor(System.Action)">
+            <summary>Provides assertion methods for verifying that synchronous delegates throw expected exceptions.</summary>
+            <param name="action">The synchronous delegate to invoke and verify.</param>
+        </member>
+        <member name="M:Jeninnet.Testing.Assertions.ActionAssertions.Throw``1(System.String)">
+            <summary>Asserts that the action throws an exception of type <typeparamref name="TException"/>.</summary>
+            <typeparam name="TException">The expected exception type.</typeparam>
+            <param name="message">
+            An optional custom failure message that is included in the
+            <see cref="T:Jeninnet.Testing.Assertions.AssertionFailedException"/> if the assertion fails.
+            </param>
+            <returns>An <see cref="T:Jeninnet.Testing.Assertions.ExceptionAssertions`1"/> that provides access to the caught exception.</returns>
+            <exception cref="T:Jeninnet.Testing.Assertions.AssertionFailedException">No exception was thrown, or a different exception type was thrown.</exception>
+        </member>
+        <member name="T:Jeninnet.Testing.Assertions.AssertionExtensions">
+            <summary>
+            Provides <c>Should()</c> extension methods that enable the fluent assertion syntax
+            (e.g. <c>value.Should().BeTrue()</c>).
+            </summary>
+        </member>
+        <member name="M:Jeninnet.Testing.Assertions.AssertionExtensions.Should(System.Boolean)">
+            <summary>Creates a <see cref="T:Jeninnet.Testing.Assertions.BoolAssertions"/> for the given <see cref="T:System.Boolean"/> value.</summary>
+            <param name="value">The boolean value to assert on.</param>
+        </member>
+        <member name="M:Jeninnet.Testing.Assertions.AssertionExtensions.Should(System.String)">
+            <summary>Creates a <see cref="T:Jeninnet.Testing.Assertions.StringAssertions"/> for the given string value.</summary>
+            <param name="value">The string value to assert on.</param>
+        </member>
+        <member name="M:Jeninnet.Testing.Assertions.AssertionExtensions.Should(System.Action)">
+            <summary>Creates an <see cref="T:Jeninnet.Testing.Assertions.ActionAssertions"/> for the given synchronous delegate.</summary>
+            <param name="value">The action delegate to assert on.</param>
+        </member>
+        <member name="M:Jeninnet.Testing.Assertions.AssertionExtensions.Should(System.Func{System.Threading.Tasks.Task})">
+            <summary>Creates an <see cref="T:Jeninnet.Testing.Assertions.AsyncActionAssertions"/> for the given asynchronous delegate.</summary>
+            <param name="value">The asynchronous action delegate to assert on.</param>
+        </member>
+        <member name="M:Jeninnet.Testing.Assertions.AssertionExtensions.Should``1(System.Collections.Generic.IEnumerable{``0})">
+            <summary>Creates a <see cref="T:Jeninnet.Testing.Assertions.CollectionAssertions`1"/> for the given collection.</summary>
+            <typeparam name="T">The type of elements in the collection.</typeparam>
+            <param name="value">The collection to assert on.</param>
+        </member>
+        <member name="M:Jeninnet.Testing.Assertions.AssertionExtensions.Should(System.Object)">
+            <summary>Creates an <see cref="T:Jeninnet.Testing.Assertions.ObjectAssertions`1"/> for the given object.</summary>
+            <param name="value">The object to assert on.</param>
+        </member>
+        <member name="T:Jeninnet.Testing.Assertions.AssertionFailedException">
+            <summary>
+            Represents an assertion failure with a descriptive message and optional inner exception.
+            This is the sole exception type thrown by all assertion methods in this library.
+            </summary>
+        </member>
+        <member name="M:Jeninnet.Testing.Assertions.AssertionFailedException.#ctor">
+            <summary>Creates a new assertion failure with no message.</summary>
+        </member>
+        <member name="M:Jeninnet.Testing.Assertions.AssertionFailedException.#ctor(System.String)">
+            <summary>Creates a new assertion failure with the given message.</summary>
+            <param name="message">The message that describes the assertion failure.</param>
+        </member>
+        <member name="M:Jeninnet.Testing.Assertions.AssertionFailedException.#ctor(System.String,System.Exception)">
+            <summary>
+            Creates a new assertion failure with a message and a reference to the inner exception
+            that caused this failure (for example, an exception of the wrong type that was thrown
+            when a specific exception type was expected).
+            </summary>
+            <param name="message">The message that describes the assertion failure.</param>
+            <param name="innerException">The exception that is the cause of the current failure.</param>
+        </member>
+        <member name="M:Jeninnet.Testing.Assertions.AssertionFailedException.#ctor(System.Runtime.Serialization.SerializationInfo,System.Runtime.Serialization.StreamingContext)">
+            <summary>Initializes a new instance from serialized data.</summary>
+            <param name="info">The <see cref="T:System.Runtime.Serialization.SerializationInfo"/> holding the serialized object data.</param>
+            <param name="context">The <see cref="T:System.Runtime.Serialization.StreamingContext"/> describing the source and destination of the serialized stream.</param>
+            <exception cref="T:System.ArgumentNullException"><paramref name="info"/> is <see langword="null"/>.</exception>
+        </member>
+        <member name="T:Jeninnet.Testing.Assertions.AsyncActionAssertions">
+            <summary>Provides assertion methods for verifying that asynchronous delegates throw expected exceptions.</summary>
+            <param name="action">The asynchronous delegate to invoke and verify.</param>
+        </member>
+        <member name="M:Jeninnet.Testing.Assertions.AsyncActionAssertions.#ctor(System.Func{System.Threading.Tasks.Task})">
+            <summary>Provides assertion methods for verifying that asynchronous delegates throw expected exceptions.</summary>
+            <param name="action">The asynchronous delegate to invoke and verify.</param>
+        </member>
+        <member name="M:Jeninnet.Testing.Assertions.AsyncActionAssertions.ThrowAsync``1(System.String)">
+            <summary>Asserts that the asynchronous action throws an exception of type <typeparamref name="TException"/>.</summary>
+            <typeparam name="TException">The expected exception type.</typeparam>
+            <param name="message">
+            An optional custom failure message that is included in the
+            <see cref="T:Jeninnet.Testing.Assertions.AssertionFailedException"/> if the assertion fails.
+            </param>
+            <returns>A task whose result is an <see cref="T:Jeninnet.Testing.Assertions.ExceptionAssertions`1"/> that provides access to the caught exception.</returns>
+            <exception cref="T:Jeninnet.Testing.Assertions.AssertionFailedException">No exception was thrown, or a different exception type was thrown.</exception>
+        </member>
+        <member name="T:Jeninnet.Testing.Assertions.BoolAssertions">
+            <summary>Provides assertion methods for verifying <see cref="T:System.Boolean"/> values.</summary>
+            <param name="value">The boolean value to assert on.</param>
+        </member>
+        <member name="M:Jeninnet.Testing.Assertions.BoolAssertions.#ctor(System.Boolean)">
+            <summary>Provides assertion methods for verifying <see cref="T:System.Boolean"/> values.</summary>
+            <param name="value">The boolean value to assert on.</param>
+        </member>
+        <member name="M:Jeninnet.Testing.Assertions.BoolAssertions.BeTrue(System.String)">
+            <summary>Asserts that the boolean value is <see langword="true"/>.</summary>
+            <param name="message">
+            An optional custom failure message that is included in the
+            <see cref="T:Jeninnet.Testing.Assertions.AssertionFailedException"/> if the assertion fails.
+            </param>
+            <exception cref="T:Jeninnet.Testing.Assertions.AssertionFailedException">The value is <see langword="false"/>.</exception>
+        </member>
+        <member name="M:Jeninnet.Testing.Assertions.BoolAssertions.BeFalse(System.String)">
+            <summary>Asserts that the boolean value is <see langword="false"/>.</summary>
+            <param name="message">
+            An optional custom failure message that is included in the
+            <see cref="T:Jeninnet.Testing.Assertions.AssertionFailedException"/> if the assertion fails.
+            </param>
+            <exception cref="T:Jeninnet.Testing.Assertions.AssertionFailedException">The value is <see langword="true"/>.</exception>
+        </member>
+        <member name="T:Jeninnet.Testing.Assertions.CollectionAssertions`1">
+            <summary>Provides assertion methods for verifying <see cref="T:System.Collections.Generic.IEnumerable`1"/> collections.</summary>
+            <typeparam name="T">The element type of the collection.</typeparam>
+            <param name="value">The collection to assert on.</param>
+        </member>
+        <member name="M:Jeninnet.Testing.Assertions.CollectionAssertions`1.#ctor(System.Collections.Generic.IEnumerable{`0})">
+            <summary>Provides assertion methods for verifying <see cref="T:System.Collections.Generic.IEnumerable`1"/> collections.</summary>
+            <typeparam name="T">The element type of the collection.</typeparam>
+            <param name="value">The collection to assert on.</param>
+        </member>
+        <member name="M:Jeninnet.Testing.Assertions.CollectionAssertions`1.HaveCount(System.Int32,System.String)">
+            <summary>Asserts that the collection contains exactly <paramref name="expected"/> items.</summary>
+            <param name="expected">The expected item count.</param>
+            <param name="message">
+            An optional custom failure message that is included in the
+            <see cref="T:Jeninnet.Testing.Assertions.AssertionFailedException"/> if the assertion fails.
+            </param>
+            <exception cref="T:Jeninnet.Testing.Assertions.AssertionFailedException">The collection is <see langword="null"/> or its count does not match.</exception>
+        </member>
+        <member name="M:Jeninnet.Testing.Assertions.CollectionAssertions`1.BeEmpty(System.String)">
+            <summary>Asserts that the collection is empty.</summary>
+            <param name="message">
+            An optional custom failure message that is included in the
+            <see cref="T:Jeninnet.Testing.Assertions.AssertionFailedException"/> if the assertion fails.
+            </param>
+            <exception cref="T:Jeninnet.Testing.Assertions.AssertionFailedException">The collection is <see langword="null"/> or contains at least one item.</exception>
+        </member>
+        <member name="M:Jeninnet.Testing.Assertions.CollectionAssertions`1.Contain(System.Func{`0,System.Boolean},System.String)">
+            <summary>Asserts that the collection contains at least one item matching the given <paramref name="predicate"/>.</summary>
+            <param name="predicate">A function to test each element against.</param>
+            <param name="message">
+            An optional custom failure message that is included in the
+            <see cref="T:Jeninnet.Testing.Assertions.AssertionFailedException"/> if the assertion fails.
+            </param>
+            <exception cref="T:Jeninnet.Testing.Assertions.AssertionFailedException">The collection is <see langword="null"/> or no item matches <paramref name="predicate"/>.</exception>
+        </member>
+        <member name="M:Jeninnet.Testing.Assertions.CollectionAssertions`1.Contain(`0,System.String)">
+            <summary>Asserts that the collection contains the specified <paramref name="item"/>.</summary>
+            <param name="item">The item to locate in the collection.</param>
+            <param name="message">
+            An optional custom failure message that is included in the
+            <see cref="T:Jeninnet.Testing.Assertions.AssertionFailedException"/> if the assertion fails.
+            </param>
+            <exception cref="T:Jeninnet.Testing.Assertions.AssertionFailedException">The collection is <see langword="null"/> or does not contain <paramref name="item"/>.</exception>
+        </member>
+        <member name="M:Jeninnet.Testing.Assertions.CollectionAssertions`1.ContainSingle(System.Func{`0,System.Boolean},System.String)">
+            <summary>
+            Asserts that the collection contains exactly one item (optionally matching <paramref name="predicate"/>)
+            and returns a <see cref="T:Jeninnet.Testing.Assertions.WhichConstraint`1"/> that exposes the single item for further assertions.
+            </summary>
+            <param name="predicate">
+            An optional filter; when provided, only items satisfying this predicate are considered.
+            When <see langword="null"/>, all items in the collection are evaluated.
+            </param>
+            <param name="message">
+            An optional custom failure message that is included in the
+            <see cref="T:Jeninnet.Testing.Assertions.AssertionFailedException"/> if the assertion fails.
+            </param>
+            <returns>A <see cref="T:Jeninnet.Testing.Assertions.WhichConstraint`1"/> wrapping the single matched item.</returns>
+            <exception cref="T:Jeninnet.Testing.Assertions.AssertionFailedException">The collection is <see langword="null"/> or does not contain exactly one matching item.</exception>
+        </member>
+        <member name="M:Jeninnet.Testing.Assertions.CollectionAssertions`1.BeEquivalentTo(System.Collections.Generic.IEnumerable{`0},System.String)">
+            <summary>
+            Asserts that the collection contains all items in <paramref name="expected"/> with the same cardinality.
+            Duplicates in <paramref name="expected"/> must be matched by distinct items in the actual collection.
+            </summary>
+            <param name="expected">The expected items that must each appear in the collection.</param>
+            <param name="message">
+            An optional custom failure message that is included in the
+            <see cref="T:Jeninnet.Testing.Assertions.AssertionFailedException"/> if the assertion fails.
+            </param>
+            <exception cref="T:Jeninnet.Testing.Assertions.AssertionFailedException">The collection is <see langword="null"/> or the contents do not match.</exception>
+        </member>
+        <member name="M:Jeninnet.Testing.Assertions.CollectionAssertions`1.NotBeEmpty(System.String)">
+            <summary>Asserts that the collection is not empty.</summary>
+            <param name="message">
+            An optional custom failure message that is included in the
+            <see cref="T:Jeninnet.Testing.Assertions.AssertionFailedException"/> if the assertion fails.
+            </param>
+            <exception cref="T:Jeninnet.Testing.Assertions.AssertionFailedException">The collection is <see langword="null"/> or is empty.</exception>
+        </member>
+        <member name="M:Jeninnet.Testing.Assertions.CollectionAssertions`1.NotContain(System.Func{`0,System.Boolean},System.String)">
+            <summary>Asserts that no item in the collection matches the given <paramref name="predicate"/>.</summary>
+            <param name="predicate">A function to test each element against.</param>
+            <param name="message">
+            An optional custom failure message that is included in the
+            <see cref="T:Jeninnet.Testing.Assertions.AssertionFailedException"/> if the assertion fails.
+            </param>
+            <exception cref="T:Jeninnet.Testing.Assertions.AssertionFailedException">The collection is <see langword="null"/> or at least one item matches <paramref name="predicate"/>.</exception>
+        </member>
+        <member name="M:Jeninnet.Testing.Assertions.CollectionAssertions`1.NotContain(`0,System.String)">
+            <summary>Asserts that the collection does not contain the specified <paramref name="item"/>.</summary>
+            <param name="item">The item that must not appear in the collection.</param>
+            <param name="message">
+            An optional custom failure message that is included in the
+            <see cref="T:Jeninnet.Testing.Assertions.AssertionFailedException"/> if the assertion fails.
+            </param>
+            <exception cref="T:Jeninnet.Testing.Assertions.AssertionFailedException">The collection is <see langword="null"/> or contains <paramref name="item"/>.</exception>
+        </member>
+        <member name="M:Jeninnet.Testing.Assertions.CollectionAssertions`1.ContainSubset(System.Collections.Generic.IEnumerable{`0},System.String)">
+            <summary>Asserts that the collection contains all items in <paramref name="expected"/> (cardinality need not match).</summary>
+            <param name="expected">The subset of items that must all be present in the collection.</param>
+            <param name="message">
+            An optional custom failure message that is included in the
+            <see cref="T:Jeninnet.Testing.Assertions.AssertionFailedException"/> if the assertion fails.
+            </param>
+            <exception cref="T:Jeninnet.Testing.Assertions.AssertionFailedException">The collection is <see langword="null"/> or one or more expected items are missing.</exception>
+        </member>
+        <member name="T:Jeninnet.Testing.Assertions.ExceptionAssertions`1">
+            <summary>
+            Provides access to a caught exception after a <c>Throw</c> or <c>ThrowAsync</c> assertion succeeds,
+            enabling further inspection of the exception instance.
+            </summary>
+            <typeparam name="TException">The type of the caught exception.</typeparam>
+            <param name="exception">The caught exception instance to expose.</param>
+        </member>
+        <member name="M:Jeninnet.Testing.Assertions.ExceptionAssertions`1.#ctor(`0)">
+            <summary>
+            Provides access to a caught exception after a <c>Throw</c> or <c>ThrowAsync</c> assertion succeeds,
+            enabling further inspection of the exception instance.
+            </summary>
+            <typeparam name="TException">The type of the caught exception.</typeparam>
+            <param name="exception">The caught exception instance to expose.</param>
+        </member>
+        <member name="P:Jeninnet.Testing.Assertions.ExceptionAssertions`1.Exception">
+            <summary>Gets the caught exception instance.</summary>
+            <exception cref="T:Jeninnet.Testing.Assertions.AssertionFailedException">Thrown if the exception instance is <see langword="null"/>.</exception>
+        </member>
+        <member name="T:Jeninnet.Testing.Assertions.Extensions.PathExtensions">
+            <summary>Provides extension methods for path-related string comparisons.</summary>
+        </member>
+        <member name="M:Jeninnet.Testing.Assertions.Extensions.PathExtensions.EndWithNormalized(System.String,System.String)">
+            <summary>
+            Determines whether the path ends with the specified suffix, normalizing both
+            paths to use the platform's directory separator character before comparing.
+            </summary>
+            <param name="path">The full path to inspect.</param>
+            <param name="ending">The suffix to look for at the end of <paramref name="path"/>.</param>
+            <returns><see langword="true"/> if <paramref name="path"/> ends with <paramref name="ending"/>; otherwise <see langword="false"/>.</returns>
+            <exception cref="T:System.ArgumentNullException"><paramref name="path"/> or <paramref name="ending"/> is <see langword="null"/>.</exception>
+        </member>
+        <member name="M:Jeninnet.Testing.Assertions.Extensions.PathExtensions.EndWithPath(System.String,System.String)">
+            <summary>
+            Determines whether the path ends with the specified relative path segment,
+            normalizing both paths to use the platform's directory separator character.
+            </summary>
+            <param name="path">The full path to inspect.</param>
+            <param name="relative">The relative path suffix to look for.</param>
+            <returns><see langword="true"/> if <paramref name="path"/> ends with <paramref name="relative"/>; otherwise <see langword="false"/>.</returns>
+            <exception cref="T:System.ArgumentNullException"><paramref name="path"/> or <paramref name="relative"/> is <see langword="null"/>.</exception>
+        </member>
+        <member name="T:Jeninnet.Testing.Assertions.Extensions.TestEnvironmentExtensions">
+            <summary>Provides extension methods for <c>TestEnvironment</c> to simplify test fixture setup.</summary>
+        </member>
+        <member name="M:Jeninnet.Testing.Assertions.Extensions.TestEnvironmentExtensions.CreateDeepDirectoryTree(Jeninnet.Testing.Assertions.IO.TestEnvironment,System.Int32,System.String,System.String,System.Int32)">
+            <summary>Creates a deep directory tree with the specified depth and optional files at the leaf level.</summary>
+            <param name="env">The test environment in which to create the tree.</param>
+            <param name="levels">The depth of the directory hierarchy (must be positive).</param>
+            <param name="fileName">The base name for files created at the deepest level (default <c>"file"</c>).</param>
+            <param name="fileExt">The file extension for created files (default <c>"txt"</c>).</param>
+            <param name="fileCount">The number of files to create at the leaf level (default 1).</param>
+            <exception cref="T:System.ArgumentNullException"><paramref name="env"/> is <see langword="null"/>.</exception>
+        </member>
+        <member name="T:Jeninnet.Testing.Assertions.IO.InaccessibleDirectorySimulator">
+            <summary>Provides helper methods to simulate inaccessible or locked directories for testing error-handling paths.</summary>
+        </member>
+        <member name="M:Jeninnet.Testing.Assertions.IO.InaccessibleDirectorySimulator.CreatePseudoInaccessibleDir(Jeninnet.Testing.Assertions.IO.TestEnvironment,System.String)">
+            <summary>
+            Creates a path that <em>looks</em> like a directory entry but is actually a file,
+            simulating an inaccessible directory scenario where directory traversal fails.
+            </summary>
+            <param name="env">The test environment.</param>
+            <param name="name">The name of the pseudo-directory entry to create.</param>
+            <returns>The absolute path to the created file entry.</returns>
+            <exception cref="T:System.ArgumentNullException"><paramref name="env"/> or <paramref name="name"/> is <see langword="null"/>.</exception>
+        </member>
+        <member name="M:Jeninnet.Testing.Assertions.IO.InaccessibleDirectorySimulator.CreateLockedDir(Jeninnet.Testing.Assertions.IO.TestEnvironment,System.String,System.IO.FileStream@)">
+            <summary>
+            Creates a directory with an exclusively-locked file inside, preventing
+            enumeration or deletion of the directory to simulate I/O contention.
+            </summary>
+            <param name="env">The test environment.</param>
+            <param name="name">The name of the directory to create and lock.</param>
+            <param name="lockHandle">When this method returns, contains a <see cref="T:System.IO.FileStream"/> holding an exclusive lock on a file within the directory.</param>
+            <returns>The absolute path to the locked directory.</returns>
+            <exception cref="T:System.ArgumentNullException"><paramref name="env"/> or <paramref name="name"/> is <see langword="null"/>.</exception>
+        </member>
+        <member name="T:Jeninnet.Testing.Assertions.IO.TestEnvironment">
+            <summary>
+            Represents a temporary test environment for file system operations, providing methods to create files and directories, including inaccessible ones, and ensuring cleanup after tests.
+            </summary>
+        </member>
+        <member name="P:Jeninnet.Testing.Assertions.IO.TestEnvironment.Root">
+            <summary>
+            Gets the root directory of the test environment, which is a temporary directory created for testing purposes.
+            </summary>
+        </member>
+        <member name="M:Jeninnet.Testing.Assertions.IO.TestEnvironment.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:Jeninnet.Testing.Assertions.IO.TestEnvironment"/> class, creating a temporary root directory for testing purposes.
+            </summary>
+        </member>
+        <member name="M:Jeninnet.Testing.Assertions.IO.TestEnvironment.CreateDirectory(System.String)">
+            <summary>
+            Creates a directory at the specified relative path within the test environment's root directory.
+            </summary>
+            <param name="relative">The relative path of the directory to create.</param>
+            <returns>Return the full path of the created directory.</returns>
+        </member>
+        <member name="M:Jeninnet.Testing.Assertions.IO.TestEnvironment.CreateFile(System.String,System.String)">
+            <summary>
+            Creates a file at the specified relative path within the test environment's root directory, optionally with specified contents.
+            </summary>
+            <param name="relativePath">The relative path of the file to create.</param>
+            <param name="contents">The contents to write to the file.</param>
+            <returns>Return the full path of the created file.</returns>
+        </member>
+        <member name="M:Jeninnet.Testing.Assertions.IO.TestEnvironment.CreateFiles(System.String[])">
+            <summary>
+            Creates multiple files at the specified relative paths within the test environment's root directory, optionally with specified contents.
+            </summary>
+            <param name="relativePaths">The relative paths of the files to create.</param>
+        </member>
+        <member name="M:Jeninnet.Testing.Assertions.IO.TestEnvironment.Abs(System.String[])">
+            <summary>
+            Returns the absolute path by combining the test environment's root directory with the specified relative paths.
+            </summary>
+            <param name="relative">The relative paths to combine with the root directory.</param>
+            <returns>The absolute path.</returns>
+        </member>
+        <member name="M:Jeninnet.Testing.Assertions.IO.TestEnvironment.CreateInaccessibleDirectory(System.String)">
+            <summary>
+            Creates a directory at the specified relative path and sets it to be inaccessible by setting its attributes to ReadOnly and System.
+            </summary>
+            <param name="relativePath">The relative path of the directory to make inaccessible.</param>
+            <returns>Return the full path of the created directory.</returns>
+        </member>
+        <member name="M:Jeninnet.Testing.Assertions.IO.TestEnvironment.SetInaccessible(System.String)">
+            <summary>
+            Sets the specified directory to be inaccessible by setting its attributes to ReadOnly and System.
+            </summary>
+            <param name="relativePath">The relative path of the directory to make inaccessible.</param>
+        </member>
+        <member name="M:Jeninnet.Testing.Assertions.IO.TestEnvironment.SetInaccessibleDirectory(System.String)">
+            <summary>
+            Sets the specified directory to be inaccessible by setting its attributes to ReadOnly and System.
+            </summary>
+            <param name="relativePath">The relative path of the directory to make inaccessible.</param>
+        </member>
+        <member name="M:Jeninnet.Testing.Assertions.IO.TestEnvironment.CreateLockedFile(System.String,System.String)">
+            <summary>
+            Creates a file at the specified relative path within the test environment's root directory,
+            opens it with exclusive access (no sharing), and returns a FileStream for the file.
+            This allows for testing scenarios where the file is locked by another process.
+            </summary>
+            <param name="relativePath">The relative path of the file to create.</param>
+            <param name="contents">The contents to write to the file.</param>
+            <returns>A FileStream for the created file.</returns>
+        </member>
+        <member name="M:Jeninnet.Testing.Assertions.IO.TestEnvironment.CreateTree(System.Collections.Generic.Dictionary{System.String,System.String})">
+            <summary>
+            Creates a directory tree based on the provided dictionary, where keys represent relative paths and values represent file contents.
+            </summary>
+            <param name="files">A dictionary where keys are relative paths and values are the contents for each file.</param>
+            <returns>The root path of the created tree.</returns>
+        </member>
+        <member name="M:Jeninnet.Testing.Assertions.IO.TestEnvironment.AssertDirectoryInaccessible(System.String)">
+            <summary>
+            Asserts that the specified directory is inaccessible by attempting to enumerate its contents.
+            </summary>
+            <param name="relativePath">The relative path of the file to create.</param>
+            <exception cref="T:System.InvalidOperationException"></exception>
+        </member>
+        <member name="M:Jeninnet.Testing.Assertions.IO.TestEnvironment.Dispose">
+            <summary>
+            Disposes of the test environment by attempting to delete the root directory and all its contents.
+            </summary>
+        </member>
+        <member name="T:Jeninnet.Testing.Assertions.ObjectAssertions`1">
+            <summary>Provides assertion methods for verifying objects of type <typeparamref name="T"/>.</summary>
+            <typeparam name="T">The static type of the object under assertion.</typeparam>
+            <param name="value">The object value to assert on.</param>
+        </member>
+        <member name="M:Jeninnet.Testing.Assertions.ObjectAssertions`1.#ctor(`0)">
+            <summary>Provides assertion methods for verifying objects of type <typeparamref name="T"/>.</summary>
+            <typeparam name="T">The static type of the object under assertion.</typeparam>
+            <param name="value">The object value to assert on.</param>
+        </member>
+        <member name="M:Jeninnet.Testing.Assertions.ObjectAssertions`1.Be(`0,System.String)">
+            <summary>Asserts that the value equals <paramref name="expected"/> using the default equality comparer.</summary>
+            <param name="expected">The expected value.</param>
+            <param name="message">
+            An optional custom failure message that is included in the
+            <see cref="T:Jeninnet.Testing.Assertions.AssertionFailedException"/> if the assertion fails.
+            </param>
+            <exception cref="T:Jeninnet.Testing.Assertions.AssertionFailedException">The values are not equal.</exception>
+        </member>
+        <member name="M:Jeninnet.Testing.Assertions.ObjectAssertions`1.Be``1(System.String)">
+            <summary>Asserts that the run-time type of the value matches <typeparamref name="TExpected"/>.</summary>
+            <typeparam name="TExpected">The expected run-time type.</typeparam>
+            <param name="message">
+            An optional custom failure message that is included in the
+            <see cref="T:Jeninnet.Testing.Assertions.AssertionFailedException"/> if the assertion fails.
+            </param>
+            <exception cref="T:Jeninnet.Testing.Assertions.AssertionFailedException">The run-time type does not match <typeparamref name="TExpected"/>.</exception>
+        </member>
+        <member name="M:Jeninnet.Testing.Assertions.ObjectAssertions`1.BeNull(System.String)">
+            <summary>Asserts that the value is <see langword="null"/>.</summary>
+            <param name="message">
+            An optional custom failure message that is included in the
+            <see cref="T:Jeninnet.Testing.Assertions.AssertionFailedException"/> if the assertion fails.
+            </param>
+            <exception cref="T:Jeninnet.Testing.Assertions.AssertionFailedException">The value is not <see langword="null"/>.</exception>
+        </member>
+        <member name="M:Jeninnet.Testing.Assertions.ObjectAssertions`1.NotBeNull(System.String)">
+            <summary>Asserts that the value is not <see langword="null"/>.</summary>
+            <param name="message">
+            An optional custom failure message that is included in the
+            <see cref="T:Jeninnet.Testing.Assertions.AssertionFailedException"/> if the assertion fails.
+            </param>
+            <exception cref="T:Jeninnet.Testing.Assertions.AssertionFailedException">The value is <see langword="null"/>.</exception>
+        </member>
+        <member name="M:Jeninnet.Testing.Assertions.ObjectAssertions`1.BeOfType``1(System.String)">
+            <summary>Asserts that the value is assignable to type <typeparamref name="TExpected"/>.</summary>
+            <typeparam name="TExpected">The type that the value must be assignable to.</typeparam>
+            <param name="message">
+            An optional custom failure message that is included in the
+            <see cref="T:Jeninnet.Testing.Assertions.AssertionFailedException"/> if the assertion fails.
+            </param>
+            <exception cref="T:Jeninnet.Testing.Assertions.AssertionFailedException">The value is <see langword="null"/> or is not of the expected type.</exception>
+        </member>
+        <member name="T:Jeninnet.Testing.Assertions.StringAssertions">
+            <summary>Provides assertion methods for verifying <see cref="T:System.String"/> values.</summary>
+            <param name="value">The string value to assert on.</param>
+        </member>
+        <member name="M:Jeninnet.Testing.Assertions.StringAssertions.#ctor(System.String)">
+            <summary>Provides assertion methods for verifying <see cref="T:System.String"/> values.</summary>
+            <param name="value">The string value to assert on.</param>
+        </member>
+        <member name="M:Jeninnet.Testing.Assertions.StringAssertions.Be(System.String,System.String)">
+            <summary>Asserts that the string exactly equals <paramref name="expected"/> using ordinal comparison.</summary>
+            <param name="expected">The expected string value.</param>
+            <param name="message">
+            An optional custom failure message that is included in the
+            <see cref="T:Jeninnet.Testing.Assertions.AssertionFailedException"/> if the assertion fails.
+            </param>
+            <exception cref="T:Jeninnet.Testing.Assertions.AssertionFailedException">The string does not match <paramref name="expected"/>.</exception>
+        </member>
+        <member name="M:Jeninnet.Testing.Assertions.StringAssertions.BeNull(System.String)">
+            <summary>Asserts that the string value is <see langword="null"/>.</summary>
+            <param name="message">
+            An optional custom failure message that is included in the
+            <see cref="T:Jeninnet.Testing.Assertions.AssertionFailedException"/> if the assertion fails.
+            </param>
+            <exception cref="T:Jeninnet.Testing.Assertions.AssertionFailedException">The string is not <see langword="null"/>.</exception>
+        </member>
+        <member name="M:Jeninnet.Testing.Assertions.StringAssertions.NotBeNull(System.String)">
+            <summary>Asserts that the string value is not <see langword="null"/>.</summary>
+            <param name="message">
+            An optional custom failure message that is included in the
+            <see cref="T:Jeninnet.Testing.Assertions.AssertionFailedException"/> if the assertion fails.
+            </param>
+            <exception cref="T:Jeninnet.Testing.Assertions.AssertionFailedException">The string is <see langword="null"/>.</exception>
+        </member>
+        <member name="M:Jeninnet.Testing.Assertions.StringAssertions.Contain(System.String,System.String)">
+            <summary>Asserts that the string contains the specified <paramref name="expected"/> substring using ordinal comparison.</summary>
+            <param name="expected">The substring to search for.</param>
+            <param name="message">
+            An optional custom failure message that is included in the
+            <see cref="T:Jeninnet.Testing.Assertions.AssertionFailedException"/> if the assertion fails.
+            </param>
+            <exception cref="T:Jeninnet.Testing.Assertions.AssertionFailedException">The underlying string is <see langword="null"/> or does not contain <paramref name="expected"/>.</exception>
+        </member>
+        <member name="M:Jeninnet.Testing.Assertions.StringAssertions.EndsWith(System.String,System.String)">
+            <summary>Asserts that the string ends with the specified <paramref name="expected"/> substring using ordinal comparison.</summary>
+            <param name="expected">The suffix that the string is expected to end with.</param>
+            <param name="message">
+            An optional custom failure message that is included in the
+            <see cref="T:Jeninnet.Testing.Assertions.AssertionFailedException"/> if the assertion fails.
+            </param>
+            <exception cref="T:Jeninnet.Testing.Assertions.AssertionFailedException">The underlying string is <see langword="null"/> or does not end with <paramref name="expected"/>.</exception>
+        </member>
+        <member name="T:Jeninnet.Testing.Assertions.Utilities.PathHelper">
+            <summary>Provides utility methods for path manipulation and comparison in test code.</summary>
+        </member>
+        <member name="M:Jeninnet.Testing.Assertions.Utilities.PathHelper.Join(System.String[])">
+            <summary>Joins path segments using the platform's directory separator character.</summary>
+            <param name="segments">The path segments to join.</param>
+            <returns>A single path string with segments separated by <see cref="F:System.IO.Path.DirectorySeparatorChar"/>.</returns>
+            <exception cref="T:System.ArgumentNullException"><paramref name="segments"/> is <see langword="null"/>.</exception>
+        </member>
+        <member name="M:Jeninnet.Testing.Assertions.Utilities.PathHelper.Normalize(System.String)">
+            <summary>Normalizes a path by replacing forward slashes with the platform's directory separator character.</summary>
+            <param name="p">The path to normalize.</param>
+            <returns>The normalized path string.</returns>
+            <exception cref="T:System.ArgumentNullException"><paramref name="p"/> is <see langword="null"/>.</exception>
+        </member>
+        <member name="M:Jeninnet.Testing.Assertions.Utilities.PathHelper.Equivalent(System.String,System.String)">
+            <summary>Determines whether two paths are equivalent after normalization and case-insensitive comparison.</summary>
+            <param name="a">The first path to compare.</param>
+            <param name="b">The second path to compare.</param>
+            <returns><see langword="true"/> if the normalized paths are equivalent; otherwise <see langword="false"/>.</returns>
+            <exception cref="T:System.ArgumentNullException"><paramref name="a"/> or <paramref name="b"/> is <see langword="null"/>.</exception>
+        </member>
+        <member name="T:Jeninnet.Testing.Assertions.WhichConstraint`1">
+            <summary>
+            Provides access to a matched value after an assertion succeeds.
+            Enables chaining further assertions on the same object without additional lookups.
+            </summary>
+            <typeparam name="T">The type of the matched value.</typeparam>
+            <param name="value">The matched value to expose.</param>
+        </member>
+        <member name="M:Jeninnet.Testing.Assertions.WhichConstraint`1.#ctor(`0)">
+            <summary>
+            Provides access to a matched value after an assertion succeeds.
+            Enables chaining further assertions on the same object without additional lookups.
+            </summary>
+            <typeparam name="T">The type of the matched value.</typeparam>
+            <param name="value">The matched value to expose.</param>
+        </member>
+        <member name="P:Jeninnet.Testing.Assertions.WhichConstraint`1.Which">
+            <summary>Gets the matched value from the preceding assertion.</summary>
+        </member>
+    </members>
+</doc>

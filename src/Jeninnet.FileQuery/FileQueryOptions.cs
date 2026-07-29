@@ -50,16 +50,10 @@ public record FileQueryOptionsConfig(
 /// </remarks>
 public sealed record FileQueryOptions {
     /// <summary>
-    /// Represents an unlimited value for numeric limits such as
-    /// <see cref="MaxRecursionDepth"/>.
-    /// </summary>
-    public const int UNLIMITED = -1;
-
-    /// <summary>
     /// Represents an unlimited recursion depth.
     /// Pass this value to <see cref="MaxRecursionDepth"/> to allow unbounded traversal.
     /// </summary>
-    public const int UNLIMITED_RECURSION_DEPTH = UNLIMITED;
+    public const int UNLIMITED_RECURSION_DEPTH = -1;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="FileQueryOptions"/> class with the specified settings.
@@ -143,12 +137,7 @@ public sealed record FileQueryOptions {
     /// <see cref="UNLIMITED_RECURSION_DEPTH"/>.
     /// </exception>
     internal void Validate() {
-        if(MaxRecursionDepth < UNLIMITED) {
-#pragma warning disable S3928
-            throw new ArgumentOutOfRangeException(nameof(MaxRecursionDepth), "Recursion depth cannot be less than -1.");
-#pragma warning restore S3928
-        }
-
+        ArgumentOutOfRangeException.ThrowIfLessThan(MaxRecursionDepth, UNLIMITED_RECURSION_DEPTH);
         ErrorRecovery.Validate();
     }
 }

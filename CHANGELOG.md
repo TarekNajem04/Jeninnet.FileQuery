@@ -29,6 +29,18 @@ Versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ---
 
+## [1.3.0] - 2026-07-26
+
+### Added
+- **OpenTelemetry Integration**: Export metrics and spans for structured observability.
+- **AOT Compilation Validation Pipeline**: Strict Native AOT compatibility checks in CI.
+- **Roslyn Analyzers for Pattern Validation**: Design-time warnings and code fixes for malformed patterns.
+
+### Changed
+- **Improved Path Validation**: `FileQueryValidator.ValidateExecution` now eagerly validates paths, providing more descriptive `ArgumentException` messages for invalid paths, excessive length, or malformed UNC structures.
+
+---
+
 ## [1.2.1] - 2026-06-22
 
 ### Fixed
