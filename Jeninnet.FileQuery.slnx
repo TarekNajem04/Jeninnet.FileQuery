@@ -142,6 +142,17 @@
         <File Path="scripts/clean/clean.schema.json" />
         <File Path="scripts/clean/README.md" />
     </Folder>
+    <Folder Name="/Solution Items/scripts/common/">
+        <File Path="scripts/common/Common.psd1" />
+        <File Path="scripts/common/Common.psm1" />
+        <File Path="scripts/common/README.md" />
+    </Folder>
+    <Folder Name="/Solution Items/scripts/coverage/">
+        <File Path="scripts/coverage/coverage.config.json" />
+        <File Path="scripts/coverage/coverage.ps1" />
+        <File Path="scripts/coverage/coverage.schema.json" />
+        <File Path="scripts/coverage/README.md" />
+    </Folder>
     <Folder Name="/Solution Items/scripts/format/">
         <File Path="scripts/format/format.config.json" />
         <File Path="scripts/format/format.ps1" />
