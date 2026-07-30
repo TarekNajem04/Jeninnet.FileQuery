@@ -7,15 +7,15 @@ public enum FileQueryErrorAction {
     /// <summary>
     /// Skip the failing entry or directory and continue traversal.
     /// </summary>
-    Skip,
+    Skip = 0,
 
     /// <summary>
     /// Retry the failing IO operation before applying abort behavior.
     /// </summary>
-    Retry,
+    Retry = 1,
 
     /// <summary>
     /// Abort traversal by propagating the IO exception.
     /// </summary>
-    Abort
+    Abort = 2
 }

@@ -16,6 +16,7 @@ internal sealed class TraversalFrontier(int initialCapacity = 64) : IDisposable 
     /// <summary>
     /// Pop a frame from the stack (DFS).
     /// </summary>
+    /// <exception cref="InvalidOperationException">Thrown when the buffer is empty.</exception>
     public TraversalFrame Pop() {
         if(IsEmpty) {
             throw new InvalidOperationException("Buffer is empty.");
@@ -33,6 +34,7 @@ internal sealed class TraversalFrontier(int initialCapacity = 64) : IDisposable 
     /// <summary>
     /// Dequeue a frame from the queue (BFS).
     /// </summary>
+    /// <exception cref="InvalidOperationException">Thrown when the buffer is empty.</exception>
     public TraversalFrame Dequeue() {
         if(IsEmpty) {
             throw new InvalidOperationException("Buffer is empty.");

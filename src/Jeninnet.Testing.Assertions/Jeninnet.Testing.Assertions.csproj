@@ -1,0 +1,37 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <GenerateDocumentationFile>true</GenerateDocumentationFile>
+        <Deterministic>true</Deterministic>
+        <ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
+        <EmbedUntrackedSources>true</EmbedUntrackedSources>
+        <IncludeSymbols>true</IncludeSymbols>
+    </PropertyGroup>
+
+    <PropertyGroup Label="Package info">
+        <IsPackable>true</IsPackable>
+        <PackageId>Jeninnet.Testing.Assertions</PackageId>
+        <Version>1.0.0</Version>
+        <Title>Jeninnet.Testing.Assertions</Title>
+        <Description>A fluent, framework-agnostic assertion library for .NET tests, providing expressive validation for objects, strings, collections, async operations, and IO infrastructure.</Description>
+        <Authors>Jeninnet</Authors>
+        <Company>Jeninnet</Company>
+        <PackageProjectUrl>https://github.com/TarekNajem04/Jeninnet.FileQuery</PackageProjectUrl>
+        <RepositoryUrl>https://github.com/TarekNajem04/Jeninnet.FileQuery</RepositoryUrl>
+        <RepositoryType>git</RepositoryType>
+        <PackageTags>test;assertions;fluent;testing;dotnet;jeninnet;tdd</PackageTags>
+        <PackageLicenseExpression>MIT</PackageLicenseExpression>
+        <PackageReadmeFile>README.md</PackageReadmeFile>
+        <PublishRepositoryUrl>true</PublishRepositoryUrl>
+        <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Microsoft.SourceLink.GitHub" PrivateAssets="All" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <None Include="README.md" Pack="true" PackagePath="\" />
+    </ItemGroup>
+
+</Project>

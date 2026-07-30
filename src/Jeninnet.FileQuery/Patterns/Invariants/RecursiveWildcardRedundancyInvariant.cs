@@ -18,7 +18,7 @@ internal sealed class RecursiveWildcardRedundancyInvariant : IPatternInvariant {
             var segment = segments[i];
 
             // Rule 1: multiple ** in same segment
-            if(segment.Count(t => t is RecursiveWildcardToken) > 1) {
+            if(segment.Count(static t => t is RecursiveWildcardToken) > 1) {
                 return PatternInvariantResult.Fail("Recursive wildcard (**) must not appear more than once in the same segment.");
             }
 

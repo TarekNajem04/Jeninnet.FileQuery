@@ -1,0 +1,126 @@
+﻿namespace Jeninnet.FileQuery.Tests.FileEnumeration.Async;
+
+/// <summary>
+/// Ensures async enumeration instances do not interfere with each other
+/// when executed concurrently.
+/// </summary>
+[TestClass]
+public class EnumerateFilesAsync_ConcurrencyIsolationTests {
+    /// <summary>
+    /// Multiple asynchronous enumerations running in parallel
+    /// must NOT share internal state.
+    /// </summary>
+    [TestMethod]
+    public async Task Should_NotInterfere_When_MultipleInstancesRunInParallel_Async() {
+        using var env = new TestEnvironment();
+
+        env.CreateFiles("x1.txt", "x2.txt");
+        env.CreateFile("sub/y1.txt");
+        env.CreateFile("sub/deep/z1.txt");
+
+        var fileQueryEngine = FileQueryRuntime.Create();
+        var options = new FileQueryOptions(
+            new FileQueryOptionsConfig(
+                PatternInput: new(
+                    Patterns: [
+                        "**",        // Exclude everything first
+                        "!**/*.txt"  // Then include all .txt files
+                    ]
+                ),
+                RecurseSubdirectories: true
+            )
+        );
+
+        // Will capture results from 3 parallel runs
+        var bag = new ConcurrentBag<List<string>>();
+
+        async Task RunOneAsync() {
+            var items = new List<string>();
+            await foreach(var path in fileQueryEngine.ExecuteAsync(new(env.Root, options), TestContext.CancellationToken)) {
+                items.Add(path);
+            }
+
+            bag.Add(items);
+        }
+
+        // run all in parallel
+        var tasks = Enumerable.Range(0, 3)
+                              .Select(_ => Task.Run(RunOneAsync, TestContext.CancellationToken))
+                              .ToArray();
+
+        await Task.WhenAll(tasks);
+
+        // All three result sets must contain the *same 4 files*
+        foreach(var result in bag) {
+            result.Should().HaveCount(4);
+            result.Should().Contain(x => x.EndsWith("x1.txt", StringComparison.Ordinal));
+            result.Should().Contain(x => x.EndsWith("x2.txt", StringComparison.Ordinal));
+            result.Should().Contain(x => x.EndsWith(Path.Combine("sub", "deep", "z1.txt"), StringComparison.Ordinal));
+        }
+    }
+
+    /// <summary>
+    /// Ensures no async state is leaked between instances with different patterns.
+    /// </summary>
+    [TestMethod]
+    public async Task Should_RemainIsolated_When_DifferentPatternsUsed_Async() {
+        using var env = new TestEnvironment();
+
+        env.CreateFiles("a.txt", "b.log", "c.md");
+
+        var fileQueryEngine = FileQueryRuntime.Create();
+
+        var txtOptions = new FileQueryOptions(
+            new FileQueryOptionsConfig(
+                PatternInput: new(
+                    Patterns: [
+                        "**",       // exclude everything
+                        "!*.txt"    // include only .txt files
+                    ]
+                )
+            )
+        );
+
+        var logOptions = new FileQueryOptions(
+            new FileQueryOptionsConfig(
+                PatternInput: new(
+                    Patterns: [
+                        "**",       // exclude everything
+                        "!*.log"    // include only .log files
+                    ]
+                )
+            )
+        );
+
+        var mdOptions = new FileQueryOptions(
+            new FileQueryOptionsConfig(
+                PatternInput: new(
+                    Patterns: [
+                        "**",       // exclude everything
+                        "!*.md"     // include only .md files
+                    ]
+                )
+            )
+        );
+
+        var txtTask = CollectAsync(txtOptions);
+        var logTask = CollectAsync(logOptions);
+        var mdTask = CollectAsync(mdOptions);
+
+        var (txt, log, md) = (await txtTask, await logTask, await mdTask);
+
+        txt.Should().ContainSingle(x => x.EndsWith("a.txt", StringComparison.Ordinal));
+        log.Should().ContainSingle(x => x.EndsWith("b.log", StringComparison.Ordinal));
+        md.Should().ContainSingle(x => x.EndsWith("c.md", StringComparison.Ordinal));
+        // Local function for clarity
+        async Task<List<string>> CollectAsync(FileQueryOptions options) =>
+            await fileQueryEngine.ExecuteAsync(new(env.Root, options), TestContext.CancellationToken)
+                                 .ToListAsync(TestContext.CancellationToken);
+    }
+
+    /// <summary>
+    /// Gets or sets the test context providing cancellation and diagnostic information.
+    /// </summary>
+    public TestContext TestContext { get; set; } = null!;
+}
+

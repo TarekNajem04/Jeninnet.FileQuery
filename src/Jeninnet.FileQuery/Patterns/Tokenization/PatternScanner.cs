@@ -37,9 +37,11 @@ internal static class PatternScanner {
         new LiteralTokenizer()        // fallback — always succeeds
     ];
 
-    // Most pattern segments contain 1–3 tokens (e.g., "*.cs" → [Wildcard, Literal(".cs")]).
-    // Initial capacity 3 avoids the first internal array resize for the vast
-    // majority of segments without over-allocating for single-token segments.
+    /// <summary>
+    /// Most pattern segments contain 1–3 tokens (e.g., "*.cs" → [Wildcard, Literal(".cs")]).
+    /// Initial capacity 3 avoids the first internal array resize for the vast
+    /// majority of segments without over-allocating for single-token segments.
+    /// </summary>
     private const int SEGMENT_INITIAL_TOKEN_CAPACITY = 3;
 
     /// <summary>

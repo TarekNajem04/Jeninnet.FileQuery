@@ -42,28 +42,28 @@ public class CommandLinePatternOptions {
             Patterns cannot end with ".." or contain consecutive "..".
             Multiple patterns must be separated by ';' (e.g. *.txt;*.log).
             """,
-            DefaultValueFactory = _ => default,
+            DefaultValueFactory = static _ => default,
             Arity = ArgumentArity.ZeroOrOne
         };
 
         Gitignore = new Option<string?>(OPTION_NAME_GITIGNORE_PATTERNS) {
             Required = false,
             Description = "Exclude patterns written in GitIgnore syntax.",
-            DefaultValueFactory = _ => default,
+            DefaultValueFactory = static _ => default,
             Arity = ArgumentArity.ZeroOrOne
         };
 
         Glob = new Option<string?>(OPTION_NAME_GLOB_PATTERNS) {
             Required = false,
             Description = "Exclude patterns written in glob syntax.",
-            DefaultValueFactory = _ => default,
+            DefaultValueFactory = static _ => default,
             Arity = ArgumentArity.ZeroOrOne
         };
 
         RegularExpression = new Option<string?>(OPTION_NAME_FLAT_PATTERNS) {
             Required = false,
             Description = "Exclude patterns written as regular expressions.",
-            DefaultValueFactory = _ => default,
+            DefaultValueFactory = static _ => default,
             Arity = ArgumentArity.ZeroOrOne
         };
     }

@@ -8,7 +8,7 @@ internal sealed class CurrentDirectoryInvariant : IPatternInvariant {
     public PatternKind? AppliesTo { get; }
 
     public PatternInvariantResult Validate(PatternCompilationContext context) {
-        if(context.Tokens!.Any(seg => seg.Count == 1 && seg[0] is LiteralToken { Text: "." })) {
+        if(context.Tokens!.Any(static seg => seg.Count == 1 && seg[0] is LiteralToken { Text: "." })) {
             return PatternInvariantResult.Fail("'.' is not a valid pattern segment.");
         }
 

@@ -28,6 +28,16 @@ To be the fastest, most predictable, and most flexible file discovery engine for
 - [x] **AOT Compilation Validation Pipeline**: Establish strict Native AOT compatibility checks in CI to ensure zero-reflection guarantees remain unbroken.
 - [x] **Roslyn Analyzers for Pattern Validation**: Provide design-time warnings and code fixes for malformed GitIgnore, Glob, or Regex patterns.
 
+## Phase 3: The "Quality & Infrastructure" Release (v1.4)
+*Goal: Elevate code quality, documentation coverage, and test infrastructure.*
+
+- [x] **Assertion Library Extraction**: Extract shared test infrastructure into `Jeninnet.Testing.Assertions` v1.0.0, a reusable, well-documented assertion library with fluent `.Should()` syntax.
+- [x] **XML Documentation Completion**: Add missing XML doc elements (`<param>`, `<exception>`, `<returns>`) across all source files; eliminate all CS1591 and RCS1141 warnings.
+- [x] **Enum Hygiene**: Add explicit underlying values to all enum members to maintain binary compatibility.
+- [x] **Test Migration**: Replace `TestAssertEx.*` with fluent `.Should()` assertions across 90+ test files.
+- [x] **Code Quality Modernization**: Adopt collection expressions, fix minor source issues, and eliminate all analyzer warnings.
+- [x] **Editorconfig Refinement**: Enable Roslynator analyzers at warning severity and align style settings.
+
 ## Phase 4: The "Ecosystem" Release (v2.x+)
 *Goal: Broaden adoption through tooling and specialized integrations.*
 

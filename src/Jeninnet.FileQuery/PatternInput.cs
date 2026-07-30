@@ -59,7 +59,7 @@ public sealed record PatternInput {
     // ------------------------------------------------------------------
 
     private static readonly IReadOnlyList<string> _emptyPatterns
-        = Array.Empty<string>();
+        = [];
 
     private static readonly IReadOnlyDictionary<PatternKind, IReadOnlyList<string>> _emptyTypedPatterns
         = new Dictionary<PatternKind, IReadOnlyList<string>>();

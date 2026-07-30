@@ -92,7 +92,7 @@ internal sealed record CompiledPattern : ICompiledPattern {
     /// <summary>
     /// Returns a debug string representation of this compiled pattern.
     /// </summary>
-    public override string ToString() => string.Join("/", Segments.Select(seg => string.Concat(seg.Select(t => t.ToString() ?? "*"))));
+    public override string ToString() => string.Join("/", Segments.Select(static seg => string.Concat(seg.Select(static t => t.ToString() ?? "*"))));
 
     private string GetDebuggerDisplay() => ToString();
 }

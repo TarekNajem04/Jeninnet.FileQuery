@@ -7,10 +7,10 @@ internal enum PathKind : byte {
     /// <summary>
     /// The entry represents a file.
     /// </summary>
-    File,
+    File = 0,
 
     /// <summary>
     /// The entry represents a directory.
     /// </summary>
-    Directory
+    Directory = 1
 }

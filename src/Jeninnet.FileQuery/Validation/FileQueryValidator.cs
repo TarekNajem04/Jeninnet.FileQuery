@@ -12,6 +12,8 @@ internal static class FileQueryValidator {
     /// <param name="options">The execution options.</param>
     /// <exception cref="ArgumentNullException">Thrown if rootPath or options are null.</exception>
     /// <exception cref="ArgumentException">Thrown if configuration is invalid.</exception>
+    /// <exception cref="InvalidOperationException">Thrown if the root path is invalid.</exception>
+    /// <exception cref="DirectoryNotFoundException">Thrown if the root path does not exist.</exception>
     public static void ValidateExecution(IFileSystem fileSystem, string? rootPath, FileQueryOptions? options) {
         if(string.IsNullOrWhiteSpace(rootPath)) {
             throw new InvalidOperationException("Root path must be specified.");

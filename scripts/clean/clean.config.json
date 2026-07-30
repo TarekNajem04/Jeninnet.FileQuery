@@ -1,0 +1,21 @@
+{
+    "$schema": "./clean.schema.json",
+    "version": 1,
+
+    "directories": {
+        "include": [
+            "bin",
+            "obj",
+            "output",
+            "artifacts",
+            "TestResults*",
+            "*Coverage*"
+        ],
+
+        "exclude": [
+            ".git",
+            ".github",
+            ".vs"
+        ]
+    }
+}

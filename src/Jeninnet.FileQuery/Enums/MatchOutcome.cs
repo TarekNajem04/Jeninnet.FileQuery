@@ -8,15 +8,15 @@ internal enum MatchOutcome : byte {
     /// No rule matched this path.
     /// Default GitIgnore state: included.
     /// </summary>
-    NoMatch,
+    NoMatch = 0,
 
     /// <summary>
     /// A rule matched and included this path.
     /// </summary>
-    Include,
+    Include = 1,
 
     /// <summary>
     /// A rule matched and excluded this path.
     /// </summary>
-    Exclude,
+    Exclude = 2,
 }

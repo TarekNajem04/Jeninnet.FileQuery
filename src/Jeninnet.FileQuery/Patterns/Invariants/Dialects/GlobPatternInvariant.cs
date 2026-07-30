@@ -10,7 +10,7 @@ internal sealed class GlobPatternInvariant : IPatternInvariant {
     public PatternInvariantResult Validate(PatternCompilationContext context) {
         // Example: recursive wildcard must be standalone segment.
         foreach(var segment in context.Tokens ?? []) {
-            var recursive = segment.Where(token => token is RecursiveWildcardToken).ToList();
+            var recursive = segment.Where(static token => token is RecursiveWildcardToken).ToList();
             if(recursive.Count > 0 && segment.Count > 1) {
                 return PatternInvariantResult.Fail("In Glob patterns, '**' must appear as a standalone segment.");
             }

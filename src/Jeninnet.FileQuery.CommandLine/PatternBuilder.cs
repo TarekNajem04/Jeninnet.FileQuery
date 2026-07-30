@@ -43,8 +43,7 @@ public static class PatternBuilder {
         const string FALLBACK_PATTERN = "!**";
         var typedPatterns = new Dictionary<PatternKind, List<string>>();
 
-        var splitedPatterns = GetSplitPatterns(patterns);
-        foreach(var rawPattern in splitedPatterns) {
+        foreach(var rawPattern in GetSplitPatterns(patterns)) {
             var type = Patterns.Classification.PatternClassifier.Classify(rawPattern);
             AddToBucket(typedPatterns, type, rawPattern);
         }
@@ -75,7 +74,11 @@ public static class PatternBuilder {
         }
     }
 
-    // Helper: split by ';' and trim entries.
+    /// <summary>
+    /// Helper: split by ';' and trim entries.
+    /// </summary>
+    /// <param name="value">The string to split.</param>
+    /// <returns>An enumeration of the split and trimmed strings.</returns>
     private static IEnumerable<string> GetSplitPatterns(string? value) =>
         string.IsNullOrWhiteSpace(value)
             ? []

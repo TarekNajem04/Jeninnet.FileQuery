@@ -15,10 +15,10 @@ public enum TraversalStrategy : byte {
     /// <summary>
     /// Depth-first traversal (stack-based).
     /// </summary>
-    DepthFirst,
+    DepthFirst = 0,
 
     /// <summary>
     /// Breadth-first traversal (queue-based).
     /// </summary>
-    BreadthFirst
+    BreadthFirst = 1
 }

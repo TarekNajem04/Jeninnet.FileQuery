@@ -86,6 +86,13 @@
             <param name="regex">Regex-style patterns.</param>
             <returns>Dictionary mapping <see cref="T:Jeninnet.FileQuery.Enums.PatternKind"/> to lists of patterns.</returns>
         </member>
+        <member name="M:Jeninnet.FileQuery.CommandLine.PatternBuilder.GetSplitPatterns(System.String)">
+            <summary>
+            Helper: split by ';' and trim entries.
+            </summary>
+            <param name="value">The string to split.</param>
+            <returns>An enumeration of the split and trimmed strings.</returns>
+        </member>
         <member name="T:Jeninnet.FileQuery.CommandLine.PatternOptions">
             <summary>
             Immutable container for parsed pattern options.

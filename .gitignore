@@ -366,9 +366,7 @@ FodyWeavers.xsd
 # ==========================================
 # Coverage Reports & Test Results
 # ==========================================
-**/TestCoverageReport/
-**/[Cc]overage/
-**/CoverageResults/
+**/**[Cc]overage**/
 **/TestResults/
 
 **/[Cc]overage*.xml

@@ -7,15 +7,15 @@ internal enum MatchPrecedence {
     /// <summary>
     /// The first matching pattern determines the result, and later matches are ignored.
     /// </summary>
-    FirstMatchWins,
+    FirstMatchWins = 0,
 
     /// <summary>
     /// The last matching pattern determines the result, overriding earlier matches.
     /// </summary>
-    LastMatchWins,
+    LastMatchWins = 1,
 
     /// <summary>
     /// Explicit exclusion rules take precedence over inclusion rules regardless of order.
     /// </summary>
-    ExcludeWins
+    ExcludeWins = 2
 }

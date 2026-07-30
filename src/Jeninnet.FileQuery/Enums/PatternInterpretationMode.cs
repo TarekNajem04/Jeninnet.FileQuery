@@ -8,10 +8,10 @@ public enum PatternInterpretationMode {
     /// Use the unified hybrid engine that supports
     /// GitIgnore + Glob + recursive semantics.
     /// </summary>
-    Hybrid,
+    Hybrid = 0,
 
     /// <summary>
     /// All patterns follow the explicit <see cref="PatternMatchingMode"/> is used withe <see cref="FileQueryOptions.PatternMatchingMode"/>.
     /// </summary>
-    Specific,
+    Specific = 1,
 }

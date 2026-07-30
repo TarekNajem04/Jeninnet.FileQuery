@@ -9,7 +9,7 @@ on:
       - main
     paths:
       - "src/**"
-      - "test/**"
+      - "tests/**"
       - "**.csproj"
       - "Directory.Packages.props"
       - "Directory.Build.props"
@@ -24,7 +24,7 @@ on:
       - reopened
     paths:
       - "src/**"
-      - "test/**"
+      - "tests/**"
       - "**.csproj"
       - "Directory.Packages.props"
       - "Directory.Build.props"
@@ -127,7 +127,7 @@ jobs:
             /d:sonar.scm.provider=git \
             /d:sonar.scm.forceReloadAll=true \
             /d:sonar.exclusions="samples/**,src/**[Bb]enchmarks/**,**/bin/**,**/obj/**,**/TestResults/**" \
-            /d:sonar.test.exclusions="test/**"
+            /d:sonar.test.exclusions="tests/**"
 
       # ---------------------------------------------------------
       # 9) Restore dependencies
@@ -147,7 +147,7 @@ jobs:
       - name: Run tests with coverage
         run: |
           dotnet test -c Release --no-build \
-            --settings test/Jeninnet.FileQuery.Tests/.runsettings \
+            --settings tests/Jeninnet.FileQuery.Tests/.runsettings \
             --collect:"XPlat Code Coverage" \
             --logger "trx;LogFileName=results.trx" \
             --results-directory TestResults
