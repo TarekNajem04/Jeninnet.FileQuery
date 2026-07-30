@@ -488,7 +488,7 @@
             <summary>CreateLockedFile with a null path throws ArgumentNullException.</summary>
         </member>
         <member name="M:Jeninnet.Testing.Assertions.Tests.IO.TestEnvironmentEdgeCaseTests.SetInaccessibleDirectory_NonExistent_CreatesDirectory">
-            <summary>SetInaccessibleDirectory on a non-existent path creates the directory first.</summary>
+            <summary>SetInaccessibleDirectory on a non-existent path creates the directory first (or makes it inaccessible); does not throw.</summary>
         </member>
         <member name="M:Jeninnet.Testing.Assertions.Tests.IO.TestEnvironmentEdgeCaseTests.Dispose_WithLockedFile_Resilient">
             <summary>Dispose with a locked file does not throw, ensuring cleanup is resilient.</summary>

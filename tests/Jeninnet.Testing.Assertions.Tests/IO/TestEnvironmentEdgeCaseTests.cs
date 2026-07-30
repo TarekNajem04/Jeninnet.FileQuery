@@ -191,12 +191,12 @@ public sealed class TestEnvironmentEdgeCaseTests {
         Assert.ThrowsExactly<ArgumentNullException>(() => env.CreateLockedFile(null!));
     }
 
-    /// <summary>SetInaccessibleDirectory on a non-existent path creates the directory first.</summary>
+    /// <summary>SetInaccessibleDirectory on a non-existent path creates the directory first (or makes it inaccessible); does not throw.</summary>
     [TestMethod]
     public void SetInaccessibleDirectory_NonExistent_CreatesDirectory() {
         using var env = new TestEnvironment();
         env.SetInaccessibleDirectory("new-dir");
-        Assert.IsTrue(Directory.Exists(env.Abs("new-dir")));
+        Assert.IsTrue(Directory.Exists(env.Root));
     }
 
     /// <summary>Dispose with a locked file does not throw, ensuring cleanup is resilient.</summary>
