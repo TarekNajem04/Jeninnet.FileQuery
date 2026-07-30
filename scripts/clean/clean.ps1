@@ -76,14 +76,14 @@ param(
 Set-StrictMode -Version Latest
 $ErrorActionPreference = "Stop"
 
-$script:ProtectedDirectories = @(
+$script:ProtectedPaths = @(
     "src",
     "tests",
     "scripts",
+    "scripts\coverage",
     ".git",
     ".github"
 )
-
 
 function Write-Banner {
 
@@ -211,14 +211,18 @@ function Get-CleanupTargets {
     }
 
 
-    return $targets |
-        Where-Object {
+return $targets |
+    Where-Object {
 
-            $_.Name -notin $Excluded -and
-            $_.Name -notin $script:ProtectedDirectories
+        $relativePath =
+            $_.FullName.Substring($Root.Length).TrimStart('\')
 
-        } |
-        Sort-Object FullName -Unique
+        $_.Name -notin $Excluded -and
+        $relativePath -notin $script:ProtectedPaths
+
+    } |
+    Sort-Object FullName -Unique |
+    Sort-Object { $_.FullName.Length } -Descending
 }
 
 
