@@ -143,9 +143,6 @@ _TeamCity*
 .axoCover/*
 !.axoCover/settings.json
 
-# Coverlet is a free, cross platform Code Coverage Tool
-coverage*.json
-coverage*.xml
 coverage*.info
 
 # Visual Studio code coverage results
@@ -366,13 +363,11 @@ FodyWeavers.xsd
 # ==========================================
 # Coverage Reports & Test Results
 # ==========================================
-**/**[Cc]overage**/
+
 **/TestResults/
 
-**/[Cc]overage*.xml
-**/[Cc]overage*.json
-*.coverage
-*.coveragexml
+# Generated coverage HTML reports
+artifacts/coverage/
 
 # ==========================================
 # SonarQube & SonarLint
