@@ -133,9 +133,7 @@
         <File Path="docs/whitepaper/jeninnet-filequery-architecture.md" />
         <File Path="docs/whitepaper/Jeninnet.FileQuery-Whitepaper.md" />
     </Folder>
-    <Folder Name="/Solution Items/scripts/">
-        <File Path="scripts/run-coverage.ps1" />
-    </Folder>
+    <Folder Name="/Solution Items/scripts/" />
     <Folder Name="/Solution Items/scripts/clean/">
         <File Path="scripts/clean/clean.config.json" />
         <File Path="scripts/clean/clean.ps1" />
