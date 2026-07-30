@@ -461,7 +461,7 @@
             <summary>Join with a single segment returns that segment.</summary>
         </member>
         <member name="M:Jeninnet.Testing.Assertions.Tests.Utilities.PathHelperTests.Normalize_ForwardSlashes_ConvertsToSeparator">
-            <summary>Normalize replaces forward slashes with the directory separator.</summary>
+            <summary>Normalize replaces forward slashes with the platform directory separator.</summary>
         </member>
         <member name="M:Jeninnet.Testing.Assertions.Tests.Utilities.PathHelperTests.Normalize_NullValue_Throws">
             <summary>Normalize with a null value throws ArgumentNullException.</summary>

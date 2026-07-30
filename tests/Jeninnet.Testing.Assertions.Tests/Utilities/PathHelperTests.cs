@@ -21,11 +21,11 @@ public sealed class PathHelperTests {
         Assert.AreEqual("root", result);
     }
 
-    /// <summary>Normalize replaces forward slashes with the directory separator.</summary>
+    /// <summary>Normalize replaces forward slashes with the platform directory separator.</summary>
     [TestMethod]
     public void Normalize_ForwardSlashes_ConvertsToSeparator() {
         var result = PathHelper.Normalize("root/child/file.txt");
-        Assert.IsFalse(result.Contains('/'));
+        Assert.AreEqual($"root{Path.DirectorySeparatorChar}child{Path.DirectorySeparatorChar}file.txt", result);
     }
 
     /// <summary>Normalize with a null value throws ArgumentNullException.</summary>

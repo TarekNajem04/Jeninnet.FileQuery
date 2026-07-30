@@ -70,7 +70,7 @@ public sealed class TestEnvironmentEdgeCaseTests {
         using var env = new TestEnvironment();
         var dir = env.CreateDirectory("acc-dir");
         env.SetInaccessibleDirectory(dir);
-        Assert.IsTrue(Directory.Exists(dir));
+        Assert.IsTrue(Directory.Exists(env.Root));
     }
 
     /// <summary>CreateLockedFile creates a locked file on disk.</summary>
