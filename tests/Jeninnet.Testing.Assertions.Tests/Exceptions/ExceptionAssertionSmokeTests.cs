@@ -32,4 +32,21 @@ public sealed class ExceptionAssertionSmokeTests {
         var ex = new AssertionFailedException();
         Assert.IsInstanceOfType<Exception>(ex);
     }
+
+    /// <summary>AssertionFailedException stores and exposes an inner exception.</summary>
+    [TestMethod]
+    public void AssertionFailedException_WithInnerException_StoresInner() {
+        var inner = new InvalidOperationException("inner");
+        var ex = new AssertionFailedException("outer", inner);
+        Assert.AreEqual("outer", ex.Message);
+        Assert.AreSame(inner, ex.InnerException);
+    }
+
+    /// <summary>AssertionFailedException with null inner exception stores null.</summary>
+    [TestMethod]
+    public void AssertionFailedException_WithNullInner_StoresNull() {
+        var ex = new AssertionFailedException("msg", null);
+        Assert.AreEqual("msg", ex.Message);
+        Assert.IsNull(ex.InnerException);
+    }
 }
