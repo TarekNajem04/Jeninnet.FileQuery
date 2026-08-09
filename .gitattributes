@@ -17,7 +17,7 @@
 *.xml          text eol=crlf
 *.cs           text eol=crlf
 *.csproj       text eol=crlf
-*.props        text eol=crlf
+*.props        text eol=lf
 *.targets      text eol=crlf
 
 ###############################################################################
