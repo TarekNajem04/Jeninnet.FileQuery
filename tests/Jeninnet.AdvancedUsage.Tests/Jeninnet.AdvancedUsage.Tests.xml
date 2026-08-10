@@ -1,0 +1,102 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Jeninnet.AdvancedUsage.Tests</name>
+    </assembly>
+    <members>
+        <member name="T:Jeninnet.AdvancedUsage.Tests.Evaluation.DatasetGeneratorBoundaryTests">
+            <summary>
+            Regression tests for the dataset generator's final-file boundary condition.
+            Runtime capacities always sum exactly to the target, so generation must
+            terminate at the target without ever requesting another extension.
+            </summary>
+        </member>
+        <member name="M:Jeninnet.AdvancedUsage.Tests.Evaluation.DatasetGeneratorBoundaryTests.GenerateAsync_WhenTargetEqualsTotalCapacity_GeneratesExactlyTargetFilesAsync">
+            <summary>
+            Regression: when the target file count equals the sum of the runtime
+            extension capacities, generation must complete exactly at the target,
+            terminate immediately, and never request another extension.
+            </summary>
+        </member>
+        <member name="M:Jeninnet.AdvancedUsage.Tests.Evaluation.DatasetGeneratorBoundaryTests.GenerateAsync_WhenTargetIsOneHundred_GeneratesExactlyTargetFilesAsync">
+            <summary>
+            Regression: small datasets must generate successfully and apply the
+            runtime capacity distribution end to end. At the smallest supported
+            target every extension receives its exact percentage share.
+            </summary>
+        </member>
+        <member name="P:Jeninnet.AdvancedUsage.Tests.Evaluation.DatasetGeneratorBoundaryTests.TestContext">
+            <inheritdoc/>
+        </member>
+        <member name="T:Jeninnet.AdvancedUsage.Tests.Evaluation.DatasetGeneratorCapacityTests">
+            <summary>
+            Tests for the runtime extension-capacity allocation of the dataset generator.
+            The target file count must be divisible by 100, every extension then receives
+            its exact percentage share, and the capacities always sum exactly to the
+            target. The same target always produces the same allocation.
+            </summary>
+        </member>
+        <member name="M:Jeninnet.AdvancedUsage.Tests.Evaluation.DatasetGeneratorCapacityTests.BuildRuntimeCapacities_WhenTargetIsOneMillion_AllocatesExpectedDistribution">
+            <summary>
+            For one million files every extension must receive its exact percentage
+            share, and the allocation must be identical on every invocation.
+            </summary>
+        </member>
+        <member name="M:Jeninnet.AdvancedUsage.Tests.Evaluation.DatasetGeneratorCapacityTests.BuildRuntimeCapacities_WhenTargetIsOneHundredThousand_SumsToTarget">
+            <summary>
+            For one hundred thousand files the capacities must sum exactly to the target.
+            </summary>
+        </member>
+        <member name="M:Jeninnet.AdvancedUsage.Tests.Evaluation.DatasetGeneratorCapacityTests.BuildRuntimeCapacities_WhenTargetIsTenThousand_SumsToTarget">
+            <summary>
+            For ten thousand files the capacities must sum exactly to the target.
+            </summary>
+        </member>
+        <member name="M:Jeninnet.AdvancedUsage.Tests.Evaluation.DatasetGeneratorCapacityTests.BuildRuntimeCapacities_WhenTargetIsOneHundred_SumsToTarget">
+            <summary>
+            For one hundred files the capacities must sum exactly to the target.
+            </summary>
+        </member>
+        <member name="M:Jeninnet.AdvancedUsage.Tests.Evaluation.DatasetGeneratorCapacityTests.BuildRuntimeCapacities_WhenTargetIsOneHundredMillion_SumsToTarget">
+            <summary>
+            Regression: for one hundred million files every extension must still
+            receive its exact percentage share and the capacities must sum exactly
+            to the target. Floating-point ratio calculations previously allocated
+            three extra files at this scale (100,000,003 instead of 100,000,000).
+            </summary>
+        </member>
+        <member name="M:Jeninnet.AdvancedUsage.Tests.Evaluation.DatasetGeneratorCapacityTests.BuildRuntimeCapacities_WhenTargetIsAtMaximumScale_SumsToTarget">
+            <summary>
+            Regression: at the largest supported target (the highest multiple of one
+            hundred that fits in an Int32) the exact integer calculation must not
+            overflow: the individual capacities are computed from the per-hundred
+            quota and the sum must still equal the target.
+            </summary>
+        </member>
+        <member name="M:Jeninnet.AdvancedUsage.Tests.Evaluation.DatasetGeneratorCapacityTests.BuildRuntimeCapacities_WhenTargetFileCountIsNotDivisibleByOneHundred_Throws">
+            <summary>
+            The target file count must be divisible by 100 because the extension
+            weights sum to 100 percent; any other value is rejected. Ten files and
+            1,000,001 files must both be rejected.
+            </summary>
+        </member>
+        <member name="T:Jeninnet.AdvancedUsage.Tests.Evaluation.EvaluationOptionsValidationTests">
+            <summary>
+            Tests for the validation of the dataset evaluation options.
+            </summary>
+        </member>
+        <member name="M:Jeninnet.AdvancedUsage.Tests.Evaluation.EvaluationOptionsValidationTests.Validate_WhenTargetFileCountIsNotDivisibleByOneHundred_Throws">
+            <summary>
+            The target file count must be divisible by 100 because the extension
+            weights sum to 100 percent; every other value is rejected. Ten files and
+            1,000,001 files must both be rejected before any generation starts.
+            </summary>
+        </member>
+        <member name="M:Jeninnet.AdvancedUsage.Tests.Evaluation.EvaluationOptionsValidationTests.Validate_WhenTargetFileCountIsDivisibleByOneHundred_DoesNotThrow">
+            <summary>
+            Every multiple of one hundred is a valid target, from the smallest
+            supported dataset up to one hundred million files.
+            </summary>
+        </member>
+    </members>
+</doc>

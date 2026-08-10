@@ -1,8 +1,8 @@
 {
     "profiles": {
-        "AITools.Console": {
+        "AdvancedUsage": {
             "commandName": "Project",
-            "commandLineArgs": "--patterns \"**;!*.exe;!Microsoft*.dll\""
+            "commandLineArgs": "--evaluate"
         }
     }
 }

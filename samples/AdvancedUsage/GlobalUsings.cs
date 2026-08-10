@@ -1,5 +1,11 @@
 ﻿global using System.CommandLine;
+global using System.Diagnostics;
+global using System.Globalization;
 global using System.Reflection;
+global using System.Runtime.InteropServices;
+global using System.Text;
+global using System.Text.Json;
+global using AdvancedUsage.Evaluation;
 global using Jeninnet.FileQuery;
 global using Jeninnet.FileQuery.CommandLine;
 global using Jeninnet.FileQuery.DependencyInjection.Extensions;
