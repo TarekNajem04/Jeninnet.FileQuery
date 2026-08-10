@@ -1,0 +1,70 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Jeninnet.AdvancedUsage.Tests</name>
+    </assembly>
+    <members>
+        <member name="T:Jeninnet.AdvancedUsage.Tests.Evaluation.DatasetGeneratorBoundaryTests">
+            <summary>
+            Regression tests for the dataset generator's final-file boundary condition.
+            Runtime capacities always sum exactly to the target, so generation must
+            terminate at the target without ever requesting another extension.
+            </summary>
+        </member>
+        <member name="M:Jeninnet.AdvancedUsage.Tests.Evaluation.DatasetGeneratorBoundaryTests.GenerateAsync_WhenTargetEqualsTotalCapacity_GeneratesExactlyTargetFiles">
+            <summary>
+            Regression: when the target file count equals the sum of the runtime
+            extension capacities, generation must complete exactly at the target,
+            terminate immediately, and never request another extension.
+            </summary>
+        </member>
+        <member name="M:Jeninnet.AdvancedUsage.Tests.Evaluation.DatasetGeneratorBoundaryTests.GenerateAsync_WhenTargetIsSmall_GeneratesExactlyTargetFiles">
+            <summary>
+            Regression: small datasets must generate successfully even though most
+            extensions receive zero capacity and are excluded from weighted selection.
+            The runtime capacity distribution must be applied end to end.
+            </summary>
+        </member>
+        <member name="T:Jeninnet.AdvancedUsage.Tests.Evaluation.DatasetGeneratorCapacityTests">
+            <summary>
+            Tests for the runtime extension-capacity allocation of the dataset generator.
+            The capacities must always sum exactly to the target file count and must be
+            deterministic for the same target.
+            </summary>
+        </member>
+        <member name="M:Jeninnet.AdvancedUsage.Tests.Evaluation.DatasetGeneratorCapacityTests.BuildRuntimeCapacities_WhenTargetIsOneMillion_AllocatesExpectedDistribution">
+            <summary>
+            For one million files every extension must receive its exact percentage
+            share, and the allocation must be identical on every invocation.
+            </summary>
+        </member>
+        <member name="M:Jeninnet.AdvancedUsage.Tests.Evaluation.DatasetGeneratorCapacityTests.BuildRuntimeCapacities_WhenTargetIsOneHundredThousand_SumsToTarget">
+            <summary>
+            For one hundred thousand files the capacities must sum exactly to the target.
+            </summary>
+        </member>
+        <member name="M:Jeninnet.AdvancedUsage.Tests.Evaluation.DatasetGeneratorCapacityTests.BuildRuntimeCapacities_WhenTargetIsTenThousand_SumsToTarget">
+            <summary>
+            For ten thousand files the capacities must sum exactly to the target.
+            </summary>
+        </member>
+        <member name="M:Jeninnet.AdvancedUsage.Tests.Evaluation.DatasetGeneratorCapacityTests.BuildRuntimeCapacities_WhenTargetIsOneHundred_SumsToTarget">
+            <summary>
+            For one hundred files the capacities must sum exactly to the target.
+            </summary>
+        </member>
+        <member name="M:Jeninnet.AdvancedUsage.Tests.Evaluation.DatasetGeneratorCapacityTests.BuildRuntimeCapacities_WhenTargetIsTen_SumsToTarget">
+            <summary>
+            For ten files the largest-remainder allocation must distribute two
+            remainder units deterministically, leaving extensions with small weights
+            at zero capacity.
+            </summary>
+        </member>
+        <member name="M:Jeninnet.AdvancedUsage.Tests.Evaluation.DatasetGeneratorCapacityTests.BuildRuntimeCapacities_WhenTargetIsOne_AllocatesExactlyOnePositiveCapacity">
+            <summary>
+            For a single file exactly one extension must receive a positive capacity,
+            and that extension must be the one with the largest weight.
+            </summary>
+        </member>
+    </members>
+</doc>

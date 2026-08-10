@@ -6,8 +6,66 @@
     <members>
         <member name="T:AdvancedUsage.CliOptions">
             <summary>
-            Defines command-line options for the advanced usage sample.
+            Defines command-line options for the advanced usage sample and its reproducible evaluation.
             </summary>
+        </member>
+        <member name="P:AdvancedUsage.CliOptions.Evaluate">
+            <summary>
+            Gets the switch that starts the reproducible evaluation.
+            </summary>
+        </member>
+        <member name="P:AdvancedUsage.CliOptions.FileCount">
+            <summary>
+            Gets the target file count.
+            </summary>
+        </member>
+        <member name="P:AdvancedUsage.CliOptions.RootCount">
+            <summary>
+            Gets the root directory count.
+            </summary>
+        </member>
+        <member name="P:AdvancedUsage.CliOptions.Depth">
+            <summary>
+            Gets the target directory depth.
+            </summary>
+        </member>
+        <member name="P:AdvancedUsage.CliOptions.DirectoryCount">
+            <summary>
+            Gets the target directory count.
+            </summary>
+        </member>
+        <member name="P:AdvancedUsage.CliOptions.MinChildren">
+            <summary>
+            Gets the minimum number of children allowed for a directory.
+            </summary>
+        </member>
+        <member name="P:AdvancedUsage.CliOptions.MaxChildren">
+            <summary>
+            Gets the maximum number of children allowed for a directory.
+            </summary>
+        </member>
+        <member name="P:AdvancedUsage.CliOptions.Seed">
+            <summary>
+            Gets the deterministic random seed.
+            </summary>
+        </member>
+        <member name="P:AdvancedUsage.CliOptions.Iterations">
+            <summary>
+            Gets the number of measured iterations.
+            </summary>
+        </member>
+        <member name="P:AdvancedUsage.CliOptions.DeleteDataset">
+            <summary>
+            Gets the option that deletes the generated dataset after the evaluation.
+            </summary>
+        </member>
+        <member name="P:AdvancedUsage.CliOptions.DatasetRoot">
+            <summary>
+            Gets an optional custom dataset location.
+            </summary>
+        </member>
+        <member name="M:AdvancedUsage.CliOptions.GetCommandOptions">
+            <inheritdoc />
         </member>
         <member name="T:AdvancedUsage.ConsolePrinter">
             <summary>
@@ -20,19 +78,489 @@
             </summary>
             <param name="path">The path to print.</param>
         </member>
+        <member name="T:AdvancedUsage.Evaluation.DatasetGenerator">
+            <summary>
+            Generates a deterministic, inspectable filesystem workload for the evaluation sample.
+            </summary>
+        </member>
+        <member name="M:AdvancedUsage.Evaluation.DatasetGenerator.BuildRuntimeCapacities(System.Int32)">
+            <summary>
+            Computes the maximum file count for every extension from the target file
+            count and the static relative weights, using exact proportional division
+            so that the capacities always sum exactly to
+            <paramref name="targetFileCount"/>.
+            </summary>
+            <param name="targetFileCount">The total number of files to generate. Must be greater than zero and divisible by <see cref="F:AdvancedUsage.Evaluation.DatasetGenerator.TOTAL_WEIGHT"/>.</param>
+            <returns>The runtime extension capacities.</returns>
+            <exception cref="T:System.ArgumentOutOfRangeException">Thrown when <paramref name="targetFileCount"/> is less than one or not divisible by <see cref="F:AdvancedUsage.Evaluation.DatasetGenerator.TOTAL_WEIGHT"/>.</exception>
+            <exception cref="T:System.InvalidOperationException">Thrown when the computed capacities do not sum to <paramref name="targetFileCount"/>.</exception>
+        </member>
+        <member name="M:AdvancedUsage.Evaluation.DatasetGenerator.GenerateAsync(AdvancedUsage.Evaluation.EvaluationOptions,System.Threading.CancellationToken)">
+            <summary>
+            Creates or reuses the dataset according to the supplied options.
+            </summary>
+            <param name="options">The dataset configuration.</param>
+            <param name="cancellationToken">The cancellation token.</param>
+            <returns>The generated or reused manifest and the generation duration.</returns>
+            <exception cref="T:System.InvalidOperationException">Thrown when the generated dataset does not meet the specified criteria.</exception>
+        </member>
+        <member name="T:AdvancedUsage.Evaluation.ExtensionDefinition">
+            <summary>
+            Defines a file extension's relative weight in the dataset distribution.
+            </summary>
+            <param name="Suffix">The file extension suffix.</param>
+            <param name="Weight">The relative weight used for weighted selection and capacity allocation.</param>
+            <param name="MaximumCount">The maximum number of files of this extension to generate. Computed at runtime from the target file count; zero capacities are excluded from selection.</param>
+        </member>
+        <member name="M:AdvancedUsage.Evaluation.ExtensionDefinition.#ctor(System.String,System.Int32,System.Int32)">
+            <summary>
+            Defines a file extension's relative weight in the dataset distribution.
+            </summary>
+            <param name="Suffix">The file extension suffix.</param>
+            <param name="Weight">The relative weight used for weighted selection and capacity allocation.</param>
+            <param name="MaximumCount">The maximum number of files of this extension to generate. Computed at runtime from the target file count; zero capacities are excluded from selection.</param>
+        </member>
+        <member name="P:AdvancedUsage.Evaluation.ExtensionDefinition.Suffix">
+            <summary>The file extension suffix.</summary>
+        </member>
+        <member name="P:AdvancedUsage.Evaluation.ExtensionDefinition.Weight">
+            <summary>The relative weight used for weighted selection and capacity allocation.</summary>
+        </member>
+        <member name="P:AdvancedUsage.Evaluation.ExtensionDefinition.MaximumCount">
+            <summary>The maximum number of files of this extension to generate. Computed at runtime from the target file count; zero capacities are excluded from selection.</summary>
+        </member>
+        <member name="T:AdvancedUsage.Evaluation.DatasetGenerationResult">
+            <summary>
+            Represents the outcome of dataset generation or reuse.
+            </summary>
+            <param name="Manifest">The dataset manifest.</param>
+            <param name="Elapsed">The time spent generating the dataset. Zero when reused.</param>
+            <param name="Reused">Whether an existing compatible dataset was reused.</param>
+        </member>
+        <member name="M:AdvancedUsage.Evaluation.DatasetGenerationResult.#ctor(AdvancedUsage.Evaluation.DatasetManifest,System.TimeSpan,System.Boolean)">
+            <summary>
+            Represents the outcome of dataset generation or reuse.
+            </summary>
+            <param name="Manifest">The dataset manifest.</param>
+            <param name="Elapsed">The time spent generating the dataset. Zero when reused.</param>
+            <param name="Reused">Whether an existing compatible dataset was reused.</param>
+        </member>
+        <member name="P:AdvancedUsage.Evaluation.DatasetGenerationResult.Manifest">
+            <summary>The dataset manifest.</summary>
+        </member>
+        <member name="P:AdvancedUsage.Evaluation.DatasetGenerationResult.Elapsed">
+            <summary>The time spent generating the dataset. Zero when reused.</summary>
+        </member>
+        <member name="P:AdvancedUsage.Evaluation.DatasetGenerationResult.Reused">
+            <summary>Whether an existing compatible dataset was reused.</summary>
+        </member>
+        <member name="T:AdvancedUsage.Evaluation.DatasetManifest">
+            <summary>
+            Describes the generated evaluation dataset and the parameters used to create it.
+            </summary>
+            <param name="SchemaVersion">The version of the schema used.</param>
+            <param name="GeneratorVersion">The version of the generator used.</param>
+            <param name="Seed">The random seed used for generation.</param>
+            <param name="TargetFileCount">The target number of files to generate.</param>
+            <param name="ActualFileCount">The actual number of files generated.</param>
+            <param name="RootDirectoryCount">The number of root directories to create.</param>
+            <param name="TargetDepth">The target depth of the directory structure.</param>
+            <param name="ActualMaximumDepth">The actual maximum depth of the generated directory structure.</param>
+            <param name="TargetDirectoryCount">The target number of directories to create.</param>
+            <param name="ActualDirectoryCount">The actual number of directories generated.</param>
+            <param name="MinimumChildrenPerDirectory">The minimum number of child nodes each directory should have.</param>
+            <param name="MaximumChildrenPerDirectory">The maximum number of child nodes each directory should have.</param>
+            <param name="ExtensionCounts">A dictionary mapping file extensions to their counts.</param>
+            <param name="GeneratedAtUtc">The UTC timestamp when the dataset was generated.</param>
+        </member>
+        <member name="M:AdvancedUsage.Evaluation.DatasetManifest.#ctor(System.Int32,System.String,System.Int32,System.Int32,System.Int32,System.Int32,System.Int32,System.Int32,System.Int32,System.Int32,System.Int32,System.Int32,System.Collections.Generic.IReadOnlyDictionary{System.String,System.Int32},System.DateTimeOffset)">
+            <summary>
+            Describes the generated evaluation dataset and the parameters used to create it.
+            </summary>
+            <param name="SchemaVersion">The version of the schema used.</param>
+            <param name="GeneratorVersion">The version of the generator used.</param>
+            <param name="Seed">The random seed used for generation.</param>
+            <param name="TargetFileCount">The target number of files to generate.</param>
+            <param name="ActualFileCount">The actual number of files generated.</param>
+            <param name="RootDirectoryCount">The number of root directories to create.</param>
+            <param name="TargetDepth">The target depth of the directory structure.</param>
+            <param name="ActualMaximumDepth">The actual maximum depth of the generated directory structure.</param>
+            <param name="TargetDirectoryCount">The target number of directories to create.</param>
+            <param name="ActualDirectoryCount">The actual number of directories generated.</param>
+            <param name="MinimumChildrenPerDirectory">The minimum number of child nodes each directory should have.</param>
+            <param name="MaximumChildrenPerDirectory">The maximum number of child nodes each directory should have.</param>
+            <param name="ExtensionCounts">A dictionary mapping file extensions to their counts.</param>
+            <param name="GeneratedAtUtc">The UTC timestamp when the dataset was generated.</param>
+        </member>
+        <member name="P:AdvancedUsage.Evaluation.DatasetManifest.SchemaVersion">
+            <summary>The version of the schema used.</summary>
+        </member>
+        <member name="P:AdvancedUsage.Evaluation.DatasetManifest.GeneratorVersion">
+            <summary>The version of the generator used.</summary>
+        </member>
+        <member name="P:AdvancedUsage.Evaluation.DatasetManifest.Seed">
+            <summary>The random seed used for generation.</summary>
+        </member>
+        <member name="P:AdvancedUsage.Evaluation.DatasetManifest.TargetFileCount">
+            <summary>The target number of files to generate.</summary>
+        </member>
+        <member name="P:AdvancedUsage.Evaluation.DatasetManifest.ActualFileCount">
+            <summary>The actual number of files generated.</summary>
+        </member>
+        <member name="P:AdvancedUsage.Evaluation.DatasetManifest.RootDirectoryCount">
+            <summary>The number of root directories to create.</summary>
+        </member>
+        <member name="P:AdvancedUsage.Evaluation.DatasetManifest.TargetDepth">
+            <summary>The target depth of the directory structure.</summary>
+        </member>
+        <member name="P:AdvancedUsage.Evaluation.DatasetManifest.ActualMaximumDepth">
+            <summary>The actual maximum depth of the generated directory structure.</summary>
+        </member>
+        <member name="P:AdvancedUsage.Evaluation.DatasetManifest.TargetDirectoryCount">
+            <summary>The target number of directories to create.</summary>
+        </member>
+        <member name="P:AdvancedUsage.Evaluation.DatasetManifest.ActualDirectoryCount">
+            <summary>The actual number of directories generated.</summary>
+        </member>
+        <member name="P:AdvancedUsage.Evaluation.DatasetManifest.MinimumChildrenPerDirectory">
+            <summary>The minimum number of child nodes each directory should have.</summary>
+        </member>
+        <member name="P:AdvancedUsage.Evaluation.DatasetManifest.MaximumChildrenPerDirectory">
+            <summary>The maximum number of child nodes each directory should have.</summary>
+        </member>
+        <member name="P:AdvancedUsage.Evaluation.DatasetManifest.ExtensionCounts">
+            <summary>A dictionary mapping file extensions to their counts.</summary>
+        </member>
+        <member name="P:AdvancedUsage.Evaluation.DatasetManifest.GeneratedAtUtc">
+            <summary>The UTC timestamp when the dataset was generated.</summary>
+        </member>
+        <member name="F:AdvancedUsage.Evaluation.DatasetManifest.FILE_NAME">
+            <summary>
+            Gets the manifest file name.
+            </summary>
+        </member>
+        <member name="T:AdvancedUsage.Evaluation.EvaluationOptions">
+            <summary>
+            Defines the configuration for the reproducible file discovery evaluation.
+            </summary>
+            <param name="TargetFileCount">The target number of files to generate.</param>
+            <param name="RootDirectoryCount">The number of root directories to create.</param>
+            <param name="TargetDepth">The target depth of the directory structure.</param>
+            <param name="TargetDirectoryCount">The target number of directories to create.</param>
+            <param name="MinimumChildrenPerDirectory">The minimum number of child nodes per directory.</param>
+            <param name="MaximumChildrenPerDirectory">The maximum number of child nodes per directory.</param>
+            <param name="RandomSeed">The seed for the random number generator.</param>
+            <param name="Iterations">The number of iterations to run.</param>
+            <param name="DeleteDatasetAfterCompletion">Indicates whether to delete the dataset after completion.</param>
+            <param name="DatasetRoot">The root directory for the dataset.</param>
+        </member>
+        <member name="M:AdvancedUsage.Evaluation.EvaluationOptions.#ctor(System.Int32,System.Int32,System.Int32,System.Int32,System.Int32,System.Int32,System.Int32,System.Int32,System.Boolean,System.String)">
+            <summary>
+            Defines the configuration for the reproducible file discovery evaluation.
+            </summary>
+            <param name="TargetFileCount">The target number of files to generate.</param>
+            <param name="RootDirectoryCount">The number of root directories to create.</param>
+            <param name="TargetDepth">The target depth of the directory structure.</param>
+            <param name="TargetDirectoryCount">The target number of directories to create.</param>
+            <param name="MinimumChildrenPerDirectory">The minimum number of child nodes per directory.</param>
+            <param name="MaximumChildrenPerDirectory">The maximum number of child nodes per directory.</param>
+            <param name="RandomSeed">The seed for the random number generator.</param>
+            <param name="Iterations">The number of iterations to run.</param>
+            <param name="DeleteDatasetAfterCompletion">Indicates whether to delete the dataset after completion.</param>
+            <param name="DatasetRoot">The root directory for the dataset.</param>
+        </member>
+        <member name="P:AdvancedUsage.Evaluation.EvaluationOptions.TargetFileCount">
+            <summary>The target number of files to generate.</summary>
+        </member>
+        <member name="P:AdvancedUsage.Evaluation.EvaluationOptions.RootDirectoryCount">
+            <summary>The number of root directories to create.</summary>
+        </member>
+        <member name="P:AdvancedUsage.Evaluation.EvaluationOptions.TargetDepth">
+            <summary>The target depth of the directory structure.</summary>
+        </member>
+        <member name="P:AdvancedUsage.Evaluation.EvaluationOptions.TargetDirectoryCount">
+            <summary>The target number of directories to create.</summary>
+        </member>
+        <member name="P:AdvancedUsage.Evaluation.EvaluationOptions.MinimumChildrenPerDirectory">
+            <summary>The minimum number of child nodes per directory.</summary>
+        </member>
+        <member name="P:AdvancedUsage.Evaluation.EvaluationOptions.MaximumChildrenPerDirectory">
+            <summary>The maximum number of child nodes per directory.</summary>
+        </member>
+        <member name="P:AdvancedUsage.Evaluation.EvaluationOptions.RandomSeed">
+            <summary>The seed for the random number generator.</summary>
+        </member>
+        <member name="P:AdvancedUsage.Evaluation.EvaluationOptions.Iterations">
+            <summary>The number of iterations to run.</summary>
+        </member>
+        <member name="P:AdvancedUsage.Evaluation.EvaluationOptions.DeleteDatasetAfterCompletion">
+            <summary>Indicates whether to delete the dataset after completion.</summary>
+        </member>
+        <member name="P:AdvancedUsage.Evaluation.EvaluationOptions.DatasetRoot">
+            <summary>The root directory for the dataset.</summary>
+        </member>
+        <member name="P:AdvancedUsage.Evaluation.EvaluationOptions.DefaultDatasetRoot">
+            <summary>
+            Gets the default dataset location used by the evaluation.
+            </summary>
+        </member>
+        <member name="P:AdvancedUsage.Evaluation.EvaluationOptions.EffectiveDatasetRoot">
+            <summary>
+            Gets the effective dataset location.
+            </summary>
+        </member>
+        <member name="M:AdvancedUsage.Evaluation.EvaluationOptions.Validate">
+            <summary>
+            Validates the evaluation configuration.
+            </summary>
+            <exception cref="T:System.ArgumentOutOfRangeException">Thrown when any of the evaluation options are out of their valid range.</exception>
+        </member>
+        <member name="T:AdvancedUsage.Evaluation.EvaluationReport">
+            <summary>
+            Contains the measured results of a file discovery evaluation.
+            </summary>
+            <param name="StartedAtUtc">The UTC timestamp when the evaluation started.</param>
+            <param name="CompletedAtUtc">The UTC timestamp when the evaluation completed.</param>
+            <param name="ExperimentId">The ID of the experiment.</param>
+            <param name="Options">The evaluation options.</param>
+            <param name="Dataset">The generated dataset.</param>
+            <param name="Environment">The environment information.</param>
+            <param name="QueryDescription">The description of the query.</param>
+            <param name="ExpectedMatches">The expected number of matches.</param>
+            <param name="Iterations">The measured iterations.</param>
+            <param name="ValidationPassed">Indicates whether the validation passed.</param>
+        </member>
+        <member name="M:AdvancedUsage.Evaluation.EvaluationReport.#ctor(System.DateTimeOffset,System.DateTimeOffset,System.String,AdvancedUsage.Evaluation.EvaluationOptions,AdvancedUsage.Evaluation.DatasetManifest,AdvancedUsage.Evaluation.SystemInformationSnapshot,System.String,System.Int32,System.Collections.Generic.IReadOnlyList{AdvancedUsage.Evaluation.EvaluationIteration},System.Boolean)">
+            <summary>
+            Contains the measured results of a file discovery evaluation.
+            </summary>
+            <param name="StartedAtUtc">The UTC timestamp when the evaluation started.</param>
+            <param name="CompletedAtUtc">The UTC timestamp when the evaluation completed.</param>
+            <param name="ExperimentId">The ID of the experiment.</param>
+            <param name="Options">The evaluation options.</param>
+            <param name="Dataset">The generated dataset.</param>
+            <param name="Environment">The environment information.</param>
+            <param name="QueryDescription">The description of the query.</param>
+            <param name="ExpectedMatches">The expected number of matches.</param>
+            <param name="Iterations">The measured iterations.</param>
+            <param name="ValidationPassed">Indicates whether the validation passed.</param>
+        </member>
+        <member name="P:AdvancedUsage.Evaluation.EvaluationReport.StartedAtUtc">
+            <summary>The UTC timestamp when the evaluation started.</summary>
+        </member>
+        <member name="P:AdvancedUsage.Evaluation.EvaluationReport.CompletedAtUtc">
+            <summary>The UTC timestamp when the evaluation completed.</summary>
+        </member>
+        <member name="P:AdvancedUsage.Evaluation.EvaluationReport.ExperimentId">
+            <summary>The ID of the experiment.</summary>
+        </member>
+        <member name="P:AdvancedUsage.Evaluation.EvaluationReport.Options">
+            <summary>The evaluation options.</summary>
+        </member>
+        <member name="P:AdvancedUsage.Evaluation.EvaluationReport.Dataset">
+            <summary>The generated dataset.</summary>
+        </member>
+        <member name="P:AdvancedUsage.Evaluation.EvaluationReport.Environment">
+            <summary>The environment information.</summary>
+        </member>
+        <member name="P:AdvancedUsage.Evaluation.EvaluationReport.QueryDescription">
+            <summary>The description of the query.</summary>
+        </member>
+        <member name="P:AdvancedUsage.Evaluation.EvaluationReport.ExpectedMatches">
+            <summary>The expected number of matches.</summary>
+        </member>
+        <member name="P:AdvancedUsage.Evaluation.EvaluationReport.Iterations">
+            <summary>The measured iterations.</summary>
+        </member>
+        <member name="P:AdvancedUsage.Evaluation.EvaluationReport.ValidationPassed">
+            <summary>Indicates whether the validation passed.</summary>
+        </member>
+        <member name="P:AdvancedUsage.Evaluation.EvaluationReport.MedianExecutionTime">
+            <summary>
+            Gets the median execution time across measured iterations.
+            </summary>
+        </member>
+        <member name="P:AdvancedUsage.Evaluation.EvaluationReport.AverageExecutionTime">
+            <summary>
+            Gets the average execution time across measured iterations.
+            </summary>
+        </member>
+        <member name="T:AdvancedUsage.Evaluation.EvaluationIteration">
+            <summary>
+            Represents one measured query execution.
+            </summary>
+            <param name="Number">The iteration number.</param>
+            <param name="ExecutionTime">The execution time.</param>
+            <param name="ActualMatches">The actual number of matches.</param>
+            <param name="AllocatedBytes">The allocated bytes.</param>
+            <param name="Gen0Collections">The number of Gen0 collections.</param>
+            <param name="Gen1Collections">The number of Gen1 collections.</param>
+            <param name="Gen2Collections">The number of Gen2 collections.</param>
+            <param name="ValidationPassed">Indicates whether the validation passed.</param>
+        </member>
+        <member name="M:AdvancedUsage.Evaluation.EvaluationIteration.#ctor(System.Int32,System.TimeSpan,System.Int32,System.Int64,System.Int32,System.Int32,System.Int32,System.Boolean)">
+            <summary>
+            Represents one measured query execution.
+            </summary>
+            <param name="Number">The iteration number.</param>
+            <param name="ExecutionTime">The execution time.</param>
+            <param name="ActualMatches">The actual number of matches.</param>
+            <param name="AllocatedBytes">The allocated bytes.</param>
+            <param name="Gen0Collections">The number of Gen0 collections.</param>
+            <param name="Gen1Collections">The number of Gen1 collections.</param>
+            <param name="Gen2Collections">The number of Gen2 collections.</param>
+            <param name="ValidationPassed">Indicates whether the validation passed.</param>
+        </member>
+        <member name="P:AdvancedUsage.Evaluation.EvaluationIteration.Number">
+            <summary>The iteration number.</summary>
+        </member>
+        <member name="P:AdvancedUsage.Evaluation.EvaluationIteration.ExecutionTime">
+            <summary>The execution time.</summary>
+        </member>
+        <member name="P:AdvancedUsage.Evaluation.EvaluationIteration.ActualMatches">
+            <summary>The actual number of matches.</summary>
+        </member>
+        <member name="P:AdvancedUsage.Evaluation.EvaluationIteration.AllocatedBytes">
+            <summary>The allocated bytes.</summary>
+        </member>
+        <member name="P:AdvancedUsage.Evaluation.EvaluationIteration.Gen0Collections">
+            <summary>The number of Gen0 collections.</summary>
+        </member>
+        <member name="P:AdvancedUsage.Evaluation.EvaluationIteration.Gen1Collections">
+            <summary>The number of Gen1 collections.</summary>
+        </member>
+        <member name="P:AdvancedUsage.Evaluation.EvaluationIteration.Gen2Collections">
+            <summary>The number of Gen2 collections.</summary>
+        </member>
+        <member name="P:AdvancedUsage.Evaluation.EvaluationIteration.ValidationPassed">
+            <summary>Indicates whether the validation passed.</summary>
+        </member>
+        <member name="T:AdvancedUsage.Evaluation.EvaluationReporter">
+            <summary>
+            Persists evaluation reports as machine-readable JSON and human-readable text.
+            </summary>
+        </member>
+        <member name="M:AdvancedUsage.Evaluation.EvaluationReporter.WriteAsync(AdvancedUsage.Evaluation.EvaluationReport,System.String,System.Threading.CancellationToken)">
+            <summary>
+            Writes the latest report and an immutable timestamped history copy.
+            </summary>
+            <param name="report">The evaluation report to write.</param>
+            <param name="outputRoot">The root directory where the reports will be saved.</param>
+            <param name="cancellationToken">A token to monitor for cancellation requests.</param>
+        </member>
+        <member name="M:AdvancedUsage.Evaluation.EvaluationReporter.RenderText(AdvancedUsage.Evaluation.EvaluationReport)">
+            <summary>
+            Renders a human-readable report.
+            </summary>
+            <param name="report">The evaluation report to render.</param>
+            <returns>A string containing the human-readable report.</returns>
+        </member>
+        <member name="T:AdvancedUsage.Evaluation.EvaluationRunner">
+            <summary>
+            Executes the FileQuery evaluation against the generated dataset.
+            </summary>
+            <param name="engine">The file query engine to use.</param>
+        </member>
+        <member name="M:AdvancedUsage.Evaluation.EvaluationRunner.#ctor(Jeninnet.FileQuery.IFileQueryEngine)">
+            <summary>
+            Executes the FileQuery evaluation against the generated dataset.
+            </summary>
+            <param name="engine">The file query engine to use.</param>
+        </member>
+        <member name="M:AdvancedUsage.Evaluation.EvaluationRunner.RunAsync(AdvancedUsage.Evaluation.EvaluationOptions,AdvancedUsage.Evaluation.DatasetGenerationResult,System.Threading.CancellationToken)">
+            <summary>
+            Runs a reproducible evaluation and returns a complete report.
+            </summary>
+            <param name="options">The evaluation options.</param>
+            <param name="dataset">The generated dataset.</param>
+            <param name="cancellationToken">The cancellation token.</param>
+        </member>
+        <member name="T:AdvancedUsage.Evaluation.SystemInformation">
+            <summary>
+            Captures non-identifying hardware and runtime information for reproducible reports.
+            </summary>
+        </member>
+        <member name="M:AdvancedUsage.Evaluation.SystemInformation.Capture(System.String)">
+            <summary>
+            Captures the current environment.
+            </summary>
+            <param name="datasetRoot">The root directory of the dataset.</param>
+        </member>
+        <member name="T:AdvancedUsage.Evaluation.SystemInformationSnapshot">
+            <summary>
+            Represents non-identifying environment information captured for an evaluation.
+            </summary>
+            <param name="OperatingSystem">The operating system description.</param>
+            <param name="Framework">The .NET runtime framework description.</param>
+            <param name="RuntimeIdentifier">The runtime identifier.</param>
+            <param name="Architecture">The architecture of the operating system.</param>
+            <param name="ProcessArchitecture">The architecture of the process.</param>
+            <param name="ProcessorCount">The number of processors.</param>
+            <param name="ProcessorName">The name of the processor.</param>
+            <param name="TotalMemoryBytes">The total amount of memory in bytes.</param>
+            <param name="FileSystem">The file system of the drive.</param>
+            <param name="DatasetDriveFormat">The format of the dataset drive.</param>
+        </member>
+        <member name="M:AdvancedUsage.Evaluation.SystemInformationSnapshot.#ctor(System.String,System.String,System.String,System.String,System.String,System.Int32,System.String,System.Int64,System.String,System.String)">
+            <summary>
+            Represents non-identifying environment information captured for an evaluation.
+            </summary>
+            <param name="OperatingSystem">The operating system description.</param>
+            <param name="Framework">The .NET runtime framework description.</param>
+            <param name="RuntimeIdentifier">The runtime identifier.</param>
+            <param name="Architecture">The architecture of the operating system.</param>
+            <param name="ProcessArchitecture">The architecture of the process.</param>
+            <param name="ProcessorCount">The number of processors.</param>
+            <param name="ProcessorName">The name of the processor.</param>
+            <param name="TotalMemoryBytes">The total amount of memory in bytes.</param>
+            <param name="FileSystem">The file system of the drive.</param>
+            <param name="DatasetDriveFormat">The format of the dataset drive.</param>
+        </member>
+        <member name="P:AdvancedUsage.Evaluation.SystemInformationSnapshot.OperatingSystem">
+            <summary>The operating system description.</summary>
+        </member>
+        <member name="P:AdvancedUsage.Evaluation.SystemInformationSnapshot.Framework">
+            <summary>The .NET runtime framework description.</summary>
+        </member>
+        <member name="P:AdvancedUsage.Evaluation.SystemInformationSnapshot.RuntimeIdentifier">
+            <summary>The runtime identifier.</summary>
+        </member>
+        <member name="P:AdvancedUsage.Evaluation.SystemInformationSnapshot.Architecture">
+            <summary>The architecture of the operating system.</summary>
+        </member>
+        <member name="P:AdvancedUsage.Evaluation.SystemInformationSnapshot.ProcessArchitecture">
+            <summary>The architecture of the process.</summary>
+        </member>
+        <member name="P:AdvancedUsage.Evaluation.SystemInformationSnapshot.ProcessorCount">
+            <summary>The number of processors.</summary>
+        </member>
+        <member name="P:AdvancedUsage.Evaluation.SystemInformationSnapshot.ProcessorName">
+            <summary>The name of the processor.</summary>
+        </member>
+        <member name="P:AdvancedUsage.Evaluation.SystemInformationSnapshot.TotalMemoryBytes">
+            <summary>The total amount of memory in bytes.</summary>
+        </member>
+        <member name="P:AdvancedUsage.Evaluation.SystemInformationSnapshot.FileSystem">
+            <summary>The file system of the drive.</summary>
+        </member>
+        <member name="P:AdvancedUsage.Evaluation.SystemInformationSnapshot.DatasetDriveFormat">
+            <summary>The format of the dataset drive.</summary>
+        </member>
         <member name="T:AdvancedUsage.FileQueryCommand">
             <summary>
             Implements the file query command for the advanced usage sample.
             </summary>
             <param name="engine">The query engine.</param>
             <param name="printer">The output printer.</param>
+            <param name="datasetGenerator">The reproducible dataset generator.</param>
         </member>
-        <member name="M:AdvancedUsage.FileQueryCommand.#ctor(Jeninnet.FileQuery.IFileQueryEngine,AdvancedUsage.IPrinter)">
+        <member name="M:AdvancedUsage.FileQueryCommand.#ctor(Jeninnet.FileQuery.IFileQueryEngine,AdvancedUsage.IPrinter,AdvancedUsage.Evaluation.DatasetGenerator)">
             <summary>
             Implements the file query command for the advanced usage sample.
             </summary>
             <param name="engine">The query engine.</param>
             <param name="printer">The output printer.</param>
+            <param name="datasetGenerator">The reproducible dataset generator.</param>
         </member>
         <member name="M:AdvancedUsage.FileQueryCommand.ExecuteAsync(System.String,System.String[],System.Threading.CancellationToken)">
             <summary>

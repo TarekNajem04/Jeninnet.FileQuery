@@ -380,3 +380,5 @@ artifacts/coverage/
 # Build-generated project XML documentation files
 src/**/*.xml
 archive/**/*.xml
+# AdvancedUsage evaluation output
+samples/AdvancedUsage/EvaluationResults/
