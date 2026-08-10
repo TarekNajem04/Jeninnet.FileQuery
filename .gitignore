@@ -382,3 +382,6 @@ src/**/*.xml
 archive/**/*.xml
 # AdvancedUsage evaluation output
 samples/AdvancedUsage/EvaluationResults/
+
+# Ignore local configuration files
+[pP]rivate/
