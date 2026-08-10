@@ -4,6 +4,8 @@
 /// <typeparam name="T">The element type of the collection.</typeparam>
 /// <param name="value">The collection to assert on.</param>
 public class CollectionAssertions<T>(IEnumerable<T>? value) {
+    private const string COLLECTION_IS_NULL_MESSAGE = "Collection is null.";
+
     private readonly IEnumerable<T>? _value = value;
 
     /// <summary>Asserts that the collection contains exactly <paramref name="expected"/> items.</summary>
@@ -15,7 +17,7 @@ public class CollectionAssertions<T>(IEnumerable<T>? value) {
     /// <exception cref="AssertionFailedException">The collection is <see langword="null"/> or its count does not match.</exception>
     public void HaveCount(int expected, string? message = null) {
         if(_value is null) {
-            throw new AssertionFailedException("Collection is null.");
+            throw new AssertionFailedException(COLLECTION_IS_NULL_MESSAGE);
         }
 
         var list = _value.ToList();
@@ -32,7 +34,7 @@ public class CollectionAssertions<T>(IEnumerable<T>? value) {
     /// <exception cref="AssertionFailedException">The collection is <see langword="null"/> or contains at least one item.</exception>
     public void BeEmpty(string? message = null) {
         if(_value is null) {
-            throw new AssertionFailedException("Collection is null.");
+            throw new AssertionFailedException(COLLECTION_IS_NULL_MESSAGE);
         }
 
         if(_value.Any()) {
@@ -49,7 +51,7 @@ public class CollectionAssertions<T>(IEnumerable<T>? value) {
     /// <exception cref="AssertionFailedException">The collection is <see langword="null"/> or no item matches <paramref name="predicate"/>.</exception>
     public void Contain(Func<T, bool> predicate, string? message = null) {
         if(_value is null) {
-            throw new AssertionFailedException("Collection is null.");
+            throw new AssertionFailedException(COLLECTION_IS_NULL_MESSAGE);
         }
 
         if(!_value.Any(predicate)) {
@@ -66,7 +68,7 @@ public class CollectionAssertions<T>(IEnumerable<T>? value) {
     /// <exception cref="AssertionFailedException">The collection is <see langword="null"/> or does not contain <paramref name="item"/>.</exception>
     public void Contain(T item, string? message = null) {
         if(_value is null) {
-            throw new AssertionFailedException("Collection is null.");
+            throw new AssertionFailedException(COLLECTION_IS_NULL_MESSAGE);
         }
 
         if(!_value.Contains(item)) {
@@ -90,7 +92,7 @@ public class CollectionAssertions<T>(IEnumerable<T>? value) {
     /// <exception cref="AssertionFailedException">The collection is <see langword="null"/> or does not contain exactly one matching item.</exception>
     public WhichConstraint<T> ContainSingle(Func<T, bool>? predicate = null, string? message = null) {
         if(_value is null) {
-            throw new AssertionFailedException("Collection is null.");
+            throw new AssertionFailedException(COLLECTION_IS_NULL_MESSAGE);
         }
 
         var items = predicate is not null ? _value.Where(predicate).ToList() : [.. _value];
@@ -113,7 +115,7 @@ public class CollectionAssertions<T>(IEnumerable<T>? value) {
     /// <exception cref="AssertionFailedException">The collection is <see langword="null"/> or the contents do not match.</exception>
     public void BeEquivalentTo(IEnumerable<T> expected, string? message = null) {
         if(_value is null) {
-            throw new AssertionFailedException("Collection is null.");
+            throw new AssertionFailedException(COLLECTION_IS_NULL_MESSAGE);
         }
 
         var expectedList = expected.ToList();
@@ -139,7 +141,7 @@ public class CollectionAssertions<T>(IEnumerable<T>? value) {
     /// <exception cref="AssertionFailedException">The collection is <see langword="null"/> or is empty.</exception>
     public void NotBeEmpty(string? message = null) {
         if(_value is null) {
-            throw new AssertionFailedException("Collection is null.");
+            throw new AssertionFailedException(COLLECTION_IS_NULL_MESSAGE);
         }
 
         if(!_value.Any()) {
@@ -156,7 +158,7 @@ public class CollectionAssertions<T>(IEnumerable<T>? value) {
     /// <exception cref="AssertionFailedException">The collection is <see langword="null"/> or at least one item matches <paramref name="predicate"/>.</exception>
     public void NotContain(Func<T, bool> predicate, string? message = null) {
         if(_value is null) {
-            throw new AssertionFailedException("Collection is null.");
+            throw new AssertionFailedException(COLLECTION_IS_NULL_MESSAGE);
         }
 
         if(_value.Any(predicate)) {
@@ -173,7 +175,7 @@ public class CollectionAssertions<T>(IEnumerable<T>? value) {
     /// <exception cref="AssertionFailedException">The collection is <see langword="null"/> or contains <paramref name="item"/>.</exception>
     public void NotContain(T item, string? message = null) {
         if(_value is null) {
-            throw new AssertionFailedException("Collection is null.");
+            throw new AssertionFailedException(COLLECTION_IS_NULL_MESSAGE);
         }
 
         if(_value.Contains(item)) {
@@ -190,7 +192,7 @@ public class CollectionAssertions<T>(IEnumerable<T>? value) {
     /// <exception cref="AssertionFailedException">The collection is <see langword="null"/> or one or more expected items are missing.</exception>
     public void ContainSubset(IEnumerable<T> expected, string? message = null) {
         if(_value is null) {
-            throw new AssertionFailedException("Collection is null.");
+            throw new AssertionFailedException(COLLECTION_IS_NULL_MESSAGE);
         }
 
         ArgumentNullException.ThrowIfNull(expected);
