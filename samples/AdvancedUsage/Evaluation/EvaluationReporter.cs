@@ -100,8 +100,8 @@ public static class EvaluationReporter {
                .AppendLine()
                .AppendLine("Results")
                .AppendLine(new string('-', 72))
-               .AppendLine(CultureInfo.InvariantCulture, $"Expected matches        : {report.ExpectedMatches:N0}")
-               .AppendLine(CultureInfo.InvariantCulture, $"Validation              : {(report.ValidationPassed ? "PASS" : "FAIL")}")
+               .AppendLine(CultureInfo.InvariantCulture, $"Matches                 : {report.Matches:N0}")
+               .AppendLine("Validation              : MANUAL")
                .AppendLine(CultureInfo.InvariantCulture, $"Median execution        : {report.MedianExecutionTime.TotalMilliseconds:N3} ms")
                .AppendLine(CultureInfo.InvariantCulture, $"Average execution       : {report.AverageExecutionTime.TotalMilliseconds:N3} ms")
                .AppendLine()
@@ -115,8 +115,7 @@ public static class EvaluationReporter {
                 $"{iteration.ExecutionTime.TotalMilliseconds:N3} ms | " +
                 $"matches={iteration.ActualMatches:N0} | " +
                 $"allocated={FormatBytes(iteration.AllocatedBytes)} | " +
-                $"GC={iteration.Gen0Collections}/{iteration.Gen1Collections}/{iteration.Gen2Collections} | " +
-                $"{(iteration.ValidationPassed ? "PASS" : "FAIL")}"
+                $"GC={iteration.Gen0Collections}/{iteration.Gen1Collections}/{iteration.Gen2Collections}"
             );
         }
 

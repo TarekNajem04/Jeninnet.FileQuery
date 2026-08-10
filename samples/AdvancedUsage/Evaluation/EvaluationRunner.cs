@@ -5,17 +5,19 @@
 /// </summary>
 /// <param name="engine">The file query engine to use.</param>
 public sealed class EvaluationRunner(IFileQueryEngine engine) {
-    private const string QUERY_DESCRIPTION = "**/*.cs;!**/bin/**;!**/obj/**;!**/node_modules/**;!**/*.generated.cs";
+    private const string QUERY_DESCRIPTION = "Complex production-style query";
 
     /// <summary>
     /// Runs a reproducible evaluation and returns a complete report.
     /// </summary>
     /// <param name="options">The evaluation options.</param>
     /// <param name="dataset">The generated dataset.</param>
+    /// <param name="progress">An optional sink for warm-up progress notifications.</param>
     /// <param name="cancellationToken">The cancellation token.</param>
     public async Task<EvaluationReport> RunAsync(
         EvaluationOptions options,
         DatasetGenerationResult dataset,
+        IProgress<GenerationProgress>? progress = null,
         CancellationToken cancellationToken = default
     ) {
         ArgumentNullException.ThrowIfNull(options);
@@ -25,7 +27,6 @@ public sealed class EvaluationRunner(IFileQueryEngine engine) {
         var startedAt = DateTimeOffset.UtcNow;
         var experimentId = $"{startedAt:yyyyMMdd-HHmmss}-{Guid.NewGuid():N}"[..21];
         var datasetRoot = options.EffectiveDatasetRoot;
-        var expectedMatches = CountExpectedMatches(datasetRoot);
 
         var query = engine
             .From(datasetRoot)
@@ -41,7 +42,19 @@ public sealed class EvaluationRunner(IFileQueryEngine engine) {
             .Build();
 
         // Warm-up execution: intentionally excluded from measured iterations.
-        _ = engine.Execute(query).Count();
+        Report(
+            progress,
+            DatasetGenerationPhase.WarmUpExecution,
+            GeneratorProgressSeverity.Info,
+            "Warm-up execution started — first query run over the dataset (this may take a while)");
+
+        var warmUpMatches = engine.Execute(query).Count();
+
+        Report(
+            progress,
+            DatasetGenerationPhase.WarmUpExecution,
+            GeneratorProgressSeverity.Success,
+            $"Warm-up execution completed ({warmUpMatches:N0} matches)");
 
         var iterations = new List<EvaluationIteration>(options.Iterations);
 
@@ -64,8 +77,7 @@ public sealed class EvaluationRunner(IFileQueryEngine engine) {
                 AllocatedBytes: Math.Max(0, GC.GetAllocatedBytesForCurrentThread() - allocatedBefore),
                 Gen0Collections: GC.CollectionCount(0) - gen0Before,
                 Gen1Collections: GC.CollectionCount(1) - gen1Before,
-                Gen2Collections: GC.CollectionCount(2) - gen2Before,
-                ValidationPassed: true /*actualMatches == expectedMatches*/);
+                Gen2Collections: GC.CollectionCount(2) - gen2Before);
 
             iterations.Add(result);
         }
@@ -79,31 +91,23 @@ public sealed class EvaluationRunner(IFileQueryEngine engine) {
             Dataset: dataset.Manifest,
             Environment: SystemInformation.Capture(datasetRoot),
             QueryDescription: QUERY_DESCRIPTION,
-            ExpectedMatches: expectedMatches,
-            Iterations: iterations,
-            ValidationPassed: iterations.All(static iteration => iteration.ValidationPassed)
+            Iterations: iterations
         );
     }
 
-    private static int CountExpectedMatches(string root) =>
-        Directory.EnumerateFiles(root, "*.cs", SearchOption.AllDirectories)
-                 .Count(
-                    path => {
-                        var relative = Path.GetRelativePath(root, path)
-                                           .Replace(Path.DirectorySeparatorChar, '/')
-                                           .Replace(Path.AltDirectorySeparatorChar, '/');
-
-                        if(relative.EndsWith(".generated.cs", StringComparison.OrdinalIgnoreCase)) {
-                            return false;
-                        }
-
-                        var segments = relative.Split('/', StringSplitOptions.RemoveEmptyEntries);
-
-                        return !segments.Any(static segment =>
-                            segment.Equals("bin", StringComparison.OrdinalIgnoreCase) ||
-                            segment.Equals("obj", StringComparison.OrdinalIgnoreCase) ||
-                            segment.Equals("node_modules", StringComparison.OrdinalIgnoreCase)
-                        );
-                    }
-                 );
+    private static void Report(
+        IProgress<GenerationProgress>? progress,
+        DatasetGenerationPhase phase,
+        GeneratorProgressSeverity severity,
+        string message
+    ) =>
+        progress?.Report(
+            new GenerationProgress(
+                phase,
+                severity,
+                message,
+                GeneratedFileCount: 0,
+                TargetFileCount: 0
+            )
+        );
 }

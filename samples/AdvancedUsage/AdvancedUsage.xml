@@ -78,6 +78,38 @@
             </summary>
             <param name="path">The path to print.</param>
         </member>
+        <member name="T:AdvancedUsage.Evaluation.ConsoleProgressReporter">
+            <summary>
+            Renders dataset-generation progress to the console: wall-clock-timestamped
+            phase events, time-throttled single-line progress updates, and a phase-
+            duration summary. Timestamps are wall-clock and for display only; all
+            duration and throttle measurements use a monotonic stopwatch.
+            </summary>
+        </member>
+        <member name="M:AdvancedUsage.Evaluation.ConsoleProgressReporter.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:AdvancedUsage.Evaluation.ConsoleProgressReporter"/> class.
+            Color is disabled automatically when output is redirected or when the
+            NO_COLOR environment variable is set.
+            </summary>
+        </member>
+        <member name="M:AdvancedUsage.Evaluation.ConsoleProgressReporter.Report(AdvancedUsage.Evaluation.GenerationProgress)">
+            <summary>
+            Reports a dataset-generation progress notification.
+            </summary>
+            <param name="value">The progress notification to render.</param>
+        </member>
+        <member name="M:AdvancedUsage.Evaluation.ConsoleProgressReporter.ReportError(System.String)">
+            <summary>
+            Renders a failure in red and clears any active progress line.
+            </summary>
+            <param name="message">The error message to display.</param>
+        </member>
+        <member name="M:AdvancedUsage.Evaluation.ConsoleProgressReporter.Dispose">
+            <summary>
+            Restores the console state after progress rendering.
+            </summary>
+        </member>
         <member name="T:AdvancedUsage.Evaluation.DatasetGenerator">
             <summary>
             Generates a deterministic, inspectable filesystem workload for the evaluation sample.
@@ -95,11 +127,12 @@
             <exception cref="T:System.ArgumentOutOfRangeException">Thrown when <paramref name="targetFileCount"/> is less than one or not divisible by <see cref="F:AdvancedUsage.Evaluation.DatasetGenerator.TOTAL_WEIGHT"/>.</exception>
             <exception cref="T:System.InvalidOperationException">Thrown when the computed capacities do not sum to <paramref name="targetFileCount"/>.</exception>
         </member>
-        <member name="M:AdvancedUsage.Evaluation.DatasetGenerator.GenerateAsync(AdvancedUsage.Evaluation.EvaluationOptions,System.Threading.CancellationToken)">
+        <member name="M:AdvancedUsage.Evaluation.DatasetGenerator.GenerateAsync(AdvancedUsage.Evaluation.EvaluationOptions,System.IProgress{AdvancedUsage.Evaluation.GenerationProgress},System.Threading.CancellationToken)">
             <summary>
             Creates or reuses the dataset according to the supplied options.
             </summary>
             <param name="options">The dataset configuration.</param>
+            <param name="progress">An optional sink for generation-phase progress notifications.</param>
             <param name="cancellationToken">The cancellation token.</param>
             <returns>The generated or reused manifest and the generation duration.</returns>
             <exception cref="T:System.InvalidOperationException">Thrown when the generated dataset does not meet the specified criteria.</exception>
@@ -326,11 +359,9 @@
             <param name="Dataset">The generated dataset.</param>
             <param name="Environment">The environment information.</param>
             <param name="QueryDescription">The description of the query.</param>
-            <param name="ExpectedMatches">The expected number of matches.</param>
             <param name="Iterations">The measured iterations.</param>
-            <param name="ValidationPassed">Indicates whether the validation passed.</param>
         </member>
-        <member name="M:AdvancedUsage.Evaluation.EvaluationReport.#ctor(System.DateTimeOffset,System.DateTimeOffset,System.String,AdvancedUsage.Evaluation.EvaluationOptions,AdvancedUsage.Evaluation.DatasetManifest,AdvancedUsage.Evaluation.SystemInformationSnapshot,System.String,System.Int32,System.Collections.Generic.IReadOnlyList{AdvancedUsage.Evaluation.EvaluationIteration},System.Boolean)">
+        <member name="M:AdvancedUsage.Evaluation.EvaluationReport.#ctor(System.DateTimeOffset,System.DateTimeOffset,System.String,AdvancedUsage.Evaluation.EvaluationOptions,AdvancedUsage.Evaluation.DatasetManifest,AdvancedUsage.Evaluation.SystemInformationSnapshot,System.String,System.Collections.Generic.IReadOnlyList{AdvancedUsage.Evaluation.EvaluationIteration})">
             <summary>
             Contains the measured results of a file discovery evaluation.
             </summary>
@@ -341,9 +372,7 @@
             <param name="Dataset">The generated dataset.</param>
             <param name="Environment">The environment information.</param>
             <param name="QueryDescription">The description of the query.</param>
-            <param name="ExpectedMatches">The expected number of matches.</param>
             <param name="Iterations">The measured iterations.</param>
-            <param name="ValidationPassed">Indicates whether the validation passed.</param>
         </member>
         <member name="P:AdvancedUsage.Evaluation.EvaluationReport.StartedAtUtc">
             <summary>The UTC timestamp when the evaluation started.</summary>
@@ -366,14 +395,13 @@
         <member name="P:AdvancedUsage.Evaluation.EvaluationReport.QueryDescription">
             <summary>The description of the query.</summary>
         </member>
-        <member name="P:AdvancedUsage.Evaluation.EvaluationReport.ExpectedMatches">
-            <summary>The expected number of matches.</summary>
-        </member>
         <member name="P:AdvancedUsage.Evaluation.EvaluationReport.Iterations">
             <summary>The measured iterations.</summary>
         </member>
-        <member name="P:AdvancedUsage.Evaluation.EvaluationReport.ValidationPassed">
-            <summary>Indicates whether the validation passed.</summary>
+        <member name="P:AdvancedUsage.Evaluation.EvaluationReport.Matches">
+            <summary>
+            Gets the number of files matched by the final measured iteration.
+            </summary>
         </member>
         <member name="P:AdvancedUsage.Evaluation.EvaluationReport.MedianExecutionTime">
             <summary>
@@ -396,9 +424,8 @@
             <param name="Gen0Collections">The number of Gen0 collections.</param>
             <param name="Gen1Collections">The number of Gen1 collections.</param>
             <param name="Gen2Collections">The number of Gen2 collections.</param>
-            <param name="ValidationPassed">Indicates whether the validation passed.</param>
         </member>
-        <member name="M:AdvancedUsage.Evaluation.EvaluationIteration.#ctor(System.Int32,System.TimeSpan,System.Int32,System.Int64,System.Int32,System.Int32,System.Int32,System.Boolean)">
+        <member name="M:AdvancedUsage.Evaluation.EvaluationIteration.#ctor(System.Int32,System.TimeSpan,System.Int32,System.Int64,System.Int32,System.Int32,System.Int32)">
             <summary>
             Represents one measured query execution.
             </summary>
@@ -409,7 +436,6 @@
             <param name="Gen0Collections">The number of Gen0 collections.</param>
             <param name="Gen1Collections">The number of Gen1 collections.</param>
             <param name="Gen2Collections">The number of Gen2 collections.</param>
-            <param name="ValidationPassed">Indicates whether the validation passed.</param>
         </member>
         <member name="P:AdvancedUsage.Evaluation.EvaluationIteration.Number">
             <summary>The iteration number.</summary>
@@ -431,9 +457,6 @@
         </member>
         <member name="P:AdvancedUsage.Evaluation.EvaluationIteration.Gen2Collections">
             <summary>The number of Gen2 collections.</summary>
-        </member>
-        <member name="P:AdvancedUsage.Evaluation.EvaluationIteration.ValidationPassed">
-            <summary>Indicates whether the validation passed.</summary>
         </member>
         <member name="T:AdvancedUsage.Evaluation.EvaluationReporter">
             <summary>
@@ -467,13 +490,124 @@
             </summary>
             <param name="engine">The file query engine to use.</param>
         </member>
-        <member name="M:AdvancedUsage.Evaluation.EvaluationRunner.RunAsync(AdvancedUsage.Evaluation.EvaluationOptions,AdvancedUsage.Evaluation.DatasetGenerationResult,System.Threading.CancellationToken)">
+        <member name="M:AdvancedUsage.Evaluation.EvaluationRunner.RunAsync(AdvancedUsage.Evaluation.EvaluationOptions,AdvancedUsage.Evaluation.DatasetGenerationResult,System.IProgress{AdvancedUsage.Evaluation.GenerationProgress},System.Threading.CancellationToken)">
             <summary>
             Runs a reproducible evaluation and returns a complete report.
             </summary>
             <param name="options">The evaluation options.</param>
             <param name="dataset">The generated dataset.</param>
+            <param name="progress">An optional sink for warm-up progress notifications.</param>
             <param name="cancellationToken">The cancellation token.</param>
+        </member>
+        <member name="T:AdvancedUsage.Evaluation.DatasetGenerationPhase">
+            <summary>
+            Identifies the dataset-generation or evaluation phase a progress notification belongs to.
+            </summary>
+        </member>
+        <member name="F:AdvancedUsage.Evaluation.DatasetGenerationPhase.ConfigurationValidated">
+            <summary>
+            The evaluation options were validated successfully.
+            </summary>
+        </member>
+        <member name="F:AdvancedUsage.Evaluation.DatasetGenerationPhase.CleaningDirectory">
+            <summary>
+            An existing dataset directory tree is being deleted before regeneration.
+            </summary>
+        </member>
+        <member name="F:AdvancedUsage.Evaluation.DatasetGenerationPhase.ExtensionDistributionCalculated">
+            <summary>
+            The runtime extension distribution has been calculated.
+            </summary>
+        </member>
+        <member name="F:AdvancedUsage.Evaluation.DatasetGenerationPhase.DirectoryTreeGenerated">
+            <summary>
+            The directory tree has been generated.
+            </summary>
+        </member>
+        <member name="F:AdvancedUsage.Evaluation.DatasetGenerationPhase.GeneratingFiles">
+            <summary>
+            Files are being generated.
+            </summary>
+        </member>
+        <member name="F:AdvancedUsage.Evaluation.DatasetGenerationPhase.WritingManifest">
+            <summary>
+            The dataset manifest is being written.
+            </summary>
+        </member>
+        <member name="F:AdvancedUsage.Evaluation.DatasetGenerationPhase.ValidatingDataset">
+            <summary>
+            The generated dataset is being validated.
+            </summary>
+        </member>
+        <member name="F:AdvancedUsage.Evaluation.DatasetGenerationPhase.WarmUpExecution">
+            <summary>
+            The evaluation query is being executed for the first time to warm up the measurement pipeline.
+            </summary>
+        </member>
+        <member name="F:AdvancedUsage.Evaluation.DatasetGenerationPhase.Completed">
+            <summary>
+            Dataset generation has completed or an existing dataset was reused.
+            </summary>
+        </member>
+        <member name="T:AdvancedUsage.Evaluation.GeneratorProgressSeverity">
+            <summary>
+            Classifies a progress notification for rendering and color coding.
+            </summary>
+        </member>
+        <member name="F:AdvancedUsage.Evaluation.GeneratorProgressSeverity.Info">
+            <summary>
+            Neutral progress information for an in-flight step.
+            </summary>
+        </member>
+        <member name="F:AdvancedUsage.Evaluation.GeneratorProgressSeverity.Success">
+            <summary>
+            A step or the overall generation completed successfully.
+            </summary>
+        </member>
+        <member name="F:AdvancedUsage.Evaluation.GeneratorProgressSeverity.Warning">
+            <summary>
+            A recoverable condition worth highlighting.
+            </summary>
+        </member>
+        <member name="F:AdvancedUsage.Evaluation.GeneratorProgressSeverity.Error">
+            <summary>
+            A failure occurred.
+            </summary>
+        </member>
+        <member name="T:AdvancedUsage.Evaluation.GenerationProgress">
+            <summary>
+            Describes a single dataset-generation progress notification.
+            </summary>
+            <param name="Phase">The generation phase the notification refers to.</param>
+            <param name="Severity">The notification severity used for color and rendering.</param>
+            <param name="Message">An optional phase message. An empty message marks a raw file-progress update.</param>
+            <param name="GeneratedFileCount">The number of files generated so far.</param>
+            <param name="TargetFileCount">The total number of files targeted by generation.</param>
+        </member>
+        <member name="M:AdvancedUsage.Evaluation.GenerationProgress.#ctor(AdvancedUsage.Evaluation.DatasetGenerationPhase,AdvancedUsage.Evaluation.GeneratorProgressSeverity,System.String,System.Int32,System.Int32)">
+            <summary>
+            Describes a single dataset-generation progress notification.
+            </summary>
+            <param name="Phase">The generation phase the notification refers to.</param>
+            <param name="Severity">The notification severity used for color and rendering.</param>
+            <param name="Message">An optional phase message. An empty message marks a raw file-progress update.</param>
+            <param name="GeneratedFileCount">The number of files generated so far.</param>
+            <param name="TargetFileCount">The total number of files targeted by generation.</param>
+        </member>
+        <member name="P:AdvancedUsage.Evaluation.GenerationProgress.Phase">
+            <summary>The generation phase the notification refers to.</summary>
+        </member>
+        <member name="P:AdvancedUsage.Evaluation.GenerationProgress.Severity">
+            <summary>The notification severity used for color and rendering.</summary>
+        </member>
+        <member name="P:AdvancedUsage.Evaluation.GenerationProgress.Message">
+            <summary>An optional phase message. An empty message marks a raw file-progress update.</summary>
+        </member>
+        <member name="P:AdvancedUsage.Evaluation.GenerationProgress.GeneratedFileCount">
+            <summary>The number of files generated so far.</summary>
+        </member>
+        <member name="P:AdvancedUsage.Evaluation.GenerationProgress.TargetFileCount">
+            <summary>The total number of files targeted by generation.</summary>
         </member>
         <member name="T:AdvancedUsage.Evaluation.SystemInformation">
             <summary>

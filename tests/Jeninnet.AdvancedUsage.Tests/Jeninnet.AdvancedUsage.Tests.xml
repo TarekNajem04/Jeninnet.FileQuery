@@ -11,19 +11,22 @@
             terminate at the target without ever requesting another extension.
             </summary>
         </member>
-        <member name="M:Jeninnet.AdvancedUsage.Tests.Evaluation.DatasetGeneratorBoundaryTests.GenerateAsync_WhenTargetEqualsTotalCapacity_GeneratesExactlyTargetFiles">
+        <member name="M:Jeninnet.AdvancedUsage.Tests.Evaluation.DatasetGeneratorBoundaryTests.GenerateAsync_WhenTargetEqualsTotalCapacity_GeneratesExactlyTargetFilesAsync">
             <summary>
             Regression: when the target file count equals the sum of the runtime
             extension capacities, generation must complete exactly at the target,
             terminate immediately, and never request another extension.
             </summary>
         </member>
-        <member name="M:Jeninnet.AdvancedUsage.Tests.Evaluation.DatasetGeneratorBoundaryTests.GenerateAsync_WhenTargetIsOneHundred_GeneratesExactlyTargetFiles">
+        <member name="M:Jeninnet.AdvancedUsage.Tests.Evaluation.DatasetGeneratorBoundaryTests.GenerateAsync_WhenTargetIsOneHundred_GeneratesExactlyTargetFilesAsync">
             <summary>
             Regression: small datasets must generate successfully and apply the
             runtime capacity distribution end to end. At the smallest supported
             target every extension receives its exact percentage share.
             </summary>
+        </member>
+        <member name="P:Jeninnet.AdvancedUsage.Tests.Evaluation.DatasetGeneratorBoundaryTests.TestContext">
+            <inheritdoc/>
         </member>
         <member name="T:Jeninnet.AdvancedUsage.Tests.Evaluation.DatasetGeneratorCapacityTests">
             <summary>

@@ -31,6 +31,8 @@ public sealed class FileQueryCommand(
 
         rootCommand.SetAction(async parseResult => {
             if(parseResult.GetValue(options.Evaluate)) {
+                using var progress = new ConsoleProgressReporter();
+
                 var evaluationOptions = new EvaluationOptions(
                     TargetFileCount: parseResult.GetValue(options.FileCount),
                     RootDirectoryCount: parseResult.GetValue(options.RootCount),
@@ -44,9 +46,18 @@ public sealed class FileQueryCommand(
                     DatasetRoot: parseResult.GetValue(options.DatasetRoot)
                 );
 
-                var dataset = await datasetGenerator.GenerateAsync(evaluationOptions, cancellationToken);
+                DatasetGenerationResult dataset;
+
+                try {
+                    dataset = await datasetGenerator.GenerateAsync(evaluationOptions, progress, cancellationToken);
+                }
+                catch(Exception exception) when(exception is not OperationCanceledException) {
+                    progress.ReportError(exception.Message);
+                    throw;
+                }
+
                 var runner = new EvaluationRunner(engine);
-                var report = await runner.RunAsync(evaluationOptions, dataset, cancellationToken);
+                var report = await runner.RunAsync(evaluationOptions, dataset, progress, cancellationToken);
 
                 var reportRoot = Path.Combine(
                     AppContext.BaseDirectory,

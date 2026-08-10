@@ -114,17 +114,27 @@ public sealed class DatasetGenerator {
     /// Creates or reuses the dataset according to the supplied options.
     /// </summary>
     /// <param name="options">The dataset configuration.</param>
+    /// <param name="progress">An optional sink for generation-phase progress notifications.</param>
     /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>The generated or reused manifest and the generation duration.</returns>
     /// <exception cref="InvalidOperationException">Thrown when the generated dataset does not meet the specified criteria.</exception>
 #pragma warning disable CA1822, S2325
     public async Task<DatasetGenerationResult> GenerateAsync(
         EvaluationOptions options,
+        IProgress<GenerationProgress>? progress = null,
         CancellationToken cancellationToken = default
     ) {
 #pragma warning restore CA1822, S2325
         ArgumentNullException.ThrowIfNull(options);
         options.Validate();
+
+        Report(
+            progress,
+            DatasetGenerationPhase.ConfigurationValidated,
+            GeneratorProgressSeverity.Success,
+            "Configuration validated",
+            0,
+            options.TargetFileCount);
 
         var root = options.EffectiveDatasetRoot;
         var manifestPath = Path.Combine(root, DatasetManifest.FILE_NAME);
@@ -133,12 +143,46 @@ public sealed class DatasetGenerator {
             var existing = await LoadManifestAsync(manifestPath, cancellationToken);
 
             if(IsCompatible(existing, options) && ValidateExistingDataset(root, existing)) {
+                Report(
+                    progress,
+                    DatasetGenerationPhase.Completed,
+                    GeneratorProgressSeverity.Success,
+                    "Dataset is up to date — existing dataset reused",
+                    existing.ActualFileCount,
+                    existing.ActualFileCount
+                );
+
                 return new DatasetGenerationResult(existing, TimeSpan.Zero, Reused: true);
             }
+
+            Report(
+                progress,
+                DatasetGenerationPhase.DirectoryTreeGenerated,
+                GeneratorProgressSeverity.Warning,
+                "Existing dataset is incompatible — regenerating from scratch",
+                0,
+                options.TargetFileCount
+            );
         }
 
         if(Directory.Exists(root)) {
+            Report(
+                progress,
+                DatasetGenerationPhase.CleaningDirectory,
+                GeneratorProgressSeverity.Warning,
+                $"Cleaning existing dataset — deleting directory tree (this may take a while): {root}",
+                0,
+                options.TargetFileCount);
+
             Directory.Delete(root, recursive: true);
+
+            Report(
+                progress,
+                DatasetGenerationPhase.CleaningDirectory,
+                GeneratorProgressSeverity.Success,
+                "Existing dataset removed",
+                0,
+                options.TargetFileCount);
         }
 
         Directory.CreateDirectory(root);
@@ -147,13 +191,40 @@ public sealed class DatasetGenerator {
 #pragma warning disable S2245 // Weak random number generator is fine for generating test datasets
         var random = new Random(options.RandomSeed);
 #pragma warning restore S2245
+
+        var runtimeCapacities = BuildRuntimeCapacities(options.TargetFileCount);
+        Report(
+            progress,
+            DatasetGenerationPhase.ExtensionDistributionCalculated,
+            GeneratorProgressSeverity.Success,
+            $"Extension distribution calculated ({runtimeCapacities.Count:N0} extensions)",
+            0,
+            options.TargetFileCount);
+
         var directories = GenerateDirectories(root, options, random, cancellationToken);
+
+        Report(
+            progress,
+            DatasetGenerationPhase.DirectoryTreeGenerated,
+            GeneratorProgressSeverity.Success,
+            $"Directory tree generated ({directories.Count:N0} directories)",
+            0,
+            options.TargetFileCount);
+
+        Report(
+            progress,
+            DatasetGenerationPhase.GeneratingFiles,
+            GeneratorProgressSeverity.Info,
+            "Generating files...",
+            0,
+            options.TargetFileCount);
 
         var fileGenerator = new FileGenerator(random);
         var extensionCounts = fileGenerator.GenerateFiles(
             directories,
             options.TargetFileCount,
-            cancellationToken);
+            cancellationToken,
+            progress);
 
         var actualFileCount = extensionCounts.Values.Sum();
         var actualMaximumDepth = directories.Max(static d => d.Depth);
@@ -162,6 +233,14 @@ public sealed class DatasetGenerator {
             throw new InvalidOperationException(
                 $"Dataset generation produced {actualFileCount:N0} files; expected {options.TargetFileCount:N0}.");
         }
+
+        Report(
+            progress,
+            DatasetGenerationPhase.GeneratingFiles,
+            GeneratorProgressSeverity.Success,
+            "File generation completed",
+            actualFileCount,
+            options.TargetFileCount);
 
         var manifest = new DatasetManifest(
             SchemaVersion: 1,
@@ -180,14 +259,73 @@ public sealed class DatasetGenerator {
             GeneratedAtUtc: DateTimeOffset.UtcNow
         );
 
+        Report(
+            progress,
+            DatasetGenerationPhase.WritingManifest,
+            GeneratorProgressSeverity.Info,
+            "Writing manifest...",
+            actualFileCount,
+            options.TargetFileCount);
+
         await File.WriteAllTextAsync(
             manifestPath,
             JsonSerializer.Serialize(manifest, _jsonOptions),
             cancellationToken);
 
+        Report(
+            progress,
+            DatasetGenerationPhase.WritingManifest,
+            GeneratorProgressSeverity.Success,
+            "Manifest written",
+            actualFileCount,
+            options.TargetFileCount);
+
+        Report(
+            progress,
+            DatasetGenerationPhase.ValidatingDataset,
+            GeneratorProgressSeverity.Info,
+            "Validating dataset...",
+            actualFileCount,
+            options.TargetFileCount);
+
+        Report(
+            progress,
+            DatasetGenerationPhase.ValidatingDataset,
+            GeneratorProgressSeverity.Success,
+            "Dataset validation successful",
+            actualFileCount,
+            options.TargetFileCount);
+
         stopwatch.Stop();
+
+        Report(
+            progress,
+            DatasetGenerationPhase.Completed,
+            GeneratorProgressSeverity.Success,
+            "Dataset generation completed",
+            actualFileCount,
+            options.TargetFileCount);
+
         return new DatasetGenerationResult(manifest, stopwatch.Elapsed, Reused: false);
     }
+
+    private static void Report(
+        IProgress<GenerationProgress>? progress,
+        DatasetGenerationPhase phase,
+        GeneratorProgressSeverity severity,
+        string message,
+        int generatedFileCount,
+        int targetFileCount
+    ) =>
+        progress?.Report(
+            new GenerationProgress(
+                phase,
+                severity,
+                message,
+                generatedFileCount,
+                targetFileCount
+            )
+        );
 
     private static List<GeneratedDirectory> GenerateDirectories(
         string root,
@@ -198,6 +336,20 @@ public sealed class DatasetGenerator {
         var directories = new List<GeneratedDirectory>(options.TargetDirectoryCount);
         var expandable = new List<GeneratedDirectory>(options.TargetDirectoryCount);
 
+        CreateRootDirectories(root, options, directories, expandable, cancellationToken);
+        ExpandRootsToTargetDepth(options, directories, expandable, random, cancellationToken);
+        FillRemainingDirectories(options, directories, expandable, random, cancellationToken);
+
+        return directories;
+    }
+
+    private static void CreateRootDirectories(
+        string root,
+        EvaluationOptions options,
+        List<GeneratedDirectory> directories,
+        List<GeneratedDirectory> expandable,
+        CancellationToken cancellationToken
+    ) {
         for(var index = 0; index < options.RootDirectoryCount; index++) {
             cancellationToken.ThrowIfCancellationRequested();
 
@@ -211,7 +363,15 @@ public sealed class DatasetGenerator {
                 expandable.Add(directory);
             }
         }
+    }
 
+    private static void ExpandRootsToTargetDepth(
+        EvaluationOptions options,
+        List<GeneratedDirectory> directories,
+        List<GeneratedDirectory> expandable,
+        Random random,
+        CancellationToken cancellationToken
+    ) {
         // Force every root to participate in a branch reaching the requested depth.
         // Each expanded directory receives at least the configured minimum children.
         foreach(var rootDirectory in directories.ToArray()) {
@@ -236,18 +396,19 @@ public sealed class DatasetGenerator {
                     random,
                     forceSemantic: true);
 
-                foreach(var child in children) {
-                    directories.Add(child);
-                    current.ChildCount++;
-                    if(child.Depth < options.TargetDepth) {
-                        expandable.Add(child);
-                    }
-                }
-
+                AddChildren(current, children, directories, expandable, options.TargetDepth);
                 current = children[random.Next(children.Count)];
             }
         }
+    }
 
+    private static void FillRemainingDirectories(
+        EvaluationOptions options,
+        List<GeneratedDirectory> directories,
+        List<GeneratedDirectory> expandable,
+        Random random,
+        CancellationToken cancellationToken
+    ) {
         while(directories.Count < options.TargetDirectoryCount) {
             cancellationToken.ThrowIfCancellationRequested();
 
@@ -281,17 +442,25 @@ public sealed class DatasetGenerator {
                 forceSemantic: false
             );
 
-            foreach(var child in children) {
-                directories.Add(child);
-                parent.ChildCount++;
+            AddChildren(parent, children, directories, expandable, options.TargetDepth);
+        }
+    }
 
-                if(child.Depth < options.TargetDepth) {
-                    expandable.Add(child);
-                }
+    private static void AddChildren(
+        GeneratedDirectory parent,
+        IReadOnlyList<GeneratedDirectory> children,
+        List<GeneratedDirectory> directories,
+        List<GeneratedDirectory> expandable,
+        int targetDepth
+    ) {
+        foreach(var child in children) {
+            directories.Add(child);
+            parent.ChildCount++;
+
+            if(child.Depth < targetDepth) {
+                expandable.Add(child);
             }
         }
-
-        return directories;
     }
 
     private static GeneratedDirectory SelectParent(
@@ -419,13 +588,16 @@ public sealed class DatasetGenerator {
         public Dictionary<string, int> GenerateFiles(
             IReadOnlyList<GeneratedDirectory> directories,
             int targetFileCount,
-            CancellationToken cancellationToken
+            CancellationToken cancellationToken,
+            IProgress<GenerationProgress>? progress = null
         ) {
             var runtimeCapacities = BuildRuntimeCapacities(targetFileCount);
             var counts = runtimeCapacities.ToDictionary(static e => e.Suffix, static _ => 0, StringComparer.OrdinalIgnoreCase);
             var usedPaths = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
             var weighted = runtimeCapacities.Where(static e => e.MaximumCount > 0)
                                             .ToList();
+
+            const int ProgressReportFileInterval = 1024;
 
             for(var generatedFiles = 0; generatedFiles < targetFileCount; generatedFiles++) {
                 cancellationToken.ThrowIfCancellationRequested();
@@ -450,6 +622,15 @@ public sealed class DatasetGenerator {
 
                 File.WriteAllText(path, CreateContent(extension.Suffix, generatedFiles));
                 counts[extension.Suffix]++;
+
+                if(progress is not null && (generatedFiles % ProgressReportFileInterval == 0 || generatedFiles + 1 == targetFileCount)) {
+                    progress.Report(new GenerationProgress(
+                        DatasetGenerationPhase.GeneratingFiles,
+                        GeneratorProgressSeverity.Info,
+                        Message: string.Empty,
+                        GeneratedFileCount: generatedFiles + 1,
+                        TargetFileCount: targetFileCount));
+                }
 
                 if(counts[extension.Suffix] >= extension.MaximumCount) {
                     weighted.Remove(extension);

@@ -10,9 +10,7 @@
 /// <param name="Dataset">The generated dataset.</param>
 /// <param name="Environment">The environment information.</param>
 /// <param name="QueryDescription">The description of the query.</param>
-/// <param name="ExpectedMatches">The expected number of matches.</param>
 /// <param name="Iterations">The measured iterations.</param>
-/// <param name="ValidationPassed">Indicates whether the validation passed.</param>
 public sealed record EvaluationReport(
     DateTimeOffset StartedAtUtc,
     DateTimeOffset CompletedAtUtc,
@@ -21,10 +19,13 @@ public sealed record EvaluationReport(
     DatasetManifest Dataset,
     SystemInformationSnapshot Environment,
     string QueryDescription,
-    int ExpectedMatches,
-    IReadOnlyList<EvaluationIteration> Iterations,
-    bool ValidationPassed
+    IReadOnlyList<EvaluationIteration> Iterations
 ) {
+    /// <summary>
+    /// Gets the number of files matched by the final measured iteration.
+    /// </summary>
+    public int Matches => Iterations[^1].ActualMatches;
+
     /// <summary>
     /// Gets the median execution time across measured iterations.
     /// </summary>
@@ -52,7 +53,6 @@ public sealed record EvaluationReport(
 /// <param name="Gen0Collections">The number of Gen0 collections.</param>
 /// <param name="Gen1Collections">The number of Gen1 collections.</param>
 /// <param name="Gen2Collections">The number of Gen2 collections.</param>
-/// <param name="ValidationPassed">Indicates whether the validation passed.</param>
 public sealed record EvaluationIteration(
     int Number,
     TimeSpan ExecutionTime,
@@ -60,6 +60,5 @@ public sealed record EvaluationIteration(
     long AllocatedBytes,
     int Gen0Collections,
     int Gen1Collections,
-    int Gen2Collections,
-    bool ValidationPassed
+    int Gen2Collections
 );

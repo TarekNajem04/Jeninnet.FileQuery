@@ -15,7 +15,7 @@ public sealed class DatasetGeneratorBoundaryTests {
     /// terminate immediately, and never request another extension.
     /// </summary>
     [TestMethod]
-    public async Task GenerateAsync_WhenTargetEqualsTotalCapacity_GeneratesExactlyTargetFiles() {
+    public async Task GenerateAsync_WhenTargetEqualsTotalCapacity_GeneratesExactlyTargetFilesAsync() {
         // Arrange: 300 is divisible by the total weight, so every extension
         // receives its exact percentage share and the boundary is hit on the
         // final file that exhausts the last remaining capacity.
@@ -34,7 +34,7 @@ public sealed class DatasetGeneratorBoundaryTests {
         try {
             // Act: must not throw an IndexOutOfRangeException or any other
             // exception when the final file exhausts the last extension capacity.
-            var result = await new DatasetGenerator().GenerateAsync(options);
+            var result = await new DatasetGenerator().GenerateAsync(options, cancellationToken: TestContext?.CancellationToken ?? CancellationToken.None);
 
             // Assert: exactly the target number of files must exist.
             Assert.AreEqual(
@@ -66,7 +66,7 @@ public sealed class DatasetGeneratorBoundaryTests {
     /// target every extension receives its exact percentage share.
     /// </summary>
     [TestMethod]
-    public async Task GenerateAsync_WhenTargetIsOneHundred_GeneratesExactlyTargetFiles() {
+    public async Task GenerateAsync_WhenTargetIsOneHundred_GeneratesExactlyTargetFilesAsync() {
         // Arrange: 100 is the smallest supported target; every extension weight
         // maps to exactly one file, so the full distribution is observable.
         const int targetFileCount = 100;
@@ -83,7 +83,7 @@ public sealed class DatasetGeneratorBoundaryTests {
 
         try {
             // Act
-            var result = await new DatasetGenerator().GenerateAsync(options);
+            var result = await new DatasetGenerator().GenerateAsync(options, cancellationToken: TestContext?.CancellationToken ?? CancellationToken.None);
 
             // Assert
             Assert.AreEqual(
@@ -140,4 +140,7 @@ public sealed class DatasetGeneratorBoundaryTests {
                 Path.GetFileName(path),
                 DatasetManifest.FILE_NAME,
                 StringComparison.OrdinalIgnoreCase));
+
+    /// <inheritdoc/>
+    public TestContext? TestContext { get; set; }
 }

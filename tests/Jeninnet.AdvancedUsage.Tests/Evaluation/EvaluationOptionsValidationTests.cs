@@ -18,7 +18,7 @@ public sealed class EvaluationOptionsValidationTests {
             var options = CreateValidOptions(invalidTarget);
 
             var exception = Assert.ThrowsExactly<ArgumentOutOfRangeException>(
-                () => options.Validate());
+                options.Validate);
 
             Assert.AreEqual(
                 nameof(EvaluationOptions.TargetFileCount),
