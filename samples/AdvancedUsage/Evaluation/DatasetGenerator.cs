@@ -86,20 +86,25 @@ public sealed class DatasetGenerator {
                 $"The target file count must be divisible by {TOTAL_WEIGHT} because the extension weights sum to {TOTAL_WEIGHT} percent.");
         }
 
+        var quota = targetFileCount / TOTAL_WEIGHT;
         var capacities = new List<ExtensionDefinition>(_extensionWeights.Length);
 
         foreach(var extension in _extensionWeights) {
-            capacities.Add(new ExtensionDefinition(
-                extension.Suffix,
-                extension.Weight,
-                targetFileCount * extension.Weight / TOTAL_WEIGHT));
+            capacities.Add(
+                new ExtensionDefinition(
+                    extension.Suffix,
+                    extension.Weight,
+                    MaximumCount: quota * extension.Weight
+                )
+            );
         }
 
         var totalCapacity = capacities.Sum(static extension => extension.MaximumCount);
 
         if(totalCapacity != targetFileCount) {
             throw new InvalidOperationException(
-                $"Dataset generation invariant violated: computed extension capacities must sum to the target file count. TargetFileCount={targetFileCount:N0}; TotalMaximumCount={totalCapacity:N0}.");
+                $"Dataset generation invariant violated: computed extension capacities must sum to the target file count. TargetFileCount={targetFileCount:N0}; TotalMaximumCount={totalCapacity:N0}."
+            );
         }
 
         return capacities;

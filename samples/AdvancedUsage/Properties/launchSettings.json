@@ -1,6 +1,6 @@
 {
     "profiles": {
-        "AITools.Console": {
+        "AdvancedUsage": {
             "commandName": "Project",
             "commandLineArgs": "--evaluate"
         }

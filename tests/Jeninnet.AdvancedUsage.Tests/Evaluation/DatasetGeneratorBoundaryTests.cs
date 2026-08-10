@@ -61,15 +61,15 @@ public sealed class DatasetGeneratorBoundaryTests {
     }
 
     /// <summary>
-    /// Regression: small datasets must generate successfully even though most
-    /// extensions receive zero capacity and are excluded from weighted selection.
-    /// The runtime capacity distribution must be applied end to end.
+    /// Regression: small datasets must generate successfully and apply the
+    /// runtime capacity distribution end to end. At the smallest supported
+    /// target every extension receives its exact percentage share.
     /// </summary>
     [TestMethod]
-    public async Task GenerateAsync_WhenTargetIsSmall_GeneratesExactlyTargetFiles() {
-        // Arrange: 10 files exercise the largest-remainder allocation; extensions
-        // such as .csproj, .dll, .tmp and .generated.cs must receive zero capacity.
-        const int targetFileCount = 10;
+    public async Task GenerateAsync_WhenTargetIsOneHundred_GeneratesExactlyTargetFiles() {
+        // Arrange: 100 is the smallest supported target; every extension weight
+        // maps to exactly one file, so the full distribution is observable.
+        const int targetFileCount = 100;
 
         var root = CreateTemporaryRoot();
         var options = new EvaluationOptions(
@@ -107,17 +107,17 @@ public sealed class DatasetGeneratorBoundaryTests {
     }
 
     private static void AssertDistribution(IReadOnlyDictionary<string, int> counts) {
-        Assert.AreEqual(3, counts[".cs"]);
-        Assert.AreEqual(2, counts[".json"]);
-        Assert.AreEqual(1, counts[".xml"]);
-        Assert.AreEqual(1, counts[".log"]);
-        Assert.AreEqual(1, counts[".md"]);
-        Assert.AreEqual(1, counts[".txt"]);
-        Assert.AreEqual(1, counts[".config"]);
-        Assert.AreEqual(0, counts[".csproj"]);
-        Assert.AreEqual(0, counts[".dll"]);
-        Assert.AreEqual(0, counts[".tmp"]);
-        Assert.AreEqual(0, counts[".generated.cs"]);
+        Assert.AreEqual(30, counts[".cs"]);
+        Assert.AreEqual(15, counts[".json"]);
+        Assert.AreEqual(10, counts[".xml"]);
+        Assert.AreEqual(10, counts[".log"]);
+        Assert.AreEqual(8, counts[".md"]);
+        Assert.AreEqual(8, counts[".txt"]);
+        Assert.AreEqual(5, counts[".config"]);
+        Assert.AreEqual(4, counts[".csproj"]);
+        Assert.AreEqual(4, counts[".dll"]);
+        Assert.AreEqual(3, counts[".tmp"]);
+        Assert.AreEqual(3, counts[".generated.cs"]);
     }
 
     private static string CreateTemporaryRoot() =>

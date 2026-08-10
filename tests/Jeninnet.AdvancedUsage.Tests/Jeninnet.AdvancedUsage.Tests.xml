@@ -18,18 +18,19 @@
             terminate immediately, and never request another extension.
             </summary>
         </member>
-        <member name="M:Jeninnet.AdvancedUsage.Tests.Evaluation.DatasetGeneratorBoundaryTests.GenerateAsync_WhenTargetIsSmall_GeneratesExactlyTargetFiles">
+        <member name="M:Jeninnet.AdvancedUsage.Tests.Evaluation.DatasetGeneratorBoundaryTests.GenerateAsync_WhenTargetIsOneHundred_GeneratesExactlyTargetFiles">
             <summary>
-            Regression: small datasets must generate successfully even though most
-            extensions receive zero capacity and are excluded from weighted selection.
-            The runtime capacity distribution must be applied end to end.
+            Regression: small datasets must generate successfully and apply the
+            runtime capacity distribution end to end. At the smallest supported
+            target every extension receives its exact percentage share.
             </summary>
         </member>
         <member name="T:Jeninnet.AdvancedUsage.Tests.Evaluation.DatasetGeneratorCapacityTests">
             <summary>
             Tests for the runtime extension-capacity allocation of the dataset generator.
-            The capacities must always sum exactly to the target file count and must be
-            deterministic for the same target.
+            The target file count must be divisible by 100, every extension then receives
+            its exact percentage share, and the capacities always sum exactly to the
+            target. The same target always produces the same allocation.
             </summary>
         </member>
         <member name="M:Jeninnet.AdvancedUsage.Tests.Evaluation.DatasetGeneratorCapacityTests.BuildRuntimeCapacities_WhenTargetIsOneMillion_AllocatesExpectedDistribution">
@@ -53,17 +54,45 @@
             For one hundred files the capacities must sum exactly to the target.
             </summary>
         </member>
-        <member name="M:Jeninnet.AdvancedUsage.Tests.Evaluation.DatasetGeneratorCapacityTests.BuildRuntimeCapacities_WhenTargetIsTen_SumsToTarget">
+        <member name="M:Jeninnet.AdvancedUsage.Tests.Evaluation.DatasetGeneratorCapacityTests.BuildRuntimeCapacities_WhenTargetIsOneHundredMillion_SumsToTarget">
             <summary>
-            For ten files the largest-remainder allocation must distribute two
-            remainder units deterministically, leaving extensions with small weights
-            at zero capacity.
+            Regression: for one hundred million files every extension must still
+            receive its exact percentage share and the capacities must sum exactly
+            to the target. Floating-point ratio calculations previously allocated
+            three extra files at this scale (100,000,003 instead of 100,000,000).
             </summary>
         </member>
-        <member name="M:Jeninnet.AdvancedUsage.Tests.Evaluation.DatasetGeneratorCapacityTests.BuildRuntimeCapacities_WhenTargetIsOne_AllocatesExactlyOnePositiveCapacity">
+        <member name="M:Jeninnet.AdvancedUsage.Tests.Evaluation.DatasetGeneratorCapacityTests.BuildRuntimeCapacities_WhenTargetIsAtMaximumScale_SumsToTarget">
             <summary>
-            For a single file exactly one extension must receive a positive capacity,
-            and that extension must be the one with the largest weight.
+            Regression: at the largest supported target (the highest multiple of one
+            hundred that fits in an Int32) the exact integer calculation must not
+            overflow: the individual capacities are computed from the per-hundred
+            quota and the sum must still equal the target.
+            </summary>
+        </member>
+        <member name="M:Jeninnet.AdvancedUsage.Tests.Evaluation.DatasetGeneratorCapacityTests.BuildRuntimeCapacities_WhenTargetFileCountIsNotDivisibleByOneHundred_Throws">
+            <summary>
+            The target file count must be divisible by 100 because the extension
+            weights sum to 100 percent; any other value is rejected. Ten files and
+            1,000,001 files must both be rejected.
+            </summary>
+        </member>
+        <member name="T:Jeninnet.AdvancedUsage.Tests.Evaluation.EvaluationOptionsValidationTests">
+            <summary>
+            Tests for the validation of the dataset evaluation options.
+            </summary>
+        </member>
+        <member name="M:Jeninnet.AdvancedUsage.Tests.Evaluation.EvaluationOptionsValidationTests.Validate_WhenTargetFileCountIsNotDivisibleByOneHundred_Throws">
+            <summary>
+            The target file count must be divisible by 100 because the extension
+            weights sum to 100 percent; every other value is rejected. Ten files and
+            1,000,001 files must both be rejected before any generation starts.
+            </summary>
+        </member>
+        <member name="M:Jeninnet.AdvancedUsage.Tests.Evaluation.EvaluationOptionsValidationTests.Validate_WhenTargetFileCountIsDivisibleByOneHundred_DoesNotThrow">
+            <summary>
+            Every multiple of one hundred is a valid target, from the smallest
+            supported dataset up to one hundred million files.
             </summary>
         </member>
     </members>

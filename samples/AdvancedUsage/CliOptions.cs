@@ -17,7 +17,7 @@ public sealed class CliOptions : CommandLinePatternOptions {
     /// </summary>
     public Option<int> FileCount { get; } = new("--file-count") {
         Description = "Exact number of files to generate.",
-        DefaultValueFactory = static _ => 100_000
+        DefaultValueFactory = static _ => 100_000_000
     };
 
     /// <summary>
