@@ -13,7 +13,7 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\..\src\Jeninnet.FileQuery\Jeninnet.FileQuery.csproj" />
+        <ProjectReference Include="..\SamplesUtilities\SamplesUtilities.csproj" />
     </ItemGroup>
 
 </Project>

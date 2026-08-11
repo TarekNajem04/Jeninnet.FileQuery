@@ -1,6 +1,4 @@
-﻿using AdvancedUsage.Evaluation;
-
-namespace Jeninnet.AdvancedUsage.Tests.Evaluation;
+﻿namespace Jeninnet.AdvancedUsage.Tests.Evaluation;
 
 /// <summary>
 /// Tests for the validation of the dataset evaluation options.

@@ -1,10 +1,24 @@
-﻿using Jeninnet.FileQuery;
+﻿/*
+ * Purpose: POSIX character classes in glob patterns.
+ * '[[:digit:]]' matches any decimal digit inside a glob.
+ */
 
-// If you don't see any results, change the folder.
-var query = FileQueryBuilder.From(".")
-                            .Where("*[[:digit:]].txt")
-                            .Execute();
+var root = SampleUtils.CreateDemoTree("POSIXClassMatching");
 
-foreach(var file in query) {
-    Console.WriteLine(file);
+try {
+    var query = FileQuery.From(root)
+                         .UsingGlob()
+                         .Where("**/*[[:digit:]].*")
+                         .Build();
+
+    SampleUtils.RunDemo(
+        title: "POSIX Class Matching",
+        description: "The POSIX class '[[:digit:]]' matches any digit, so only files whose name contains a digit match.",
+        queryText: "FileQuery.From(root).UsingGlob().Where(\"**/*[[:digit:]].*\").Build()",
+        query: query,
+        expected: "The 2 images with digits in their names: 'logo1.png', 'logo2.png'."
+    );
+}
+finally {
+    SampleUtils.Cleanup(root);
 }

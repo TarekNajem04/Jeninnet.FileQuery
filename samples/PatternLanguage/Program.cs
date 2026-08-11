@@ -1,52 +1,31 @@
 ﻿/*
- * Purpose: demonstrate GitIgnore-style rules.
- * This sample demonstrates how to use the pattern language to include or exclude files in a query.
+ * Purpose: the pattern language.
+ * Demonstrates GitIgnore-style rules and last-role-wins evaluation:
+ * each matching rule flips the role of the previous one.
  */
 
-using System.Reflection;
-using Jeninnet.FileQuery;
+var root = SampleUtils.CreateDemoTree("PatternLanguage");
 
-var root = @"C:\repo";
+try {
+    var query = FileQuery.From(root)
+                         .UsingGitIgnore()
+                         .Where(
+                             "**",           // Exclude every file.
+                             "!**/*.cs",     // ...then re-include every .cs file at any depth.
+                             "**/cli/**"     // ...and finally exclude the 'cli' subtree again.
+                         )
+                         .Build();
 
-if(!Directory.Exists(root)) {
-    Console.WriteLine($"Directory '{root}' does not exist. We will use the directory of the executing assembly as the root for our query.");
-    root = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+    SampleUtils.RunDemo(
+        title: "Pattern Language — GitIgnore-style rules",
+        description: "Patterns are evaluated in order with last-role-wins semantics: '**' excludes all files, " +
+                     "'!**/*.cs' re-includes C# files, and '**/cli/**' excludes the 'cli' subtree again — " +
+                     "the last matching rule always decides.",
+        queryText: "FileQuery.From(root).UsingGitIgnore().Where(\"**\", \"!**/*.cs\", \"**/cli/**\").Build()",
+        query: query,
+        expected: "The 3 .cs files outside 'cli': 'src/FileQuery.cs', 'src/Program.cs', 'src/test/helpers.cs'."
+    );
 }
-
-if(string.IsNullOrEmpty(root)) {
-    Console.WriteLine("Unable to determine a valid root directory for the query.");
-    return;
-}
-
-var engine = FileQueryRuntime.Create();
-
-/*
- * Notes:
- * - The order of the patterns matters. The first pattern that matches a file will determine
- * - whether it is included or excluded. In the above example, we first exclude all files with "**" and then include only "*.txt" files. 
- *   If we reversed the order, we would include all "*.txt" files and then exclude everything else, resulting in no files being included.
- * - The patterns are evaluated in a depth-first manner, meaning that the engine will first evaluate the patterns for the current directory before moving on to subdirectories.
- *   This allows for more granular control over which files are included or excluded based on their location in the directory structure.
- * - We use last-role-wins semantics, which means that if a file matches multiple patterns, the last pattern that matches will determine whether the file is included or excluded.
- */
-var query = FileQuery.From(root)
-                     .UsingGitIgnore()  // Use the GitIgnore-style pattern matcher
-                     .Where(
-                         "**",      // Exclude all files by default
-                         /*
-                          * Because we use the GitIgnore-style matcher, we need to use the "!" prefix to indicate that the pattern is an inclusion pattern.
-                          */
-                         "!*.txt"   // Then include only .txt files
-                     )
-                     .Build();
-
-var results = engine.Execute(query).ToList();
-
-if(results.Count == 0) {
-    Console.WriteLine("No files matched the query.");
-    return;
-}
-
-foreach(var file in results) {
-    Console.WriteLine(file);
+finally {
+    SampleUtils.Cleanup(root);
 }

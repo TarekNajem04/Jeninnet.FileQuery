@@ -1,0 +1,42 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>SamplesUtilities</name>
+    </assembly>
+    <members>
+        <member name="T:Jeninnet.FileQuery.Samples.SampleUtils">
+            <summary>
+            Provides shared helpers for the FileQuery sample applications:
+            a deterministic demo file tree, an explanatory demo runner, and best-effort cleanup.
+            </summary>
+        </member>
+        <member name="F:Jeninnet.FileQuery.Samples.SampleUtils._demoTreeFiles">
+            <summary>
+            Gets the relative layout of the deterministic demo tree shared by every sample.
+            </summary>
+        </member>
+        <member name="M:Jeninnet.FileQuery.Samples.SampleUtils.CreateDemoTree(System.String)">
+            <summary>
+            Creates a fresh, deterministic demo tree for the sample with the specified name and returns its root directory.
+            </summary>
+            <param name="sampleName">The name of the sample; used to isolate its demo directory.</param>
+            <returns>The absolute path of the sample's demo root directory.</returns>
+        </member>
+        <member name="M:Jeninnet.FileQuery.Samples.SampleUtils.RunDemo(System.String,System.String,System.String,Jeninnet.FileQuery.FileQuery,System.String)">
+            <summary>
+            Runs an explanatory demo: prints a header, executes the query, lists every match, and prints a summary.
+            </summary>
+            <param name="title">The title of the demo.</param>
+            <param name="description">What the demo demonstrates.</param>
+            <param name="queryText">The query expressed as code, shown in the header.</param>
+            <param name="query">The built query to execute.</param>
+            <param name="expected">What the demo is expected to produce, shown in the header.</param>
+        </member>
+        <member name="M:Jeninnet.FileQuery.Samples.SampleUtils.Cleanup(System.String)">
+            <summary>
+            Deletes the demo tree created by <see cref="M:Jeninnet.FileQuery.Samples.SampleUtils.CreateDemoTree(System.String)"/>.
+            </summary>
+            <param name="root">The demo root directory to delete.</param>
+        </member>
+    </members>
+</doc>

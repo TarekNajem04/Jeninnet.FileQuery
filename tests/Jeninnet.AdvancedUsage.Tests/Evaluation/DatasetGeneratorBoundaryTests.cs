@@ -1,6 +1,4 @@
-﻿using AdvancedUsage.Evaluation;
-
-namespace Jeninnet.AdvancedUsage.Tests.Evaluation;
+﻿namespace Jeninnet.AdvancedUsage.Tests.Evaluation;
 
 /// <summary>
 /// Regression tests for the dataset generator's final-file boundary condition.

@@ -1,10 +1,29 @@
-﻿using Jeninnet.FileQuery;
+﻿/*
+ * Purpose: nested glob matching.
+ * Recursive '**' patterns combined in one query select files with different
+ * extensions at any depth.
+ */
 
-// If you don't see any results, change the folder.
-var query = FileQueryBuilder.From(".")
-                            .Where("**/*.{cs,csproj}")
-                            .Execute();
+var root = SampleUtils.CreateDemoTree("NestedGlobMatching");
 
-foreach(var file in query) {
-    Console.WriteLine(file);
+try {
+    var query = FileQuery.From(root)
+                         .UsingGlob()
+                         .Where(
+                             "**/*.cs",   // Every .cs file at any depth.
+                             "**/*.md"    // Every .md file at any depth.
+                         )
+                         .Build();
+
+    SampleUtils.RunDemo(
+        title: "Nested Glob Matching",
+        description: "Each recursive '**' pattern reaches one extension at any depth; combining both globs " +
+                     "in a single query selects .cs and .md files together.",
+        queryText: "FileQuery.From(root).UsingGlob().Where(\"**/*.cs\", \"**/*.md\").Build()",
+        query: query,
+        expected: "The 4 .cs files plus the 2 .md files (6 files)."
+    );
+}
+finally {
+    SampleUtils.Cleanup(root);
 }
