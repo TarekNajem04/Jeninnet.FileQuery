@@ -1097,6 +1097,36 @@
         <member name="M:Jeninnet.FileQuery.IO.FileSystem.GetFullPath(System.String,System.String)">
             <inheritdoc/>
         </member>
+        <member name="M:Jeninnet.FileQuery.IO.FileSystem.CreateEnumerator(System.String)">
+            <summary>
+            Creates an enumerator over the specified directory whose entries carry the
+            attributes provided directly by the OS enumeration.
+            </summary>
+            <param name="directory">The directory to enumerate.</param>
+            <remarks>
+            <para>
+            The enumeration is configured exactly like <see cref="M:System.IO.Directory.EnumerateFileSystemEntries(System.String)"/>:
+            every entry is returned regardless of its attributes (<see cref="P:System.IO.EnumerationOptions.AttributesToSkip"/>
+            is zero) and access errors surface as exceptions so the caller's skip/retry
+            policy can apply (<see cref="P:System.IO.EnumerationOptions.IgnoreInaccessible"/> is disabled).
+            </para>
+            <para>
+            This replaces the previous per-entry <see cref="M:System.IO.File.GetAttributes(System.String)"/>
+            call: on Windows, <see cref="P:System.IO.Enumeration.FileSystemEntry.Attributes"/> is populated
+            from the <c>WIN32_FIND_DATA</c> returned by the enumeration itself, eliminating
+            one attribute lookup (and its internal full-path normalization) per entry.
+            Reparse points are reported without following the link, matching the
+            <see cref="M:System.IO.File.GetAttributes(System.String)"/> semantics.
+            </para>
+            </remarks>
+        </member>
+        <member name="M:Jeninnet.FileQuery.IO.FileSystem.TransformEntry(System.IO.Enumeration.FileSystemEntry@)">
+            <summary>
+            Builds a <see cref="T:Jeninnet.FileQuery.IO.FileSystemEntry"/> from the raw OS enumeration data.
+            </summary>
+            <param name="entry">The raw enumeration entry.</param>
+            <returns>The file system entry used by the engine.</returns>
+        </member>
         <member name="T:Jeninnet.FileQuery.IO.FileSystemEntry">
             <summary>
             Represents a filesystem entry without exposing <see cref="N:System.IO"/> types directly.
