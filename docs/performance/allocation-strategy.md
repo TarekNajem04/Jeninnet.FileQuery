@@ -96,6 +96,20 @@ Budget at one million entries (1,004,096):
 allocating a relative string per entry. Result strings — one `string` per
 matched file — remain the only unavoidable allocation.
 
+### Measured outcome (Phase 4)
+
+Implemented as `RelativePathBuffer` in `TraversalExecutor`: the relative path
+is composed into a rented, growing `char[]` buffer and passed to the matchers
+as a span; a `string` is materialized only for diagnostics or result paths.
+Measured on the same 1,000,000-file dataset and query (876,017 matches):
+
+| Metric | Phase 3 baseline | Phase 4 | Change |
+|--------|------------------|---------|--------|
+| Median execution | 18,382 ms | 4,417 ms | −76% |
+| Average execution | 18,222 ms | 4,430 ms | −76% |
+| Allocated per run | 516.19 MB | 330.60 MB | −36% |
+| Matches | 876,017 | 876,017 | 0% |
+
 ## Measuring Allocations
 
 Use BenchmarkDotNet with `[MemoryDiagnoser]` to verify zero allocations in the hot path:

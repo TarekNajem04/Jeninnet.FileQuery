@@ -4965,6 +4965,62 @@
             <param name="progress">The optional progress sink for traversal snapshots.</param>
             <returns>A traversal execution plan.</returns>
         </member>
+        <member name="T:Jeninnet.FileQuery.Traversal.RelativePathBuffer">
+            <summary>
+            Reusable, rented character buffer used to compose root-relative paths during
+            traversal without materializing a managed string for every filesystem entry.
+            </summary>
+            <remarks>
+            <para>
+            The buffer is rented once from <see cref="P:System.Buffers.ArrayPool`1.Shared"/> and returned on
+            dispose. It grows by renting a larger array, copying the existing content, and
+            returning the old array to the pool. A path built for entry N is guaranteed to
+            stay valid while entry N is processed; the next call to
+            <see cref="M:Jeninnet.FileQuery.Traversal.RelativePathBuffer.BuildRelativePath(System.String,Jeninnet.FileQuery.IO.FileSystemEntry)"/> overwrites it. Spans returned by this type must
+            never outlive either the next build or the buffer instance itself.
+            </para>
+            </remarks>
+        </member>
+        <member name="M:Jeninnet.FileQuery.Traversal.RelativePathBuffer.#ctor">
+            <summary>
+            Initializes the buffer and rents the backing storage from the shared
+            <see cref="P:System.Buffers.ArrayPool`1.Shared"/>.
+            </summary>
+        </member>
+        <member name="P:Jeninnet.FileQuery.Traversal.RelativePathBuffer.Capacity">
+            <summary>Gets the number of characters the rented backing storage can hold.</summary>
+        </member>
+        <member name="P:Jeninnet.FileQuery.Traversal.RelativePathBuffer.RelativePath">
+            <summary>
+            Gets the root-relative path currently composed in the buffer.
+            </summary>
+        </member>
+        <member name="M:Jeninnet.FileQuery.Traversal.RelativePathBuffer.BuildRelativePath(System.String,Jeninnet.FileQuery.IO.FileSystemEntry)">
+            <summary>
+            Composes the root-relative, normalized representation of <paramref name="entry"/>
+            in the reusable buffer.
+            </summary>
+            <remarks>
+            Semantics are identical to <see cref="M:Jeninnet.FileQuery.IO.PathUtilities.BuildRelativePath(System.String,Jeninnet.FileQuery.IO.FileSystemEntry)"/>:
+            the root prefix is removed, path separators become forward slashes, and
+            directories receive a trailing <c>'/'</c>. The returned span is valid only until
+            the next call to this method.
+            </remarks>
+            <param name="rootDir">The root directory of the traversal.</param>
+            <param name="entry">The filesystem entry to build a path for.</param>
+        </member>
+        <member name="M:Jeninnet.FileQuery.Traversal.RelativePathBuffer.Dispose">
+            <summary>
+            Returns the rented backing storage to the shared <see cref="P:System.Buffers.ArrayPool`1.Shared"/>.
+            </summary>
+        </member>
+        <member name="M:Jeninnet.FileQuery.Traversal.RelativePathBuffer.EnsureCapacity(System.Int32)">
+            <summary>
+            Grows the backing storage until it can hold at least <paramref name="required"/>
+            characters, copying the composed content into the replacement.
+            </summary>
+            <param name="required">The minimum number of characters the buffer must hold.</param>
+        </member>
         <member name="T:Jeninnet.FileQuery.Traversal.TraversalConfiguration">
             <summary>
             Internal immutable projection of traversal-related settings.
@@ -5080,7 +5136,7 @@
             <param name="buffer">The traversal frontier buffer.</param>
             <param name="options">The traversal configuration options.</param>
         </member>
-        <member name="M:Jeninnet.FileQuery.Traversal.TraversalExecutor.TryProcessEntry(Jeninnet.FileQuery.Traversal.TraversalPlan,Jeninnet.FileQuery.IO.FileSystemEntry,Jeninnet.FileQuery.Traversal.TraversalFrame,Jeninnet.FileQuery.Traversal.TraversalFrontier,System.Collections.Generic.HashSet{System.String},System.Nullable{Jeninnet.FileQuery.IO.FileSystemEntry}@)">
+        <member name="M:Jeninnet.FileQuery.Traversal.TraversalExecutor.TryProcessEntry(Jeninnet.FileQuery.Traversal.TraversalPlan,Jeninnet.FileQuery.IO.FileSystemEntry,Jeninnet.FileQuery.Traversal.TraversalFrame,Jeninnet.FileQuery.Traversal.TraversalFrontier,System.Collections.Generic.HashSet{System.String},Jeninnet.FileQuery.Traversal.RelativePathBuffer,System.Nullable{Jeninnet.FileQuery.IO.FileSystemEntry}@)">
             <summary>
             Processes a single filesystem entry, potentially adding it to the frontier or yielding it if it matches.
             </summary>
@@ -5089,9 +5145,10 @@
             <param name="frame">The current traversal frame.</param>
             <param name="buffer">The traversal frontier buffer.</param>
             <param name="visited">The set of visited directory paths (for symlink cycle detection).</param>
+            <param name="pathBuffer">The reusable buffer used to compose the root-relative path.</param>
             <param name="yieldedFile">The resulting entry if a file was matched.</param>
         </member>
-        <member name="M:Jeninnet.FileQuery.Traversal.TraversalExecutor.HasPotentialReInclusionInside(Jeninnet.FileQuery.Matching.ICompiledPatternSet,System.String,System.StringComparison)">
+        <member name="M:Jeninnet.FileQuery.Traversal.TraversalExecutor.HasPotentialReInclusionInside(Jeninnet.FileQuery.Matching.ICompiledPatternSet,System.ReadOnlySpan{System.Char},System.StringComparison)">
             <summary>
             Determines whether any negated pattern in <paramref name="patterns"/> could
             potentially produce a match for a path inside <paramref name="directoryRelativePath"/>.
@@ -5101,7 +5158,16 @@
             <param name="directoryRelativePath">The directory path relative to the root.</param>
             <param name="comparison">The string comparison mode.</param>
         </member>
-        <member name="M:Jeninnet.FileQuery.Traversal.TraversalExecutor.IsPathPrefixOrEqual(System.String,System.String,System.StringComparison)">
+        <member name="M:Jeninnet.FileQuery.Traversal.TraversalExecutor.ContainsSegmentEndingWith(System.ReadOnlySpan{System.Char},System.String,System.StringComparison)">
+            <summary>
+            Determines whether any segment of <paramref name="path"/> ends with
+            <paramref name="suffix"/>, using <paramref name="comparison"/>.
+            </summary>
+            <param name="path">The path whose segments are inspected.</param>
+            <param name="suffix">The suffix each segment is tested against.</param>
+            <param name="comparison">The string comparison mode.</param>
+        </member>
+        <member name="M:Jeninnet.FileQuery.Traversal.TraversalExecutor.IsPathPrefixOrEqual(System.ReadOnlySpan{System.Char},System.ReadOnlySpan{System.Char},System.StringComparison)">
             <summary>
             Returns true when <paramref name="prefix"/> is path-equal to or a proper
             path-prefix of <paramref name="path"/>.
@@ -5145,7 +5211,7 @@
             <param name="state">The current traversal progress state.</param>
             <param name="currentPath">The path of the entry being reported.</param>
         </member>
-        <member name="M:Jeninnet.FileQuery.Traversal.TraversalExecutor.ReportDiagnostic(Jeninnet.FileQuery.Traversal.TraversalPlan,Jeninnet.FileQuery.IO.FileSystemEntry,System.String,Jeninnet.FileQuery.Matching.PathMatchContext,Jeninnet.FileQuery.Enums.MatchOutcome)">
+        <member name="M:Jeninnet.FileQuery.Traversal.TraversalExecutor.ReportDiagnostic(Jeninnet.FileQuery.Traversal.TraversalPlan,Jeninnet.FileQuery.IO.FileSystemEntry,System.ReadOnlySpan{System.Char},Jeninnet.FileQuery.Matching.PathMatchContext,Jeninnet.FileQuery.Enums.MatchOutcome)">
             <summary>
             Reports diagnostic information for the given entry, if diagnostics are enabled.
             </summary>

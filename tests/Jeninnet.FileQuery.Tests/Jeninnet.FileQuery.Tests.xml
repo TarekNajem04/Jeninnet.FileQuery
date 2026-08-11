@@ -5564,6 +5564,98 @@
             Gets or sets the test context, which provides information about the current test execution.
             </summary>
         </member>
+        <member name="T:Jeninnet.FileQuery.Tests.Unit.Traversal.RelativePathBufferEngineTests">
+            <summary>
+            Engine-level tests verifying that traversal still produces correct results when
+            the relative path is composed in the reusable <see cref="T:Jeninnet.FileQuery.Traversal.RelativePathBuffer"/>
+            instead of an allocation per entry.
+            </summary>
+        </member>
+        <member name="P:Jeninnet.FileQuery.Tests.Unit.Traversal.RelativePathBufferEngineTests.TestContext">
+            <summary>
+            Gets or sets the test context.
+            </summary>
+        </member>
+        <member name="M:Jeninnet.FileQuery.Tests.Unit.Traversal.RelativePathBufferEngineTests.Execute_ShallowAndRootRelative_FilesMatchWithFullPaths">
+            <summary>
+            Verifies that shallow and root-relative files match with their full paths
+            as results.
+            </summary>
+        </member>
+        <member name="M:Jeninnet.FileQuery.Tests.Unit.Traversal.RelativePathBufferEngineTests.Execute_DeeplyNestedPathRequiringBufferGrowth_MatchesCorrectly">
+            <summary>
+            Verifies that a deeply nested path long enough to grow the buffer past its
+            initial capacity still matches with a correct full path.
+            </summary>
+        </member>
+        <member name="M:Jeninnet.FileQuery.Tests.Unit.Traversal.RelativePathBufferEngineTests.Execute_MatchingAndNonMatchingEntries_AreSeparatedExactly">
+            <summary>
+            Verifies that matching and non-matching entries are separated exactly and
+            that non-matching entries never appear in the results.
+            </summary>
+        </member>
+        <member name="M:Jeninnet.FileQuery.Tests.Unit.Traversal.RelativePathBufferEngineTests.Execute_ResultOrdering_IsPreserved">
+            <summary>
+            Verifies that result ordering is preserved: parent directories are visited
+            before their children and files keep their enumeration order.
+            </summary>
+        </member>
+        <member name="M:Jeninnet.FileQuery.Tests.Unit.Traversal.RelativePathBufferEngineTests.ExecuteAsync_DeepPaths_MatchSyncResultsAsync">
+            <summary>
+            Verifies that the async traversal produces identical results to the sync
+            traversal when paths are composed in the reusable buffer.
+            </summary>
+        </member>
+        <member name="T:Jeninnet.FileQuery.Tests.Unit.Traversal.RelativePathBufferTests">
+            <summary>
+            Tests for <see cref="T:Jeninnet.FileQuery.Traversal.RelativePathBuffer"/>: reusable, rented buffer used by the
+            traversal hot path to compose root-relative paths without per-entry strings.
+            </summary>
+        </member>
+        <member name="M:Jeninnet.FileQuery.Tests.Unit.Traversal.RelativePathBufferTests.BuildRelativePath_ShallowFile_StripsRootPrefix">
+            <summary>
+            Verifies that a shallow file path is composed without a leading separator.
+            </summary>
+        </member>
+        <member name="M:Jeninnet.FileQuery.Tests.Unit.Traversal.RelativePathBufferTests.BuildRelativePath_RootRelative_NormalizesLeadingSeparator">
+            <summary>
+            Verifies that the leading separator between root and path is removed.
+            </summary>
+        </member>
+        <member name="M:Jeninnet.FileQuery.Tests.Unit.Traversal.RelativePathBufferTests.BuildRelativePath_Directory_AppendsTrailingSlash">
+            <summary>
+            Verifies that directories receive a trailing slash, preserving
+            directory-only pattern semantics.
+            </summary>
+        </member>
+        <member name="M:Jeninnet.FileQuery.Tests.Unit.Traversal.RelativePathBufferTests.BuildRelativePath_Backslashes_AreNormalizedToForwardSlashes">
+            <summary>
+            Verifies that backslash separators are converted to forward slashes.
+            </summary>
+        </member>
+        <member name="M:Jeninnet.FileQuery.Tests.Unit.Traversal.RelativePathBufferTests.BuildRelativePath_DeepPath_GrowsBufferAndStaysCorrect">
+            <summary>
+            Verifies that a path longer than the initial capacity grows the buffer
+            and is still composed correctly.
+            </summary>
+        </member>
+        <member name="M:Jeninnet.FileQuery.Tests.Unit.Traversal.RelativePathBufferTests.BuildRelativePath_RepeatedBuilds_OverwritePreviousContent">
+            <summary>
+            Verifies that consecutive builds reuse the backing storage and that a
+            later, longer path overwrites the previous content without leftovers.
+            </summary>
+        </member>
+        <member name="M:Jeninnet.FileQuery.Tests.Unit.Traversal.RelativePathBufferTests.Dispose_IsIdempotent">
+            <summary>
+            Verifies that disposing twice is safe and returns storage to the pool exactly once.
+            </summary>
+        </member>
+        <member name="M:Jeninnet.FileQuery.Tests.Unit.Traversal.RelativePathBufferTests.BuildRelativePath_RootItself_ComposesDirectoryMarker">
+            <summary>
+            Verifies that an entry equal to the root produces the shortest possible
+            relative representation (a directory marker only).
+            </summary>
+        </member>
         <member name="T:Jeninnet.FileQuery.Tests.Validation.FileQueryValidatorTests">
             <summary>
             Contains unit tests for the <see cref="T:Jeninnet.FileQuery.Validation.FileQueryValidator"/> class.
