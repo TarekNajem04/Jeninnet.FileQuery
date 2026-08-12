@@ -199,25 +199,8 @@ internal sealed class GitIgnoreInstructionMatcher : SegmentMatchEngine {
             return false;
         }
 
-        // Suffix rejection fast path. When the pattern's last segment carries a
-        // fixed literal run, any path the pattern can possibly match must end with
-        // it: non-directory-only patterns always map their last segment onto the
-        // path's last segment (MatchRecursiveSegments only reports a match once the
-        // path is fully consumed), so a missing suffix proves no match without
-        // entering the recursive matcher. Directory-only patterns are exempt: they
-        // may legitimately match with leftover path segments (e.g. "/a/" matching
-        // the file "a/b"), so their suffix is never resolved (empty).
-        if(!pattern.DirectoryOnly && pattern.LiteralSuffix.Length > 0) {
-            var path = pathView.Path;
-
-            // Directory paths carry a trailing '/' (see PathUtilities.BuildRelativePath).
-            if(path.Length > 0 && path[^1] == '/') {
-                path = path[..^1];
-            }
-
-            if(!path.EndsWith(pattern.LiteralSuffix, comparison)) {
-                return false;
-            }
+        if(RejectsByLiteralSuffix(pattern, pathView, comparison)) {
+            return false;
         }
 
         var enumerator = pathView.EnumerateSegments();
@@ -237,7 +220,61 @@ internal sealed class GitIgnoreInstructionMatcher : SegmentMatchEngine {
             );
         }
 
-        // Unanchored: slide the pattern across segments.
+        return MatchUnanchored(
+            pattern,
+            pathView,
+            comparison,
+            enumerator
+        );
+    }
+
+    /// <summary>
+    /// Suffix rejection fast path. When the pattern's last segment carries a
+    /// fixed literal run, any path the pattern can possibly match must end with
+    /// it: non-directory-only patterns always map their last segment onto the
+    /// path's last segment (<see cref="MatchRecursiveSegments"/> only reports a
+    /// match once the path is fully consumed), so a missing suffix proves no
+    /// match without entering the recursive matcher. Directory-only patterns are
+    /// exempt: they may legitimately match with leftover path segments
+    /// (e.g. <c>/a/</c> matching the file <c>a/b</c>), so their suffix is never
+    /// resolved (empty).
+    /// </summary>
+    /// <param name="pattern">The compiled pattern.</param>
+    /// <param name="pathView">The view of the path segments.</param>
+    /// <param name="comparison">The string comparison rules.</param>
+    private static bool RejectsByLiteralSuffix(
+        ICompiledPattern pattern,
+        PathView pathView,
+        StringComparison comparison
+    ) {
+        if(pattern.DirectoryOnly || pattern.LiteralSuffix.Length == 0) {
+            return false;
+        }
+
+        var path = pathView.Path;
+
+        // Directory paths carry a trailing '/' (see PathUtilities.BuildRelativePath).
+        if(path.Length > 0 && path[^1] == '/') {
+            path = path[..^1];
+        }
+
+        return !path.EndsWith(pattern.LiteralSuffix, comparison);
+    }
+
+    /// <summary>
+    /// Unanchored match: slides the pattern across path segments until a match
+    /// is found or the path is exhausted.
+    /// </summary>
+    /// <param name="pattern">The compiled pattern.</param>
+    /// <param name="pathView">The view of the path segments.</param>
+    /// <param name="comparison">The string comparison rules.</param>
+    /// <param name="enumerator">The enumerator for path segments.</param>
+    private bool MatchUnanchored(
+        ICompiledPattern pattern,
+        PathView pathView,
+        StringComparison comparison,
+        PathSegmentEnumerator enumerator
+    ) {
         var skip = 0;
         while(true) {
             var fork = enumerator; // value-type copy for speculation
