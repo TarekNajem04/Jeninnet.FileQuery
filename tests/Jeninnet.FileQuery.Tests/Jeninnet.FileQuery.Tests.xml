@@ -5683,8 +5683,12 @@
         <member name="M:Jeninnet.FileQuery.Tests.Unit.Traversal.RelativePathBufferEngineTests.Execute_ResultOrdering_IsPreserved">
             <summary>
             Verifies that result ordering is preserved: parent directories are visited
-            before their children and files keep their enumeration order.
+            before their children and sibling files keep filesystem enumeration order.
             </summary>
+            <remarks>
+            Sibling order is taken from the OS enumerator — it is not alphabetical and
+            must not be hard-coded (Linux CI often differs from Windows).
+            </remarks>
         </member>
         <member name="M:Jeninnet.FileQuery.Tests.Unit.Traversal.RelativePathBufferEngineTests.ExecuteAsync_DeepPaths_MatchSyncResultsAsync">
             <summary>

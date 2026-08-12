@@ -102,8 +102,12 @@ public class RelativePathBufferEngineTests {
 
     /// <summary>
     /// Verifies that result ordering is preserved: parent directories are visited
-    /// before their children and files keep their enumeration order.
+    /// before their children and sibling files keep filesystem enumeration order.
     /// </summary>
+    /// <remarks>
+    /// Sibling order is taken from the OS enumerator — it is not alphabetical and
+    /// must not be hard-coded (Linux CI often differs from Windows).
+    /// </remarks>
     [TestMethod]
     public void Execute_ResultOrdering_IsPreserved() {
         using var env = new TestEnvironment();
@@ -115,9 +119,34 @@ public class RelativePathBufferEngineTests {
         var results = engine.Execute(query).ToList();
 
         TestAssertEx.HasCount(results, 3);
-        Assert.IsTrue(results[0].EndsWith("a.txt", StringComparison.Ordinal));
-        Assert.IsTrue(results[1].EndsWith("b.txt", StringComparison.Ordinal));
-        Assert.IsTrue(results[2].EndsWith(System.IO.Path.Combine("sub", "c.txt"), StringComparison.Ordinal));
+
+        var aIndex = results.FindIndex(static r => r.EndsWith("a.txt", StringComparison.Ordinal));
+        var bIndex = results.FindIndex(static r => r.EndsWith("b.txt", StringComparison.Ordinal));
+        var cIndex = results.FindIndex(
+            static r => r.EndsWith(System.IO.Path.Combine("sub", "c.txt"), StringComparison.Ordinal)
+        );
+
+        Assert.IsGreaterThanOrEqualTo(0, aIndex);
+        Assert.IsGreaterThanOrEqualTo(0, bIndex);
+        Assert.IsGreaterThanOrEqualTo(0, cIndex);
+
+        // BFS default: root files appear before descendants.
+        Assert.IsLessThan(cIndex, aIndex);
+        Assert.IsLessThan(cIndex, bIndex);
+
+        // Sibling order must match native directory enumeration order.
+        var rootSiblingOrder = Directory
+            .EnumerateFileSystemEntries(env.Root)
+            .Select(System.IO.Path.GetFileName)
+            .Where(static name => name is "a.txt" or "b.txt")
+            .ToList();
+
+        Assert.HasCount(2, rootSiblingOrder);
+        var expectedFirstSibling = rootSiblingOrder[0]!;
+        var expectedSecondSibling = rootSiblingOrder[1]!;
+        var firstSiblingIndex = expectedFirstSibling == "a.txt" ? aIndex : bIndex;
+        var secondSiblingIndex = expectedSecondSibling == "a.txt" ? aIndex : bIndex;
+        Assert.IsLessThan(secondSiblingIndex, firstSiblingIndex);
     }
 
     /// <summary>
