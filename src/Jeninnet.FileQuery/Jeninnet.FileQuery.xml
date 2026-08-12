@@ -1581,6 +1581,32 @@
             <param name="comparison">The string comparison rules.</param>
             <returns>True if the path matches the pattern; otherwise, false.</returns>
         </member>
+        <member name="M:Jeninnet.FileQuery.Matching.Compiled.GitIgnoreInstructionMatcher.RejectsByLiteralSuffix(Jeninnet.FileQuery.Matching.ICompiledPattern,Jeninnet.FileQuery.IO.PathView,System.StringComparison)">
+            <summary>
+            Suffix rejection fast path. When the pattern's last segment carries a
+            fixed literal run, any path the pattern can possibly match must end with
+            it: non-directory-only patterns always map their last segment onto the
+            path's last segment (<see cref="M:Jeninnet.FileQuery.Matching.Compiled.GitIgnoreInstructionMatcher.MatchRecursiveSegments(Jeninnet.FileQuery.Matching.ICompiledPattern,System.Int32,System.StringComparison,Jeninnet.FileQuery.IO.PathSegmentEnumerator,System.Int32,System.Boolean)"/> only reports a
+            match once the path is fully consumed), so a missing suffix proves no
+            match without entering the recursive matcher. Directory-only patterns are
+            exempt: they may legitimately match with leftover path segments
+            (e.g. <c>/a/</c> matching the file <c>a/b</c>), so their suffix is never
+            resolved (empty).
+            </summary>
+            <param name="pattern">The compiled pattern.</param>
+            <param name="pathView">The view of the path segments.</param>
+            <param name="comparison">The string comparison rules.</param>
+        </member>
+        <member name="M:Jeninnet.FileQuery.Matching.Compiled.GitIgnoreInstructionMatcher.MatchUnanchored(Jeninnet.FileQuery.Matching.ICompiledPattern,Jeninnet.FileQuery.IO.PathView,System.StringComparison,Jeninnet.FileQuery.IO.PathSegmentEnumerator)">
+            <summary>
+            Unanchored match: slides the pattern across path segments until a match
+            is found or the path is exhausted.
+            </summary>
+            <param name="pattern">The compiled pattern.</param>
+            <param name="pathView">The view of the path segments.</param>
+            <param name="comparison">The string comparison rules.</param>
+            <param name="enumerator">The enumerator for path segments.</param>
+        </member>
         <member name="M:Jeninnet.FileQuery.Matching.Compiled.GitIgnoreInstructionMatcher.MatchRecursiveSegments(Jeninnet.FileQuery.Matching.ICompiledPattern,System.Int32,System.StringComparison,Jeninnet.FileQuery.IO.PathSegmentEnumerator,System.Int32,System.Boolean)">
             <summary>
             Core recursive segment matcher implementing GitIgnore semantics.

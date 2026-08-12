@@ -11,35 +11,7 @@
 
 **A high-performance, deterministic file discovery and filtering engine for .NET.**
 
----
-
-## 📊 Repo Stats
-
-![Repobeats analytics image](https://repobeats.axiom.co/api/embed/57d92552dfb25309185f7457c01037a504b5fa24.svg "Repobeats analytics image")
-
----
-
-## Upgrading
-If you are upgrading from v1.0.0 or v1.1.0 to v1.2.0, please see the [Migration Guide](Migration.md) for important breaking changes regarding `FileQueryOptions`.
-
----
-
-`Jeninnet.FileQuery` is a modern, high-performance file query system designed for .NET 10 and C# 14. It combines multiple pattern dialectsâ€”**GitIgnore**, **Glob**, and **Regular Expressions**â€”into a unified, deterministic, and allocation-free matching pipeline. Decoupled from `System.IO`, the engine allows precise, scalable file discovery across massive directory structures on Windows, Linux, and macOS.
-
-The Phase 2 observability surface adds async progress snapshots, optional match audit diagnostics, deep cancellation verification, and configurable IO recovery strategies without changing default query behavior.
-
----
-
-## 📂 Project Suite Directory
-
-This repository contains the core library and its companion packages:
-
-*   **[Core Engine (Jeninnet.FileQuery)](./src/Jeninnet.FileQuery/README.md)**: The main matching runtime, builders, and parser pipeline.
-*   **[CommandLine Integration (Jeninnet.FileQuery.CommandLine)](./src/Jeninnet.FileQuery.CommandLine/README.md)**: Bridges command-line arguments (using `System.CommandLine`) to file query patterns.
-*   **[DependencyInjection Integration (Jeninnet.FileQuery.DependencyInjection)](./src/Jeninnet.FileQuery.DependencyInjection/README.md)**: Configures and registers the engine and its components in standard .NET host applications.
-*   **[Documentation Suite (docs/)](./docs/README.md)**: Deep technical specifications, guides, and architectural whitepapers.
-*   **[Benchmark Suite (benchmarks/)](./benchmarks/README.md)**: Performance measurements and allocation verification.
-*   **[Samples (samples/)](./samples/AdvancedUsage/README.md)**: Practical examples showing basic to advanced usage.
+Jeninnet.FileQuery combines three pattern dialects — **GitIgnore**, **Glob**, and **Regular Expressions** — into a single, deterministic query pipeline. Patterns are tokenized, validated against structural invariants, and compiled into immutable instruction sets before any filesystem work begins. The compiled matchers then evaluate every entry through one unified pipeline where GitIgnore, Glob, and Regex rules coexist with well-defined precedence. The result is predictable, scalable file discovery across Windows, Linux, and macOS — decoupled from `System.IO` through the [`IFileSystem`](./src/Jeninnet.FileQuery/IO/IFileSystem.cs) abstraction.
 
 ---
 
@@ -81,9 +53,90 @@ foreach (var file in files)
 
 ---
 
+## ✨ Features
+
+### Pattern Queries
+
+*   **Three dialects, one pipeline.** Write patterns in GitIgnore, Glob, or Regex (`r:` prefix) syntax. In Hybrid mode the engine classifies each pattern automatically; in Specific mode you choose a single dialect explicitly.
+*   **Deterministic precedence.** GitIgnore inclusions take final precedence over Glob and Regex sub-sets. A GitIgnore inclusion is final; Glob and Regex matchers can re-include paths excluded by GitIgnore but cannot exclude paths that GitIgnore has included.
+*   **POSIX character classes.** Bracket expressions support named classes (`[:digit:]`, `[:alpha:]`, `[:alnum:]`, `[:space:]`, `[:blank:]`, `[:upper:]`, `[:lower:]`, `[:print:]`, `[:graph:]`, `[:punct:]`, `[:cntrl:]`, `[:xdigit:]`).
+*   **Compile-time validation.** Patterns are tokenized and checked against semantic and structural invariants (e.g., `**` isolation, valid character ranges) before execution. Malformed patterns produce rich diagnostics without throwing during tokenization.
+
+### Traversal
+
+*   **Depth-first or breadth-first.** Choose between stack-based (`DepthFirst`) or queue-based (`BreadthFirst`) traversal strategies through `TraversalOptions`.
+*   **Symlink policies.** Control symbolic link behavior with `Ignore`, `Follow`, or `FollowWithCycleDetection`.
+*   **Decoupled filesystem.** The [`IFileSystem`](./src/Jeninnet.FileQuery/IO/IFileSystem.cs) interface decouples all IO, enabling virtual or mock filesystems for cloud workloads and test isolation.
+*   **Configurable error recovery.** Handle IO errors with `Skip`, `Retry(n)`, or `Abort` strategies through `FileQueryErrorRecoveryOptions`.
+
+### Observability
+
+*   **Async progress snapshots.** Report live traversal statistics (entries scanned, files matched, directories visited) through `IProgress<FileQueryProgress>`.
+*   **Match audit diagnostics.** Opt-in per-entry explanations of match outcomes, including the responsible pattern and its source metadata, through `IProgress<FileQueryDiagnostic>`.
+*   **Deep cancellation.** `CancellationToken` propagation is verified across all hot paths.
+*   **OpenTelemetry integration.** Export metrics and spans for structured observability.
+*   **Roslyn analyzers.** Design-time warnings and code fixes for malformed GitIgnore, Glob, or Regex patterns.
+
+### Performance
+
+*   **Zero-allocation matching hot path.** The matching evaluation loop is designed to avoid per-entry heap allocations, using `ReadOnlySpan<char>`, stack-allocated `ref struct` types (`PathView`, `PathSegmentEnumerator`), and index-based loops. Allocation-free matching is enforced by architecture tests.
+*   **Pooled relative-path buffering.** Relative paths are composed in a reusable `ArrayPool<char>`-backed buffer (`RelativePathBuffer`) rather than allocating a new string for every traversed entry. A `string` is materialized only for matched results.
+*   **GitIgnore literal-suffix fast path.** Eligible wildcard patterns resolve their literal suffix at compile time, allowing zero-allocation `EndsWith` rejection before recursive matching.
+*   **AOT-ready.** Reflection is completely avoided to ensure compatibility with .NET Native AOT compilation.
+
+---
+
+## ⚡ Performance at Scale
+
+Jeninnet.FileQuery v1.5.0 has been validated against a reproducible evaluation environment containing **1,000,000 files across 4,096 directories**. This dataset is used for traversal performance measurement and regression detection.
+
+### v1.5.0 Performance Investigation
+
+The v1.5.0 release completed a systematic performance investigation cycle covering filesystem enumeration, traversal allocations, GitIgnore matching cost, and the remaining BCL/OS-bound overhead. The investigation was conducted across multiple profiling phases using the same 1,000,000-file dataset with the following query:
+
+```
+**/*.cs;!**/bin/**;!**/obj/**;!**/node_modules/**;!**/*.generated.cs
+```
+
+Key findings from the investigation:
+
+*   **Redundant per-entry attribute lookups** were eliminated by consuming filesystem attributes directly from .NET enumeration results.
+*   **Per-entry relative-path string allocations** were replaced with a pooled `ArrayPool<char>`-backed buffer, reducing total allocations by ~36% for the measured query.
+*   **The GitIgnore literal-suffix fast path** reduced the marginal matching cost of eligible wildcard negation patterns (e.g., `!**/*.generated.cs`) to effectively zero in the profiled workload, down from being the single largest matching cost prior to this optimization.
+*   **After all optimizations**, profiling confirmed that the matching engine, traversal logic, and path processing together account for a small fraction of total execution time. The dominant remaining cost is attributable to .NET/BCL filesystem enumeration (`FileSystemEnumerator`) and underlying operating-system filesystem operations.
+
+Further native filesystem enumeration was not introduced because the measured benefit did not justify the additional platform-specific complexity and maintenance risk. The detailed investigation methodology and per-phase measurements are documented under [`docs/performance/`](./docs/performance/).
+
+---
+
+## 📊 Repo Stats
+
+![Repobeats analytics image](https://repobeats.axiom.co/api/embed/57d92552dfb25309185f7457c01037a504b5fa24.svg "Repobeats analytics image")
+
+---
+
+## Upgrading
+
+If you are upgrading from v1.0.0 or v1.1.0 to v1.2.0, please see the [Migration Guide](Migration.md) for important breaking changes regarding `FileQueryOptions`.
+
+---
+
+## 📂 Project Suite Directory
+
+This repository contains the core library and its companion packages:
+
+*   **[Core Engine (Jeninnet.FileQuery)](./src/Jeninnet.FileQuery/README.md)**: The main matching runtime, builders, and parser pipeline.
+*   **[CommandLine Integration (Jeninnet.FileQuery.CommandLine)](./src/Jeninnet.FileQuery.CommandLine/README.md)**: Bridges command-line arguments (using `System.CommandLine`) to file query patterns.
+*   **[DependencyInjection Integration (Jeninnet.FileQuery.DependencyInjection)](./src/Jeninnet.FileQuery.DependencyInjection/README.md)**: Configures and registers the engine and its components in standard .NET host applications.
+*   **[Documentation Suite (docs/)](./docs/README.md)**: Deep technical specifications, guides, and architectural whitepapers.
+*   **[Benchmark Suite](./src/Jeninnet.FileQuery.Benchmarks/README.md)**: Performance measurements and allocation verification.
+*   **[Samples (samples/)](./samples/AdvancedUsage/README.md)**: Practical examples showing basic to advanced usage.
+
+---
+
 ## 🏗️ High-Level Architecture Overview
 
-`Jeninnet.FileQuery` splits filesystem traversal, pattern compilation, and matching into distinct, highly optimized layers:
+`Jeninnet.FileQuery` splits filesystem traversal, pattern compilation, and matching into distinct layers:
 
 ```txt
                      ┌───────────────────────┐
@@ -123,39 +176,18 @@ foreach (var file in files)
                        └───────────────────┘
 ```
 
-1.  **Orchestration & API Layer**: [FileQueryBuilder](./src/Jeninnet.FileQuery/FileQueryBuilder.cs) accepts configuration inputs and builds an immutable [FileQuery](./src/Jeninnet.FileQuery/FileQuery.cs) instance.
-2.  **Matching Layer**: [HybridPathMatcher](./src/Jeninnet.FileQuery/Matching/Compiled/HybridPathMatcher.cs) decomposes rules and routes them to target matchers (GitIgnore, Glob, Regex). GitIgnore inclusions take final precedence.
+### Layer Responsibilities
+
+1.  **Orchestration & API Layer**: [`FileQueryBuilder`](./src/Jeninnet.FileQuery/FileQueryBuilder.cs) accepts configuration inputs and builds an immutable [`FileQuery`](./src/Jeninnet.FileQuery/FileQuery.cs) instance.
+2.  **Matching Layer**: [`HybridPathMatcher`](./src/Jeninnet.FileQuery/Matching/Compiled/HybridPathMatcher.cs) decomposes rules and routes them to target matchers (GitIgnore, Glob, Regex). GitIgnore inclusions take final precedence.
 3.  **Compilation & Parser Layer**: Tokenizes raw strings, checks them against semantic and structural invariants (e.g., recursive wildcard isolation), and produces compiled instruction sets.
-4.  **IO Traversal Layer**: Traverses directories using an stack-based or queue-based execution plan, decoupling all IO through the [IFileSystem](./src/Jeninnet.FileQuery/IO/IFileSystem.cs) interface.
+4.  **IO Traversal Layer**: Traverses directories using a stack-based or queue-based execution plan, decoupling all IO through the [`IFileSystem`](./src/Jeninnet.FileQuery/IO/IFileSystem.cs) interface.
 
 ---
 
-## 💡 Advanced & Developer-Oriented Features
+## 💡 Advanced Usage
 
-### 1. POSIX Character Classes
-The engine supports POSIX-named character classes within Glob and GitIgnore bracket expressions (e.g., `[[:digit:]]`). Supported classes include:
-*   `[:digit:]`: Decimal digits (`0-9`)
-*   `[:alpha:]`: Alphabetic characters
-*   `[:alnum:]`: Alphanumeric characters
-*   `[:space:]`: White space characters
-*   `[:blank:]`: Space or horizontal tab characters
-*   `[:upper:]` / `[:lower:]`: Uppercase / lowercase characters
-*   `[:print:]` / `[:graph:]`: Printable / visible characters
-*   `[:punct:]`: Punctuation and symbol characters
-*   `[:cntrl:]`: Control characters
-*   `[:xdigit:]`: Hexadecimal digits
-
-### 2. Zero-Allocation Matching Path
-To support massive file trees containing millions of files, the matching evaluation loop is completely allocation-free, utilizing `ReadOnlySpan<char>` and stack-allocated parsing arrays.
-
-### 3. Decoupled Filesystem Abstraction
-By using the [IFileSystem](./src/Jeninnet.FileQuery/IO/IFileSystem.cs) interface, the traversal engine can run against virtual or mock filesystems (useful for cloud workloads and fast test isolation).
-
-### 4. Advanced Traversal Tuning
-Through `TraversalOptions`, developers can choose between `DepthFirst` (stack-based) or `BreadthFirst` (queue-based) search strategies and control symlink behavior with policies like `Ignore`, `Follow`, or `FollowWithCycleDetection`.
-
-### 5. Observability and Recovery
-Async scans can report live statistics through `IProgress<FileQueryProgress>`:
+### Async Traversal with Progress Reporting
 
 ```csharp
 var progress = new Progress<FileQueryProgress>(snapshot =>
@@ -168,6 +200,8 @@ await foreach (var file in engine.ExecuteAsync(query, progress, cancellationToke
     Console.WriteLine(file);
 }
 ```
+
+### Match Audit Diagnostics
 
 Opt-in diagnostics explain match outcomes and responsible pattern metadata:
 
@@ -184,11 +218,37 @@ var query = FileQuery.From("./src")
                      .Build();
 ```
 
+### Decoupled Filesystem Abstraction
+
+By using the [`IFileSystem`](./src/Jeninnet.FileQuery/IO/IFileSystem.cs) interface, the traversal engine can run against virtual or mock filesystems (useful for cloud workloads and fast test isolation).
+
+---
+
+## 📋 Project Status
+
+**Current release: v1.5.0** — This release completes a focused performance engineering cycle for large-scale filesystem traversal and pattern matching.
+
+The optimization cycle was validated against a reproducible **1,000,000-file / 4,096-directory** dataset and included:
+
+- Elimination of redundant per-entry filesystem attribute lookups.
+- Removal of per-entry relative-path string allocations through pooled path buffering.
+- A compile-time GitIgnore literal-suffix fast path for inexpensive wildcard rejection.
+- Measurement-driven profiling of traversal, matching, allocation, and filesystem enumeration costs.
+- Verification that the remaining dominant cost is the underlying .NET/BCL filesystem enumeration and operating-system I/O boundary.
+
+The measured optimization work reduced execution time substantially while preserving matching semantics, public APIs, and allocation behavior outside the targeted hot paths.
+
+The performance investigation is intentionally stopped at this boundary. Further optimization of the remaining BCL/OS-bound enumeration cost would require substantially more platform-specific and runtime-dependent techniques, with a higher complexity and maintenance cost.
+
+All optimization decisions were based on measurements rather than speculative micro-optimizations.
+
+See **[CHANGELOG.md](./CHANGELOG.md)** for the release history and **[ROADMAP.md](./ROADMAP.md)** for planned future work.
+
 ---
 
 ## 📜 Governance and Philosophy
 
-The project adheres to the **[Jeninnet.FileQuery Constitution](./constitution.md)**:
+The project adheres to the **Jeninnet.FileQuery Constitution**:
 1.  **Engine‑First & Pattern‑Compiled**: Always tokenize, validate invariants, and compile before running; no ad-hoc string regexes or runtime heuristics.
 2.  **Compile‑Time Safe**: Malformed patterns never throw during tokenization; all syntax errors are captured during the invariant phase to output rich diagnostics.
 3.  **AOT-Ready**: Reflection is completely avoided to ensure compatibility with .NET Native AOT compilation.
@@ -207,7 +267,7 @@ The project adheres to the **[Jeninnet.FileQuery Constitution](./constitution.md
 ## 🚀 Contributing & Roadmap
 
 *   Please consult **[CONTRIBUTING.md](./CONTRIBUTING.md)** before submitting pull requests.
-*   See **[ROADMAP.md](./ROADMAP.md)** for planned features (such as Progress Reporting, Audit Diagnostics, and Parallel Traversal).
+*   See **[ROADMAP.md](./ROADMAP.md)** for planned features and the project's strategic direction.
 
 ---
 
