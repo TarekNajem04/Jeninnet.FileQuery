@@ -108,6 +108,9 @@
         <File Path="docs/performance/design-for-performance.md" />
         <File Path="docs/performance/matcher-performance.md" />
         <File Path="docs/performance/performance.md" />
+        <File Path="docs/performance/phase5-perf-investigation.md" />
+        <File Path="docs/performance/phase6-perf-optimization.md" />
+        <File Path="docs/performance/phase7-perf-investigation.md" />
         <File Path="docs/performance/release-benchmark-baseline.md" />
         <File Path="docs/performance/toc.yml" />
         <File Path="docs/performance/traversal-model.md" />
