@@ -47,6 +47,7 @@ internal sealed class TraversalExecutor : ITraversalExecutor {
         TraversalProgressState state,
         [EnumeratorCancellation] CancellationToken cancellationToken
     ) {
+        using var pathBuffer = new RelativePathBuffer();
         buffer.Push(new TraversalFrame(startDir, Depth: 0));
 
         while(!buffer.IsEmpty) {
@@ -72,6 +73,7 @@ internal sealed class TraversalExecutor : ITraversalExecutor {
                         frame,
                         buffer,
                         visited,
+                        pathBuffer,
                         out var yieldedFile
                     )
                 ) {
@@ -93,6 +95,7 @@ internal sealed class TraversalExecutor : ITraversalExecutor {
         TraversalFrontier buffer,
         HashSet<string>? visited
     ) {
+        using var pathBuffer = new RelativePathBuffer();
         buffer.Push(new TraversalFrame(startDir, Depth: 0));
 
         while(!buffer.IsEmpty) {
@@ -110,6 +113,7 @@ internal sealed class TraversalExecutor : ITraversalExecutor {
                         frame,
                         buffer,
                         visited,
+                        pathBuffer,
                         out var yieldedFile
                     )
                 ) {
@@ -141,6 +145,7 @@ internal sealed class TraversalExecutor : ITraversalExecutor {
     /// <param name="frame">The current traversal frame.</param>
     /// <param name="buffer">The traversal frontier buffer.</param>
     /// <param name="visited">The set of visited directory paths (for symlink cycle detection).</param>
+    /// <param name="pathBuffer">The reusable buffer used to compose the root-relative path.</param>
     /// <param name="yieldedFile">The resulting entry if a file was matched.</param>
     private static bool TryProcessEntry(
         TraversalPlan plan,
@@ -148,6 +153,7 @@ internal sealed class TraversalExecutor : ITraversalExecutor {
         TraversalFrame frame,
         TraversalFrontier buffer,
         HashSet<string>? visited,
+        RelativePathBuffer pathBuffer,
         out FileSystemEntry? yieldedFile
     ) {
         yieldedFile = null;
@@ -156,7 +162,7 @@ internal sealed class TraversalExecutor : ITraversalExecutor {
             return false;
         }
 
-        var relativePath = PathUtilities.BuildRelativePath(plan.RootDirectory, entry);
+        var relativePath = pathBuffer.BuildRelativePath(plan.RootDirectory, entry);
         var pathMatchContext = new PathMatchContext(
             relativePath, entry.PathKind, plan.Matching.CaseSensitivity.Resolve());
         var matchOutcome = plan.Matcher.Match(plan.CompiledPatterns, pathMatchContext);
@@ -214,7 +220,7 @@ internal sealed class TraversalExecutor : ITraversalExecutor {
     /// <param name="comparison">The string comparison mode.</param>
     private static bool HasPotentialReInclusionInside(
         ICompiledPatternSet patterns,
-        string directoryRelativePath,
+        ReadOnlySpan<char> directoryRelativePath,
         StringComparison comparison
     ) {
         var dirPath = directoryRelativePath.TrimEnd('/');
@@ -238,7 +244,7 @@ internal sealed class TraversalExecutor : ITraversalExecutor {
                 if(pattern.DirectoryOnly &&
                     pattern.Segments.Count > 0 &&
                     TryGetLiteralSuffix(pattern.Segments[^1], out var suffix)) {
-                    return dirPath.Split('/').Any(part => part.EndsWith(suffix, comparison));
+                    return ContainsSegmentEndingWith(dirPath, suffix, comparison);
                 }
 
                 // Non-directory-only patterns (e.g. !**/*.txt) or patterns
@@ -261,6 +267,36 @@ internal sealed class TraversalExecutor : ITraversalExecutor {
     }
 
     /// <summary>
+    /// Determines whether any segment of <paramref name="path"/> ends with
+    /// <paramref name="suffix"/>, using <paramref name="comparison"/>.
+    /// </summary>
+    /// <param name="path">The path whose segments are inspected.</param>
+    /// <param name="suffix">The suffix each segment is tested against.</param>
+    /// <param name="comparison">The string comparison mode.</param>
+    private static bool ContainsSegmentEndingWith(
+        ReadOnlySpan<char> path,
+        string suffix,
+        StringComparison comparison
+    ) {
+        var start = 0;
+
+        while(true) {
+            var idx = path[start..].IndexOf('/');
+            var part = idx < 0 ? path[start..] : path.Slice(start, idx);
+
+            if(part.EndsWith(suffix, comparison)) {
+                return true;
+            }
+
+            if(idx < 0) {
+                return false;
+            }
+
+            start += idx + 1;
+        }
+    }
+
+    /// <summary>
     /// Returns true when <paramref name="prefix"/> is path-equal to or a proper
     /// path-prefix of <paramref name="path"/>.
     /// Uses a separator check to avoid "sub" matching "subother".
@@ -269,8 +305,8 @@ internal sealed class TraversalExecutor : ITraversalExecutor {
     /// <param name="path">The path to check.</param>
     /// <param name="comparison">The string comparison mode.</param>
     private static bool IsPathPrefixOrEqual(
-        string prefix,
-        string path,
+        ReadOnlySpan<char> prefix,
+        ReadOnlySpan<char> path,
         StringComparison comparison
     ) {
         if(!path.StartsWith(prefix, comparison)) {
@@ -440,7 +476,7 @@ internal sealed class TraversalExecutor : ITraversalExecutor {
     private static void ReportDiagnostic(
         TraversalPlan plan,
         FileSystemEntry entry,
-        string relativePath,
+        ReadOnlySpan<char> relativePath,
         PathMatchContext context,
         MatchOutcome outcome
     ) {
@@ -455,7 +491,7 @@ internal sealed class TraversalExecutor : ITraversalExecutor {
 
         plan.Diagnostics.Report(new FileQueryDiagnostic(
             entry.FullPath,
-            relativePath,
+            relativePath.ToString(),
             entry.PathKind.ToString(),
             outcome.ToString(),
             reason,

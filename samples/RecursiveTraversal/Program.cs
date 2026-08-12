@@ -1,53 +1,28 @@
 ﻿/*
- * Purpose: demonstrate recursive directory matching, deep traversal, project filtering.
- * This sample demonstrates how to use the pattern language to demonstrate recursive directory matching.
- * We will include only .cs files under the "src" directory and its subdirectories.
+ * Purpose: recursive traversal.
+ * A negated recursive pattern re-includes the whole 'src' subtree.
  */
 
-using System.Reflection;
-using Jeninnet.FileQuery;
+var root = SampleUtils.CreateDemoTree("RecursiveTraversal");
 
-var root = @"C:\repo";
+try {
+    var query = FileQuery.From(root)
+                         .UsingGitIgnore()
+                         .Where(
+                             "**",              // Exclude every file.
+                             "!src/**/*.cs"     // ...then re-include every .cs file under 'src', at any depth.
+                         )
+                         .Build();
 
-if(!Directory.Exists(root)) {
-    Console.WriteLine($"Directory '{root}' does not exist. We will use the directory of the executing assembly as the root for our query.");
-    root = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+    SampleUtils.RunDemo(
+        title: "Recursive Traversal",
+        description: "After '**' excludes all files, '!src/**/*.cs' re-includes the whole 'src' subtree: " +
+                     "the recursive '**' walks every nested folder ('cli', 'test') down to its .cs files.",
+        queryText: "FileQuery.From(root).UsingGitIgnore().Where(\"**\", \"!src/**/*.cs\").Build()",
+        query: query,
+        expected: "The 4 .cs files under 'src' — including 'src/cli' and 'src/test'."
+    );
 }
-
-if(string.IsNullOrEmpty(root)) {
-    Console.WriteLine("Unable to determine a valid root directory for the query.");
-    return;
-}
-
-var engine = FileQueryRuntime.Create();
-
-/*
- * Notes:
- * - The order of the patterns matters. The first pattern that matches a file will determine
- * - whether it is included or excluded. In the this example, we first exclude all files with "**" and then include only .cs files under the "src" directory and its subdirectories. 
- *   If we reversed the order, we would include all "src//**//*.cs" files and then exclude everything else, resulting in no files being included.
- * - The patterns are evaluated in a depth-first manner, meaning that the engine will first evaluate the patterns for the current directory before moving on to subdirectories.
- *   This allows for more granular control over which files are included or excluded based on their location in the directory structure.
- * - We use last-role-wins semantics, which means that if a file matches multiple patterns, the last pattern that matches will determine whether the file is included or excluded.
- */
-var query = FileQuery.From(root)
-                     .UsingGitIgnore()          // Use the GitIgnore-style pattern matcher
-                     .Where(
-                         "**",          // Exclude all files by default
-                         /*
-                          * Because we use the GitIgnore-style matcher, we need to use the "!" prefix to indicate that the pattern is an inclusion pattern.
-                          */
-                         "!src/**/*.cs" // Then include only .cs files under the "src" directory and its subdirectories
-                     )
-                     .Build();
-
-var results = engine.Execute(query).ToList();
-
-if(results.Count == 0) {
-    Console.WriteLine("No files matched the query.");
-    return;
-}
-
-foreach(var file in results) {
-    Console.WriteLine(file);
+finally {
+    SampleUtils.Cleanup(root);
 }

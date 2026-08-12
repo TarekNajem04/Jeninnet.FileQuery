@@ -61,6 +61,55 @@ The frontier buffer is rented from `ArrayPool<TraversalFrame>.Shared` and return
 
 ---
 
+## Measured Dataset Profile (Phase 3 Probe)
+
+Allocation targets are sized against a probe of a real generated dataset
+(50,000 sampled files under a typical root, depth ≤ 3):
+
+| Metric | Measured |
+|--------|----------|
+| Average full path length | 114 chars |
+| Average relative path length | 39 chars |
+| Average file name length | 17 chars |
+| Average depth | 2.4 levels (max 3) |
+| Directories in dataset | 4,096 |
+
+Per-entry allocation cost at these lengths:
+
+| Operation | Size |
+|-----------|------|
+| `new string(fullPath)` (114 chars) | 256 B |
+| `new string(relativePath)` (39 chars) | 104 B |
+| `new string(fileName)` (17 chars) | 56 B |
+| `string.Concat(relativePath, fileName)` | 136 B |
+
+Budget at one million entries (1,004,096):
+
+| Strategy | Total |
+|----------|-------|
+| Relative string per entry + full path for matches | 313.5 MB |
+| Relative path composed in a reusable buffer (0 B per non-match) + full path only for matches | 213.9 MB |
+| Unavoidable result strings (matches only) at measured 256 B/path | 100 MB per 409,600 matches |
+
+**Decision:** the hot path must compose relative paths in a reusable buffer
+(rented `char[]`, extended only when a file actually matches) instead of
+allocating a relative string per entry. Result strings — one `string` per
+matched file — remain the only unavoidable allocation.
+
+### Measured outcome (Phase 4)
+
+Implemented as `RelativePathBuffer` in `TraversalExecutor`: the relative path
+is composed into a rented, growing `char[]` buffer and passed to the matchers
+as a span; a `string` is materialized only for diagnostics or result paths.
+Measured on the same 1,000,000-file dataset and query (876,017 matches):
+
+| Metric | Phase 3 baseline | Phase 4 | Change |
+|--------|------------------|---------|--------|
+| Median execution | 18,382 ms | 4,417 ms | −76% |
+| Average execution | 18,222 ms | 4,430 ms | −76% |
+| Allocated per run | 516.19 MB | 330.60 MB | −36% |
+| Matches | 876,017 | 876,017 | 0% |
+
 ## Measuring Allocations
 
 Use BenchmarkDotNet with `[MemoryDiagnoser]` to verify zero allocations in the hot path:
@@ -112,6 +161,6 @@ This test fails if any change to the matching hot path introduces a heap allocat
 
 The following allocations are unavoidable and are not considered regressions:
 
-- **Result path strings** — each matched file path is a `string` returned to the caller. For a query returning 10,000 files, this is approximately 500 KB assuming an average path length of 50 characters.
+- **Result path strings** — each matched file path is a `string` returned to the caller. At the measured average of 114 chars (~256 B per string), 10,000 matches cost approximately 2.5 MB. This is proportional to result count, not dataset size.
 - **First regex compilation** — the first call to a regex pattern compiles a `Regex` object. Subsequent calls with the same `(text, case sensitivity)` key return the cached instance.
 - **Query initialization** — pattern compilation allocates once per query build.

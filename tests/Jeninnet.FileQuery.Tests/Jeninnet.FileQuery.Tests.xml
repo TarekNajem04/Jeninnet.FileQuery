@@ -4070,6 +4070,92 @@
             Verifies that Should NotThrow When DirectoryIsAccessible.
             </summary>
         </member>
+        <member name="T:Jeninnet.FileQuery.Tests.Unit.Matchers.GitIgnoreLiteralSuffixTests">
+            <summary>
+            Tests for the LiteralSuffix rejection fast path applied to GitIgnore wildcard
+            filename patterns. The fast path is semantically transparent: every assertion
+            here validates end-to-end match results, and the suffix resolution itself is
+            verified directly through the compiled pattern metadata.
+            </summary>
+        </member>
+        <member name="M:Jeninnet.FileQuery.Tests.Unit.Matchers.GitIgnoreLiteralSuffixTests.Should_ResolveTrailingLiteralRun_When_LastSegmentEndsWithLiterals">
+            <summary>
+            Verifies that the trailing literal run of the last segment is resolved as the
+            suffix (e.g. <c>**/*.cs</c> → <c>.cs</c>, <c>**/*.generated.cs</c> → <c>.generated.cs</c>).
+            </summary>
+        </member>
+        <member name="M:Jeninnet.FileQuery.Tests.Unit.Matchers.GitIgnoreLiteralSuffixTests.Should_ResolveNoSuffix_When_LastSegmentEndsWithWildcard">
+            <summary>
+            Verifies that no suffix is resolved when the last segment ends with a wildcard,
+            single-character wildcard, or recursive wildcard token.
+            </summary>
+        </member>
+        <member name="M:Jeninnet.FileQuery.Tests.Unit.Matchers.GitIgnoreLiteralSuffixTests.Should_ResolveOnlyTrailingTokens_When_EarlierTokensAreWildcards">
+            <summary>
+            Verifies that the trailing run stops at the first non-literal token scanning
+            backwards, so only the true tail of the segment forms the suffix, while literal
+            runs that precede a wildcard are excluded.
+            </summary>
+        </member>
+        <member name="M:Jeninnet.FileQuery.Tests.Unit.Matchers.GitIgnoreLiteralSuffixTests.Should_ResolveSuffix_When_LiteralRunContainsEscapedCharacters">
+            <summary>
+            Verifies that escaped characters participate in the resolved suffix.
+            </summary>
+        </member>
+        <member name="M:Jeninnet.FileQuery.Tests.Unit.Matchers.GitIgnoreLiteralSuffixTests.Should_ResolveNoSuffix_When_PatternIsDirectoryOnly">
+            <summary>
+            Verifies that directory-only patterns never carry a suffix; their last segment
+            may match an ancestor segment rather than the path's final segment.
+            </summary>
+        </member>
+        <member name="M:Jeninnet.FileQuery.Tests.Unit.Matchers.GitIgnoreLiteralSuffixTests.Should_MatchExtensionFiles_When_RecursiveWildcardSuffixPatternUsed">
+            <summary>
+            Verifies that <c>**/*.cs</c> matches both root and deeply nested files while
+            rejecting files with other extensions via the suffix fast path.
+            </summary>
+        </member>
+        <member name="M:Jeninnet.FileQuery.Tests.Unit.Matchers.GitIgnoreLiteralSuffixTests.Should_ReincludeSuffixedFiles_When_NegatedWildcardSuffixPatternUsed">
+            <summary>
+            Verifies that a negated suffix pattern re-includes only the files carrying the
+            suffix, while all other files remain excluded.
+            </summary>
+        </member>
+        <member name="M:Jeninnet.FileQuery.Tests.Unit.Matchers.GitIgnoreLiteralSuffixTests.Should_HonorCaseSensitivity_When_FastPathRejects">
+            <summary>
+            Verifies that the fast path honors the active case-sensitivity mode.
+            </summary>
+        </member>
+        <member name="M:Jeninnet.FileQuery.Tests.Unit.Matchers.GitIgnoreLiteralSuffixTests.Should_MatchEscapedWildcardSuffix_When_PatternEndsWithEscapedCharacter">
+            <summary>
+            Verifies that escaped wildcard characters in the suffix are matched literally
+            and only as a necessary condition (the full matcher still rules).
+            </summary>
+        </member>
+        <member name="M:Jeninnet.FileQuery.Tests.Unit.Matchers.GitIgnoreLiteralSuffixTests.Should_FallBackToFullMatcher_When_NoSuffixResolved">
+            <summary>
+            Verifies that patterns with no resolvable suffix fall back to the full matcher
+            and behave exactly as before.
+            </summary>
+        </member>
+        <member name="M:Jeninnet.FileQuery.Tests.Unit.Matchers.GitIgnoreLiteralSuffixTests.Should_PreserveDirectoryOnlySemantics_When_SuffixPatternPresent">
+            <summary>
+            Verifies that directory-only and anchored directory-only patterns are untouched
+            by the fast path, including the anchored subtree semantics where a directory-only
+            pattern matches descendant files.
+            </summary>
+        </member>
+        <member name="M:Jeninnet.FileQuery.Tests.Unit.Matchers.GitIgnoreLiteralSuffixTests.Should_RequireSuffixOnFinalSegment_When_UnanchoredMultiSegmentPatternUsed">
+            <summary>
+            Verifies that multi-segment unanchored patterns still require the suffix on the
+            path's final segment only.
+            </summary>
+        </member>
+        <member name="M:Jeninnet.FileQuery.Tests.Unit.Matchers.GitIgnoreLiteralSuffixTests.Should_HandleTrailingSeparator_When_PathIsDirectory">
+            <summary>
+            Verifies that directory paths (which carry a trailing separator) are evaluated
+            correctly by the fast path.
+            </summary>
+        </member>
         <member name="T:Jeninnet.FileQuery.Tests.Unit.Matchers.GitIgnoreMatcherTests">
             <summary>
             Tests for the GitIgnore instruction matcher, validating negation, anchoring, directory-only rules,
@@ -5562,6 +5648,102 @@
         <member name="P:Jeninnet.FileQuery.Tests.Unit.Traversal.BfsTraversalTests.TestContext">
             <summary>
             Gets or sets the test context, which provides information about the current test execution.
+            </summary>
+        </member>
+        <member name="T:Jeninnet.FileQuery.Tests.Unit.Traversal.RelativePathBufferEngineTests">
+            <summary>
+            Engine-level tests verifying that traversal still produces correct results when
+            the relative path is composed in the reusable <see cref="T:Jeninnet.FileQuery.Traversal.RelativePathBuffer"/>
+            instead of an allocation per entry.
+            </summary>
+        </member>
+        <member name="P:Jeninnet.FileQuery.Tests.Unit.Traversal.RelativePathBufferEngineTests.TestContext">
+            <summary>
+            Gets or sets the test context.
+            </summary>
+        </member>
+        <member name="M:Jeninnet.FileQuery.Tests.Unit.Traversal.RelativePathBufferEngineTests.Execute_ShallowAndRootRelative_FilesMatchWithFullPaths">
+            <summary>
+            Verifies that shallow and root-relative files match with their full paths
+            as results.
+            </summary>
+        </member>
+        <member name="M:Jeninnet.FileQuery.Tests.Unit.Traversal.RelativePathBufferEngineTests.Execute_DeeplyNestedPathRequiringBufferGrowth_MatchesCorrectly">
+            <summary>
+            Verifies that a deeply nested path long enough to grow the buffer past its
+            initial capacity still matches with a correct full path.
+            </summary>
+        </member>
+        <member name="M:Jeninnet.FileQuery.Tests.Unit.Traversal.RelativePathBufferEngineTests.Execute_MatchingAndNonMatchingEntries_AreSeparatedExactly">
+            <summary>
+            Verifies that matching and non-matching entries are separated exactly and
+            that non-matching entries never appear in the results.
+            </summary>
+        </member>
+        <member name="M:Jeninnet.FileQuery.Tests.Unit.Traversal.RelativePathBufferEngineTests.Execute_ResultOrdering_IsPreserved">
+            <summary>
+            Verifies that result ordering is preserved: parent directories are visited
+            before their children and sibling files keep filesystem enumeration order.
+            </summary>
+            <remarks>
+            Sibling order is taken from the OS enumerator — it is not alphabetical and
+            must not be hard-coded (Linux CI often differs from Windows).
+            </remarks>
+        </member>
+        <member name="M:Jeninnet.FileQuery.Tests.Unit.Traversal.RelativePathBufferEngineTests.ExecuteAsync_DeepPaths_MatchSyncResultsAsync">
+            <summary>
+            Verifies that the async traversal produces identical results to the sync
+            traversal when paths are composed in the reusable buffer.
+            </summary>
+        </member>
+        <member name="T:Jeninnet.FileQuery.Tests.Unit.Traversal.RelativePathBufferTests">
+            <summary>
+            Tests for <see cref="T:Jeninnet.FileQuery.Traversal.RelativePathBuffer"/>: reusable, rented buffer used by the
+            traversal hot path to compose root-relative paths without per-entry strings.
+            </summary>
+        </member>
+        <member name="M:Jeninnet.FileQuery.Tests.Unit.Traversal.RelativePathBufferTests.BuildRelativePath_ShallowFile_StripsRootPrefix">
+            <summary>
+            Verifies that a shallow file path is composed without a leading separator.
+            </summary>
+        </member>
+        <member name="M:Jeninnet.FileQuery.Tests.Unit.Traversal.RelativePathBufferTests.BuildRelativePath_RootRelative_NormalizesLeadingSeparator">
+            <summary>
+            Verifies that the leading separator between root and path is removed.
+            </summary>
+        </member>
+        <member name="M:Jeninnet.FileQuery.Tests.Unit.Traversal.RelativePathBufferTests.BuildRelativePath_Directory_AppendsTrailingSlash">
+            <summary>
+            Verifies that directories receive a trailing slash, preserving
+            directory-only pattern semantics.
+            </summary>
+        </member>
+        <member name="M:Jeninnet.FileQuery.Tests.Unit.Traversal.RelativePathBufferTests.BuildRelativePath_Backslashes_AreNormalizedToForwardSlashes">
+            <summary>
+            Verifies that backslash separators are converted to forward slashes.
+            </summary>
+        </member>
+        <member name="M:Jeninnet.FileQuery.Tests.Unit.Traversal.RelativePathBufferTests.BuildRelativePath_DeepPath_GrowsBufferAndStaysCorrect">
+            <summary>
+            Verifies that a path longer than the initial capacity grows the buffer
+            and is still composed correctly.
+            </summary>
+        </member>
+        <member name="M:Jeninnet.FileQuery.Tests.Unit.Traversal.RelativePathBufferTests.BuildRelativePath_RepeatedBuilds_OverwritePreviousContent">
+            <summary>
+            Verifies that consecutive builds reuse the backing storage and that a
+            later, longer path overwrites the previous content without leftovers.
+            </summary>
+        </member>
+        <member name="M:Jeninnet.FileQuery.Tests.Unit.Traversal.RelativePathBufferTests.Dispose_IsIdempotent">
+            <summary>
+            Verifies that disposing twice is safe and returns storage to the pool exactly once.
+            </summary>
+        </member>
+        <member name="M:Jeninnet.FileQuery.Tests.Unit.Traversal.RelativePathBufferTests.BuildRelativePath_RootItself_ComposesDirectoryMarker">
+            <summary>
+            Verifies that an entry equal to the root produces the shortest possible
+            relative representation (a directory marker only).
             </summary>
         </member>
         <member name="T:Jeninnet.FileQuery.Tests.Validation.FileQueryValidatorTests">

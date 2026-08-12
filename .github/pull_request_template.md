@@ -17,7 +17,7 @@ Why is this change necessary? What problem does it solve?
 ## Tests
 
 - [ ] `dotnet build Jeninnet.FileQuery.slnx`
-- [ ] `dotnet test test/Jeninnet.FileQuery.Tests/Jeninnet.FileQuery.Tests.csproj`
+- [ ] `dotnet test tests/Jeninnet.FileQuery.Tests/Jeninnet.FileQuery.Tests.csproj`
 - [ ] New test cases added (if applicable)
 - [ ] All existing tests passed
 - [ ] Other: 

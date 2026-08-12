@@ -1,36 +1,22 @@
 ﻿/*
  * Purpose: hello world of the library.
- * This sample demonstrates the most basic usage of the library.
+ * A query without patterns includes every file under the root and its subdirectories.
  */
-using System.Reflection;
-using Jeninnet.FileQuery;
 
-var root = @"C:\repo";
+var root = SampleUtils.CreateDemoTree("BasicMatching");
 
-if(!Directory.Exists(root)) {
-    Console.WriteLine($"Directory '{root}' does not exist. We will use the directory of the executing assembly as the root for our query.");
-    root = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+try {
+    var query = FileQuery.From(root)
+                         .Build();
+
+    SampleUtils.RunDemo(
+        title: "Basic Matching — hello world",
+        description: "The most basic usage: a query with no patterns matches every file in the tree.",
+        queryText: "FileQuery.From(root).Build()",
+        query: query,
+        expected: "All 12 files of the demo tree."
+    );
 }
-
-if(string.IsNullOrEmpty(root)) {
-    Console.WriteLine("Unable to determine a valid root directory for the query.");
-    return;
-}
-
-var engine = FileQueryRuntime.Create();
-// Including all files by default,
-// we can simply build a query with the root directory and no patterns.
-// This will include all files under the root directory and its subdirectories.
-var query = FileQuery.From(root)
-                     .Build();
-
-var results = engine.Execute(query).ToList();
-
-if(results.Count == 0) {
-    Console.WriteLine("No files matched the query.");
-    return;
-}
-
-foreach(var file in results) {
-    Console.WriteLine(file);
+finally {
+    SampleUtils.Cleanup(root);
 }

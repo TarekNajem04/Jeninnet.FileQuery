@@ -1,4 +1,7 @@
-﻿namespace Jeninnet.FileQuery.IO;
+﻿using System.IO.Enumeration;
+using SystemFileSystemEntry = System.IO.Enumeration.FileSystemEntry;
+
+namespace Jeninnet.FileQuery.IO;
 
 /// <summary>
 /// The default implementation of the file system abstraction.
@@ -24,10 +27,10 @@ internal sealed class FileSystem : IFileSystem {
     ) {
         var attempts = GetMaxAttempts(errorRecovery);
         var attempt = 0;
-        IEnumerator<string>? enumerator = null;
+        IEnumerator<FileSystemEntry>? enumerator = null;
 
         while(attempt < attempts) {
-            var res = TryMoveNext(directory, ref enumerator, ignoreInaccessible, errorRecovery, ref attempt, attempts, out var path);
+            var res = TryMoveNext(directory, ref enumerator, ignoreInaccessible, errorRecovery, ref attempt, attempts, out var entry);
             if(res == EnumerationResult.Break) {
                 yield break;
             }
@@ -36,9 +39,11 @@ internal sealed class FileSystem : IFileSystem {
                 continue;
             }
 
-            if(TryCreateEntry(path!, ignoreInaccessible, errorRecovery, out var entry)) {
-                yield return entry;
+            if(entry.IsDirectory && !TryEnsureAccessible(entry.FullPath, ignoreInaccessible, errorRecovery)) {
+                continue;
             }
+
+            yield return entry;
         }
     }
 
@@ -55,12 +60,12 @@ internal sealed class FileSystem : IFileSystem {
 
         var attempts = GetMaxAttempts(errorRecovery);
         var attempt = 0;
-        IEnumerator<string>? enumerator = null;
+        IEnumerator<FileSystemEntry>? enumerator = null;
 
         while(attempt < attempts) {
             cancellationToken.ThrowIfCancellationRequested();
 
-            var res = TryMoveNext(directory, ref enumerator, ignoreInaccessible, errorRecovery, ref attempt, attempts, out var path);
+            var res = TryMoveNext(directory, ref enumerator, ignoreInaccessible, errorRecovery, ref attempt, attempts, out var entry);
             if(res == EnumerationResult.Break) {
                 yield break;
             }
@@ -69,10 +74,12 @@ internal sealed class FileSystem : IFileSystem {
                 continue;
             }
 
-            if(TryCreateEntry(path!, ignoreInaccessible, errorRecovery, out var entry)) {
-                yield return entry;
-                await Task.Yield();
+            if(entry.IsDirectory && !TryEnsureAccessible(entry.FullPath, ignoreInaccessible, errorRecovery)) {
+                continue;
             }
+
+            yield return entry;
+            await Task.Yield();
         }
     }
 
@@ -121,18 +128,18 @@ internal sealed class FileSystem : IFileSystem {
 
     private static EnumerationResult TryMoveNext(
         string directory,
-        ref IEnumerator<string>? enumerator,
+        ref IEnumerator<FileSystemEntry>? enumerator,
         bool ignoreInaccessible,
         FileQueryErrorRecoveryOptions errorRecovery,
         ref int attempt,
         int attempts,
-        out string? path
+        out FileSystemEntry entry
     ) {
-        path = null;
+        entry = default;
         try {
-            enumerator ??= Directory.EnumerateFileSystemEntries(directory).GetEnumerator();
+            enumerator ??= CreateEnumerator(directory);
             if(enumerator.MoveNext()) {
-                path = enumerator.Current;
+                entry = enumerator.Current;
                 return EnumerationResult.Success;
             }
 
@@ -156,48 +163,44 @@ internal sealed class FileSystem : IFileSystem {
         }
     }
 
-    private static bool TryCreateEntry(string path, bool ignoreInaccessible, FileQueryErrorRecoveryOptions errorRecovery, out FileSystemEntry entry) {
-        entry = default;
-        if(!TryGetAttributes(path, ignoreInaccessible, errorRecovery, out var attributes)) {
-            return false;
-        }
+    /// <summary>
+    /// Creates an enumerator over the specified directory whose entries carry the
+    /// attributes provided directly by the OS enumeration.
+    /// </summary>
+    /// <param name="directory">The directory to enumerate.</param>
+    /// <remarks>
+    /// <para>
+    /// The enumeration is configured exactly like <see cref="Directory.EnumerateFileSystemEntries(string)"/>:
+    /// every entry is returned regardless of its attributes (<see cref="EnumerationOptions.AttributesToSkip"/>
+    /// is zero) and access errors surface as exceptions so the caller's skip/retry
+    /// policy can apply (<see cref="EnumerationOptions.IgnoreInaccessible"/> is disabled).
+    /// </para>
+    /// <para>
+    /// This replaces the previous per-entry <see cref="File.GetAttributes(string)"/>
+    /// call: on Windows, <see cref="SystemFileSystemEntry.Attributes"/> is populated
+    /// from the <c>WIN32_FIND_DATA</c> returned by the enumeration itself, eliminating
+    /// one attribute lookup (and its internal full-path normalization) per entry.
+    /// Reparse points are reported without following the link, matching the
+    /// <see cref="File.GetAttributes(string)"/> semantics.
+    /// </para>
+    /// </remarks>
+    private static IEnumerator<FileSystemEntry> CreateEnumerator(string directory) {
+        var options = new EnumerationOptions {
+            AttributesToSkip = 0,
+            IgnoreInaccessible = false
+        };
 
-        if(attributes.HasFlag(FileAttributes.Directory) && !TryEnsureAccessible(path, ignoreInaccessible, errorRecovery)) {
-            return false;
-        }
-
-        entry = new FileSystemEntry(path, attributes);
-        return true;
+        return new FileSystemEnumerable<FileSystemEntry>(directory, TransformEntry, options).GetEnumerator();
     }
 
-    private static bool TryGetAttributes(
-        string path,
-        bool ignoreInaccessible,
-        FileQueryErrorRecoveryOptions errorRecovery,
-        out FileAttributes attributes
-    ) {
-        attributes = default;
-        var attempts = GetMaxAttempts(errorRecovery);
-
-        for(var attempt = 0; attempt < attempts; attempt++) {
-            try {
-                attributes = File.GetAttributes(path);
-                return true;
-            }
-            catch(Exception ex) when(FileSystemGuards.IsRecoverable(ex)) {
-                if(FileSystemGuards.ShouldSkip(ignoreInaccessible, errorRecovery, attempt, attempts)) {
-                    return false;
-                }
-
-                if(errorRecovery.Action is FileQueryErrorAction.Retry && attempt < attempts - 1) {
-                    continue;
-                }
-
-                throw;
-            }
-        }
-
-        return false;
+    /// <summary>
+    /// Builds a <see cref="FileSystemEntry"/> from the raw OS enumeration data.
+    /// </summary>
+    /// <param name="entry">The raw enumeration entry.</param>
+    /// <returns>The file system entry used by the engine.</returns>
+    private static FileSystemEntry TransformEntry(ref SystemFileSystemEntry entry) {
+        var path = entry.ToFullPath();
+        return new FileSystemEntry(path, entry.Attributes);
     }
 
     private static bool TryEnsureAccessible(

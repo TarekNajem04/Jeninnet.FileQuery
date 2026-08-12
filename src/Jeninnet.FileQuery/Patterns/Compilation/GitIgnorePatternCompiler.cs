@@ -23,16 +23,21 @@ internal sealed class GitIgnorePatternCompiler : PatternCompilerBase {
         var state = context.State;
         var tokens = context.Tokens!;
 
-        return new CompiledPattern(new CompiledPatternConfig(
-            IsNegated: state.IsNegated,
-            DirectoryOnly: state.IsDirectoryOnly,
-            AnchoredToRoot: state.IsRootAnchored,
-            Segments: tokens,
-            PatternKind: PatternKind.GitIgnore,
-            Intent: CompiledMatchIntent.FromNegation(state.IsNegated),
-            ConcretePathAnchor: PatternAnchorResolver.Resolve(tokens),
-            SourceText: context.Pattern.Text,
-            SourceIndex: context.Pattern.SourceIndex
-        ));
+        return new CompiledPattern(
+            new CompiledPatternConfig(
+                IsNegated: state.IsNegated,
+                DirectoryOnly: state.IsDirectoryOnly,
+                AnchoredToRoot: state.IsRootAnchored,
+                Segments: tokens,
+                PatternKind: PatternKind.GitIgnore,
+                Intent: CompiledMatchIntent.FromNegation(state.IsNegated),
+                ConcretePathAnchor: PatternAnchorResolver.Resolve(tokens),
+                SourceText: context.Pattern.Text,
+                SourceIndex: context.Pattern.SourceIndex,
+                LiteralSuffix: state.IsDirectoryOnly
+                    ? string.Empty
+                    : LiteralSuffixResolver.Resolve(tokens)
+            )
+        );
     }
 }

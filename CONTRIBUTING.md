@@ -47,7 +47,7 @@ src/
     Jeninnet.FileQuery.CommandLine
     Jeninnet.FileQuery.DependencyInjection
 
-test/
+tests/
     Jeninnet.FileQuery.Tests
 
 samples/

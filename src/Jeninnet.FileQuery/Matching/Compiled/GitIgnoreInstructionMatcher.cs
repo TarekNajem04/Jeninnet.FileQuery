@@ -199,6 +199,27 @@ internal sealed class GitIgnoreInstructionMatcher : SegmentMatchEngine {
             return false;
         }
 
+        // Suffix rejection fast path. When the pattern's last segment carries a
+        // fixed literal run, any path the pattern can possibly match must end with
+        // it: non-directory-only patterns always map their last segment onto the
+        // path's last segment (MatchRecursiveSegments only reports a match once the
+        // path is fully consumed), so a missing suffix proves no match without
+        // entering the recursive matcher. Directory-only patterns are exempt: they
+        // may legitimately match with leftover path segments (e.g. "/a/" matching
+        // the file "a/b"), so their suffix is never resolved (empty).
+        if(!pattern.DirectoryOnly && pattern.LiteralSuffix.Length > 0) {
+            var path = pathView.Path;
+
+            // Directory paths carry a trailing '/' (see PathUtilities.BuildRelativePath).
+            if(path.Length > 0 && path[^1] == '/') {
+                path = path[..^1];
+            }
+
+            if(!path.EndsWith(pattern.LiteralSuffix, comparison)) {
+                return false;
+            }
+        }
+
         var enumerator = pathView.EnumerateSegments();
 
         var hasLeadingDoubleStar =

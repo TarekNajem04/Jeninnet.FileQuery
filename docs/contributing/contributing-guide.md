@@ -107,7 +107,7 @@ All public members require XML documentation comments. The project is configured
 2. Set `Phase` to the correct phase (`Lexical`, `Structural`, or `Semantic`).
 3. Set `AppliesTo` to the pattern kind(s) it applies to, or `null` for all kinds.
 4. Register it in `PatternPipeline.CreateDefault()`.
-5. Add tests in `test/Jeninnet.FileQuery.Tests/Invariants/`.
+5. Add tests in `tests/Jeninnet.FileQuery.Tests/Invariants/`.
 6. Document it in `docs/architecture/matcher-invariants.md`.
 
 ---

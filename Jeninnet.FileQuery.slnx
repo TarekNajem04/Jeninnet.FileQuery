@@ -15,6 +15,7 @@
         <Project Path="samples/RecursiveTraversal/RecursiveTraversal.csproj" />
         <Project Path="samples/RegexAnchoredMatching/RegexAnchoredMatching.csproj" />
         <Project Path="samples/RegexMatching/RegexMatching.csproj" />
+        <Project Path="samples/SamplesUtilities/SamplesUtilities.csproj" />
     </Folder>
     <Folder Name="/Solution Items/">
         <File Path=".editorconfig" />
@@ -107,6 +108,9 @@
         <File Path="docs/performance/design-for-performance.md" />
         <File Path="docs/performance/matcher-performance.md" />
         <File Path="docs/performance/performance.md" />
+        <File Path="docs/performance/phase5-perf-investigation.md" />
+        <File Path="docs/performance/phase6-perf-optimization.md" />
+        <File Path="docs/performance/phase7-perf-investigation.md" />
         <File Path="docs/performance/release-benchmark-baseline.md" />
         <File Path="docs/performance/toc.yml" />
         <File Path="docs/performance/traversal-model.md" />
@@ -164,9 +168,9 @@
         <Project Path="src/Jeninnet.Testing.Assertions/Jeninnet.Testing.Assertions.csproj" />
     </Folder>
     <Folder Name="/tests/">
+        <Project Path="tests/Jeninnet.AdvancedUsage.Tests/Jeninnet.AdvancedUsage.Tests.csproj" />
         <Project Path="tests/Jeninnet.FileQuery.Tests/Jeninnet.FileQuery.Tests.csproj" />
         <Project Path="tests/Jeninnet.Testing.Assertions.Tests/Jeninnet.Testing.Assertions.Tests.csproj" />
-        <Project Path="tests/Jeninnet.AdvancedUsage.Tests/Jeninnet.AdvancedUsage.Tests.csproj" />
     </Folder>
 
 </Solution>

@@ -12,13 +12,14 @@ Jeninnet.FileQuery/
 ├── src/
 │   ├── Jeninnet.FileQuery/                         Core engine
 │   ├── Jeninnet.FileQuery.CommandLine/             CLI integration
-│   └── Jeninnet.FileQuery.DependencyInjection/     DI integration
+│   ├── Jeninnet.FileQuery.DependencyInjection/     DI integration
+│   ├── Jeninnet.FileQuery.Benchmarks/              BenchmarkDotNet benchmarks
+│   └── Jeninnet.Testing.Assertions/                Test assertion helpers
 │
-├── test/
-│   └── Jeninnet.FileQuery.Tests/                   Unit and integration tests
-│
-├── benchmarks/
-│   └── Jeninnet.FileQuery.Benchmarks/              BenchmarkDotNet benchmarks
+├── tests/
+│   ├── Jeninnet.FileQuery.Tests/                   Unit and integration tests
+│   ├── Jeninnet.AdvancedUsage.Tests/               AdvancedUsage sample tests
+│   └── Jeninnet.Testing.Assertions.Tests/          Assertions library tests
 │
 ├── samples/
 │   ├── BasicMatching/                              Hello-world sample
@@ -114,7 +115,7 @@ Jeninnet.FileQuery/
 
 ---
 
-## Tests — `test/Jeninnet.FileQuery.Tests`
+## Tests — `tests/Jeninnet.FileQuery.Tests`
 
 ```
 Jeninnet.FileQuery.Tests/

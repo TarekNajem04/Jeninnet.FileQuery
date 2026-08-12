@@ -158,7 +158,7 @@ Add a new assertion type:
 ## Building
 
 ```shell
-dotnet build test/Jeninnet.Testing.Assertions/
+dotnet build tests/Jeninnet.Testing.Assertions.Tests/
 dotnet test  # Runs all tests including consumer project
 ```
 
