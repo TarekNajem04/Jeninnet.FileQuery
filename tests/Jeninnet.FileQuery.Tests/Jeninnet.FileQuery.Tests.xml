@@ -4070,6 +4070,92 @@
             Verifies that Should NotThrow When DirectoryIsAccessible.
             </summary>
         </member>
+        <member name="T:Jeninnet.FileQuery.Tests.Unit.Matchers.GitIgnoreLiteralSuffixTests">
+            <summary>
+            Tests for the LiteralSuffix rejection fast path applied to GitIgnore wildcard
+            filename patterns. The fast path is semantically transparent: every assertion
+            here validates end-to-end match results, and the suffix resolution itself is
+            verified directly through the compiled pattern metadata.
+            </summary>
+        </member>
+        <member name="M:Jeninnet.FileQuery.Tests.Unit.Matchers.GitIgnoreLiteralSuffixTests.Should_ResolveTrailingLiteralRun_When_LastSegmentEndsWithLiterals">
+            <summary>
+            Verifies that the trailing literal run of the last segment is resolved as the
+            suffix (e.g. <c>**/*.cs</c> → <c>.cs</c>, <c>**/*.generated.cs</c> → <c>.generated.cs</c>).
+            </summary>
+        </member>
+        <member name="M:Jeninnet.FileQuery.Tests.Unit.Matchers.GitIgnoreLiteralSuffixTests.Should_ResolveNoSuffix_When_LastSegmentEndsWithWildcard">
+            <summary>
+            Verifies that no suffix is resolved when the last segment ends with a wildcard,
+            single-character wildcard, or recursive wildcard token.
+            </summary>
+        </member>
+        <member name="M:Jeninnet.FileQuery.Tests.Unit.Matchers.GitIgnoreLiteralSuffixTests.Should_ResolveOnlyTrailingTokens_When_EarlierTokensAreWildcards">
+            <summary>
+            Verifies that the trailing run stops at the first non-literal token scanning
+            backwards, so only the true tail of the segment forms the suffix, while literal
+            runs that precede a wildcard are excluded.
+            </summary>
+        </member>
+        <member name="M:Jeninnet.FileQuery.Tests.Unit.Matchers.GitIgnoreLiteralSuffixTests.Should_ResolveSuffix_When_LiteralRunContainsEscapedCharacters">
+            <summary>
+            Verifies that escaped characters participate in the resolved suffix.
+            </summary>
+        </member>
+        <member name="M:Jeninnet.FileQuery.Tests.Unit.Matchers.GitIgnoreLiteralSuffixTests.Should_ResolveNoSuffix_When_PatternIsDirectoryOnly">
+            <summary>
+            Verifies that directory-only patterns never carry a suffix; their last segment
+            may match an ancestor segment rather than the path's final segment.
+            </summary>
+        </member>
+        <member name="M:Jeninnet.FileQuery.Tests.Unit.Matchers.GitIgnoreLiteralSuffixTests.Should_MatchExtensionFiles_When_RecursiveWildcardSuffixPatternUsed">
+            <summary>
+            Verifies that <c>**/*.cs</c> matches both root and deeply nested files while
+            rejecting files with other extensions via the suffix fast path.
+            </summary>
+        </member>
+        <member name="M:Jeninnet.FileQuery.Tests.Unit.Matchers.GitIgnoreLiteralSuffixTests.Should_ReincludeSuffixedFiles_When_NegatedWildcardSuffixPatternUsed">
+            <summary>
+            Verifies that a negated suffix pattern re-includes only the files carrying the
+            suffix, while all other files remain excluded.
+            </summary>
+        </member>
+        <member name="M:Jeninnet.FileQuery.Tests.Unit.Matchers.GitIgnoreLiteralSuffixTests.Should_HonorCaseSensitivity_When_FastPathRejects">
+            <summary>
+            Verifies that the fast path honors the active case-sensitivity mode.
+            </summary>
+        </member>
+        <member name="M:Jeninnet.FileQuery.Tests.Unit.Matchers.GitIgnoreLiteralSuffixTests.Should_MatchEscapedWildcardSuffix_When_PatternEndsWithEscapedCharacter">
+            <summary>
+            Verifies that escaped wildcard characters in the suffix are matched literally
+            and only as a necessary condition (the full matcher still rules).
+            </summary>
+        </member>
+        <member name="M:Jeninnet.FileQuery.Tests.Unit.Matchers.GitIgnoreLiteralSuffixTests.Should_FallBackToFullMatcher_When_NoSuffixResolved">
+            <summary>
+            Verifies that patterns with no resolvable suffix fall back to the full matcher
+            and behave exactly as before.
+            </summary>
+        </member>
+        <member name="M:Jeninnet.FileQuery.Tests.Unit.Matchers.GitIgnoreLiteralSuffixTests.Should_PreserveDirectoryOnlySemantics_When_SuffixPatternPresent">
+            <summary>
+            Verifies that directory-only and anchored directory-only patterns are untouched
+            by the fast path, including the anchored subtree semantics where a directory-only
+            pattern matches descendant files.
+            </summary>
+        </member>
+        <member name="M:Jeninnet.FileQuery.Tests.Unit.Matchers.GitIgnoreLiteralSuffixTests.Should_RequireSuffixOnFinalSegment_When_UnanchoredMultiSegmentPatternUsed">
+            <summary>
+            Verifies that multi-segment unanchored patterns still require the suffix on the
+            path's final segment only.
+            </summary>
+        </member>
+        <member name="M:Jeninnet.FileQuery.Tests.Unit.Matchers.GitIgnoreLiteralSuffixTests.Should_HandleTrailingSeparator_When_PathIsDirectory">
+            <summary>
+            Verifies that directory paths (which carry a trailing separator) are evaluated
+            correctly by the fast path.
+            </summary>
+        </member>
         <member name="T:Jeninnet.FileQuery.Tests.Unit.Matchers.GitIgnoreMatcherTests">
             <summary>
             Tests for the GitIgnore instruction matcher, validating negation, anchoring, directory-only rules,

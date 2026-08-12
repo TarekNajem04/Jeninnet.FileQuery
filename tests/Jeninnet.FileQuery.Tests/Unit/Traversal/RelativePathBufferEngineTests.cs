@@ -1,7 +1,4 @@
 ﻿namespace Jeninnet.FileQuery.Tests.Unit.Traversal;
-
-using Path = System.IO.Path;
-
 /// <summary>
 /// Engine-level tests verifying that traversal still produces correct results when
 /// the relative path is composed in the reusable <see cref="RelativePathBuffer"/>
@@ -30,7 +27,7 @@ public class RelativePathBufferEngineTests {
 
         TestAssertEx.HasCount(results, 2);
         Assert.Contains(static x => x.EndsWith("a.txt", StringComparison.Ordinal), results);
-        Assert.Contains(static x => x.EndsWith(Path.Combine("sub", "c.txt"), StringComparison.Ordinal), results);
+        Assert.Contains(static x => x.EndsWith(System.IO.Path.Combine("sub", "c.txt"), StringComparison.Ordinal), results);
 
         foreach(var result in results) {
             Assert.IsTrue(result.StartsWith(env.Root, StringComparison.Ordinal));
@@ -49,7 +46,7 @@ public class RelativePathBufferEngineTests {
         var segments = Enumerable.Range(0, 12)
                                  .Select(static i => $"directory-with-a-long-name-{i:00}")
                                  .ToArray();
-        var relativeDeep = Path.Combine(
+        var relativeDeep = System.IO.Path.Combine(
             [.. segments, "deeply-nested-file.txt"]
         );
 
@@ -64,7 +61,7 @@ public class RelativePathBufferEngineTests {
 
         TestAssertEx.HasCount(results, 2);
         Assert.Contains(
-            x => x.EndsWith(Path.Combine(relativeDeep), StringComparison.Ordinal),
+            x => x.EndsWith(System.IO.Path.Combine(relativeDeep), StringComparison.Ordinal),
             results
         );
         Assert.Contains(static x => x.EndsWith("root-level.txt", StringComparison.Ordinal), results);
@@ -98,7 +95,7 @@ public class RelativePathBufferEngineTests {
         TestAssertEx.HasCount(results, 3);
         Assert.Contains(static x => x.EndsWith("keep.txt", StringComparison.Ordinal), results);
         Assert.Contains(static x => x.EndsWith("keep.md", StringComparison.Ordinal), results);
-        Assert.Contains(static x => x.EndsWith(Path.Combine("sub", "keep.txt"), StringComparison.Ordinal), results);
+        Assert.Contains(static x => x.EndsWith(System.IO.Path.Combine("sub", "keep.txt"), StringComparison.Ordinal), results);
         Assert.DoesNotContain(static x => x.EndsWith("drop.log", StringComparison.Ordinal), results);
         Assert.DoesNotContain(static x => x.EndsWith("drop.tmp", StringComparison.Ordinal), results);
     }
@@ -120,7 +117,7 @@ public class RelativePathBufferEngineTests {
         TestAssertEx.HasCount(results, 3);
         Assert.IsTrue(results[0].EndsWith("a.txt", StringComparison.Ordinal));
         Assert.IsTrue(results[1].EndsWith("b.txt", StringComparison.Ordinal));
-        Assert.IsTrue(results[2].EndsWith(Path.Combine("sub", "c.txt"), StringComparison.Ordinal));
+        Assert.IsTrue(results[2].EndsWith(System.IO.Path.Combine("sub", "c.txt"), StringComparison.Ordinal));
     }
 
     /// <summary>
@@ -134,7 +131,7 @@ public class RelativePathBufferEngineTests {
         var segments = Enumerable.Range(0, 10)
                                  .Select(static i => $"deep-directory-{i:00}")
                                  .ToArray();
-        var relativeDeep = Path.Combine([.. segments, "async-file.txt"]);
+        var relativeDeep = System.IO.Path.Combine([.. segments, "async-file.txt"]);
         env.CreateFiles(relativeDeep, "root.txt");
 
         var engine = FileQueryRuntime.Create();
@@ -145,6 +142,6 @@ public class RelativePathBufferEngineTests {
                                        .ToListAsync(TestContext.CancellationToken);
 
         Assert.AreSequenceEqual(syncResults, [.. asyncResults.Order()]);
-        Assert.AreEqual(2, asyncResults.Count);
+        Assert.HasCount(2, asyncResults);
     }
 }

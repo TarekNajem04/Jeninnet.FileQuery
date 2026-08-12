@@ -51,6 +51,15 @@ internal interface ICompiledPattern {
     string ConcretePathAnchor { get; }
 
     /// <summary>
+    /// Gets the trailing literal suffix of the last pattern segment, when one exists.
+    /// Every path that the pattern can match must end with this suffix; matchers use
+    /// it as a zero-allocation rejection fast path before entering the recursive
+    /// segment matcher. Empty when no fixed suffix exists or when the suffix is
+    /// unsafe to apply (e.g. directory-only patterns).
+    /// </summary>
+    string LiteralSuffix { get; }
+
+    /// <summary>
     /// Gets the raw regex string if the pattern is a Regex kind.
     /// </summary>
     string? RegexText { get; }

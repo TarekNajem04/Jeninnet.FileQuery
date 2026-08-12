@@ -279,6 +279,7 @@ public sealed class Phase2CoverageDeepDiveTests {
         public string SourceText => string.Empty;
         public int SourceIndex => -1;
         public string ConcretePathAnchor => string.Empty;
+        public string LiteralSuffix => string.Empty;
         public string? RegexText => null;
     }
 

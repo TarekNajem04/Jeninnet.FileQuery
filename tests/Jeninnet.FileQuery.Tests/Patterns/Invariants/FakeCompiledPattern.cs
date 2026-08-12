@@ -10,6 +10,7 @@ internal sealed class FakeCompiledPattern : ICompiledPattern {
     public string SourceText => "test";
     public int SourceIndex => 0;
     public string ConcretePathAnchor => "";
+    public string LiteralSuffix => string.Empty;
     public string? RegexText => null;
 }
 

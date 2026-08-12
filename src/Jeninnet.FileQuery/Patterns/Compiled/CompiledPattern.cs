@@ -13,6 +13,7 @@
 /// <param name="SourceText">The source text.</param>
 /// <param name="SourceIndex">The source index.</param>
 /// <param name="RegexText">The raw regex string.</param>
+/// <param name="LiteralSuffix">The trailing literal suffix of the last segment, or an empty string when none applies.</param>
 internal record CompiledPatternConfig(
     bool IsNegated,
     bool DirectoryOnly,
@@ -23,7 +24,8 @@ internal record CompiledPatternConfig(
     string ConcretePathAnchor,
     string SourceText = "",
     int SourceIndex = -1,
-    string? RegexText = null
+    string? RegexText = null,
+    string LiteralSuffix = ""
 );
 
 /// <summary>
@@ -75,6 +77,9 @@ internal sealed record CompiledPattern : ICompiledPattern {
     /// </summary>
     public string? RegexText { get; init; }
 
+    /// <inheritdoc/>
+    public string LiteralSuffix { get; init; }
+
     internal CompiledPattern(CompiledPatternConfig config) {
         ArgumentNullException.ThrowIfNull(config);
         IsNegated = config.IsNegated;
@@ -87,6 +92,7 @@ internal sealed record CompiledPattern : ICompiledPattern {
         SourceText = config.SourceText;
         SourceIndex = config.SourceIndex;
         RegexText = config.RegexText;
+        LiteralSuffix = config.LiteralSuffix;
     }
 
     /// <summary>

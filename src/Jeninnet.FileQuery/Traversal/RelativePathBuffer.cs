@@ -17,7 +17,7 @@ namespace Jeninnet.FileQuery.Traversal;
 /// </para>
 /// </remarks>
 internal sealed class RelativePathBuffer : IDisposable {
-    private const int InitialCapacity = 256;
+    private const int INITIAL_CAPACITY = 256;
 
     private char[] _buffer;
     private int _written;
@@ -26,9 +26,7 @@ internal sealed class RelativePathBuffer : IDisposable {
     /// Initializes the buffer and rents the backing storage from the shared
     /// <see cref="ArrayPool{T}.Shared"/>.
     /// </summary>
-    public RelativePathBuffer() {
-        _buffer = ArrayPool<char>.Shared.Rent(InitialCapacity);
-    }
+    public RelativePathBuffer() => _buffer = ArrayPool<char>.Shared.Rent(INITIAL_CAPACITY);
 
     /// <summary>Gets the number of characters the rented backing storage can hold.</summary>
     public int Capacity => _buffer.Length;

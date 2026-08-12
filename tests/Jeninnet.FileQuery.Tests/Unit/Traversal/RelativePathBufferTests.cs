@@ -1,7 +1,7 @@
-﻿namespace Jeninnet.FileQuery.Tests.Unit.Traversal;
-
+﻿
 using Path = System.IO.Path;
 
+namespace Jeninnet.FileQuery.Tests.Unit.Traversal;
 /// <summary>
 /// Tests for <see cref="RelativePathBuffer"/>: reusable, rented buffer used by the
 /// traversal hot path to compose root-relative paths without per-entry strings.
@@ -16,7 +16,7 @@ public class RelativePathBufferTests {
         using var buffer = new RelativePathBuffer();
         const string root = "C:/root";
         var entry = new FileSystemEntry(
-            Path.Combine(root, "file.txt"),
+            System.IO.Path.Combine(root, "file.txt"),
             FileAttributes.Normal
         );
 
@@ -33,7 +33,7 @@ public class RelativePathBufferTests {
         using var buffer = new RelativePathBuffer();
         const string root = "C:/root";
         var entry = new FileSystemEntry(
-            Path.Combine(root, "sub", "file.txt"),
+            System.IO.Path.Combine(root, "sub", "file.txt"),
             FileAttributes.Normal
         );
 
@@ -51,7 +51,7 @@ public class RelativePathBufferTests {
         using var buffer = new RelativePathBuffer();
         const string root = "C:/root";
         var entry = new FileSystemEntry(
-            Path.Combine(root, "subdir"),
+            System.IO.Path.Combine(root, "subdir"),
             FileAttributes.Directory
         );
 
@@ -68,7 +68,7 @@ public class RelativePathBufferTests {
         using var buffer = new RelativePathBuffer();
         const string root = @"C:\root";
         var entry = new FileSystemEntry(
-            Path.Combine(root, "a", "b.txt"),
+            System.IO.Path.Combine(root, "a", "b.txt"),
             FileAttributes.Normal
         );
 
@@ -87,10 +87,10 @@ public class RelativePathBufferTests {
         const string root = "C:/root";
 
         var segments = string.Join(
-            Path.DirectorySeparatorChar,
+            System.IO.Path.DirectorySeparatorChar,
             Enumerable.Range(0, 12).Select(static i => $"directory-with-a-long-name-{i:00}")
         );
-        var full = Path.Combine(root, segments, "deeply-nested-file.txt");
+        var full = System.IO.Path.Combine(root, segments, "deeply-nested-file.txt");
         var entry = new FileSystemEntry(full, FileAttributes.Normal);
 
         var expected = PathUtilities.BuildRelativePath(root, entry);
@@ -111,17 +111,17 @@ public class RelativePathBufferTests {
 
         var first = buffer.BuildRelativePath(
             root,
-            new FileSystemEntry(Path.Combine(root, "a.txt"), FileAttributes.Normal)
+            new FileSystemEntry(System.IO.Path.Combine(root, "a.txt"), FileAttributes.Normal)
         );
         Assert.AreEqual("a.txt", first.ToString());
 
         var longSegments = string.Join(
-            Path.DirectorySeparatorChar,
+            System.IO.Path.DirectorySeparatorChar,
             Enumerable.Range(0, 10).Select(static i => $"segment-{i:00}")
         );
         var second = buffer.BuildRelativePath(
             root,
-            new FileSystemEntry(Path.Combine(root, longSegments, "b.txt"), FileAttributes.Normal)
+            new FileSystemEntry(System.IO.Path.Combine(root, longSegments, "b.txt"), FileAttributes.Normal)
         );
 
         Assert.AreEqual(
@@ -140,7 +140,6 @@ public class RelativePathBufferTests {
         var capacity = buffer.Capacity;
         Assert.IsGreaterThan(0, capacity);
 
-        buffer.Dispose();
         buffer.Dispose();
     }
 

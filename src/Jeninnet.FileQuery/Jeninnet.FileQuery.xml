@@ -2012,6 +2012,15 @@
             Used during directory traversal decisions.
             </summary>
         </member>
+        <member name="P:Jeninnet.FileQuery.Matching.ICompiledPattern.LiteralSuffix">
+            <summary>
+            Gets the trailing literal suffix of the last pattern segment, when one exists.
+            Every path that the pattern can match must end with this suffix; matchers use
+            it as a zero-allocation rejection fast path before entering the recursive
+            segment matcher. Empty when no fixed suffix exists or when the suffix is
+            unsafe to apply (e.g. directory-only patterns).
+            </summary>
+        </member>
         <member name="P:Jeninnet.FileQuery.Matching.ICompiledPattern.RegexText">
             <summary>
             Gets the raw regex string if the pattern is a Regex kind.
@@ -3059,6 +3068,34 @@
             <param name="type">The pattern kind for which to retrieve a compiler.</param>
             <returns>The result containing the compiler or an error message.</returns>
         </member>
+        <member name="T:Jeninnet.FileQuery.Patterns.Compilation.LiteralSuffixResolver">
+            <summary>
+            Resolves the trailing literal suffix of a pattern's last segment.
+            </summary>
+            <remarks>
+            <para>
+            Any path segment that matches a tokenized pattern segment must end with the
+            segment's trailing run of literal/escaped characters (the matcher consumes
+            those characters positionally). GitIgnore matchers therefore use the resolved
+            suffix as a zero-allocation rejection fast path: when the candidate path's
+            last segment does not end with the suffix, the pattern cannot match and the
+            expensive recursive wildcard matcher is never entered.
+            </para>
+            <para>
+            The suffix is a necessary condition only — callers must still run the full
+            matcher when the check passes. An empty result means no fixed suffix exists
+            (wildcard, single-character, or character-class token terminates the segment)
+            and the fast path must be skipped.
+            </para>
+            </remarks>
+        </member>
+        <member name="M:Jeninnet.FileQuery.Patterns.Compilation.LiteralSuffixResolver.Resolve(System.Collections.Generic.IReadOnlyList{System.Collections.Generic.IReadOnlyList{Jeninnet.FileQuery.Matching.IPatternToken}})">
+            <summary>
+            Returns the trailing literal run of the last pattern segment, or an empty
+            string when no fixed suffix exists.
+            </summary>
+            <param name="segments">The tokenized pattern segments.</param>
+        </member>
         <member name="T:Jeninnet.FileQuery.Patterns.Compilation.PatternCompilationContext">
             <summary>
             Shared, allocation-free context flowing through the pattern compilation pipeline.
@@ -3188,8 +3225,9 @@
             <param name="SourceText">The source text.</param>
             <param name="SourceIndex">The source index.</param>
             <param name="RegexText">The raw regex string.</param>
+            <param name="LiteralSuffix">The trailing literal suffix of the last segment, or an empty string when none applies.</param>
         </member>
-        <member name="M:Jeninnet.FileQuery.Patterns.Compiled.CompiledPatternConfig.#ctor(System.Boolean,System.Boolean,System.Boolean,System.Collections.Generic.IReadOnlyList{System.Collections.Generic.IReadOnlyList{Jeninnet.FileQuery.Matching.IPatternToken}},Jeninnet.FileQuery.Enums.PatternKind,Jeninnet.FileQuery.Patterns.Compilation.Intent.CompiledMatchIntent,System.String,System.String,System.Int32,System.String)">
+        <member name="M:Jeninnet.FileQuery.Patterns.Compiled.CompiledPatternConfig.#ctor(System.Boolean,System.Boolean,System.Boolean,System.Collections.Generic.IReadOnlyList{System.Collections.Generic.IReadOnlyList{Jeninnet.FileQuery.Matching.IPatternToken}},Jeninnet.FileQuery.Enums.PatternKind,Jeninnet.FileQuery.Patterns.Compilation.Intent.CompiledMatchIntent,System.String,System.String,System.Int32,System.String,System.String)">
             <summary>
             Configuration for creating a <see cref="T:Jeninnet.FileQuery.Patterns.Compiled.CompiledPattern"/>.
             </summary>
@@ -3203,6 +3241,7 @@
             <param name="SourceText">The source text.</param>
             <param name="SourceIndex">The source index.</param>
             <param name="RegexText">The raw regex string.</param>
+            <param name="LiteralSuffix">The trailing literal suffix of the last segment, or an empty string when none applies.</param>
         </member>
         <member name="P:Jeninnet.FileQuery.Patterns.Compiled.CompiledPatternConfig.IsNegated">
             <summary>Indicates if the pattern is negated.</summary>
@@ -3233,6 +3272,9 @@
         </member>
         <member name="P:Jeninnet.FileQuery.Patterns.Compiled.CompiledPatternConfig.RegexText">
             <summary>The raw regex string.</summary>
+        </member>
+        <member name="P:Jeninnet.FileQuery.Patterns.Compiled.CompiledPatternConfig.LiteralSuffix">
+            <summary>The trailing literal suffix of the last segment, or an empty string when none applies.</summary>
         </member>
         <member name="T:Jeninnet.FileQuery.Patterns.Compiled.CompiledPattern">
             <summary>
@@ -3280,6 +3322,9 @@
             <summary>
             Gets the raw regex string if the pattern is a Regex kind.
             </summary>
+        </member>
+        <member name="P:Jeninnet.FileQuery.Patterns.Compiled.CompiledPattern.LiteralSuffix">
+            <inheritdoc/>
         </member>
         <member name="M:Jeninnet.FileQuery.Patterns.Compiled.CompiledPattern.ToString">
             <summary>
