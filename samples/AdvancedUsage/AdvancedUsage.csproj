@@ -9,7 +9,7 @@
         1.1.1  bug fix
         2.0.0  breaking change        
         -->
-        <Version>1.4.0</Version>
+        <Version>1.5.0</Version>
     </PropertyGroup>
 
     <ItemGroup>
