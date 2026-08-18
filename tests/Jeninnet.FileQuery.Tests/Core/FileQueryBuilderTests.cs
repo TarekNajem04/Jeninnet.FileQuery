@@ -195,4 +195,3 @@ public class FileQueryBuilderTests {
         Assert.Throws<DirectoryNotFoundException>(builder.Build);
     }
 }
-

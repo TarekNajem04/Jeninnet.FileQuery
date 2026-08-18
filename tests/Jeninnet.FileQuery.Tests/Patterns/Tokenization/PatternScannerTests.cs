@@ -20,4 +20,3 @@ public sealed class PatternScannerTests {
         Assert.HasCount(2, context.Tokens); // foo, bar
     }
 }
-

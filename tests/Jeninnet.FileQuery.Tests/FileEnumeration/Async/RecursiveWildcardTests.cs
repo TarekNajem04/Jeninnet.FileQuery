@@ -77,4 +77,3 @@ public class EnumerateFilesAsync_RecursiveWildcardTests {
     /// </summary>
     public TestContext TestContext { get; set; } = null!;
 }
-

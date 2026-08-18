@@ -137,4 +137,3 @@ public sealed class PatternInvariantTests {
         // If we reach here, no exception was thrown → success
     }
 }
-

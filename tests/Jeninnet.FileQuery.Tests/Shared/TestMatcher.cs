@@ -6,4 +6,3 @@
 internal static class TestMatcher {
     public static HybridPathMatcher Create() => new();
 }
-

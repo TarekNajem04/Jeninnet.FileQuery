@@ -139,4 +139,3 @@ public class AdvancedPatternClassifierComprehensiveTests {
     [TestMethod]
     public void ShouldHandleInlineComments() => AssertClassification("*.log # ignore logs", PatternKind.GitIgnore);
 }
-

@@ -59,4 +59,3 @@ public class PatternResultCoverageTests {
         Assert.AreEqual("*.txt", ex.Pattern);
     }
 }
-

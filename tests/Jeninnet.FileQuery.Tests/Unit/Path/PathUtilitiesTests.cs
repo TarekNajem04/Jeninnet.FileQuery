@@ -56,4 +56,3 @@ public class PathUtilitiesTests {
     [TestMethod]
     public void Should_ReturnZero_When_CountingSegmentsOfEmptyPath() => Assert.AreEqual(0, PathUtilities.CountSegments([], false));
 }
-

@@ -23,4 +23,3 @@ public class FileQueryCoreTests {
         Assert.AreEqual(options, query.Options);
     }
 }
-

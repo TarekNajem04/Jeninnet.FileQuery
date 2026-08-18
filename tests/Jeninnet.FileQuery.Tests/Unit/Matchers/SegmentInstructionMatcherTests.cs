@@ -44,4 +44,3 @@ public class SegmentInstructionMatcherTests {
         Assert.IsFalse(SegmentInstructionMatcher.MatchSegment("a", tokens, StringComparison.Ordinal));
     }
 }
-

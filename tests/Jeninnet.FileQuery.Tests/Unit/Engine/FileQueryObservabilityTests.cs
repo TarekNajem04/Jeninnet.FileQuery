@@ -269,4 +269,3 @@ public sealed class FileQueryObservabilityTests {
         public string GetFullPath(string path, string basePath) => System.IO.Path.Combine(basePath, path);
     }
 }
-

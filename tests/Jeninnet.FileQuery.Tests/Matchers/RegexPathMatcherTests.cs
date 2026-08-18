@@ -154,4 +154,3 @@ public class RegexPathMatcherTests {
         Assert.IsTrue(result.IsSuccess(), "because RegexPathMatcher hardcodes IsIncluded=true and ignores the pattern's IsNegated property.");
     }
 }
-

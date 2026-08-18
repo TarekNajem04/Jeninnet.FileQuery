@@ -111,4 +111,3 @@ public class FileSystemCoverageTests {
     [TestMethod]
     public void FileSystem_DirectorySeparator_IsChar() => Assert.AreEqual(Path.DirectorySeparatorChar, FileSystem.Instance.DirectorySeparator);
 }
-

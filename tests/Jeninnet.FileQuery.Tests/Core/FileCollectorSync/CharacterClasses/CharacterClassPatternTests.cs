@@ -86,4 +86,3 @@ public class CharacterClassPatternTests {
         Assert.DoesNotContain(static x => x.EndsWith("c.txt", StringComparison.Ordinal), results);
     }
 }
-

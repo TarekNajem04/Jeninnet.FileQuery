@@ -113,4 +113,3 @@ public class EnumerateFilesAsync_AnchoredAndMixedPatternTests {
     /// </summary>
     public TestContext TestContext { get; set; } = null!;
 }
-

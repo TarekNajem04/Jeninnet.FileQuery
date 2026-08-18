@@ -116,4 +116,3 @@ public class EnumerateFilesAsync_DirectoryOnlyPatternTests {
     /// </summary>
     public TestContext TestContext { get; set; } = null!;
 }
-

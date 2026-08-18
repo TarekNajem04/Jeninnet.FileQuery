@@ -30,4 +30,3 @@ public class NullMatcherTests {
         Assert.IsTrue(matcher.Supports(PatternKind.Unknown));
     }
 }
-

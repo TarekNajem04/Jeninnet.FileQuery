@@ -147,4 +147,3 @@ public class DirectoryPatternTests {
         result.Should().NotContain(static x => x.Contains(Path.Combine("src", "other")));
     }
 }
-

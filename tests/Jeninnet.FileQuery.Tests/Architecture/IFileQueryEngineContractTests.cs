@@ -113,4 +113,3 @@ public class IFileQueryEngineContractTests {
     /// </summary>
     public TestContext TestContext { get; set; } = null!;
 }
-

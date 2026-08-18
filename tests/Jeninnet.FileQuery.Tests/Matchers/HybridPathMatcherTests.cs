@@ -224,4 +224,3 @@ public class HybridPathMatcherTests {
         Assert.IsTrue(nestedFileResult.IsSuccess(), "File inside non-matching nested 'src/temp' should be Included by default.");
     }
 }
-

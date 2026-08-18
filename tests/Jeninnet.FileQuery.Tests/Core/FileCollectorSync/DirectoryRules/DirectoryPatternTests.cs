@@ -139,4 +139,3 @@ public class DirectoryPatternTests {
         TestAssertEx.DoesNotContain(result, static x => x.Contains(Path.Combine("src", "other")));
     }
 }
-

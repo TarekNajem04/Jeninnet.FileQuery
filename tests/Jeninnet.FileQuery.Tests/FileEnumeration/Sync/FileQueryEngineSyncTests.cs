@@ -99,4 +99,3 @@ public class FileQueryEngineSyncTests {
         files.Should().Contain(PathUtilities.Normalize(Path.Combine(env.Root, "root.txt")));
     }
 }
-

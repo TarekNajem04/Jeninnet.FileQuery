@@ -119,4 +119,3 @@ public class NegationRuleTests {
         result.Should().ContainSingle(static x => x.EndsWith("revive.txt", StringComparison.Ordinal));
     }
 }
-

@@ -319,4 +319,3 @@ public sealed class PathUtilitiesUncTests {
         Assert.ThrowsExactly<ArgumentException>(static () => PathUtilities.Normalize(""));
     }
 }
-

@@ -220,4 +220,3 @@ public class DirectoryOnlyPatternTests {
         results.Should().NotContain(env.Abs("tmp", "sub", "x.txt"), "File 'b.txt' inside nested 'tmp/sub' must be excluded by '*/sub/*'.");
     }
 }
-

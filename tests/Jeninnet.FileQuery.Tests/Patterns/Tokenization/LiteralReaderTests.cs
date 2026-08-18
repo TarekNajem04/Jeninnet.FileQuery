@@ -45,4 +45,3 @@ public sealed class LiteralReaderTests {
         Assert.AreEqual("abc", ((LiteralToken)token).Text);
     }
 }
-

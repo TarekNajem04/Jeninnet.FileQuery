@@ -288,4 +288,3 @@ public sealed class Phase2CoverageDeepDiveTests {
     /// </summary>
     public TestContext? TestContext { get; set; }
 }
-

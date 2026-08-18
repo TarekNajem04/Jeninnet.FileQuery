@@ -206,4 +206,3 @@ public class FileQueryEngineAsyncTests {
         Assert.HasCount(3, results, "Should return file1.txt, file3.txt (root) and bin/file3.txt after exclusions/pruning.");
     }
 }
-

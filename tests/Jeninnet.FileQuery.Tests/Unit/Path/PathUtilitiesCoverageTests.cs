@@ -93,4 +93,3 @@ public class PathUtilitiesCoverageTests {
         Assert.AreEqual($"{longSegment}/file.txt", relative);
     }
 }
-

@@ -44,4 +44,3 @@ public sealed class PatternClassifierTests {
         Assert.AreEqual(PatternKind.GitIgnore, PatternClassifier.Classify("foo"));
     }
 }
-

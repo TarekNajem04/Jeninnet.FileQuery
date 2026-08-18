@@ -113,4 +113,3 @@ public class EnumerateFilesAsync_StressAndEdgeCaseTests {
     /// </summary>
     public TestContext TestContext { get; set; } = null!;
 }
-

@@ -180,4 +180,3 @@ public sealed class PatternValidatorTests {
             $"Pattern '{pattern}' must not be reported as malformed."
         );
 }
-

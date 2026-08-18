@@ -122,4 +122,3 @@ public class GlobMatcherTests {
         Assert.AreEqual(MatchOutcome.Include, matcher.Match(patterns, ctx));
     }
 }
-

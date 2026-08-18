@@ -182,4 +182,3 @@ public sealed class InvariantTests {
             "'**/*.cs' must contain exactly one '**' segment — not two.");
     }
 }
-

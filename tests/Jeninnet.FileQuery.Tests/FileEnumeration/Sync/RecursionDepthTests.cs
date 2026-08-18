@@ -99,4 +99,3 @@ public class RecursionDepthTests {
         result.Should().HaveCount(3);
     }
 }
-

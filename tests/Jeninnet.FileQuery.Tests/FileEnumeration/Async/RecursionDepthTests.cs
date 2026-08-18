@@ -122,4 +122,3 @@ public class EnumerateFilesAsync_RecursionDepthTests {
     /// </summary>
     public TestContext TestContext { get; set; } = null!;
 }
-

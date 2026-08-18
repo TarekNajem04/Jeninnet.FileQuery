@@ -93,4 +93,3 @@ public class AnchoredPatternTests {
         onlyResult.Which.Should().EndsWith(Path.Combine("sub", "a.txt"), "Only the file inside the root-level 'sub' directory should be included.");
     }
 }
-

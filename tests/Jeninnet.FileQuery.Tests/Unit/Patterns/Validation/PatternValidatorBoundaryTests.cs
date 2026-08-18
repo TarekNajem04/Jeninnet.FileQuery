@@ -46,4 +46,3 @@ public sealed class PatternValidatorBoundaryTests {
     [TestMethod]
     public void Should_ReturnFalseForStrayBracket_When_NullInput() => Assert.IsFalse(PatternValidator.HasStrayClosingBracket(default));
 }
-

@@ -31,4 +31,3 @@ public class GlobPatternCompilerTests {
         compiledPattern.Segments[0].Should().ContainSingle(static x => x is RecursiveWildcardToken);
     }
 }
-

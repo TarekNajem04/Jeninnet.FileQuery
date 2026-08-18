@@ -218,4 +218,3 @@ public sealed class FileQueryBuilderTests : IDisposable {
         Assert.Throws<DirectoryNotFoundException>(builder.Build);
     }
 }
-

@@ -16,4 +16,3 @@ public sealed class PatternSyntaxProfileTests {
         Assert.AreEqual(PatternSyntaxProfile.Default, PatternSyntaxProfile.GetProfileForPatternType(PatternKind.Unknown));
     }
 }
-

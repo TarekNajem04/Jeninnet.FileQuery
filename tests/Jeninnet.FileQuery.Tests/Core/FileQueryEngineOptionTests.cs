@@ -125,4 +125,3 @@ public class FileQueryEngineOptionTests {
         TestAssertEx.Contains(results, x => x.EndsWith("testfile.txt", comparisonType), "The file 'testfile.txt' must be included because the test is case-insensitive.");
     }
 }
-

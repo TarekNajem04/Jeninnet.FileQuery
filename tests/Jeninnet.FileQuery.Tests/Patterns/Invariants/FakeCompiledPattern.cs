@@ -13,4 +13,3 @@ internal sealed class FakeCompiledPattern : ICompiledPattern {
     public string LiteralSuffix => string.Empty;
     public string? RegexText => null;
 }
-

@@ -93,4 +93,3 @@ public class ComplexWildcardTests {
         Assert.IsTrue(results.All(static x => x.Contains('a')));
     }
 }
-

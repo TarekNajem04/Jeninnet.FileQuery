@@ -33,4 +33,3 @@ public sealed class MatchDeterminismTests {
         Assert.AreEqual(MatchOutcome.NoMatch, result);
     }
 }
-

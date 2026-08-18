@@ -44,4 +44,3 @@ public class PatternTokenTests {
         Assert.IsNotNull(token);
     }
 }
-

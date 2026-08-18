@@ -23,4 +23,3 @@ public static class PatternHelpers {
         [patternKind] = patterns.Where(static p => !string.IsNullOrWhiteSpace(p))
     };
 }
-

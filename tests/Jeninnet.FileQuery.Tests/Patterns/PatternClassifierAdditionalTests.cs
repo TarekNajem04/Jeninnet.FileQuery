@@ -17,4 +17,3 @@ public class PatternClassifierAdditionalTests {
         Assert.AreEqual(PatternKind.GitIgnore, PatternClassifier.Classify("**/foo"));
     }
 }
-

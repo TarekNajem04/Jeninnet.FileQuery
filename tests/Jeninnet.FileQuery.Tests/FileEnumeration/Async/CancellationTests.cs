@@ -121,4 +121,3 @@ public class EnumerateFilesAsync_CancellationTests {
     /// </summary>
     public TestContext TestContext { get; set; } = null!;
 }
-

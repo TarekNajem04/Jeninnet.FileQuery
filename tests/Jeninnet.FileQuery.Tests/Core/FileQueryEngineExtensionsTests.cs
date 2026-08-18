@@ -37,4 +37,3 @@ public class FileQueryEngineExtensionsTests {
         Assert.IsNotNull(builder);
     }
 }
-

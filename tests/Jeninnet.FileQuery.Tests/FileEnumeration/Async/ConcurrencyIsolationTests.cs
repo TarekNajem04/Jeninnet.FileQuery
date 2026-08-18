@@ -123,4 +123,3 @@ public class EnumerateFilesAsync_ConcurrencyIsolationTests {
     /// </summary>
     public TestContext TestContext { get; set; } = null!;
 }
-

@@ -101,4 +101,3 @@ public sealed class CanonicalPatternInputTests {
         Assert.IsEmpty(input.TypedPatterns);
     }
 }
-

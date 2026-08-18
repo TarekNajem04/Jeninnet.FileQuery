@@ -153,4 +153,3 @@ public class DotfileAndHiddenFileTests {
         Assert.Contains(static x => x.EndsWith("file.txt", StringComparison.Ordinal), result);
     }
 }
-

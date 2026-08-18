@@ -288,4 +288,3 @@ public sealed class Phase2CoverageDeepDiveTests {
         public string? RegexText => null;
     }
 }
-

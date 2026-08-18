@@ -98,4 +98,3 @@ public class EnumerateFilesAsync_CharacterClassPatternTests {
     /// </summary>
     public TestContext TestContext { get; set; } = null!;
 }
-

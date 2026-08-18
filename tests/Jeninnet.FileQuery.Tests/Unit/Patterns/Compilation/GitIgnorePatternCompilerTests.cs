@@ -63,4 +63,3 @@ public class GitIgnorePatternCompilerTests {
         Assert.IsEmpty(compiledPatternSets);
     }
 }
-

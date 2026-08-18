@@ -32,4 +32,3 @@ public sealed class PatternTypeComparerTests {
         Assert.AreEqual(PatternKind.GitIgnore.GetHashCode(), comparer.GetHashCode(PatternKind.GitIgnore));
     }
 }
-

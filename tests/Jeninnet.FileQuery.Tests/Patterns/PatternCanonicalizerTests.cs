@@ -105,4 +105,3 @@ public sealed class PatternCanonicalizerTests {
         Assert.HasCount(2, result.Patterns);
     }
 }
-

@@ -44,4 +44,3 @@ public sealed class DefaultEngineBuilderTests {
         Assert.AreSequenceEqual(expected, actual);
     }
 }
-

@@ -43,4 +43,3 @@ public sealed class MatchPrecedenceTests {
         Assert.AreEqual(MatchOutcome.Exclude, resultExclude);
     }
 }
-

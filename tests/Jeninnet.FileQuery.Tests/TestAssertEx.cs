@@ -53,4 +53,3 @@ internal static class TestAssertEx {
 
     public static void EndsWith(string actual, string suffix, string? message = null) => Assert.EndsWith(suffix, actual, message);
 }
-

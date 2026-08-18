@@ -77,4 +77,3 @@ public sealed class FileQueryValidatorTests {
         Assert.ThrowsExactly<InvalidOperationException>(() => FileQueryValidator.ValidateExecution(fs, "C:\\valid", null));
     }
 }
-

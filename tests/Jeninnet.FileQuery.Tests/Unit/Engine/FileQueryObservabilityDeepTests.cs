@@ -93,4 +93,3 @@ public sealed class FileQueryObservabilityDeepTests {
         Assert.AreEqual("/root/a.txt", progress.CurrentPath);
     }
 }
-

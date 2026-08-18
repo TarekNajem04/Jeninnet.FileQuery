@@ -141,4 +141,3 @@ public class PatternMergingTests {
         Assert.HasCount(1, result[PatternKind.Glob], "Want the merged result to be immutable and not reflect changes to the original or the merged list.");
     }
 }
-

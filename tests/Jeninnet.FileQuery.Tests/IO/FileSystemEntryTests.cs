@@ -37,4 +37,3 @@ public class FileSystemEntryTests {
         Assert.HasCount(2, active);
     }
 }
-

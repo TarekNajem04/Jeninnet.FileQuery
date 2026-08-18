@@ -449,4 +449,3 @@ public sealed class ArchitectureTests {
         BindingFlags.Instance |
         BindingFlags.Static;
 }
-

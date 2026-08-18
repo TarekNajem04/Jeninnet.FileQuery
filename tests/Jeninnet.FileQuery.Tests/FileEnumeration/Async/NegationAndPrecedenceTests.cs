@@ -111,4 +111,3 @@ public class EnumerateFilesAsync_NegationAndPrecedenceTests {
     /// </summary>
     public TestContext TestContext { get; set; } = null!;
 }
-

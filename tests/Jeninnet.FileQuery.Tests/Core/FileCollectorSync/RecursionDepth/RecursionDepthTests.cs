@@ -99,4 +99,3 @@ public class RecursionDepthTests {
         TestAssertEx.HasCount(result, 3);
     }
 }
-

@@ -17,4 +17,3 @@ public sealed class PatternOptionsTests {
         Assert.AreEqual("r", options.RegularExpression);
     }
 }
-

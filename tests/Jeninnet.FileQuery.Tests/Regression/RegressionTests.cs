@@ -222,4 +222,3 @@ public sealed class RegressionTests {
         );
     }
 }
-

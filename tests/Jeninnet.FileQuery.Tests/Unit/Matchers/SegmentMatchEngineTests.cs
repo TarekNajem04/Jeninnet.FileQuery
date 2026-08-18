@@ -17,4 +17,3 @@ public class SegmentMatchEngineTests {
         Assert.AreEqual(StringComparison.OrdinalIgnoreCase, contextInsensitive.GetStringComparison());
     }
 }
-

@@ -56,4 +56,3 @@ public sealed class EscapeReaderTests {
         Assert.AreEqual('\\', ((EscapeToken)token).Escaped);
     }
 }
-

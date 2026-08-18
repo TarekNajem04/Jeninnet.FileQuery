@@ -90,4 +90,3 @@ public class NegationRuleTests {
         TestAssertEx.ContainsSingle(result, static x => x.EndsWith("revive.txt", StringComparison.Ordinal));
     }
 }
-

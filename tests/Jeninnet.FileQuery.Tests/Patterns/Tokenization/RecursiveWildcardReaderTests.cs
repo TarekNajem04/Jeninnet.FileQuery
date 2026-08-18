@@ -36,4 +36,3 @@ public sealed class RecursiveWildcardReaderTests {
         Assert.AreEqual(0, i);
     }
 }
-

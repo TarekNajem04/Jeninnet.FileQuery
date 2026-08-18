@@ -82,4 +82,3 @@ public class SymlinkCycleTests {
     /// </summary>
     public TestContext TestContext { get; set; } = null!;
 }
-

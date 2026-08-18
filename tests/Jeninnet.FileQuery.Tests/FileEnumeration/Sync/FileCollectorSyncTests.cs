@@ -377,4 +377,3 @@ public class FileCollectorSyncTests {
         result.Single().Should().Contain(Path.DirectorySeparatorChar.ToString());
     }
 }
-

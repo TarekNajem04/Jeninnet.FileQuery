@@ -97,4 +97,3 @@ public class RecursiveWildcardTests {
         result.Should().NotContain(static x => x.EndsWith("b.log", StringComparison.Ordinal));
     }
 }
-

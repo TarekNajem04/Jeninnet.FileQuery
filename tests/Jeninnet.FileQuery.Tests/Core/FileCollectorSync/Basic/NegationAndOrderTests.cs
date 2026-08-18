@@ -93,4 +93,3 @@ public class NegationAndOrderTests {
         TestAssertEx.Contains(result, static x => x.EndsWith("file.txt", StringComparison.Ordinal));
     }
 }
-

@@ -16,4 +16,3 @@ public sealed class FileSystemGuardsTests {
         Assert.IsTrue(Directory.Exists(env.Root));
     }
 }
-

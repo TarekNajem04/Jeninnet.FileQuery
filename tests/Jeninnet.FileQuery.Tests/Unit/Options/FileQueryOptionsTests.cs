@@ -22,4 +22,3 @@ public class FileQueryOptionsTests {
         Assert.Throws<ArgumentOutOfRangeException>(options.Validate);
     }
 }
-

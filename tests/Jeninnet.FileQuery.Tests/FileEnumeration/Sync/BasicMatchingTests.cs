@@ -89,4 +89,3 @@ public class BasicMatchingTests {
         result.Should().Contain(static x => x.EndsWith("fileB.txt", StringComparison.Ordinal));
     }
 }
-

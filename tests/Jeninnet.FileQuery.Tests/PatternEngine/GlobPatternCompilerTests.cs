@@ -27,4 +27,3 @@ public class GlobPatternCompilerTests {
         TestAssertEx.ContainsSingle(compiledPattern.Segments[0], static x => x is RecursiveWildcardToken);
     }
 }
-

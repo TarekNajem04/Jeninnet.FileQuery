@@ -37,4 +37,3 @@ public class ResourcesCoverageTests {
         Assert.IsNotNull(instance);
     }
 }
-

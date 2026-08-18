@@ -83,4 +83,3 @@ public class InaccessibleDirectoryTests {
         Assert.EndsWith("keep.txt", result.Single());
     }
 }
-

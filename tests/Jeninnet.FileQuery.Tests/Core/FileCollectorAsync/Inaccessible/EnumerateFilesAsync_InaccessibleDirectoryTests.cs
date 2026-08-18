@@ -126,4 +126,3 @@ public class EnumerateFilesAsync_InaccessibleDirectoryTests {
     /// </summary>
     public TestContext TestContext { get; set; } = null!;
 }
-

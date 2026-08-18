@@ -300,4 +300,3 @@ public class GitIgnoreMatcherTests {
         Assert.IsTrue(matcher.Match(patterns, CreateDirectoryContext(path: "bin/file3.txt")).IsSuccess(), "The 'bin' directory should be INCLUDED by the global '!**/*.txt' rule.");
     }
 }
-

@@ -56,4 +56,3 @@ public sealed class PatternSplitterTests {
         Assert.IsEmpty(result);
     }
 }
-

@@ -107,4 +107,3 @@ public class EnumerateFilesAsync_PathEdgeCaseTests {
     /// </summary>
     public TestContext TestContext { get; set; } = null!;
 }
-

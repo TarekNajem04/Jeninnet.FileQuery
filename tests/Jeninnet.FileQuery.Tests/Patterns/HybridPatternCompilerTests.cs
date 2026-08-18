@@ -58,4 +58,3 @@ public sealed class HybridPatternCompilerTests {
         Assert.AreEqual(PatternKind.GitIgnore, selected.PatternKind);
     }
 }
-

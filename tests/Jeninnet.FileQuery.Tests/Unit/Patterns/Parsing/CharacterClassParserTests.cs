@@ -437,4 +437,3 @@ public sealed class CharacterClassParserTests {
         }
     }
 }
-

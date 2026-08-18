@@ -102,4 +102,3 @@ public class EnumerateFilesAsync_BasicTests {
     /// </summary>
     public TestContext TestContext { get; set; } = null!;
 }
-

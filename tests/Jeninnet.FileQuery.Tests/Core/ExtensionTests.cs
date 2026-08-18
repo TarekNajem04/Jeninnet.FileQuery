@@ -49,4 +49,3 @@ public sealed class ExtensionTests {
         Assert.AreEqual("Matched: False, Included: False", noMatchResult.ToDebugString());
     }
 }
-

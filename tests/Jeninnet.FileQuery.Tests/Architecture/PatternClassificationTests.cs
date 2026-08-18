@@ -20,4 +20,3 @@ public sealed class PatternClassificationTests {
             PatternClassifier.Classify(canonical, PatternInterpretationMode.Specific));
     }
 }
-

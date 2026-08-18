@@ -49,4 +49,3 @@ public sealed class PatternInvariantContextTests {
         Assert.AreEqual(compiled, context.Compiled);
     }
 }
-

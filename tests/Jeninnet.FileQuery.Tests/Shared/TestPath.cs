@@ -8,4 +8,3 @@ internal static class TestPath {
 
     public static PathMatchContext Directory(string path) => new(path, pathKind: PathKind.Directory, caseSensitivity: CaseSensitivity.Sensitive);
 }
-

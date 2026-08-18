@@ -28,4 +28,3 @@ public class PatternAnalyzerTests {
         Assert.IsTrue(result.HasGitIgnoreSyntax);
     }
 }
-
