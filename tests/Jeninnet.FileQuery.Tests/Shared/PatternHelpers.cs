@@ -1,4 +1,11 @@
-﻿namespace Jeninnet.FileQuery.Tests.Shared;
+//
+// Copyright (c) Jeninnet.
+// Part of the Jeninnet Platform.
+// Platform Repository: https://github.com/TarekNajem04/Jeninnet.Platform/ [PENDING]
+// Solution Repository: https://github.com/TarekNajem04/Jeninnet.FileQuery [LIVE]
+// Licensed under the MIT License.
+//
+namespace Jeninnet.FileQuery.Tests.Shared;
 
 /// <summary>
 /// Provides helper methods for creating pattern dictionaries used to associate pattern types with collections of pattern strings.

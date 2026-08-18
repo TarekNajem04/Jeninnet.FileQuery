@@ -1,4 +1,11 @@
-﻿/*
+//
+// Copyright (c) Jeninnet.
+// Part of the Jeninnet Platform.
+// Platform Repository: https://github.com/TarekNajem04/Jeninnet.Platform/ [PENDING]
+// Solution Repository: https://github.com/TarekNajem04/Jeninnet.FileQuery [LIVE]
+// Licensed under the MIT License.
+//
+/*
  * Purpose: asynchronous streaming with cancellation.
  * Demonstrates ExecuteAsync: results are streamed as they are discovered, with
  * cooperative cancellation and real-time per-file processing.

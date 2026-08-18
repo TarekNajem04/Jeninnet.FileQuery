@@ -1,4 +1,11 @@
-﻿/*
+//
+// Copyright (c) Jeninnet.
+// Part of the Jeninnet Platform.
+// Platform Repository: https://github.com/TarekNajem04/Jeninnet.Platform/ [PENDING]
+// Solution Repository: https://github.com/TarekNajem04/Jeninnet.FileQuery [LIVE]
+// Licensed under the MIT License.
+//
+/*
  * Purpose: nested glob matching.
  * Recursive '**' patterns combined in one query select files with different
  * extensions at any depth.

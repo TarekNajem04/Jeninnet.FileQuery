@@ -1,4 +1,11 @@
-﻿/*
+//
+// Copyright (c) Jeninnet.
+// Part of the Jeninnet Platform.
+// Platform Repository: https://github.com/TarekNajem04/Jeninnet.Platform/ [PENDING]
+// Solution Repository: https://github.com/TarekNajem04/Jeninnet.FileQuery [LIVE]
+// Licensed under the MIT License.
+//
+/*
  * Purpose: anchored regex patterns.
  * '^' anchors the regex to the root, so only files whose full relative path starts with 'src/' match.
  */

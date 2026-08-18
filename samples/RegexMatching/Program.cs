@@ -1,4 +1,11 @@
-﻿/*
+//
+// Copyright (c) Jeninnet.
+// Part of the Jeninnet Platform.
+// Platform Repository: https://github.com/TarekNajem04/Jeninnet.Platform/ [PENDING]
+// Solution Repository: https://github.com/TarekNajem04/Jeninnet.FileQuery [LIVE]
+// Licensed under the MIT License.
+//
+/*
  * Purpose: regex pattern support.
  * An unanchored regex matches anywhere in the relative path, so '.*\.log$'
  * finds every '.log' file regardless of its directory.

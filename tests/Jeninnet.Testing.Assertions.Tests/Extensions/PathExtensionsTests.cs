@@ -1,4 +1,11 @@
-﻿namespace Jeninnet.Testing.Assertions.Tests.Extensions;
+//
+// Copyright (c) Jeninnet.
+// Part of the Jeninnet Platform.
+// Platform Repository: https://github.com/TarekNajem04/Jeninnet.Platform/ [PENDING]
+// Solution Repository: https://github.com/TarekNajem04/Jeninnet.FileQuery [LIVE]
+// Licensed under the MIT License.
+//
+namespace Jeninnet.Testing.Assertions.Tests.Extensions;
 
 /// <summary>Verifies <see cref="PathExtensions"/> methods including null guards and edge cases.</summary>
 [TestClass]

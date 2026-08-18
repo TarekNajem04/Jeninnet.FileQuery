@@ -1,4 +1,11 @@
-﻿namespace Jeninnet.AdvancedUsage.Tests.Evaluation;
+//
+// Copyright (c) Jeninnet.
+// Part of the Jeninnet Platform.
+// Platform Repository: https://github.com/TarekNajem04/Jeninnet.Platform/ [PENDING]
+// Solution Repository: https://github.com/TarekNajem04/Jeninnet.FileQuery [LIVE]
+// Licensed under the MIT License.
+//
+namespace Jeninnet.AdvancedUsage.Tests.Evaluation;
 
 /// <summary>
 /// Tests for the validation of the dataset evaluation options.

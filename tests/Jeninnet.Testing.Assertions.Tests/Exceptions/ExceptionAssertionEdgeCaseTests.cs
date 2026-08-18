@@ -1,4 +1,11 @@
-﻿namespace Jeninnet.Testing.Assertions.Tests.Exceptions;
+//
+// Copyright (c) Jeninnet.
+// Part of the Jeninnet Platform.
+// Platform Repository: https://github.com/TarekNajem04/Jeninnet.Platform/ [PENDING]
+// Solution Repository: https://github.com/TarekNajem04/Jeninnet.FileQuery [LIVE]
+// Licensed under the MIT License.
+//
+namespace Jeninnet.Testing.Assertions.Tests.Exceptions;
 
 /// <summary>Verifies error paths and edge cases in <see cref="ExceptionAssertions{T}"/>.</summary>
 [TestClass]

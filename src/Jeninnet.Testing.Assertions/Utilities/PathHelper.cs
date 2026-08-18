@@ -1,4 +1,11 @@
-﻿namespace Jeninnet.Testing.Assertions.Utilities;
+//
+// Copyright (c) Jeninnet.
+// Part of the Jeninnet Platform.
+// Platform Repository: https://github.com/TarekNajem04/Jeninnet.Platform/ [PENDING]
+// Solution Repository: https://github.com/TarekNajem04/Jeninnet.FileQuery [LIVE]
+// Licensed under the MIT License.
+//
+namespace Jeninnet.Testing.Assertions.Utilities;
 
 /// <summary>Provides utility methods for path manipulation and comparison in test code.</summary>
 public static class PathHelper {

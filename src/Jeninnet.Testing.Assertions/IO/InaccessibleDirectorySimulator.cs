@@ -1,4 +1,11 @@
-﻿namespace Jeninnet.Testing.Assertions.IO;
+//
+// Copyright (c) Jeninnet.
+// Part of the Jeninnet Platform.
+// Platform Repository: https://github.com/TarekNajem04/Jeninnet.Platform/ [PENDING]
+// Solution Repository: https://github.com/TarekNajem04/Jeninnet.FileQuery [LIVE]
+// Licensed under the MIT License.
+//
+namespace Jeninnet.Testing.Assertions.IO;
 
 /// <summary>Provides helper methods to simulate inaccessible or locked directories for testing error-handling paths.</summary>
 public static class InaccessibleDirectorySimulator {

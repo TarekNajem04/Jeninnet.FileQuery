@@ -1,4 +1,11 @@
-﻿namespace Jeninnet.FileQuery.Tests.Patterns;
+//
+// Copyright (c) Jeninnet.
+// Part of the Jeninnet Platform.
+// Platform Repository: https://github.com/TarekNajem04/Jeninnet.Platform/ [PENDING]
+// Solution Repository: https://github.com/TarekNajem04/Jeninnet.FileQuery [LIVE]
+// Licensed under the MIT License.
+//
+namespace Jeninnet.FileQuery.Tests.Patterns;
 
 /// <summary>
 /// Contains unit tests for the <see cref="PatternCanonicalizer"/> class, verifying its ability to correctly canonicalize pattern inputs.

@@ -1,4 +1,11 @@
-﻿namespace Jeninnet.Testing.Assertions.IO;
+//
+// Copyright (c) Jeninnet.
+// Part of the Jeninnet Platform.
+// Platform Repository: https://github.com/TarekNajem04/Jeninnet.Platform/ [PENDING]
+// Solution Repository: https://github.com/TarekNajem04/Jeninnet.FileQuery [LIVE]
+// Licensed under the MIT License.
+//
+namespace Jeninnet.Testing.Assertions.IO;
 
 /// <summary>
 /// Represents a temporary test environment for file system operations, providing methods to create files and directories, including inaccessible ones, and ensuring cleanup after tests.

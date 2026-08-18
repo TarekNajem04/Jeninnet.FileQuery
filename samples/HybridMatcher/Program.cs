@@ -1,4 +1,11 @@
-﻿/*
+//
+// Copyright (c) Jeninnet.
+// Part of the Jeninnet Platform.
+// Platform Repository: https://github.com/TarekNajem04/Jeninnet.Platform/ [PENDING]
+// Solution Repository: https://github.com/TarekNajem04/Jeninnet.FileQuery [LIVE]
+// Licensed under the MIT License.
+//
+/*
  * Purpose: matcher composition.
  * Demonstrates the hybrid pattern matcher: GitIgnore-style patterns, negation,
  * and Regex patterns combined in a single query.

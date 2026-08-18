@@ -1,4 +1,11 @@
-﻿#pragma warning disable RCS1194
+//
+// Copyright (c) Jeninnet.
+// Part of the Jeninnet Platform.
+// Platform Repository: https://github.com/TarekNajem04/Jeninnet.Platform/ [PENDING]
+// Solution Repository: https://github.com/TarekNajem04/Jeninnet.FileQuery [LIVE]
+// Licensed under the MIT License.
+//
+#pragma warning disable RCS1194
 namespace Jeninnet.FileQuery.Patterns.Exceptions;
 
 /// <summary>

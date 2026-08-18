@@ -1,4 +1,11 @@
-﻿namespace Jeninnet.FileQuery.Tests.Unit.Traversal;
+//
+// Copyright (c) Jeninnet.
+// Part of the Jeninnet Platform.
+// Platform Repository: https://github.com/TarekNajem04/Jeninnet.Platform/ [PENDING]
+// Solution Repository: https://github.com/TarekNajem04/Jeninnet.FileQuery [LIVE]
+// Licensed under the MIT License.
+//
+namespace Jeninnet.FileQuery.Tests.Unit.Traversal;
 /// <summary>
 /// Engine-level tests verifying that traversal still produces correct results when
 /// the relative path is composed in the reusable <see cref="RelativePathBuffer"/>

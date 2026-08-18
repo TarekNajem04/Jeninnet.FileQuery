@@ -1,4 +1,11 @@
-﻿namespace Jeninnet.FileQuery.Patterns.Syntax;
+//
+// Copyright (c) Jeninnet.
+// Part of the Jeninnet Platform.
+// Platform Repository: https://github.com/TarekNajem04/Jeninnet.Platform/ [PENDING]
+// Solution Repository: https://github.com/TarekNajem04/Jeninnet.FileQuery [LIVE]
+// Licensed under the MIT License.
+//
+namespace Jeninnet.FileQuery.Patterns.Syntax;
 
 /// <summary>
 /// Specifies the types of tokens that can appear in a pattern expression, such as those used for file path or string

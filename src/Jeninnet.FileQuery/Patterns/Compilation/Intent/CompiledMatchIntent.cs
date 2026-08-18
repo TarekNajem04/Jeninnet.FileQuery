@@ -1,4 +1,11 @@
-﻿namespace Jeninnet.FileQuery.Patterns.Compilation.Intent;
+//
+// Copyright (c) Jeninnet.
+// Part of the Jeninnet Platform.
+// Platform Repository: https://github.com/TarekNajem04/Jeninnet.Platform/ [PENDING]
+// Solution Repository: https://github.com/TarekNajem04/Jeninnet.FileQuery [LIVE]
+// Licensed under the MIT License.
+//
+namespace Jeninnet.FileQuery.Patterns.Compilation.Intent;
 
 /// <summary>
 /// Represents the match intent of a compiled pattern (either to include or exclude).

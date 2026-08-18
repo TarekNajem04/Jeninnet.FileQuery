@@ -1,4 +1,11 @@
-﻿namespace Jeninnet.Testing.Assertions;
+//
+// Copyright (c) Jeninnet.
+// Part of the Jeninnet Platform.
+// Platform Repository: https://github.com/TarekNajem04/Jeninnet.Platform/ [PENDING]
+// Solution Repository: https://github.com/TarekNajem04/Jeninnet.FileQuery [LIVE]
+// Licensed under the MIT License.
+//
+namespace Jeninnet.Testing.Assertions;
 
 /// <summary>
 /// Provides access to a caught exception after a <c>Throw</c> or <c>ThrowAsync</c> assertion succeeds,

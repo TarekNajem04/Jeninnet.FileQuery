@@ -1,4 +1,11 @@
-﻿namespace Jeninnet.Testing.Assertions.Tests.Assertions;
+//
+// Copyright (c) Jeninnet.
+// Part of the Jeninnet Platform.
+// Platform Repository: https://github.com/TarekNajem04/Jeninnet.Platform/ [PENDING]
+// Solution Repository: https://github.com/TarekNajem04/Jeninnet.FileQuery [LIVE]
+// Licensed under the MIT License.
+//
+namespace Jeninnet.Testing.Assertions.Tests.Assertions;
 
 /// <summary>Verifies the remaining <see cref="BoolAssertions"/> paths including BeFalse and custom messages.</summary>
 [TestClass]

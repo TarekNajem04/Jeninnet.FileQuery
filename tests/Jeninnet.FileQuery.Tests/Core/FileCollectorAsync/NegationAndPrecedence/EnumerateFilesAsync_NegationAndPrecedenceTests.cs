@@ -1,4 +1,11 @@
-﻿namespace Jeninnet.FileQuery.Tests.Core.FileCollectorAsync.NegationAndPrecedence;
+//
+// Copyright (c) Jeninnet.
+// Part of the Jeninnet Platform.
+// Platform Repository: https://github.com/TarekNajem04/Jeninnet.Platform/ [PENDING]
+// Solution Repository: https://github.com/TarekNajem04/Jeninnet.FileQuery [LIVE]
+// Licensed under the MIT License.
+//
+namespace Jeninnet.FileQuery.Tests.Core.FileCollectorAsync.NegationAndPrecedence;
 
 /// <summary>
 /// Async tests that validate hybrid GitIgnore-style precedence rules:

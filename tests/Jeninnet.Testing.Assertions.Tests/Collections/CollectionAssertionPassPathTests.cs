@@ -1,4 +1,11 @@
-﻿namespace Jeninnet.Testing.Assertions.Tests.Collections;
+//
+// Copyright (c) Jeninnet.
+// Part of the Jeninnet Platform.
+// Platform Repository: https://github.com/TarekNajem04/Jeninnet.Platform/ [PENDING]
+// Solution Repository: https://github.com/TarekNajem04/Jeninnet.FileQuery [LIVE]
+// Licensed under the MIT License.
+//
+namespace Jeninnet.Testing.Assertions.Tests.Collections;
 
 /// <summary>Verifies passing paths for remaining collection assertion methods: HaveCount, Contain, and pass-through assertions.</summary>
 [TestClass]

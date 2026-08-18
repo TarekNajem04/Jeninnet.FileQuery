@@ -1,4 +1,11 @@
-﻿// Requires C# 14 — uses the 'extension' member syntax introduced in C# 14.
+//
+// Copyright (c) Jeninnet.
+// Part of the Jeninnet Platform.
+// Platform Repository: https://github.com/TarekNajem04/Jeninnet.Platform/ [PENDING]
+// Solution Repository: https://github.com/TarekNajem04/Jeninnet.FileQuery [LIVE]
+// Licensed under the MIT License.
+//
+// Requires C# 14 — uses the 'extension' member syntax introduced in C# 14.
 namespace Jeninnet.FileQuery.Extensions;
 
 /// <summary>

@@ -1,4 +1,11 @@
-﻿namespace Jeninnet.Testing.Assertions.Tests.IO;
+//
+// Copyright (c) Jeninnet.
+// Part of the Jeninnet Platform.
+// Platform Repository: https://github.com/TarekNajem04/Jeninnet.Platform/ [PENDING]
+// Solution Repository: https://github.com/TarekNajem04/Jeninnet.FileQuery [LIVE]
+// Licensed under the MIT License.
+//
+namespace Jeninnet.Testing.Assertions.Tests.IO;
 
 /// <summary>Smoke tests for TestEnvironment: creation, disposal, and file/directory operations.</summary>
 [TestClass]
