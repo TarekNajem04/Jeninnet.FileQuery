@@ -9,8 +9,8 @@ File system querying can easily become a bottleneck in large repositories. We us
 ## Implementation in this Solution
 The project includes a `Jeninnet.FileQuery.Benchmarks` project using **BenchmarkDotNet**.
 
-### Automated Baselines (CI)
-To ensure performance stability across all supported platforms, the CI pipeline (`.github/workflows/ci.yml`) executes a benchmark matrix on every push to `main` and for every Pull Request.
+### Automated Baselines (on demand)
+Benchmarks run in a dedicated workflow (`.github/workflows/benchmarks.yml`) on manual dispatch, weekly schedule, tags (`v*`), and published releases — not on every pull request, to keep CI feedback fast and avoid noisy-neighbor numbers gating merges.
 
 - **Platforms**: Windows (Latest), Ubuntu (Latest), macOS (Latest).
 - **Artifacts**: Benchmark results (Markdown, JSON) are uploaded as build artifacts (e.g., `benchmarks-windows-latest`).

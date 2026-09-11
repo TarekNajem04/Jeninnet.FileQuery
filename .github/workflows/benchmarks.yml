@@ -1,0 +1,75 @@
+name: Benchmarks
+
+on:
+  workflow_dispatch:
+
+  schedule:
+    - cron: '0 3 * * 1'
+
+  push:
+    tags:
+      - 'v*'
+
+  release:
+    types:
+      - published
+
+permissions:
+  contents: read
+
+env:
+  DOTNET_SKIP_FIRST_TIME_EXPERIENCE: true
+  DOTNET_NOLOGO: true
+  DOTNET_CLI_TELEMETRY_OPTOUT: true
+
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
+concurrency:
+  group: benchmarks-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+
+  benchmarks:
+
+    name: Benchmarks (${{ matrix.os }})
+
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      fail-fast: false
+
+      matrix:
+        os:
+          - windows-latest
+          - ubuntu-latest
+          - macos-latest
+
+    steps:
+
+      - name: Checkout
+        uses: actions/checkout@v7.0.1
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v6.0.0
+        with:
+          dotnet-version: 10.0.x
+
+      - name: Restore
+        run: dotnet restore
+
+      - name: Run Benchmarks
+        run: >
+          dotnet run
+          --project src/Jeninnet.FileQuery.Benchmarks/Jeninnet.FileQuery.Benchmarks.csproj
+          --configuration Release
+          --no-restore
+          -- --job Short --exporters json markdown
+
+      - name: Upload Results
+        uses: actions/upload-artifact@v7.0.1
+        with:
+          name: benchmarks-${{ matrix.os }}
+          path: BenchmarkDotNet.Artifacts/results/
+          retention-days: 30
+          if-no-files-found: warn
