@@ -86,9 +86,7 @@ Set-StrictMode -Version Latest
 
 $ErrorActionPreference = 'Stop'
 
-Import-Module `
-    "$PSScriptRoot\..\common\Common.psd1" `
-    -Force
+Import-Module -Name (Join-Path $PSScriptRoot ".." "common" "Common.psd1") -Force
 
 $script:Stopwatch =
     [System.Diagnostics.Stopwatch]::StartNew()
