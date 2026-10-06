@@ -10,6 +10,7 @@ on:
     paths:
       - "src/**"
       - "tests/**"
+      - "scripts/**"
       - "**.csproj"
       - "Directory.Packages.props"
       - "Directory.Build.props"
@@ -25,6 +26,7 @@ on:
     paths:
       - "src/**"
       - "tests/**"
+      - "scripts/**"
       - "**.csproj"
       - "Directory.Packages.props"
       - "Directory.Build.props"
@@ -124,6 +126,7 @@ jobs:
             /d:sonar.qualitygate.wait=true \
             /d:sonar.cs.vstest.reportsPaths="TestResults/**/*.trx" \
             /d:sonar.cs.opencover.reportsPaths="**/coverage.opencover.xml" \
+            /d:sonar.coverage.exclusions="**/*.ps1" \
             /d:sonar.scm.provider=git \
             /d:sonar.scm.forceReloadAll=true \
             /d:sonar.exclusions="samples/**,src/**[Bb]enchmarks/**,**/bin/**,**/obj/**,**/TestResults/**" \

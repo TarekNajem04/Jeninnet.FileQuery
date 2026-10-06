@@ -376,6 +376,7 @@ artifacts/coverage/
 .sonar/
 .sonarcloud/
 .sonarqube/
+.scannerwork/
 
 # Build-generated project XML documentation files
 src/**/*.xml

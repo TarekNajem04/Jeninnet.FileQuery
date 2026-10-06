@@ -264,7 +264,7 @@ ReportGenerator is required to generate coverage reports.
 Install it or run the script again with:
 -InstallTools
 "@
-            }    
+            }
 
         }
     }
@@ -387,12 +387,12 @@ Install it or run the script again with:
             -Recurse `
             -Include "*.xml" `
             -ErrorAction SilentlyContinue |
-        Where-Object {
+            Where-Object {
 
-            $_.FullName -match "TestResults" -and
-            $_.Name -match "coverage|cobertura|opencover"
+                $_.FullName -match "TestResults" -and
+                $_.Name -match "coverage|cobertura|opencover"
 
-        }
+            }
 
 
     if ($null -eq $coverageFiles -or $coverageFiles.Count -eq 0) {
@@ -457,7 +457,7 @@ Expected files:
 
 
     $OpenReport =
-        $configuration.behavior.openReport 
+        $configuration.behavior.openReport
 
 
     $reportArguments = @(
