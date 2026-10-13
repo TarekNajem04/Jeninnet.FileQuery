@@ -88,7 +88,7 @@ Set-StrictMode -Version Latest
 $ErrorActionPreference = "Stop"
 
 
-$script:Organization = "jeninnet-file-query"
+$script:Organization = "jeninnet"
 $script:ProjectKey = "jeninnet-file-query"
 $script:SonarHostUrl = "https://sonarcloud.io"
 
