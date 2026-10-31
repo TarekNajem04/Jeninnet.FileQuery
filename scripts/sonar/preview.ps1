@@ -90,6 +90,7 @@ $ErrorActionPreference = "Stop"
 
 $script:Organization = "jeninnet"
 $script:ProjectKey = "jeninnet-file-query"
+$script:ProjectName = "Jeninnet.FileQuery"
 $script:SonarHostUrl = "https://sonarcloud.io"
 
 
@@ -524,6 +525,7 @@ try {
         "sonarscanner",
         "begin",
         "/k:$script:ProjectKey",
+        "/n:$script:ProjectName",
         "/o:$script:Organization",
         "/d:sonar.host.url=$script:SonarHostUrl",
         "/d:sonar.token=$Token",
