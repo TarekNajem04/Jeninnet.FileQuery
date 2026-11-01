@@ -91,9 +91,9 @@ See the [Global Tool guide](./docs/guides/global-tool.md) for the full option se
 
 *   **Async progress snapshots.** Report live traversal statistics (entries scanned, files matched, directories visited) through `IProgress<FileQueryProgress>`.
 *   **Match audit diagnostics.** Opt-in per-entry explanations of match outcomes, including the responsible pattern and its source metadata, through `IProgress<FileQueryDiagnostic>`.
-*   **Deep cancellation.** `CancellationToken` propagation is verified across all hot paths.
-*   **OpenTelemetry integration.** Export metrics and spans for structured observability.
-*   **Roslyn analyzers.** Design-time warnings and code fixes for malformed GitIgnore, Glob, or Regex patterns.
+*   **Deep cancellation (async).** `CancellationToken` propagation is verified across the async traversal and matching paths; sync cancellation is tracked in the pre-v2.0.0 hardening plan.
+*   **OpenTelemetry (planned).** `ActivitySource`/`Meter` instrumentation is scheduled in the pre-v2.0.0 hardening cycle (ROADMAP Phase 5.5).
+*   **Roslyn analyzers (planned).** Design-time pattern validation is scheduled in the pre-v2.0.0 hardening cycle (ROADMAP Phase 5.5).
 
 ### Performance
 

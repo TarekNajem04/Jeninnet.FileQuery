@@ -33,7 +33,7 @@ Jeninnet.FileQuery is not just a file filter — it is a **pattern execution eng
 
 # Key Features
 
-- Ultra‑fast file enumeration (1M–2M files/sec)
+- High-throughput enumeration (≈570k entries/s on the reference 1M-file dataset, warm cache)
 - GitIgnore‑compatible pattern engine
 - Glob pattern support
 - Flat Regex mode (`r:` prefix)

@@ -22,6 +22,7 @@ Versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Changed
 
+- **Documentation Accuracy**: Corrected unbacked claims (OpenTelemetry integration, Roslyn analyzers, AOT validation pipeline), qualified the throughput and sync-cancellation statements, and scheduled the missing capabilities in ROADMAP Phase 5.5 (pre-v2.0.0 hardening). The affected Phase 2 items were reopened and the task-board statuses reclassified.
 - **Platform Support Policy**: v2.0.0 remains .NET 10-only. .NET 8 (end of support 2026-11-10) and .NET 9 (end of support 2026-05-12) are not targeted. The release after v2.0.0 adds .NET 11 through `net10.0;net11.0` multi-targeting (ROADMAP Phase 6).
 - **Capability Review**: Added `docs/articles/library-capability-review.md`, comparing the library with `Microsoft.Extensions.FileSystemGlobbing`, `DotNet.Glob`, gitignore parsers, BCL enumeration, and `fd`/`ripgrep`, with a prioritized backlog and an audit of the published claims.
 - **Native Enumeration Decision**: Rejected platform-specific enumeration for v2.0.0. .NET already wraps `FindFirstFileExW`/`getdents64`/`readdir`; the addressable ceiling is a fraction of the 7.29 ms BCL baseline, while three OS-specific implementations would add unsafe code, semantic drift risk, and a permanent verification matrix. The measurements and revisit criteria are recorded in `docs/performance/native-enumeration-research.md`.
