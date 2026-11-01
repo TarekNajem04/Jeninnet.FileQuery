@@ -78,6 +78,7 @@ dotnet-filequery --dialect glob "**/*.json"
 | `--changed-since <revision>` | Only files changed since a commit, tag, or branch. |
 | `--changed-since-date <timestamp>` | Only files changed since an ISO 8601 timestamp. |
 | `--no-untracked` | Exclude untracked files from a change-set query. |
+| `--explain` | Write per-file include/exclude reasons instead of matching paths. |
 
 `--no-recursive` and `--depth` are mutually exclusive.
 
@@ -109,6 +110,16 @@ Use `--count` to print only the number of matches:
 ```bash
 dotnet-filequery --dialect regex "\.Tests\.cs$" --count
 ```
+
+Use `--explain` to see why every file was included or excluded. The output is tab-separated:
+
+```text
+include	src/Engine/FileQueryEngine.cs	Include by GitIgnore pattern.
+exclude	bin/Debug/app.dll	Exclude by GitIgnore pattern.
+```
+
+`--explain` cannot be combined with `--count` or `--null`. The VS Code extension uses this mode
+to render its include/exclude view.
 
 ---
 

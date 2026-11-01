@@ -2,6 +2,8 @@
   href: global-tool.md
 - name: Diff-Aware Queries
   href: diff-aware-queries.md
+- name: VS Code Extension
+  href: ide-extension.md
 - name: CLI Usage
   href: cli-usage.md
 - name: Dependency Injection
