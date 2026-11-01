@@ -4,6 +4,8 @@
   href: benchmarking.md
 - name: Cross-Platform Baseline
   href: cross-platform-baseline.md
+- name: Long-Running Stability
+  href: long-running-stability.md
 - name: Design for Performance
   href: design-for-performance.md
 - name: Matcher Performance

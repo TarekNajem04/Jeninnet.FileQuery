@@ -129,6 +129,8 @@ Further native filesystem enumeration was not introduced because the measured be
 
 Traversal behaviour is compared on Windows x64, Ubuntu x64, and macOS Arm64 using a deterministic 10,000-file tree (`CrossPlatformTraversalBenchmark`) plus the scheduled three-OS benchmark artifacts. The recorded baseline, analysis, and the 25% regression policy live in the [cross-platform baseline](./docs/performance/cross-platform-baseline.md).
 
+Long-running stability is validated by a dedicated soak harness that repeats queries, samples the managed heap after full collections, and fails on heap growth or throughput degradation. The recorded run and verdict rules are in the [stability report](./docs/performance/long-running-stability.md).
+
 ---
 
 ## 📊 Repo Stats
