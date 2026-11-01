@@ -79,8 +79,21 @@ dotnet-filequery --dialect glob "**/*.json"
 | `--changed-since-date <timestamp>` | Only files changed since an ISO 8601 timestamp. |
 | `--no-untracked` | Exclude untracked files from a change-set query. |
 | `--explain` | Write per-file include/exclude reasons instead of matching paths. |
+| `--ignore-files` | Load root/nested `.gitignore`, `.git/info/exclude`, and optional global rules. |
+| `--global-ignore <path>` | Additional global ignore file; requires `--ignore-files`. |
 
 `--no-recursive` and `--depth` are mutually exclusive.
+
+### Git ignore files
+
+```bash
+dotnet-filequery --root . --ignore-files
+dotnet-filequery --root . --ignore-files --global-ignore ~/.config/git/ignore "**/*.cs"
+```
+
+Loaded ignore rules come before positional or `--patterns` rules, so explicit patterns win. When
+`--ignore-files` is used without patterns, the tool omits its implicit include-all fallback so the
+ignore files can exclude files. See [Git Ignore Files](gitignore-files.md) for precedence details.
 
 ---
 

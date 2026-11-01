@@ -87,7 +87,8 @@ internal static class QueryRunner {
             CaseSensitivity: request.CaseSensitivity,
             Traversal: new TraversalOptions(SymlinkPolicy: request.SymlinkPolicy),
             AuditMatches: diagnostics is not null,
-            Diagnostics: diagnostics) {
+            Diagnostics: diagnostics,
+            GitIgnoreFiles: request.GitIgnoreFiles) {
             IncludedPaths = includedPaths
         });
 

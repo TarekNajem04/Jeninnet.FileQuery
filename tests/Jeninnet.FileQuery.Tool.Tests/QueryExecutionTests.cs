@@ -249,6 +249,33 @@ public sealed class QueryExecutionTests {
     }
 
     /// <summary>
+    /// Verifies that <c>--ignore-files</c> loads the repository's Git ignore files.
+    /// </summary>
+    [TestMethod]
+    public void Run_ShouldLoadIgnoreFiles_WhenRequested() {
+        using var environment = CreateEnvironment();
+        environment.CreateFile(".gitignore", "*.log\n");
+
+        var result = Run("--root", environment.Root, "--ignore-files");
+
+        result.ExitCode.Should().Be(0);
+        AssertPaths(result.Output, environment, ".gitignore", "a.txt", "src/c.cs", "src/nested/d.cs", "bin/e.txt");
+    }
+
+    /// <summary>
+    /// Verifies that <c>--global-ignore</c> requires <c>--ignore-files</c>.
+    /// </summary>
+    [TestMethod]
+    public void Run_ShouldReturnUsageError_WhenGlobalIgnoreIsUsedAlone() {
+        using var environment = CreateEnvironment();
+
+        var result = Run("--root", environment.Root, "--global-ignore", "ignores.txt");
+
+        result.ExitCode.Should().Be(CliApplication.EXIT_USAGE);
+        result.Error.Should().Contain("--global-ignore requires --ignore-files");
+    }
+
+    /// <summary>
     /// Runs the application with captured output streams.
     /// </summary>
     /// <param name="args">The command-line arguments.</param>

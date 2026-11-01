@@ -30,6 +30,7 @@ namespace Jeninnet.FileQuery.Tool;
 /// <param name="ChangedSinceDate">The timestamp baseline, or <see langword="null"/> when not used.</param>
 /// <param name="IncludeUntracked">Whether untracked files are included in a change-set query.</param>
 /// <param name="Explain">Whether per-file include/exclude explanations replace the normal output.</param>
+/// <param name="GitIgnoreFiles">The optional Git ignore-file loading settings.</param>
 internal sealed record QueryRequest(
     string Root,
     IReadOnlyDictionary<PatternKind, IEnumerable<string>> TypedPatterns,
@@ -45,7 +46,8 @@ internal sealed record QueryRequest(
     string? ChangedSince,
     DateTimeOffset? ChangedSinceDate,
     bool IncludeUntracked,
-    bool Explain
+    bool Explain,
+    GitIgnoreOptions? GitIgnoreFiles
 ) {
     private const string DIALECT_HYBRID = "hybrid";
     private const string DIALECT_GITIGNORE = "gitignore";
@@ -138,6 +140,14 @@ internal sealed record QueryRequest(
             return false;
         }
 
+        var ignoreFiles = parseResult.GetValue(options.IgnoreFiles);
+        var globalIgnore = parseResult.GetValue(options.GlobalIgnore);
+
+        if(!ignoreFiles && !string.IsNullOrWhiteSpace(globalIgnore)) {
+            error = "--global-ignore requires --ignore-files.";
+            return false;
+        }
+
         var gitignore = parseResult.GetValue(options.Gitignore);
         var glob = parseResult.GetValue(options.Glob);
         var regex = parseResult.GetValue(options.RegularExpression);
@@ -157,11 +167,25 @@ internal sealed record QueryRequest(
             return false;
         }
 
+        GitIgnoreOptions? gitIgnoreOptions = null;
+
+        if(ignoreFiles) {
+            gitIgnoreOptions = new GitIgnoreOptions {
+                GlobalExcludesFile = string.IsNullOrWhiteSpace(globalIgnore) ? null : globalIgnore.Trim()
+            };
+        }
+
+        var typedPatterns = dialect is null
+            ? BuildHybridPatterns(parseResult, options)
+            : BuildSpecificPatterns(parseResult, options, dialect);
+
+        if(ignoreFiles) {
+            RemoveFallbackIncludeAll(typedPatterns);
+        }
+
         request = new QueryRequest(
             Root: root,
-            TypedPatterns: dialect is null
-                ? BuildHybridPatterns(parseResult, options)
-                : BuildSpecificPatterns(parseResult, options, dialect),
+            TypedPatterns: typedPatterns,
             InterpretationMode: dialect is null ? PatternInterpretationMode.Hybrid : PatternInterpretationMode.Specific,
             MatchingMode: dialect?.MatchingMode ?? PatternMatchingMode.GitIgnore,
             RecurseSubdirectories: !noRecursive,
@@ -174,10 +198,32 @@ internal sealed record QueryRequest(
             ChangedSince: string.IsNullOrWhiteSpace(changedSince) ? null : changedSince.Trim(),
             ChangedSinceDate: changedSinceDate,
             IncludeUntracked: !parseResult.GetValue(options.NoUntracked),
-            Explain: explain
+            Explain: explain,
+            GitIgnoreFiles: gitIgnoreOptions
         );
 
         return true;
+    }
+
+    /// <summary>
+    /// Removes the CLI's implicit include-all fallback so that loaded ignore rules can exclude files.
+    /// </summary>
+    /// <param name="typedPatterns">The pattern buckets built from the command line.</param>
+    /// <remarks>
+    /// <c>PatternBuilder</c> supplies <c>!**</c> when no pattern is given, which would otherwise
+    /// be the last rule and re-include every file ignored by a <c>.gitignore</c> file.
+    /// </remarks>
+    private static void RemoveFallbackIncludeAll(Dictionary<PatternKind, IEnumerable<string>> typedPatterns) {
+        if(typedPatterns.Count != 1 ||
+            !typedPatterns.TryGetValue(PatternKind.GitIgnore, out var patterns)) {
+            return;
+        }
+
+        var values = patterns as IReadOnlyCollection<string> ?? [.. patterns];
+
+        if(values.Count == 1 && string.Equals(values.First(), "!**", StringComparison.Ordinal)) {
+            typedPatterns.Clear();
+        }
     }
 
     /// <summary>

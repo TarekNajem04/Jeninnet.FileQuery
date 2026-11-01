@@ -29,6 +29,8 @@ internal sealed class ToolOptions : CommandLinePatternOptions {
     private const string OPTION_NAME_CHANGED_SINCE_DATE = "--changed-since-date";
     private const string OPTION_NAME_NO_UNTRACKED = "--no-untracked";
     private const string OPTION_NAME_EXPLAIN = "--explain";
+    private const string OPTION_NAME_IGNORE_FILES = "--ignore-files";
+    private const string OPTION_NAME_GLOBAL_IGNORE = "--global-ignore";
 
     /// <summary>
     /// Gets the positional patterns to match. Each value may contain multiple semicolon-separated patterns.
@@ -99,6 +101,16 @@ internal sealed class ToolOptions : CommandLinePatternOptions {
     /// Gets the option that writes per-file include/exclude explanations instead of matches.
     /// </summary>
     public Option<bool> Explain { get; }
+
+    /// <summary>
+    /// Gets the option that loads Git ignore files into the query.
+    /// </summary>
+    public Option<bool> IgnoreFiles { get; }
+
+    /// <summary>
+    /// Gets the option that supplies an additional global Git ignore file.
+    /// </summary>
+    public Option<string?> GlobalIgnore { get; }
 
     /// <summary>
     /// Initializes a new instance of the <see cref="ToolOptions"/> class.
@@ -182,6 +194,17 @@ internal sealed class ToolOptions : CommandLinePatternOptions {
             Description = "Write one line per file with its include/exclude outcome and reason instead of matching paths.",
             Arity = ArgumentArity.Zero
         };
+
+        IgnoreFiles = new Option<bool>(OPTION_NAME_IGNORE_FILES) {
+            Description = "Load .gitignore files (root and nested), .git/info/exclude, and the optional --global-ignore file.",
+            Arity = ArgumentArity.Zero
+        };
+
+        GlobalIgnore = new Option<string?>(OPTION_NAME_GLOBAL_IGNORE) {
+            Description = "Additional global Git ignore file to load with --ignore-files. Relative paths are resolved against the root.",
+            DefaultValueFactory = static _ => default,
+            Arity = ArgumentArity.ExactlyOne
+        };
     }
 
     /// <summary>
@@ -204,5 +227,7 @@ internal sealed class ToolOptions : CommandLinePatternOptions {
             ChangedSinceDate,
             NoUntracked,
             Explain,
+            IgnoreFiles,
+            GlobalIgnore,
         ];
 }
