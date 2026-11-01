@@ -40,6 +40,34 @@
                     }
                 }
             }
+        },
+
+        "files": {
+            "type": "object",
+
+            "required": [
+                "include",
+                "exclude"
+            ],
+
+            "properties": {
+
+                "include": {
+                    "type": "array",
+                    "description": "File patterns to remove.",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+
+                "exclude": {
+                    "type": "array",
+                    "description": "File names excluded from cleanup.",
+                    "items": {
+                        "type": "string"
+                    }
+                }
+            }
         }
     }
 }
