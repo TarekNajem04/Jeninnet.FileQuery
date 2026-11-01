@@ -1,0 +1,151 @@
+﻿//
+// Copyright (c) Jeninnet.
+// Part of the Jeninnet Platform.
+// Platform Repository: https://github.com/TarekNajem04/Jeninnet.Platform/ [PENDING]
+// Solution Repository: https://github.com/TarekNajem04/Jeninnet.FileQuery [LIVE]
+// Licensed under the MIT License.
+//
+namespace Jeninnet.FileQuery.FileProviders.Tests;
+
+/// <summary>
+/// Tests the IFileProvider adapter with physical and in-memory providers.
+/// </summary>
+[TestClass]
+public sealed class FileProviderQueryTests {
+    private static readonly string[] PHYSICAL_MATCHES = ["a.cs", "src/c.cs"];
+    private static readonly string[] MEMORY_MATCHES = ["src/b.cs", "src/nested/c.cs"];
+    private static readonly string[] SCOPED_MATCHES = ["/src/keep.cs"];
+    private static readonly string[] GITIGNORE_MATCHES = ["/.gitignore", "/a.txt"];
+
+    /// <summary>
+    /// Provider enumeration failures honor the configured skip/abort policy.
+    /// </summary>
+    [TestMethod]
+    public void Provider_EnumerationFailure_HonorsErrorRecovery() {
+        var provider = new InMemoryFileProvider(throwOnEnumeration: true);
+        var skipped = FileProviderQuery.From(provider).Execute().ToArray();
+        Assert.IsEmpty(skipped);
+
+        var aborting = FileProviderQuery.From(provider)
+            .WithErrorRecovery(FileQueryErrorRecoveryOptions.Abort);
+
+        Assert.ThrowsExactly<UnauthorizedAccessException>(() => aborting.Execute().ToArray());
+    }
+
+    /// <summary>
+    /// Null providers and empty roots are rejected at the entry point.
+    /// </summary>
+    [TestMethod]
+    public void From_InvalidArguments_Throw() {
+        Assert.ThrowsExactly<ArgumentNullException>(() => FileProviderQuery.From(null!));
+        Assert.ThrowsExactly<ArgumentException>(() => FileProviderQuery.From(new InMemoryFileProvider(), " "));
+    }
+
+    /// <summary>
+    /// Queries a physical provider with the normal matching pipeline.
+    /// </summary>
+    [TestMethod]
+    public void PhysicalProvider_MatchesAndReturnsMetadata() {
+        using var environment = new TestEnvironment();
+        environment.CreateFile("a.cs", "class A {}");
+        environment.CreateFile("b.txt", "text");
+        environment.CreateFile("src/c.cs", "class C {}");
+        using var provider = new PhysicalFileProvider(environment.Root);
+
+        var entries = FileProviderQuery.From(provider)
+            .UsingGlob()
+            .Where(PatternKind.Glob, ["**/*.cs"])
+            .ExecuteEntries()
+            .OrderBy(static entry => entry.RelativePath, StringComparer.Ordinal)
+            .ToArray();
+
+        CollectionAssert.AreEqual(PHYSICAL_MATCHES, entries.Select(static entry => entry.RelativePath).ToArray());
+        Assert.IsTrue(entries.All(static entry => entry.Length > 0));
+        Assert.IsTrue(entries.All(static entry => entry.LastWriteTimeUtc > DateTime.MinValue));
+        Assert.IsTrue(entries.All(static entry => entry.RootPath == "/"));
+    }
+
+    /// <summary>
+    /// Queries an in-memory provider without materializing files.
+    /// </summary>
+    [TestMethod]
+    public void InMemoryProvider_MatchesNestedFiles() {
+        var provider = new InMemoryFileProvider();
+        provider.AddFile("a.txt", "a");
+        provider.AddFile("src/b.cs", "class B {}");
+        provider.AddFile("src/nested/c.cs", "class C {}");
+
+        var entries = FileProviderQuery.From(provider)
+            .UsingGlob()
+            .Where(PatternKind.Glob, ["**/*.cs"])
+            .ExecuteEntries()
+            .OrderBy(static entry => entry.RelativePath, StringComparer.Ordinal)
+            .ToArray();
+
+        CollectionAssert.AreEqual(
+            MEMORY_MATCHES,
+            entries.Select(static entry => entry.RelativePath).ToArray());
+        Assert.AreEqual("class B {}".Length, entries[0].Length);
+    }
+
+    /// <summary>
+    /// Git ignore files are read through the provider abstraction.
+    /// </summary>
+    [TestMethod]
+    public void Provider_GitIgnoreFiles_Work() {
+        var provider = new InMemoryFileProvider();
+        provider.AddFile(".gitignore", "*.log\n");
+        provider.AddFile("a.txt", "a");
+        provider.AddFile("b.log", "b");
+
+        var paths = FileProviderQuery.From(provider)
+            .UseGitIgnoreFiles()
+            .Execute()
+            .OrderBy(static path => path, StringComparer.Ordinal)
+            .ToArray();
+
+        CollectionAssert.AreEqual(GITIGNORE_MATCHES, paths);
+    }
+
+    /// <summary>
+    /// Scoped roots and metadata filters work through the provider adapter.
+    /// </summary>
+    [TestMethod]
+    public void Provider_ScopedRootAndFilters_Work() {
+        var provider = new InMemoryFileProvider();
+        provider.AddFile("src/keep.cs", "keep");
+        provider.AddFile("src/skip.txt", "skip");
+        provider.AddFile("other/keep.cs", "other");
+
+        var paths = FileProviderQuery.From(provider, "/src")
+            .UsingGlob()
+            .Where(PatternKind.Glob, ["**/*.cs"])
+            .MinSize(1)
+            .Execute()
+            .OrderBy(static path => path, StringComparer.Ordinal)
+            .ToArray();
+
+        CollectionAssert.AreEqual(SCOPED_MATCHES, paths);
+    }
+
+    /// <summary>
+    /// Directory results and async execution work through the adapter.
+    /// </summary>
+    [TestMethod]
+    public async Task Provider_DirectoryResultsAndAsync_Work() {
+        var provider = new InMemoryFileProvider();
+        provider.AddFile("src/a.cs", "a");
+        provider.AddFile("src/nested/b.cs", "b");
+
+        var builder = FileProviderQuery.From(provider).IncludeDirectories();
+        var entries = new List<FileQueryEntry>();
+
+        await foreach(var entry in builder.ExecuteEntriesAsync()) {
+            entries.Add(entry);
+        }
+
+        Assert.IsTrue(entries.Any(static entry => entry.RelativePath == "src" && entry.IsDirectory));
+        Assert.IsTrue(entries.Any(static entry => entry.RelativePath == "src/nested" && entry.IsDirectory));
+        Assert.IsTrue(entries.Any(static entry => entry.RelativePath == "src/nested/b.cs" && !entry.IsDirectory));
+    }
+}

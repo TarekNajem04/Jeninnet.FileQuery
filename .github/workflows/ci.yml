@@ -141,6 +141,7 @@ jobs:
             tests/Jeninnet.FileQuery.Tooling.Tests/Jeninnet.FileQuery.Tooling.Tests.csproj \
             tests/Jeninnet.FileQuery.Analyzers.Tests/Jeninnet.FileQuery.Analyzers.Tests.csproj \
             tests/Jeninnet.FileQuery.Build.Tests/Jeninnet.FileQuery.Build.Tests.csproj \
+            tests/Jeninnet.FileQuery.FileProviders.Tests/Jeninnet.FileQuery.FileProviders.Tests.csproj \
             tests/Jeninnet.Testing.Assertions.Tests/Jeninnet.Testing.Assertions.Tests.csproj; do
             dotnet test "$project" \
               -c Release \
@@ -459,5 +460,9 @@ jobs:
             /p:EnablePackageValidation=true
 
           dotnet pack src/Jeninnet.FileQuery.Build/Jeninnet.FileQuery.Build.csproj \
+            -c Release \
+            /p:EnablePackageValidation=true
+
+          dotnet pack src/Jeninnet.FileQuery.FileProviders/Jeninnet.FileQuery.FileProviders.csproj \
             -c Release \
             /p:EnablePackageValidation=true

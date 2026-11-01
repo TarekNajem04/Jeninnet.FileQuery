@@ -644,7 +644,7 @@ public sealed class FileQueryBuilder {
 
     // ===== Private helpers =====
 
-    private IFileQueryEngine GetEngine() => _engine ??= FileQueryRuntime.Create();
+    private IFileQueryEngine GetEngine() => _engine ??= DefaultEngineBuilder.Create(_fileSystem);
 
     /// <summary>
     /// Merges <paramref name="patterns"/> into the typed bucket for <paramref name="patternKind"/>,

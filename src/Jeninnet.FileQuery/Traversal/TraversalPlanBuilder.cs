@@ -22,7 +22,10 @@ internal sealed class TraversalPlanBuilder(IFileSystem fileSystem) : ITraversalP
         var options = query.Options;
         options.Validate();
 
-        var rootDirectory = fileSystem.GetFullPath(query.RootPath).TrimEnd(fileSystem.DirectorySeparator);
+        var resolvedRoot = fileSystem.GetFullPath(query.RootPath);
+        var rootDirectory = resolvedRoot.Length > 1
+            ? resolvedRoot.TrimEnd(fileSystem.DirectorySeparator)
+            : resolvedRoot;
 
         // ===== Traversal configuration =====
         var traversalConfig = new TraversalConfiguration(

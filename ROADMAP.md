@@ -128,7 +128,7 @@ unless stated. Detailed tasks live in `private/Tasks/pre-v2-hardening/` (`TASK-H
 
 - [x] **H-09 `.gitignore` file ingestion**: root, nested, `.git/info/exclude`, and optional global
   excludes, with Git-accurate scoping and negation.
-- [ ] **H-10 `IFileProvider` adapter package**: query an `IFileProvider` (ASP.NET Core, Razor,
+- [x] **H-10 `IFileProvider` adapter package**: query an `IFileProvider` (ASP.NET Core, Razor,
   static files, in-memory providers).
 - [x] **H-11 Sync cancellation and progress**: `Execute(query, CancellationToken)` and sync progress
   parity with the async API.

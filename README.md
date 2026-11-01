@@ -9,7 +9,7 @@
 ![NuGet Version](https://img.shields.io/nuget/v/Jeninnet.FileQuery)
 [![NuGet downloads](https://img.shields.io/nuget/dt/Jeninnet.FileQuery)](https://www.nuget.org/packages/Jeninnet.FileQuery.CommandLine/)
 
-![architecture: invariants ok](badges/architecture.svg) ![target framework: net10.0](badges/frameworks.svg) ![documented packages: 4](badges/packages.svg)
+![architecture: invariants ok](badges/architecture.svg) ![target framework: net10.0](badges/frameworks.svg) ![documented packages: 5](badges/packages.svg)
 
 **A high-performance, deterministic file discovery and filtering engine for .NET.**
 
@@ -78,6 +78,7 @@ See the [Global Tool guide](./docs/guides/global-tool.md) for the full option se
 *   **Compile-time validation.** Patterns are tokenized and checked against semantic and structural invariants (e.g., `**` isolation, valid character ranges) before execution. Malformed patterns produce rich diagnostics without throwing during tokenization.
 *   **Diff-aware scans.** Restrict any query to an explicit path allow-list with `RestrictToPaths`, so incremental tooling processes only the files that changed. The `dotnet-filequery` tool fills that list from a Git commit or timestamp.
 *   **Build-tool SDK.** `Jeninnet.FileQuery.Tooling` exposes classification, structural validation, and tokenization without executing a query, so MSBuild tasks, linters, and IDE plugins can reuse the engine's pattern semantics.
+*   **`IFileProvider` sources.** Query physical, embedded, and in-memory providers through `FileProviderQuery.From(provider)`, with the same matching, filters, directory results, and GitIgnore ingestion as disk queries.
 *   **CI integration.** A composite GitHub Action runs the global tool and exposes `files` and `count` outputs for downstream jobs, including diff-aware scans.
 
 ### Traversal
@@ -165,6 +166,7 @@ This repository contains the core library and its companion packages:
 *   **[DependencyInjection Integration (Jeninnet.FileQuery.DependencyInjection)](./src/Jeninnet.FileQuery.DependencyInjection/README.md)**: Configures and registers the engine and its components in standard .NET host applications.
 *   **[Global Tool (Jeninnet.FileQuery.Tool)](./src/Jeninnet.FileQuery.Tool/README.md)**: The `dotnet-filequery` terminal tool for scripting and pipelines.
 *   **[VS Code Extension](./extensions/vscode/README.md)**: Pattern tester and explainer that drives the global tool from the editor.
+*   **[File Provider Adapter (Jeninnet.FileQuery.FileProviders)](./src/Jeninnet.FileQuery.FileProviders/README.md)**: Query physical, embedded, and in-memory `IFileProvider` sources with the same pipeline.
 *   **[Build Tooling SDK (Jeninnet.FileQuery.Tooling)](./src/Jeninnet.FileQuery.Tooling/README.md)**: Classify, validate, and tokenize patterns without executing a query.
 *   **[GitHub Action](./.github/actions/filequery/action.yml)**: Runs the global tool in workflows and exposes matched files and counts as step outputs.
 *   **[Documentation Suite (docs/)](./docs/README.md)**: Deep technical specifications, guides, and architectural whitepapers.

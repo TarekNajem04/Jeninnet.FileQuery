@@ -35,6 +35,15 @@ Registers `IFileQueryEngine` and related services in a `Microsoft.Extensions.Dep
 dotnet add package Jeninnet.FileQuery.DependencyInjection
 ```
 
+### File Provider Adapter
+
+Queries physical, embedded, and in-memory `Microsoft.Extensions.FileProviders.IFileProvider`
+sources through the same pipeline:
+
+```bash
+dotnet add package Jeninnet.FileQuery.FileProviders
+```
+
 ### Global Tool
 
 The terminal tool is installed globally and needs no project reference:

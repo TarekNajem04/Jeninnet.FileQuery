@@ -196,6 +196,7 @@
         <Project Path="src/Jeninnet.FileQuery.Analyzers/Jeninnet.FileQuery.Analyzers.csproj" />
         <Project Path="src/Jeninnet.FileQuery.Analyzers.CodeFix/Jeninnet.FileQuery.Analyzers.CodeFix.csproj" />
         <Project Path="src/Jeninnet.FileQuery.Build/Jeninnet.FileQuery.Build.csproj" />
+        <Project Path="src/Jeninnet.FileQuery.FileProviders/Jeninnet.FileQuery.FileProviders.csproj" />
         <Project Path="src/Jeninnet.Testing.Assertions/Jeninnet.Testing.Assertions.csproj" />
     </Folder>
 
@@ -207,6 +208,7 @@
         <Project Path="tests/Jeninnet.Testing.Assertions.Tests/Jeninnet.Testing.Assertions.Tests.csproj" />
         <Project Path="tests/Jeninnet.FileQuery.Analyzers.Tests/Jeninnet.FileQuery.Analyzers.Tests.csproj" />
         <Project Path="tests/Jeninnet.FileQuery.Build.Tests/Jeninnet.FileQuery.Build.Tests.csproj" />
+        <Project Path="tests/Jeninnet.FileQuery.FileProviders.Tests/Jeninnet.FileQuery.FileProviders.Tests.csproj" />
     </Folder>
 
     <Folder Name="/samples/">

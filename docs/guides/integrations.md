@@ -11,8 +11,8 @@ global tool inside a workflow and exposes the results as step outputs.
 | Target | Priority | Status | Rationale |
 |---|---|---|---|
 | GitHub Actions (composite action) | High | **Shipped** | No new dependency: the action composes the published tool + `setup-dotnet`, and CI jobs can consume `files`/`count` directly. Prototyped in this repository's CI. |
-| MSBuild task | High | Candidate | Incremental builds and pattern validation belong in evaluation; needs a package referencing `Microsoft.Build.Utilities.Core` and a documented `UsingTask`. |
-| SARIF exporter | Medium | Candidate | Code-scanning dashboards need a SARIF projection of validation diagnostics; the engine currently returns plain messages. |
+| MSBuild task | High | **Shipped** | `Jeninnet.FileQuery.Build` validates `FileQueryPatterns` during evaluation and reports `JNQ2001`. |
+| SARIF exporter | Medium | **Shipped** | `SarifExporter` and the build package emit SARIF 2.1.0 for GitHub code scanning. |
 | Azure DevOps task | Medium | Candidate | Same value as the GitHub Action, but requires extension packaging and Marketplace publishing. |
 | Repository analysis tools | Low | Candidate | No stable plugin contract identified; revisit when one emerges. |
 | pre-commit hook | Low | Not planned | Patterns are supplied per invocation, so a hook would need to know each project's intent; the CLI already covers the validation step. |

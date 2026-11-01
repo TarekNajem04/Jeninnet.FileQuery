@@ -32,6 +32,8 @@ Jeninnet.FileQuery addresses all of these by treating file discovery as a first-
 | `Jeninnet.FileQuery`                     | Core engine. No external dependencies.                                          |
 | `Jeninnet.FileQuery.CommandLine`         | CLI argument mapping via `System.CommandLine`.                                  |
 | `Jeninnet.FileQuery.DependencyInjection` | `IFileQueryEngine` registration for `Microsoft.Extensions.DependencyInjection`. |
+| `Jeninnet.FileQuery.FileProviders`       | Query `Microsoft.Extensions.FileProviders.IFileProvider` sources.               |
+| `Jeninnet.FileQuery.Tooling`             | Pattern classification, validation, and tokenization without execution.        |
 
 ## Target Framework
 

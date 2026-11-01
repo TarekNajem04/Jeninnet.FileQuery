@@ -13,6 +13,7 @@ Jeninnet.FileQuery/
 │   ├── Jeninnet.FileQuery/                         Core engine
 │   ├── Jeninnet.FileQuery.CommandLine/             CLI integration
 │   ├── Jeninnet.FileQuery.DependencyInjection/     DI integration
+│   ├── Jeninnet.FileQuery.FileProviders/           IFileProvider adapter
 │   ├── Jeninnet.FileQuery.Benchmarks/              BenchmarkDotNet benchmarks
 │   └── Jeninnet.Testing.Assertions/                Test assertion helpers
 │

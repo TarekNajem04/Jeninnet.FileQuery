@@ -24,6 +24,8 @@
   href: multiple-roots.md
 - name: Brace Expansion
   href: brace-expansion.md
+- name: IFileProvider Adapter
+  href: file-provider-adapter.md
 - name: In-Memory Matching
   href: in-memory-matching.md
 - name: Git Ignore Files
