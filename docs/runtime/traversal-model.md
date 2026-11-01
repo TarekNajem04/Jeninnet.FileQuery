@@ -82,7 +82,7 @@ public enum SymlinkPolicy
 }
 ```
 
-The default `Ignore` is the safe choice. `Follow` is appropriate for filesystems where symlinks are used as first-class directory structures. `FollowWithCycleDetection` adds a `HashSet<string>` to detect circular references at the cost of additional allocation per traversal.
+The default `Ignore` is the safe choice. `Follow` is appropriate for filesystems where symlinks are used as first-class directory structures. `Follow` performs no cycle detection, so a symlink cycle can make traversal run indefinitely; use `FollowWithCycleDetection` for any tree that may contain cycles. `FollowWithCycleDetection` adds a `HashSet<string>` to detect circular references at the cost of additional allocation per traversal.
 
 ---
 

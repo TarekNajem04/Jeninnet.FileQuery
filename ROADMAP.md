@@ -98,7 +98,8 @@ The resulting performance measurements and engineering decisions are documented 
 
 *Goal: Make the published claims true, close the highest-value capability gaps, and raise the
 adoption ceiling before v2.0.0. Every item is free of paid services and new runtime dependencies
-unless stated. Detailed tasks live in `private/Tasks/pre-v2-hardening/` (`TASK-H-01…16`).*
+unless stated. Detailed tasks for H-01…H-15 live in `private/Tasks/pre-v2-hardening/`; watch mode
+(H-16) is tracked under `private/Tasks/post-v2.0.0/`.*
 
 ### Credibility (P0 — required before v2.0.0)
 
@@ -138,11 +139,6 @@ unless stated. Detailed tasks live in `private/Tasks/pre-v2-hardening/` (`TASK-H
   `PatternException`/Tooling diagnostics.
 - [x] **H-15 MSBuild task and SARIF exporter**: evaluation-time validation and code-scanning output.
 
-### Deferred (P3)
-
-- [ ] **H-16 Watch mode**: `FileSystemWatcher`-backed continuous queries. Deferred until the
-  one-pass result and `.gitignore` work lands.
-
 ---
 
 ## Platform Support Policy
@@ -157,13 +153,29 @@ unless stated. Detailed tasks live in `private/Tasks/pre-v2-hardening/` (`TASK-H
 
 *Goal: Adopt .NET 11 as it ships while keeping the .NET 10 LTS baseline and the current quality bar.*
 
-- [ ] **Multi-target libraries and tool**: `net10.0;net11.0` for the core, CommandLine, DependencyInjection, Tooling, and the global tool.
+- [ ] **Multi-target libraries and tool**: `net10.0;net11.0` for the core, CommandLine,
+  DependencyInjection, FileProviders, Tooling, and the global tool. The Build package remains a
+  build-time `net10.0` task unless the .NET 11 SDK proves otherwise.
 - [ ] **CI matrix**: build and test both target frameworks on Windows, Linux, and macOS.
 - [ ] **AOT and trimming validation on .NET 11**: publish a sample with `PublishAot` and treat trimming warnings as errors.
 - [ ] **Performance re-baseline on .NET 11**: refresh `docs/performance/cross-platform-baseline.json`, `runtime-evolution.json`, and the soak reference.
 - [ ] **Package validation and documentation**: validate both targets, update the framework badges, README, and the supported-frameworks policy.
 
 > Capability opportunities beyond the roadmap (entry metadata, `.gitignore` ingestion, single-path matching, and others) are analysed in [`docs/articles/library-capability-review.md`](docs/articles/library-capability-review.md).
+
+---
+
+## Deferred Capability Work (post-v2.0.0)
+
+The following work was evaluated and deliberately left out of v2.0.0. It is tracked in its own
+group so it cannot be mistaken for release scope.
+
+- [ ] **H-16 Watch mode**: `FileSystemWatcher`-backed continuous queries. Prerequisites (entry
+  metadata, single-path matching, `.gitignore` ingestion) are complete and the capability is
+  implementable, but event loss, duplicate/reordered notifications, debounce policy, rename
+  pairing, disposal, and timing-sensitive tests create more risk than value without a concrete
+  IDE/dev-tool consumer. Physical filesystems only (`IFileProvider` has no watcher). Revisit after
+  Phase 6 or on demand.
 
 ---
 

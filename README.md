@@ -168,6 +168,7 @@ This repository contains the core library and its companion packages:
 *   **[VS Code Extension](./extensions/vscode/README.md)**: Pattern tester and explainer that drives the global tool from the editor.
 *   **[File Provider Adapter (Jeninnet.FileQuery.FileProviders)](./src/Jeninnet.FileQuery.FileProviders/README.md)**: Query physical, embedded, and in-memory `IFileProvider` sources with the same pipeline.
 *   **[Build Tooling SDK (Jeninnet.FileQuery.Tooling)](./src/Jeninnet.FileQuery.Tooling/README.md)**: Classify, validate, and tokenize patterns without executing a query.
+*   **[MSBuild Validation (Jeninnet.FileQuery.Build)](./src/Jeninnet.FileQuery.Build/README.md)**: Validate `FileQueryPatterns` during `dotnet build` and export SARIF for code scanning.
 *   **[GitHub Action](./.github/actions/filequery/action.yml)**: Runs the global tool in workflows and exposes matched files and counts as step outputs.
 *   **[Documentation Suite (docs/)](./docs/README.md)**: Deep technical specifications, guides, and architectural whitepapers.
 *   **[Benchmark Suite](./src/Jeninnet.FileQuery.Benchmarks/README.md)**: Performance measurements and allocation verification.
