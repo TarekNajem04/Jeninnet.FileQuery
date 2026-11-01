@@ -5,7 +5,10 @@
 // Solution Repository: https://github.com/TarekNajem04/Jeninnet.FileQuery [LIVE]
 // Licensed under the MIT License.
 //
+using System.Buffers;
 using System.Globalization;
+using System.Text;
+using System.Text.Json;
 using Jeninnet.FileQuery.Tool.Git;
 using Jeninnet.FileQuery.Traversal;
 
@@ -29,16 +32,29 @@ internal static class QueryRunner {
             request,
             ResolveIncludedPaths(request),
             request.Explain
-                ? new ImmediateProgress<FileQueryDiagnostic>(diagnostic => WriteExplanation(diagnostic, output))
+                ? new ImmediateProgress<FileQueryDiagnostic>(diagnostic => WriteDiagnostic(diagnostic, request.JsonOutput, output))
                 : null);
         var engine = FileQueryRuntime.Create();
+
+        if(request.Explain) {
+            // The diagnostic sink writes each result; enumeration drives the traversal.
+            _ = engine.Execute(query).Count();
+            output.Flush();
+            return CliApplication.EXIT_SUCCESS;
+        }
+
+        if(request.JsonOutput) {
+            foreach(var entry in engine.ExecuteEntries(query)) {
+                WriteEntryJson(entry, output);
+            }
+
+            output.Flush();
+            return CliApplication.EXIT_SUCCESS;
+        }
+
         var matches = 0L;
 
         foreach(var path in engine.Execute(query)) {
-            if(request.Explain) {
-                continue;
-            }
-
             matches++;
 
             if(request.CountOnly) {
@@ -96,15 +112,30 @@ internal static class QueryRunner {
     }
 
     /// <summary>
+    /// Writes an explanation in text or JSON form.
+    /// </summary>
+    /// <param name="diagnostic">The diagnostic reported by the engine.</param>
+    /// <param name="json">Whether to write JSON.</param>
+    /// <param name="output">The writer that receives the result.</param>
+    private static void WriteDiagnostic(FileQueryDiagnostic diagnostic, bool json, TextWriter output) {
+        if(!string.Equals(diagnostic.EntryKind, "File", StringComparison.Ordinal)) {
+            return;
+        }
+
+        if(json) {
+            WriteDiagnosticJson(diagnostic, output);
+            return;
+        }
+
+        WriteExplanation(diagnostic, output);
+    }
+
+    /// <summary>
     /// Writes one tab-separated explanation line for a file.
     /// </summary>
     /// <param name="diagnostic">The diagnostic reported by the engine.</param>
     /// <param name="output">The writer that receives the line.</param>
     private static void WriteExplanation(FileQueryDiagnostic diagnostic, TextWriter output) {
-        if(!string.Equals(diagnostic.EntryKind, "File", StringComparison.Ordinal)) {
-            return;
-        }
-
         var outcome = string.Equals(diagnostic.Outcome, "Include", StringComparison.Ordinal)
             ? "include"
             : "exclude";
@@ -119,6 +150,115 @@ internal static class QueryRunner {
         output.Write('\t');
         output.WriteLine(reason);
     }
+
+    /// <summary>
+    /// Writes one newline-delimited JSON object for a matched entry.
+    /// </summary>
+    /// <param name="entry">The matched entry.</param>
+    /// <param name="output">The writer that receives the line.</param>
+    private static void WriteEntryJson(FileQueryEntry entry, TextWriter output) {
+        var line = SerializeJson(writer => {
+            writer.WriteString("path", entry.FullPath);
+            writer.WriteString("relativePath", entry.RelativePath);
+            writer.WriteNumber("length", entry.Length);
+            writer.WriteString("createdUtc", entry.CreationTimeUtc);
+            writer.WriteString("modifiedUtc", entry.LastWriteTimeUtc);
+            WriteAttributes(writer, entry.Attributes);
+            writer.WriteBoolean("isDirectory", entry.IsDirectory);
+        });
+
+        output.WriteLine(line);
+    }
+
+    /// <summary>
+    /// Writes one newline-delimited JSON object for an explanation.
+    /// </summary>
+    /// <param name="diagnostic">The diagnostic reported by the engine.</param>
+    /// <param name="output">The writer that receives the line.</param>
+    private static void WriteDiagnosticJson(FileQueryDiagnostic diagnostic, TextWriter output) {
+        var line = SerializeJson(writer => {
+            writer.WriteString("path", diagnostic.Path);
+            writer.WriteString("relativePath", diagnostic.RelativePath);
+            writer.WriteString("entryKind", diagnostic.EntryKind);
+            writer.WriteString("outcome", ToJsonOutcome(diagnostic.Outcome));
+            writer.WriteString("reason", diagnostic.Reason);
+
+            if(diagnostic.Length is { } length) {
+                writer.WriteNumber("length", length);
+            }
+
+            if(diagnostic.CreationTimeUtc is { } createdUtc) {
+                writer.WriteString("createdUtc", createdUtc);
+            }
+
+            if(diagnostic.LastWriteTimeUtc is { } lastWriteUtc) {
+                writer.WriteString("modifiedUtc", lastWriteUtc);
+            }
+
+            if(diagnostic.Attributes is { } attributes) {
+                WriteAttributes(writer, attributes);
+            }
+
+            if(diagnostic.IsDirectory is { } isDirectory) {
+                writer.WriteBoolean("isDirectory", isDirectory);
+            }
+
+            writer.WriteString("patternKind", diagnostic.PatternKind?.ToString());
+            writer.WriteString("pattern", diagnostic.Pattern);
+
+            if(diagnostic.PatternIndex is { } patternIndex) {
+                writer.WriteNumber("patternIndex", patternIndex);
+            } else {
+                writer.WriteNull("patternIndex");
+            }
+        });
+
+        output.WriteLine(line);
+    }
+
+    /// <summary>
+    /// Writes an attribute array with stable flag names.
+    /// </summary>
+    /// <param name="writer">The JSON writer.</param>
+    /// <param name="attributes">The attribute flags.</param>
+    private static void WriteAttributes(Utf8JsonWriter writer, FileAttributes attributes) {
+        writer.WriteStartArray("attributes");
+
+        foreach(var value in Enum.GetValues<FileAttributes>()) {
+            if(value is not FileAttributes.None && (attributes & value) == value) {
+                writer.WriteStringValue(value.ToString());
+            }
+        }
+
+        writer.WriteEndArray();
+    }
+
+    /// <summary>
+    /// Serializes a JSON object into a single line.
+    /// </summary>
+    /// <param name="writeProperties">The callback that writes the object properties.</param>
+    /// <returns>The JSON text without a trailing newline.</returns>
+    private static string SerializeJson(Action<Utf8JsonWriter> writeProperties) {
+        var buffer = new ArrayBufferWriter<byte>();
+        using(var writer = new Utf8JsonWriter(buffer)) {
+            writer.WriteStartObject();
+            writeProperties(writer);
+            writer.WriteEndObject();
+        }
+
+        return Encoding.UTF8.GetString(buffer.WrittenSpan);
+    }
+
+    /// <summary>
+    /// Maps the engine outcome to the stable lowercase JSON value.
+    /// </summary>
+    /// <param name="outcome">The engine outcome.</param>
+    private static string ToJsonOutcome(string outcome) =>
+        outcome switch {
+            "Include" => "include",
+            "Exclude" => "exclude",
+            _ => "nomatch"
+        };
 
     /// <summary>
     /// Resolves the allow-list for a diff-aware query.

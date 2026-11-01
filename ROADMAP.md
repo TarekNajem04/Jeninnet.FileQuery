@@ -122,7 +122,7 @@ unless stated. Detailed tasks live in `private/Tasks/pre-v2-hardening/` (`TASK-H
   directory-only patterns and pruning.
 - [x] **H-07 Single-path matcher**: public `IsMatch(string)`/`IsMatch(ReadOnlySpan<char>)` and
   `Explain(path)` over a compiled pattern set, for linters and IDE plugins.
-- [ ] **H-08 CLI `--json` output**: path + metadata for scripts, mirroring `fd`/`ripgrep`.
+- [x] **H-08 CLI `--json` output**: path + metadata for scripts, mirroring `fd`/`ripgrep`.
 
 ### Ecosystem and parity (P1/P2)
 

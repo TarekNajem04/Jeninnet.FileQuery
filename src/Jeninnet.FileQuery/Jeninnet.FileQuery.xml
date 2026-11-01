@@ -875,6 +875,31 @@
         <member name="P:Jeninnet.FileQuery.FileQueryDiagnostic.PatternIndex">
             <summary>The zero-based source pattern index responsible for the outcome, when available.</summary>
         </member>
+        <member name="P:Jeninnet.FileQuery.FileQueryDiagnostic.Length">
+            <summary>
+            Gets the entry length in bytes as reported by the enumeration, when available.
+            </summary>
+        </member>
+        <member name="P:Jeninnet.FileQuery.FileQueryDiagnostic.CreationTimeUtc">
+            <summary>
+            Gets the creation time in UTC as reported by the enumeration, when available.
+            </summary>
+        </member>
+        <member name="P:Jeninnet.FileQuery.FileQueryDiagnostic.LastWriteTimeUtc">
+            <summary>
+            Gets the last-write time in UTC as reported by the enumeration, when available.
+            </summary>
+        </member>
+        <member name="P:Jeninnet.FileQuery.FileQueryDiagnostic.Attributes">
+            <summary>
+            Gets the raw attribute flags reported by the enumeration, when available.
+            </summary>
+        </member>
+        <member name="P:Jeninnet.FileQuery.FileQueryDiagnostic.IsDirectory">
+            <summary>
+            Gets a value indicating whether the audited entry is a directory, when available.
+            </summary>
+        </member>
         <member name="T:Jeninnet.FileQuery.FileQueryEngineExtensions">
             <summary>
             Provides extension methods for <see cref="T:Jeninnet.FileQuery.IFileQueryEngine"/> and related types

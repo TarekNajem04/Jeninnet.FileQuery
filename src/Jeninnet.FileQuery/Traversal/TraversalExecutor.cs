@@ -607,7 +607,13 @@ internal sealed class TraversalExecutor : ITraversalExecutor {
             pattern?.PatternKind,
             pattern?.SourceText,
             pattern?.SourceIndex >= 0 ? pattern.SourceIndex : null
-        ));
+        ) {
+            Length = entry.Length,
+            CreationTimeUtc = entry.CreationTimeUtc,
+            LastWriteTimeUtc = entry.LastWriteTimeUtc,
+            Attributes = entry.Attributes,
+            IsDirectory = entry.IsDirectory
+        });
     }
 
     private sealed class TraversalProgressState {

@@ -81,6 +81,7 @@ dotnet-filequery --dialect glob "**/*.json"
 | `--explain` | Write per-file include/exclude reasons instead of matching paths. |
 | `--ignore-files` | Load root/nested `.gitignore`, `.git/info/exclude`, and optional global rules. |
 | `--global-ignore <path>` | Additional global ignore file; requires `--ignore-files`. |
+| `--json` | Write one JSON object per line with path and metadata; combines with `--explain` and diff-aware queries. |
 
 `--no-recursive` and `--depth` are mutually exclusive.
 
@@ -94,6 +95,18 @@ dotnet-filequery --root . --ignore-files --global-ignore ~/.config/git/ignore "*
 Loaded ignore rules come before positional or `--patterns` rules, so explicit patterns win. When
 `--ignore-files` is used without patterns, the tool omits its implicit include-all fallback so the
 ignore files can exclude files. See [Git Ignore Files](gitignore-files.md) for precedence details.
+
+### JSON output
+
+```bash
+dotnet-filequery --root . --json "**/*.cs"
+dotnet-filequery --root . --json --explain "**;!*.cs"
+```
+
+`--json` writes newline-delimited objects containing absolute and relative paths, size,
+timestamps, attributes, and directory state. It cannot be combined with `--null` or `--count`, and
+`--relative` is unnecessary because both path forms are present. See [JSON Output](json-output.md)
+for the schema.
 
 ---
 

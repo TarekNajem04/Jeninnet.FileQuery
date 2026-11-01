@@ -31,6 +31,7 @@ internal sealed class ToolOptions : CommandLinePatternOptions {
     private const string OPTION_NAME_EXPLAIN = "--explain";
     private const string OPTION_NAME_IGNORE_FILES = "--ignore-files";
     private const string OPTION_NAME_GLOBAL_IGNORE = "--global-ignore";
+    private const string OPTION_NAME_JSON = "--json";
 
     /// <summary>
     /// Gets the positional patterns to match. Each value may contain multiple semicolon-separated patterns.
@@ -111,6 +112,11 @@ internal sealed class ToolOptions : CommandLinePatternOptions {
     /// Gets the option that supplies an additional global Git ignore file.
     /// </summary>
     public Option<string?> GlobalIgnore { get; }
+
+    /// <summary>
+    /// Gets the option that writes newline-delimited JSON objects with entry metadata.
+    /// </summary>
+    public Option<bool> JsonOutput { get; }
 
     /// <summary>
     /// Initializes a new instance of the <see cref="ToolOptions"/> class.
@@ -205,6 +211,11 @@ internal sealed class ToolOptions : CommandLinePatternOptions {
             DefaultValueFactory = static _ => default,
             Arity = ArgumentArity.ExactlyOne
         };
+
+        JsonOutput = new Option<bool>(OPTION_NAME_JSON) {
+            Description = "Write one JSON object per line with path and metadata; combine with --explain for outcomes and reasons.",
+            Arity = ArgumentArity.Zero
+        };
     }
 
     /// <summary>
@@ -229,5 +240,6 @@ internal sealed class ToolOptions : CommandLinePatternOptions {
             Explain,
             IgnoreFiles,
             GlobalIgnore,
+            JsonOutput,
         ];
 }

@@ -13,6 +13,42 @@ namespace Jeninnet.FileQuery.Tool.Tests.Git;
 [TestClass]
 public sealed class GitQueryTests {
     /// <summary>
+    /// Verifies that JSON output composes with a change-set query.
+    /// </summary>
+    [TestMethod]
+    public void Run_ShouldWriteJson_WhenChangedSinceIsUsed() {
+        using var repository = new TemporaryGitRepository();
+        repository.Write("a.txt", "one");
+        repository.Write("b.txt", "one");
+        repository.Commit("initial");
+
+        repository.Write("a.txt", "two");
+        repository.Delete("b.txt");
+        repository.Write("c.txt", "three");
+
+        var result = Run("--root", repository.Root, "--changed-since", "HEAD", "--json");
+
+        result.ExitCode.Should().Be(0);
+
+        var lines = SplitLines(result.Output);
+        lines.Count.Should().Be(2);
+
+        var paths = new List<string>();
+        var lengths = new Dictionary<string, long>(StringComparer.Ordinal);
+
+        foreach(var line in lines) {
+            using var document = JsonDocument.Parse(line);
+            var relativePath = document.RootElement.GetProperty("relativePath").GetString()!;
+            paths.Add(relativePath);
+            lengths[relativePath] = document.RootElement.GetProperty("length").GetInt64();
+        }
+
+        paths.Should().BeEquivalentTo(["a.txt", "c.txt"]);
+        lengths["a.txt"].Should().Be(3L);
+        lengths["c.txt"].Should().Be(5L);
+    }
+
+    /// <summary>
     /// Verifies that only changed files are returned and deletions are excluded.
     /// </summary>
     [TestMethod]

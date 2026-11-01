@@ -70,6 +70,41 @@ public sealed class ExplainTests {
     }
 
     /// <summary>
+    /// Verifies that JSON explain output carries outcomes, reasons, and metadata.
+    /// </summary>
+    [TestMethod]
+    public void Run_ShouldExplainInJson_WhenRequested() {
+        using var environment = CreateEnvironment();
+
+        var result = Run("--root", environment.Root, "--gitignore", "**;!*.cs", "--explain", "--json");
+
+        result.ExitCode.Should().Be(0);
+
+        var lines = SplitLines(result.Output);
+        lines.Count.Should().Be(5);
+
+        var byPath = new Dictionary<string, JsonElement>(StringComparer.Ordinal);
+
+        foreach(var line in lines) {
+            using var document = JsonDocument.Parse(line);
+            var relativePath = document.RootElement.GetProperty("relativePath").GetString()!;
+            byPath[relativePath] = document.RootElement.Clone();
+        }
+
+        var included = byPath["src/c.cs"];
+        included.GetProperty("outcome").GetString().Should().Be("include");
+        included.GetProperty("entryKind").GetString().Should().Be("File");
+        included.GetProperty("patternKind").GetString().Should().Be("GitIgnore");
+        included.GetProperty("patternIndex").GetInt32().Should().Be(1);
+        included.GetProperty("reason").GetString().Should().Contain("Include");
+        Assert.IsTrue(included.GetProperty("length").GetInt64() >= 0);
+
+        var excluded = byPath["a.txt"];
+        excluded.GetProperty("outcome").GetString().Should().Be("exclude");
+        excluded.GetProperty("reason").GetString().Should().Contain("Exclude");
+    }
+
+    /// <summary>
     /// Runs the application with captured output streams.
     /// </summary>
     /// <param name="args">The command-line arguments.</param>

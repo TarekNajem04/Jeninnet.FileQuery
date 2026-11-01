@@ -10,6 +10,8 @@
   href: integrations.md
 - name: CLI Usage
   href: cli-usage.md
+- name: JSON Output
+  href: json-output.md
 - name: Dependency Injection
   href: dependency-injection.md
 - name: Observability and Diagnostics

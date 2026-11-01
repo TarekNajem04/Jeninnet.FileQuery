@@ -276,6 +276,47 @@ public sealed class QueryExecutionTests {
     }
 
     /// <summary>
+    /// Verifies that JSON output contains the documented metadata fields.
+    /// </summary>
+    [TestMethod]
+    public void Run_ShouldWriteJsonMetadata_WhenRequested() {
+        using var environment = CreateEnvironment();
+
+        var result = Run("--root", environment.Root, "--json");
+
+        result.ExitCode.Should().Be(0);
+
+        var lines = SplitLines(result.Output);
+        lines.Count.Should().Be(5);
+
+        using var document = JsonDocument.Parse(lines[0]);
+        var root = document.RootElement;
+        root.GetProperty("path").GetString().Should().Be(environment.Abs("a.txt"));
+        root.GetProperty("relativePath").GetString().Should().Be("a.txt");
+        root.GetProperty("length").GetInt64().Should().Be(0L);
+        Assert.IsFalse(string.IsNullOrEmpty(root.GetProperty("createdUtc").GetString()));
+        Assert.IsFalse(string.IsNullOrEmpty(root.GetProperty("modifiedUtc").GetString()));
+        root.GetProperty("attributes").ValueKind.Should().Be(JsonValueKind.Array);
+        root.GetProperty("isDirectory").GetBoolean().Should().BeFalse();
+    }
+
+    /// <summary>
+    /// Verifies that JSON output rejects count and NUL formats.
+    /// </summary>
+    [TestMethod]
+    public void Run_ShouldRejectJsonWithCountOrNull() {
+        using var environment = CreateEnvironment();
+
+        var count = Run("--root", environment.Root, "--json", "--count");
+        var nul = Run("--root", environment.Root, "--json", "--null");
+
+        count.ExitCode.Should().Be(CliApplication.EXIT_USAGE);
+        count.Error.Should().Contain("--json");
+        nul.ExitCode.Should().Be(CliApplication.EXIT_USAGE);
+        nul.Error.Should().Contain("--json");
+    }
+
+    /// <summary>
     /// Runs the application with captured output streams.
     /// </summary>
     /// <param name="args">The command-line arguments.</param>

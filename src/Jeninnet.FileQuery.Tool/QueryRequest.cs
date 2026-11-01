@@ -31,6 +31,7 @@ namespace Jeninnet.FileQuery.Tool;
 /// <param name="IncludeUntracked">Whether untracked files are included in a change-set query.</param>
 /// <param name="Explain">Whether per-file include/exclude explanations replace the normal output.</param>
 /// <param name="GitIgnoreFiles">The optional Git ignore-file loading settings.</param>
+/// <param name="JsonOutput">Whether results are written as one JSON object per line.</param>
 internal sealed record QueryRequest(
     string Root,
     IReadOnlyDictionary<PatternKind, IEnumerable<string>> TypedPatterns,
@@ -47,7 +48,8 @@ internal sealed record QueryRequest(
     DateTimeOffset? ChangedSinceDate,
     bool IncludeUntracked,
     bool Explain,
-    GitIgnoreOptions? GitIgnoreFiles
+    GitIgnoreOptions? GitIgnoreFiles,
+    bool JsonOutput
 ) {
     private const string DIALECT_HYBRID = "hybrid";
     private const string DIALECT_GITIGNORE = "gitignore";
@@ -129,6 +131,7 @@ internal sealed record QueryRequest(
         }
 
         var explain = parseResult.GetValue(options.Explain);
+        var jsonOutput = parseResult.GetValue(options.JsonOutput);
 
         if(explain && parseResult.GetValue(options.Count)) {
             error = "--explain cannot be combined with --count.";
@@ -137,6 +140,16 @@ internal sealed record QueryRequest(
 
         if(explain && parseResult.GetValue(options.NullSeparated)) {
             error = "--explain cannot be combined with --null.";
+            return false;
+        }
+
+        if(jsonOutput && parseResult.GetValue(options.Count)) {
+            error = "--json cannot be combined with --count.";
+            return false;
+        }
+
+        if(jsonOutput && parseResult.GetValue(options.NullSeparated)) {
+            error = "--json cannot be combined with --null.";
             return false;
         }
 
@@ -199,7 +212,8 @@ internal sealed record QueryRequest(
             ChangedSinceDate: changedSinceDate,
             IncludeUntracked: !parseResult.GetValue(options.NoUntracked),
             Explain: explain,
-            GitIgnoreFiles: gitIgnoreOptions
+            GitIgnoreFiles: gitIgnoreOptions,
+            JsonOutput: jsonOutput
         );
 
         return true;
