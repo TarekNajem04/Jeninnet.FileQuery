@@ -131,6 +131,8 @@ Traversal behaviour is compared on Windows x64, Ubuntu x64, and macOS Arm64 usin
 
 Long-running stability is validated by a dedicated soak harness that repeats queries, samples the managed heap after full collections, and fails on heap growth or throughput degradation. The recorded run and verdict rules are in the [stability report](./docs/performance/long-running-stability.md).
 
+Runtime updates are tracked against the benchmark baseline: `scripts/performance/check-runtime.ps1` detects drift, and the [runtime evolution](./docs/performance/runtime-evolution.md) page defines when benchmarks are re-run and how the baseline is refreshed.
+
 ---
 
 ## 📊 Repo Stats
