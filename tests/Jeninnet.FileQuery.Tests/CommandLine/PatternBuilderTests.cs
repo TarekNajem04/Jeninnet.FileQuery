@@ -69,6 +69,28 @@ public sealed class PatternBuilderTests {
     }
 
     /// <summary>
+    /// Verifies that regex patterns without the dialect prefix are normalized.
+    /// </summary>
+    [TestMethod]
+    public void Build_ShouldAddRegexPrefix_WhenPrefixIsMissing() {
+        var result = PatternBuilder.Build(regex: @"d\.txt$");
+
+        Assert.HasCount(1, result[PatternKind.Regex]);
+        Assert.AreEqual(@"r:d\.txt$", result[PatternKind.Regex][0]);
+    }
+
+    /// <summary>
+    /// Verifies that an existing regex dialect prefix is preserved.
+    /// </summary>
+    [TestMethod]
+    public void Build_ShouldPreserveRegexPrefix_WhenPrefixIsPresent() {
+        var result = PatternBuilder.Build(regex: @"r:d\.txt$");
+
+        Assert.HasCount(1, result[PatternKind.Regex]);
+        Assert.AreEqual(@"r:d\.txt$", result[PatternKind.Regex][0]);
+    }
+
+    /// <summary>
     /// Verifies that the <see cref="PatternBuilder.Build(ParseResult, CommandLinePatternOptions)"/> method correctly calls the parser.
     /// </summary>
     [TestMethod]

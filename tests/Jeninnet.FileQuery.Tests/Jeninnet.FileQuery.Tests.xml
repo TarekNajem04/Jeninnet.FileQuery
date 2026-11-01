@@ -199,6 +199,16 @@
             Verifies that the <see cref="M:Jeninnet.FileQuery.CommandLine.PatternBuilder.Build(System.String,System.String,System.String,System.String)"/> method handles specific inputs for different pattern types.
             </summary>
         </member>
+        <member name="M:Jeninnet.FileQuery.Tests.CommandLine.PatternBuilderTests.Build_ShouldAddRegexPrefix_WhenPrefixIsMissing">
+            <summary>
+            Verifies that regex patterns without the dialect prefix are normalized.
+            </summary>
+        </member>
+        <member name="M:Jeninnet.FileQuery.Tests.CommandLine.PatternBuilderTests.Build_ShouldPreserveRegexPrefix_WhenPrefixIsPresent">
+            <summary>
+            Verifies that an existing regex dialect prefix is preserved.
+            </summary>
+        </member>
         <member name="M:Jeninnet.FileQuery.Tests.CommandLine.PatternBuilderTests.Build_ParseResult_ShouldCallParser">
             <summary>
             Verifies that the <see cref="M:Jeninnet.FileQuery.CommandLine.PatternBuilder.Build(System.CommandLine.ParseResult,Jeninnet.FileQuery.CommandLine.CommandLinePatternOptions)"/> method correctly calls the parser.

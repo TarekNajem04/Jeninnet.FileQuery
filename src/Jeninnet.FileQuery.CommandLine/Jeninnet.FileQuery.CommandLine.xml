@@ -57,8 +57,9 @@
             Builds a classified dictionary of file patterns from command-line options.
             </summary>
             <remarks>
-            Consolidates --patterns, and --gitignore into a single GitIgnore list
-            following the "last rule wins" principle.
+            Classifies patterns supplied through <c>--patterns</c>, keeps the explicitly typed
+            <c>--gitignore</c>, <c>--glob</c>, and <c>--regex</c> buckets separate, and prefixes regex
+            patterns with the <c>r:</c> dialect marker when it is missing.
             </remarks>
         </member>
         <member name="M:Jeninnet.FileQuery.CommandLine.PatternBuilder.Build(System.CommandLine.ParseResult,Jeninnet.FileQuery.CommandLine.CommandLinePatternOptions)">
@@ -92,6 +93,14 @@
             </summary>
             <param name="value">The string to split.</param>
             <returns>An enumeration of the split and trimmed strings.</returns>
+        </member>
+        <member name="M:Jeninnet.FileQuery.CommandLine.PatternBuilder.EnsureRegexPrefix(System.String)">
+            <summary>
+            Ensures a pattern supplied through the regex option carries the <c>r:</c> dialect prefix
+            required by the pattern tokenizer.
+            </summary>
+            <param name="pattern">The raw regex pattern.</param>
+            <returns>The pattern with an <c>r:</c> prefix.</returns>
         </member>
         <member name="T:Jeninnet.FileQuery.CommandLine.PatternOptions">
             <summary>
