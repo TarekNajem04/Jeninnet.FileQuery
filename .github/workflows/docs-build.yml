@@ -89,7 +89,8 @@ jobs:
           for project in \
             src/Jeninnet.FileQuery/Jeninnet.FileQuery.csproj \
             src/Jeninnet.FileQuery.CommandLine/Jeninnet.FileQuery.CommandLine.csproj \
-            src/Jeninnet.FileQuery.DependencyInjection/Jeninnet.FileQuery.DependencyInjection.csproj; do
+            src/Jeninnet.FileQuery.DependencyInjection/Jeninnet.FileQuery.DependencyInjection.csproj \
+            src/Jeninnet.FileQuery.Tooling/Jeninnet.FileQuery.Tooling.csproj; do
             dotnet build "$project" --configuration Release --nologo
           done
 

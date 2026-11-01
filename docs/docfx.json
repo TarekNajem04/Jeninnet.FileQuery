@@ -9,7 +9,8 @@
                     "files": [
                         "Jeninnet.FileQuery/Jeninnet.FileQuery.csproj",
                         "Jeninnet.FileQuery.CommandLine/Jeninnet.FileQuery.CommandLine.csproj",
-                        "Jeninnet.FileQuery.DependencyInjection/Jeninnet.FileQuery.DependencyInjection.csproj"
+                        "Jeninnet.FileQuery.DependencyInjection/Jeninnet.FileQuery.DependencyInjection.csproj",
+                        "Jeninnet.FileQuery.Tooling/Jeninnet.FileQuery.Tooling.csproj"
                     ]
                 }
             ],
