@@ -27,13 +27,13 @@ To be the fastest, most predictable, and most flexible file discovery engine for
 
 - [x] **Progress Reporting**: Support `IProgress<T>` in `EnumerateFilesAsync` for real-time scan statistics.
 - [x] **Match Diagnostics**: Introduce an optional audit mode to explain why a file was included or excluded.
-- [x] **Deep Cancellation**: Ensure `CancellationToken` propagation is verified across all hot paths.
+- [x] **Deep Cancellation**: Ensure `CancellationToken` propagation is verified across all hot paths. *(async paths; sync cancellation is tracked in the pre-v2.0.0 hardening plan)*
 - [x] **Enhanced Error Recovery**: Provide configurable strategies for handling IO errors (`Skip`, `Retry`, `Abort`).
 - [x] **Pattern Validation Framework**: Implement early detection and reporting for malformed patterns.
 - [x] **Improved Path Validation**: Enhance `FileQueryValidator` for eager path structure validation.
-- [x] **OpenTelemetry Integration**: Export metrics and spans for structured observability.
-- [x] **AOT Compilation Validation Pipeline**: Establish strict Native AOT compatibility checks in CI to ensure zero-reflection guarantees remain unbroken.
-- [x] **Roslyn Analyzers for Pattern Validation**: Provide design-time warnings and code fixes for malformed GitIgnore, Glob, or Regex patterns.
+- [ ] **OpenTelemetry Integration**: Export metrics and spans for structured observability. *(not implemented; pre-v2.0.0 hardening H-02)*
+- [ ] **AOT Compilation Validation Pipeline**: Establish strict Native AOT compatibility checks in CI to ensure zero-reflection guarantees remain unbroken. *(not implemented; pre-v2.0.0 hardening H-04)*
+- [ ] **Roslyn Analyzers for Pattern Validation**: Provide design-time warnings and code fixes for malformed GitIgnore, Glob, or Regex patterns. *(not implemented; pre-v2.0.0 hardening H-03)*
 
 ---
 
@@ -94,6 +94,57 @@ The resulting performance measurements and engineering decisions are documented 
 
 ---
 
+## Phase 5.5: Pre-v2.0.0 Hardening (credibility & capability)
+
+*Goal: Make the published claims true, close the highest-value capability gaps, and raise the
+adoption ceiling before v2.0.0. Every item is free of paid services and new runtime dependencies
+unless stated. Detailed tasks live in `private/Tasks/pre-v2-hardening/` (`TASK-H-01…16`).*
+
+### Credibility (P0 — required before v2.0.0)
+
+- [x] **H-01 Claims audit**: reconcile the README and roadmap with the code, qualify the
+  performance/cancellation claims, and re-audit the three Phase 2 statuses below.
+- [ ] **H-02 OpenTelemetry instrumentation**: `ActivitySource` for query spans and `Meter` for
+  entries/scanned/matched counters and duration, with tests and documentation. No external
+  OpenTelemetry package is required; consumers attach exporters.
+- [ ] **H-03 Roslyn analyzers for pattern validation**: design-time diagnostics and code fixes for
+  malformed pattern literals; package, document, and test them.
+- [ ] **H-04 AOT validation pipeline**: publish and run a Native AOT sample in CI on .NET 10, with
+  trimming/AOT warnings as errors.
+
+### One-pass results (P1 — highest user value)
+
+- [ ] **H-05 Entry metadata and filters**: `FileQueryEntry` (`Length`, `CreationTimeUtc`,
+  `LastWriteTimeUtc`, `Attributes`, `IsDirectory`) with `ExecuteEntries()` and
+  `MinSize`/`MaxSize`/`ModifiedAfter`/`ModifiedBefore`/`AttributesToSkip`. The enumeration already
+  carries this data, so no extra syscalls.
+- [ ] **H-06 Directory results**: opt-in directory matches, with documented interaction with
+  directory-only patterns and pruning.
+- [ ] **H-07 Single-path matcher**: public `IsMatch(string)`/`IsMatch(ReadOnlySpan<char>)` and
+  `Explain(path)` over a compiled pattern set, for linters and IDE plugins.
+- [ ] **H-08 CLI `--json` output**: path + metadata for scripts, mirroring `fd`/`ripgrep`.
+
+### Ecosystem and parity (P1/P2)
+
+- [ ] **H-09 `.gitignore` file ingestion**: root, nested, `.git/info/exclude`, and optional global
+  excludes, with Git-accurate scoping and negation.
+- [ ] **H-10 `IFileProvider` adapter package**: query an `IFileProvider` (ASP.NET Core, Razor,
+  static files, in-memory providers).
+- [ ] **H-11 Sync cancellation and progress**: `Execute(query, CancellationToken)` and sync progress
+  parity with the async API.
+- [ ] **H-12 Brace expansion** `{a,b}` for glob patterns, with escaping rules and tests.
+- [ ] **H-13 Multiple roots**: query several directories in one pipeline with deterministic order.
+- [ ] **H-14 Validation error positions**: surface the offending index/segment in
+  `PatternException`/Tooling diagnostics.
+- [ ] **H-15 MSBuild task and SARIF exporter**: evaluation-time validation and code-scanning output.
+
+### Deferred (P3)
+
+- [ ] **H-16 Watch mode**: `FileSystemWatcher`-backed continuous queries. Deferred until the
+  one-pass result and `.gitignore` work lands.
+
+---
+
 ## Platform Support Policy
 
 - **v2.0.0 targets .NET 10.0 only.** .NET 8 reaches end of support on 2026-11-10 and .NET 9 on 2026-05-12, so neither is added as a package target. A `net8.0` target is technically feasible (one `GetAlternateLookup` fallback) but would extend support beyond Microsoft's lifecycle and add a permanent verification matrix.
@@ -122,9 +173,9 @@ Performance optimization remains an ongoing engineering concern, but future work
 
 Potential future investigations include:
 
-- [ ] **Cross-Platform Performance Validation**: Compare large-scale traversal behavior on Windows, Linux, and macOS.
-- [ ] **Long-Running Stability Validation**: Validate traversal behavior under repeated large-scale execution.
-- [ ] **Runtime Evolution Tracking**: Re-evaluate BCL filesystem enumeration performance as newer .NET runtimes become available.
-- [ ] **Native Enumeration Research**: Revisit native or platform-specific enumeration only if future measurements demonstrate a sufficiently large benefit to justify the complexity.
+- [x] **Cross-Platform Performance Validation**: Compare large-scale traversal behavior on Windows, Linux, and macOS. *(completed; see the cross-platform baseline)*
+- [x] **Long-Running Stability Validation**: Validate traversal behavior under repeated large-scale execution. *(completed; see the soak report)*
+- [x] **Runtime Evolution Tracking**: Re-evaluate BCL filesystem enumeration performance as newer .NET runtimes become available. *(completed; tracked by `check-runtime.ps1` and the runtime-evolution record)*
+- [x] **Native Enumeration Research**: Revisit native or platform-specific enumeration only if future measurements demonstrate a sufficiently large benefit to justify the complexity. *(rejected with measurements; see `docs/performance/native-enumeration-research.md`)*
 
 Future performance work is not part of the v1.5 release scope.
