@@ -97,6 +97,7 @@ See the [Global Tool guide](./docs/guides/global-tool.md) for the full option se
 *   **Entry metadata.** `ExecuteEntries()` returns full/relative paths, size, timestamps, attributes, and directory state without extra file-system calls, with size/time/attribute filters.
 *   **Directory results.** `IncludeDirectories()` opts into yielding matching directories from the same traversal, with directory-only and negation semantics preserved.
 *   **Multiple roots.** `FileQueryBatch` runs several roots as one deterministic stream; entry results expose `RootPath`.
+*   **Brace expansion.** Write `src/**/*.{cs,vb}` instead of repeating alternatives; nesting and escaping follow documented rules.
 *   **Script-friendly CLI.** `dotnet-filequery --json` streams newline-delimited objects with paths, size, timestamps, attributes, and explain outcomes.
 *   **Actionable pattern errors.** `PatternException` and the Tooling SDK expose the offending character position and segment when available.
 

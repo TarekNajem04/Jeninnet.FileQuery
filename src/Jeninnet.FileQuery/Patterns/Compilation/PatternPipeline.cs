@@ -98,7 +98,21 @@ internal sealed class PatternPipeline {
         var compiled = new List<ICompiledPattern>(set.Patterns.Count);
 
         foreach(var pattern in set.Patterns) {
-            compiled.Add(Compile(pattern));
+            if(pattern.Type is PatternKind.Regex) {
+                compiled.Add(Compile(pattern));
+                continue;
+            }
+
+            var expansions = BraceExpander.Expand(pattern.Text);
+
+            if(expansions.Count == 1 && string.Equals(expansions[0], pattern.Text, StringComparison.Ordinal)) {
+                compiled.Add(Compile(pattern));
+                continue;
+            }
+
+            foreach(var expansion in expansions) {
+                compiled.Add(Compile(new ClassifiedPattern(expansion, pattern.Type, pattern.SourceIndex)));
+            }
         }
 
         return new CompiledPatternSet(compiled);

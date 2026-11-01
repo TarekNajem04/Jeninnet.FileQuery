@@ -128,6 +128,7 @@ public static class PatternInspector {
             HasRecursiveWildcard: analysis.HasRecursiveWildcard,
             HasCharacterClass: analysis.HasBracket,
             HasEscapedCharacters: analysis.HasEscapedCharacters,
+            HasBraceAlternation: analysis.HasBraceAlternation,
             SegmentCount: analysis.SegmentCount,
             Validation: validation,
             Segments: segments);

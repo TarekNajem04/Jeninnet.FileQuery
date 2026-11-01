@@ -3516,6 +3516,61 @@
         <member name="M:Jeninnet.FileQuery.Tests.Patterns.Analysis.PatternAnalyzerTests.Analyze_ShouldDetectTrailingSlash">
             <summary>Tests Analyze_ShouldDetectTrailingSlash.</summary>
         </member>
+        <member name="T:Jeninnet.FileQuery.Tests.Patterns.Braces.BraceExpansionTests">
+            <summary>
+            Tests for brace alternation expansion.
+            </summary>
+        </member>
+        <member name="M:Jeninnet.FileQuery.Tests.Patterns.Braces.BraceExpansionTests.Compile_ExpandsSimpleAlternation">
+            <summary>
+            A brace group expands to individual alternatives.
+            </summary>
+        </member>
+        <member name="M:Jeninnet.FileQuery.Tests.Patterns.Braces.BraceExpansionTests.Compile_ExpandsNestedAlternation">
+            <summary>
+            Nested groups form a cartesian product.
+            </summary>
+        </member>
+        <member name="M:Jeninnet.FileQuery.Tests.Patterns.Braces.BraceExpansionTests.Compile_TreatsEscapedBracesAsLiteral">
+            <summary>
+            Escaped braces remain literal.
+            </summary>
+        </member>
+        <member name="M:Jeninnet.FileQuery.Tests.Patterns.Braces.BraceExpansionTests.Classification_RecognizesBraceAlternation">
+            <summary>
+            Brace alternation is classified as a Glob feature.
+            </summary>
+        </member>
+        <member name="M:Jeninnet.FileQuery.Tests.Patterns.Braces.BraceExpansionTests.Compile_ReportsUnterminatedBrace">
+            <summary>
+            An unterminated group reports a validation error with a position.
+            </summary>
+        </member>
+        <member name="M:Jeninnet.FileQuery.Tests.Patterns.Braces.BraceExpansionTests.Compile_ReportsStrayClosingBrace">
+            <summary>
+            A stray closing brace is rejected.
+            </summary>
+        </member>
+        <member name="M:Jeninnet.FileQuery.Tests.Patterns.Braces.BraceExpansionTests.Compile_RejectsEmptyAlternative">
+            <summary>
+            Empty alternatives are rejected instead of producing an empty pattern.
+            </summary>
+        </member>
+        <member name="M:Jeninnet.FileQuery.Tests.Patterns.Braces.BraceExpansionTests.Compile_RejectsExcessiveExpansion">
+            <summary>
+            Expansion is bounded to avoid runaway pattern input.
+            </summary>
+        </member>
+        <member name="M:Jeninnet.FileQuery.Tests.Patterns.Braces.BraceExpansionTests.Compile_DoesNotExpandRegexBraces">
+            <summary>
+            Regex quantifiers are not treated as brace alternation.
+            </summary>
+        </member>
+        <member name="M:Jeninnet.FileQuery.Tests.Patterns.Braces.BraceExpansionTests.Execute_MatchesBraceAlternatives">
+            <summary>
+            Brace expansion works through the engine on a real tree.
+            </summary>
+        </member>
         <member name="T:Jeninnet.FileQuery.Tests.Patterns.CanonicalPatternInputTests">
             <summary>
             Contains unit tests for the <see cref="T:Jeninnet.FileQuery.Patterns.Canonical.CanonicalPatternInput"/> class, ensuring correct initialization

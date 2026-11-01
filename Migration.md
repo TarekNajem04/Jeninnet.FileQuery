@@ -24,6 +24,7 @@ The built-in engine implements both. Callers that only use `Execute`/`ExecuteAsy
   `IProgress<FileQueryProgress>`; the token-free overloads remain.
 - `FileQueryBatch` for multiple roots, and `FileQueryEntry.RootPath` on entry results.
 - `PatternException.Position`/`Segment` and `PatternValidation.Position`/`Segment` (additive; `null` when unknown).
+- Brace alternation (`{a,b}`) in non-regex patterns; regex quantifiers are unchanged.
 - `FileQueryPatternSet` (`IsMatch` string/span, `Explain`) for in-memory matching.
 - `GitIgnoreOptions` + `UseGitIgnoreFiles()`; CLI `--ignore-files` / `--global-ignore`.
 - `FileQueryTelemetry` names and built-in spans/metrics.

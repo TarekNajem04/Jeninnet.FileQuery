@@ -22,6 +22,8 @@
   href: directory-results.md
 - name: Multiple Roots
   href: multiple-roots.md
+- name: Brace Expansion
+  href: brace-expansion.md
 - name: In-Memory Matching
   href: in-memory-matching.md
 - name: Git Ignore Files

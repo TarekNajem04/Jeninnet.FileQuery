@@ -3539,8 +3539,9 @@
             <param name="HasEscapedCharacters">Whether the pattern contains escaped characters.</param>
             <param name="HasGitIgnoreSyntax">Whether the pattern contains gitignore syntax.</param>
             <param name="SegmentCount">The number of segments.</param>
+            <param name="HasBraceAlternation">Whether the pattern contains expandable brace alternation.</param>
         </member>
-        <member name="M:Jeninnet.FileQuery.Patterns.Analysis.PatternAnalysisResult.#ctor(System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Int32)">
+        <member name="M:Jeninnet.FileQuery.Patterns.Analysis.PatternAnalysisResult.#ctor(System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Int32,System.Boolean)">
             <summary>
             Represents extracted structural and semantic signals from a pattern.
             </summary>
@@ -3556,6 +3557,7 @@
             <param name="HasEscapedCharacters">Whether the pattern contains escaped characters.</param>
             <param name="HasGitIgnoreSyntax">Whether the pattern contains gitignore syntax.</param>
             <param name="SegmentCount">The number of segments.</param>
+            <param name="HasBraceAlternation">Whether the pattern contains expandable brace alternation.</param>
         </member>
         <member name="P:Jeninnet.FileQuery.Patterns.Analysis.PatternAnalysisResult.IsEmpty">
             <summary>Whether the pattern is empty.</summary>
@@ -3592,6 +3594,9 @@
         </member>
         <member name="P:Jeninnet.FileQuery.Patterns.Analysis.PatternAnalysisResult.SegmentCount">
             <summary>The number of segments.</summary>
+        </member>
+        <member name="P:Jeninnet.FileQuery.Patterns.Analysis.PatternAnalysisResult.HasBraceAlternation">
+            <summary>Whether the pattern contains expandable brace alternation.</summary>
         </member>
         <member name="T:Jeninnet.FileQuery.Patterns.Analysis.PatternAnalyzer">
             <inheritdoc/>
@@ -3651,6 +3656,21 @@
             <param name="i">The index of the wildcard character.</param>
             <param name="skipNext">Whether to skip the next character in analysis.</param>
         </member>
+        <member name="M:Jeninnet.FileQuery.Patterns.Analysis.PatternAnalyzer.HandleBrace(System.ReadOnlySpan{System.Char},Jeninnet.FileQuery.Patterns.Analysis.PatternAnalyzer.AnalysisState,System.Int32)">
+            <summary>
+            Handles brace alternation groups.
+            </summary>
+            <param name="pattern">The pattern being analyzed.</param>
+            <param name="state">Mutable analysis state.</param>
+            <param name="index">The current index.</param>
+        </member>
+        <member name="M:Jeninnet.FileQuery.Patterns.Analysis.PatternAnalyzer.HasTopLevelComma(System.ReadOnlySpan{System.Char},System.Int32)">
+            <summary>
+            Detects whether a brace group contains a top-level comma.
+            </summary>
+            <param name="pattern">The pattern being analyzed.</param>
+            <param name="start">The position after the opening brace.</param>
+        </member>
         <member name="M:Jeninnet.FileQuery.Patterns.Analysis.PatternAnalyzer.HandleBracket(System.Char,Jeninnet.FileQuery.Patterns.Analysis.PatternAnalyzer.AnalysisState)">
             <summary>
             Handles bracket characters (<c>[</c> and <c>]</c>).
@@ -3701,6 +3721,9 @@
         </member>
         <member name="F:Jeninnet.FileQuery.Patterns.Analysis.PatternAnalyzer.AnalysisState.HasGitIgnoreSyntax">
             <summary>True if any GitIgnore‑specific syntax was detected.</summary>
+        </member>
+        <member name="F:Jeninnet.FileQuery.Patterns.Analysis.PatternAnalyzer.AnalysisState.HasBraceAlternation">
+            <summary>True if a brace alternation group was detected.</summary>
         </member>
         <member name="F:Jeninnet.FileQuery.Patterns.Analysis.PatternAnalyzer.AnalysisState.SegmentCount">
             <summary>Number of path segments (counted via <c>/</c>).</summary>
@@ -3830,6 +3853,93 @@
             ○ Match a character in the set [!#*?[]].<br/>
             </code>
             </remarks>
+        </member>
+        <member name="T:Jeninnet.FileQuery.Patterns.Compilation.BraceExpander">
+            <summary>
+            Expands brace alternation (<c>{a,b}</c>) before pattern compilation.
+            </summary>
+            <remarks>
+            <para>
+            Brace expansion follows shell-style rules: alternatives are separated by top-level commas,
+            groups can be nested, and escaped braces (<c>\{</c>, <c>\}</c>) or braces inside a character
+            class are literal. A single group creates one pattern per alternative; multiple groups form a
+            cartesian product.
+            </para>
+            <para>
+            Expansion is bounded to avoid runaway input. Invalid or unterminated braces raise
+            <see cref="T:Jeninnet.FileQuery.Patterns.Exceptions.PatternException"/> with a character position and segment.
+            </para>
+            </remarks>
+        </member>
+        <member name="M:Jeninnet.FileQuery.Patterns.Compilation.BraceExpander.Expand(System.String)">
+            <summary>
+            Expands all brace groups in a pattern.
+            </summary>
+            <param name="pattern">The raw pattern text.</param>
+            <returns>The expanded patterns in stable alternative order.</returns>
+            <exception cref="T:Jeninnet.FileQuery.Patterns.Exceptions.PatternException">Thrown when a brace is unmatched or expansion is too large.</exception>
+        </member>
+        <member name="M:Jeninnet.FileQuery.Patterns.Compilation.BraceExpander.ExpandCore(System.String,System.Int32,System.Text.StringBuilder,System.Collections.Generic.List{System.String})">
+            <summary>
+            Recursively expands the next brace group.
+            </summary>
+            <param name="pattern">The text to expand.</param>
+            <param name="start">The position to start scanning.</param>
+            <param name="builder">The accumulated prefix.</param>
+            <param name="results">The expansion sink.</param>
+            <returns>An error, or <see langword="null"/> on success.</returns>
+        </member>
+        <member name="M:Jeninnet.FileQuery.Patterns.Compilation.BraceExpander.FindGroup(System.String,System.Int32)">
+            <summary>
+            Finds the next expandable brace group.
+            </summary>
+            <param name="pattern">The text to scan.</param>
+            <param name="start">The position to start scanning.</param>
+            <returns>The group bounds or an error.</returns>
+        </member>
+        <member name="M:Jeninnet.FileQuery.Patterns.Compilation.BraceExpander.FindClosingBrace(System.String,System.Int32)">
+            <summary>
+            Finds the closing brace of a group, respecting nesting, escapes, and character classes.
+            </summary>
+            <param name="pattern">The text to scan.</param>
+            <param name="start">The position after the opening brace.</param>
+            <returns>The closing position, or <c>-1</c> when absent.</returns>
+        </member>
+        <member name="M:Jeninnet.FileQuery.Patterns.Compilation.BraceExpander.HasTopLevelComma(System.String,System.Int32,System.Int32)">
+            <summary>
+            Determines whether a group has a comma at its own nesting level.
+            </summary>
+            <param name="pattern">The text to scan.</param>
+            <param name="start">The position after the opening brace.</param>
+            <param name="end">The closing brace position.</param>
+        </member>
+        <member name="M:Jeninnet.FileQuery.Patterns.Compilation.BraceExpander.SplitAlternatives(System.String,System.Int32,System.Int32)">
+            <summary>
+            Splits the content of a group on top-level commas.
+            </summary>
+            <param name="pattern">The text to scan.</param>
+            <param name="start">The position after the opening brace.</param>
+            <param name="end">The closing brace position.</param>
+        </member>
+        <member name="T:Jeninnet.FileQuery.Patterns.Compilation.BraceExpander.BraceError">
+            <summary>
+            Describes an expansion failure.
+            </summary>
+            <param name="Message">The actionable failure message.</param>
+            <param name="Position">The character position of the failure.</param>
+        </member>
+        <member name="M:Jeninnet.FileQuery.Patterns.Compilation.BraceExpander.BraceError.#ctor(System.String,System.Int32)">
+            <summary>
+            Describes an expansion failure.
+            </summary>
+            <param name="Message">The actionable failure message.</param>
+            <param name="Position">The character position of the failure.</param>
+        </member>
+        <member name="P:Jeninnet.FileQuery.Patterns.Compilation.BraceExpander.BraceError.Message">
+            <summary>The actionable failure message.</summary>
+        </member>
+        <member name="P:Jeninnet.FileQuery.Patterns.Compilation.BraceExpander.BraceError.Position">
+            <summary>The character position of the failure.</summary>
         </member>
         <member name="T:Jeninnet.FileQuery.Patterns.Compilation.CompiledPatternFactory">
             <summary>
@@ -5922,6 +6032,13 @@
             without a corresponding opening bracket.
             </summary>
             <param name="pattern">The pattern span to check.</param>
+        </member>
+        <member name="M:Jeninnet.FileQuery.Patterns.Validation.PatternValidator.ValidateBraces(System.ReadOnlySpan{System.Char})">
+            <summary>
+            Validates brace pairing outside character classes and escapes.
+            </summary>
+            <param name="pattern">The raw pattern text.</param>
+            <returns>An error message and position, or <see langword="null"/> when braces are balanced.</returns>
         </member>
         <member name="M:Jeninnet.FileQuery.Patterns.Validation.PatternValidator.DetectNestedBrackets">
             <remarks>

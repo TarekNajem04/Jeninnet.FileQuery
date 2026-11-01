@@ -87,7 +87,7 @@ source-compatible.
 | `Kind` | The dialect used for tokenization |
 | `IsRegex` | Whether the source carried the `r:` prefix |
 | `IsNegated`, `IsRootAnchored`, `IsDirectoryOnly` | GitIgnore structural flags |
-| `HasGitIgnoreSyntax`, `HasWildcard`, `HasRecursiveWildcard`, `HasCharacterClass`, `HasEscapedCharacters` | Structural signals |
+| `HasGitIgnoreSyntax`, `HasWildcard`, `HasRecursiveWildcard`, `HasCharacterClass`, `HasEscapedCharacters`, `HasBraceAlternation` | Structural signals |
 | `SegmentCount`, `Segments` | Tokenized slash-separated segments |
 | `Validation` | Structural validation result |
 

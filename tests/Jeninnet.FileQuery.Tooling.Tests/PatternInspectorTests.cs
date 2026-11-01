@@ -191,6 +191,23 @@ public sealed class PatternInspectorTests {
     }
 
     /// <summary>
+    /// Verifies brace alternation detection and validation positions.
+    /// </summary>
+    [TestMethod]
+    public void Inspect_ShouldReportBraceAlternation() {
+        var inspection = PatternInspector.Inspect("*.{cs,vb}");
+
+        inspection.HasBraceAlternation.Should().BeTrue();
+        inspection.Kind.Should().Be(PatternKind.Glob);
+
+        var invalid = PatternInspector.Validate("src/{a,b");
+
+        invalid.IsValid.Should().BeFalse();
+        invalid.Position.Should().Be(4);
+        invalid.Segment.Should().Be(1);
+    }
+
+    /// <summary>
     /// Verifies empty pattern handling.
     /// </summary>
     [TestMethod]

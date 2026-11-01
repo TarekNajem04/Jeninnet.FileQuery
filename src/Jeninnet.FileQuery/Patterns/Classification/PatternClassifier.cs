@@ -115,14 +115,21 @@ internal static partial class PatternClassifier {
         }
 
         // ---------------------------------------------------------
-        // 7. Wildcards default to GitIgnore
+        // 7. Brace alternation is a glob feature
+        // ---------------------------------------------------------
+        if(analysis.HasBraceAlternation) {
+            return PatternKind.Glob;
+        }
+
+        // ---------------------------------------------------------
+        // 8. Wildcards default to GitIgnore
         // ---------------------------------------------------------
         if(analysis.HasWildcard || analysis.HasBracket) {
             return PatternKind.GitIgnore;
         }
 
         // ---------------------------------------------------------
-        // 8. Fallback
+        // 9. Fallback
         // ---------------------------------------------------------
         return PatternKind.GitIgnore;
     }

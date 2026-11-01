@@ -50,6 +50,12 @@ internal static partial class PatternValidator {
             return (true, "Pattern ends with an unescaped backslash.", pattern.Length - 1, PatternTextPosition.SegmentAt(pattern, pattern.Length - 1));
         }
 
+        var braceError = ValidateBraces(pattern);
+        if(braceError is not null) {
+            var position = braceError.Value.Position;
+            return (true, braceError.Value.Message, position, PatternTextPosition.SegmentAt(pattern, position));
+        }
+
         if(!pattern.Contains('[')) {
             return (false, null, null, null);
         }
@@ -106,6 +112,66 @@ internal static partial class PatternValidator {
     private static bool EndsWithEscape(ReadOnlySpan<char> pattern) => pattern[^1] == '\\';
 
     private static bool ContainsEmptyBracket(ReadOnlySpan<char> pattern) => pattern.Contains("[]", StringComparison.Ordinal);
+
+    /// <summary>
+    /// Validates brace pairing outside character classes and escapes.
+    /// </summary>
+    /// <param name="pattern">The raw pattern text.</param>
+    /// <returns>An error message and position, or <see langword="null"/> when braces are balanced.</returns>
+    private static (string Message, int Position)? ValidateBraces(ReadOnlySpan<char> pattern) {
+        var depth = 0;
+        var firstOpen = -1;
+        var inCharacterClass = false;
+        var i = 0;
+
+        while(i < pattern.Length) {
+            var c = pattern[i];
+
+            if(c == '\\') {
+                i += 2;
+                continue;
+            }
+
+            if(c == '[') {
+                inCharacterClass = true;
+                i++;
+                continue;
+            }
+
+            if(c == ']' && inCharacterClass) {
+                inCharacterClass = false;
+                i++;
+                continue;
+            }
+
+            if(inCharacterClass) {
+                i++;
+                continue;
+            }
+
+            if(c == '{') {
+                if(depth == 0) {
+                    firstOpen = i;
+                }
+
+                depth++;
+            } else if(c == '}') {
+                if(depth == 0) {
+                    return ("Closing brace '}' has no matching opening brace '{'.", i);
+                }
+
+                depth--;
+            }
+
+            i++;
+        }
+
+        if(depth > 0) {
+            return ("Opening brace '{' has no matching closing brace '}'.", firstOpen);
+        }
+
+        return null;
+    }
 
     // ------------------------------------------------------------------
     // Source-generated Regex helpers

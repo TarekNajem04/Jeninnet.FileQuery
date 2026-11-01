@@ -23,6 +23,7 @@ namespace Jeninnet.FileQuery.Tooling;
 /// <param name="HasRecursiveWildcard">Whether the pattern contains the recursive wildcard <c>**</c>.</param>
 /// <param name="HasCharacterClass">Whether the pattern contains a bracket expression.</param>
 /// <param name="HasEscapedCharacters">Whether the pattern contains escaped characters.</param>
+/// <param name="HasBraceAlternation">Whether the pattern contains an expandable brace group.</param>
 /// <param name="SegmentCount">The number of slash-separated segments in the pattern.</param>
 /// <param name="Validation">The structural validation result.</param>
 /// <param name="Segments">The tokenized segments, in source order.</param>
@@ -38,6 +39,7 @@ public sealed record PatternInspection(
     bool HasRecursiveWildcard,
     bool HasCharacterClass,
     bool HasEscapedCharacters,
+    bool HasBraceAlternation,
     int SegmentCount,
     PatternValidation Validation,
     IReadOnlyList<PatternSegmentInfo> Segments
