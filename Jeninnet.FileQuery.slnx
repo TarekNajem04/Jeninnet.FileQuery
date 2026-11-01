@@ -57,6 +57,9 @@
         <File Path="scripts/format/format.schema.json" />
         <File Path="scripts/format/README.md" />
     </Folder>
+    <Folder Name="/scripts/performance/">
+        <File Path="scripts/performance/check-runtime.ps1" />
+    </Folder>
     <Folder Name="/scripts/sonar/">
         <File Path="scripts/sonar/preview.ps1" />
         <File Path="scripts/sonar/README.md" />

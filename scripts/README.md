@@ -10,6 +10,7 @@ PowerShell tooling for repository maintenance. Each script is preview-first unle
 | `scripts/format` | Applies and verifies .NET formatting | [README](format/README.md) |
 | `scripts/sonar` | Runs a local SonarScanner preview (SonarCloud or local SonarQube) | [README](sonar/README.md) |
 | `scripts/badges` | Generates the repository README badges | `generate.ps1` |
+| `scripts/performance` | Checks the .NET runtime against the recorded benchmark baseline | `check-runtime.ps1` |
 | `scripts/docs` | Verifies documentation links, root README claims, and generated API coverage | `check-doc-links.ps1`, `check-readme-claims.ps1`, `check-api-reference.ps1` |
 
 The documentation scripts are part of the documentation gate:
