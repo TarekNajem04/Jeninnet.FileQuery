@@ -10,10 +10,17 @@ on:
     paths:
       - "src/**"
       - "tests/**"
+      - "samples/**"
+      - "docs/**"
       - "scripts/**"
       - "**.csproj"
+      - "**.slnx"
       - "Directory.Packages.props"
       - "Directory.Build.props"
+      - "Directory.Build.targets"
+      - "global.json"
+      - "README.md"
+      - ".editorconfig"
       - ".github/workflows/sonarcloud.yml"
 
   pull_request:
@@ -26,10 +33,17 @@ on:
     paths:
       - "src/**"
       - "tests/**"
+      - "samples/**"
+      - "docs/**"
       - "scripts/**"
       - "**.csproj"
+      - "**.slnx"
       - "Directory.Packages.props"
       - "Directory.Build.props"
+      - "Directory.Build.targets"
+      - "global.json"
+      - "README.md"
+      - ".editorconfig"
       - ".github/workflows/sonarcloud.yml"
 
 permissions:
@@ -44,12 +58,18 @@ env:
   DOTNET_NOLOGO: true
   DOTNET_CLI_TELEMETRY_OPTOUT: true
 
+# One-time repository setup (owner): create the SonarCloud project and add the
+# SONAR_TOKEN repository secret. Without a token the analysis steps skip
+# gracefully (build, test, and coverage collection still run).
+
 jobs:
   build-analyze:
     name: Build, Test, Analyze
     runs-on: ubuntu-latest
+    timeout-minutes: 45
     # This job will completely bypass the check if the PR is opened from an external account that does not have access to secrets.
     if: github.event_name == 'push' || github.event.pull_request.head.repo.full_name == github.repository
+
     env:
       SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
@@ -75,24 +95,24 @@ jobs:
       # 3) Setup Java (required by SonarScanner)
       # ---------------------------------------------------------
       - name: Setup Java 17
-        uses: actions/setup-java@v6.0.1
+        uses: actions/setup-java@v6.1.0
         with:
           distribution: zulu
           java-version: "17"
 
       # ---------------------------------------------------------
-      # 4) Setup .NET
+      # 4) Setup .NET SDK (global.json)
       # ---------------------------------------------------------
-      - name: Setup .NET 10
+      - name: Setup .NET SDK (global.json)
         uses: actions/setup-dotnet@v6.0.0
         with:
-          dotnet-version: "10.0.x"
+          global-json-file: global.json
 
       # ---------------------------------------------------------
       # 5) Cache NuGet packages
       # ---------------------------------------------------------
       - name: Cache NuGet packages
-        uses: actions/cache@v6
+        uses: actions/cache@v6.1.0
         with:
           path: ~/.nuget/packages
           key: ${{ runner.os }}-nuget-${{ hashFiles('**/*.csproj') }}
@@ -101,7 +121,7 @@ jobs:
       # 6) Cache SonarCloud
       # ---------------------------------------------------------
       - name: Cache SonarCloud
-        uses: actions/cache@v6
+        uses: actions/cache@v6.1.0
         with:
           path: ~/.sonar/cache
           key: ${{ runner.os }}-sonar
@@ -115,6 +135,11 @@ jobs:
       # ---------------------------------------------------------
       # 8) Begin SonarCloud analysis
       # ---------------------------------------------------------
+      # Documentation, repository scripts, and workflow files are project
+      # infrastructure, not compiled product code (same rationale as the sibling
+      # projects). The exclusion comment lives here — never as '#' lines inside the
+      # continued shell command below, where a comment would swallow the continuation
+      # and break the scanner invocation.
       - name: Begin SonarCloud analysis
         if: env.SONAR_TOKEN != ''
         run: |
@@ -127,31 +152,33 @@ jobs:
             /d:sonar.qualitygate.wait=true \
             /d:sonar.cs.vstest.reportsPaths="TestResults/**/*.trx" \
             /d:sonar.cs.opencover.reportsPaths="**/coverage.opencover.xml" \
-            /d:sonar.coverage.exclusions="**/*.ps1" \
+            /d:sonar.coverage.exclusions="**/*.ps1,docs/**,scripts/**,.github/**,artifacts/**" \
             /d:sonar.scm.provider=git \
             /d:sonar.scm.forceReloadAll=true \
-            /d:sonar.exclusions="samples/**,src/**[Bb]enchmarks/**,**/bin/**,**/obj/**,**/TestResults/**" \
+            /d:sonar.exclusions="samples/**,src/**[Bb]enchmarks/**,docs/**,scripts/**,.github/**,artifacts/**,**/*.ps1,**/*.md,**/bin/**,**/obj/**,**/TestResults/**" \
             /d:sonar.test.exclusions="tests/**"
 
       # ---------------------------------------------------------
       # 9) Restore dependencies
       # ---------------------------------------------------------
       - name: Restore dependencies
-        run: dotnet restore
+        run: dotnet restore Jeninnet.FileQuery.slnx
 
       # ---------------------------------------------------------
       # 10) Build solution
       # ---------------------------------------------------------
       - name: Build solution
-        run: dotnet build -c Release --no-restore
+        run: dotnet build Jeninnet.FileQuery.slnx -c Release --no-restore
 
       # ---------------------------------------------------------
-      # 11) Run tests with coverage
+      # 11) Run tests with coverage (OpenCover for SonarCloud;
+      #     the standalone coverage tool keeps using Cobertura)
       # ---------------------------------------------------------
       - name: Run tests with coverage
         run: |
-          dotnet test -c Release --no-build \
-            --settings tests/Jeninnet.FileQuery.Tests/.runsettings \
+          dotnet test Jeninnet.FileQuery.slnx -c Release \
+            --no-build \
+            --settings tests/coverage.opencover.runsettings \
             --collect:"XPlat Code Coverage" \
             --logger "trx;LogFileName=results.trx" \
             --results-directory TestResults
