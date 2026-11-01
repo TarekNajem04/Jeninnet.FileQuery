@@ -1652,6 +1652,56 @@
             Tests that the default engine builder creates a working engine.
             </summary>
         </member>
+        <member name="T:Jeninnet.FileQuery.Tests.Entries.FileQueryEntryTests">
+            <summary>
+            Tests for <see cref="T:Jeninnet.FileQuery.FileQueryEntry"/> result APIs and metadata filters.
+            </summary>
+        </member>
+        <member name="M:Jeninnet.FileQuery.Tests.Entries.FileQueryEntryTests.ExecuteEntries_ReturnsMetadataAndRelativePaths">
+            <summary>
+            Entries expose paths and metadata captured by the enumeration.
+            </summary>
+        </member>
+        <member name="M:Jeninnet.FileQuery.Tests.Entries.FileQueryEntryTests.ExecuteEntries_NormalizesNestedRelativePaths">
+            <summary>
+            Relative paths use forward slashes for nested entries.
+            </summary>
+        </member>
+        <member name="M:Jeninnet.FileQuery.Tests.Entries.FileQueryEntryTests.ExecuteEntriesAsync_ReturnsSameEntries">
+            <summary>
+            The asynchronous API returns the same entries as the synchronous API.
+            </summary>
+        </member>
+        <member name="M:Jeninnet.FileQuery.Tests.Entries.FileQueryEntryTests.Execute_PathOnlyApi_RemainsCompatible">
+            <summary>
+            The path-only result API returns the same files as the entry API.
+            </summary>
+        </member>
+        <member name="M:Jeninnet.FileQuery.Tests.Entries.FileQueryEntryTests.SizeFilters_PruneBeforeMatching">
+            <summary>
+            Size filters are inclusive and prune before matching.
+            </summary>
+        </member>
+        <member name="M:Jeninnet.FileQuery.Tests.Entries.FileQueryEntryTests.TimeFilters_PruneBeforeMatching">
+            <summary>
+            Time filters are exclusive and use the last-write timestamp from the enumeration.
+            </summary>
+        </member>
+        <member name="M:Jeninnet.FileQuery.Tests.Entries.FileQueryEntryTests.EntryFilter_SkipsMatchingAttributes">
+            <summary>
+            Attribute filters prune matching entries and directories.
+            </summary>
+        </member>
+        <member name="M:Jeninnet.FileQuery.Tests.Entries.FileQueryEntryTests.Options_Reject_InvalidMetadataRanges">
+            <summary>
+            Invalid size and time ranges are rejected.
+            </summary>
+        </member>
+        <member name="M:Jeninnet.FileQuery.Tests.Entries.FileQueryEntryTests.CreateEnvironment">
+            <summary>
+            Creates a tree with known sizes and timestamps.
+            </summary>
+        </member>
         <member name="T:Jeninnet.FileQuery.Tests.FileEnumeration.Async.EnumerateFilesAsync_AnchoredAndMixedPatternTests">
             <summary>
             Tests complex glob rule combinations:
@@ -2529,6 +2579,87 @@
             Verifies that PatternToken correctly supports character classes.
             </summary>
         </member>
+        <member name="T:Jeninnet.FileQuery.Tests.GitIgnore.GitIgnoreFileIngestionTests">
+            <summary>
+            End-to-end tests for loading Git ignore files into a query.
+            </summary>
+        </member>
+        <member name="M:Jeninnet.FileQuery.Tests.GitIgnore.GitIgnoreFileIngestionTests.RootIgnoreFile_ExcludesMatchingFiles">
+            <summary>
+            The root <c>.gitignore</c> excludes files at every depth.
+            </summary>
+        </member>
+        <member name="M:Jeninnet.FileQuery.Tests.GitIgnore.GitIgnoreFileIngestionTests.NestedIgnoreFile_IsScopedToItsDirectory">
+            <summary>
+            A nested ignore file only affects its subtree.
+            </summary>
+        </member>
+        <member name="M:Jeninnet.FileQuery.Tests.GitIgnore.GitIgnoreFileIngestionTests.Negation_UsesLastMatchWins">
+            <summary>
+            Deeper negations override earlier rules.
+            </summary>
+        </member>
+        <member name="M:Jeninnet.FileQuery.Tests.GitIgnore.GitIgnoreFileIngestionTests.NestedNegation_OverridesParentRule">
+            <summary>
+            A deeper ignore file can re-include a file excluded by a parent rule.
+            </summary>
+        </member>
+        <member name="M:Jeninnet.FileQuery.Tests.GitIgnore.GitIgnoreFileIngestionTests.DirectoryOnlyRule_PrunesSubtree">
+            <summary>
+            Directory-only rules prune the directory subtree.
+            </summary>
+        </member>
+        <member name="M:Jeninnet.FileQuery.Tests.GitIgnore.GitIgnoreFileIngestionTests.EscapedCharacters_AreLiterals">
+            <summary>
+            Escaped comment/negation characters are treated as literals.
+            </summary>
+        </member>
+        <member name="M:Jeninnet.FileQuery.Tests.GitIgnore.GitIgnoreFileIngestionTests.TrailingSpaces_AreTrimmed">
+            <summary>
+            Unescaped trailing spaces are ignored, matching Git.
+            </summary>
+        </member>
+        <member name="M:Jeninnet.FileQuery.Tests.GitIgnore.GitIgnoreFileIngestionTests.InfoExclude_IsLoaded">
+            <summary>
+            <c>.git/info/exclude</c> is loaded for a repository-root query.
+            </summary>
+        </member>
+        <member name="M:Jeninnet.FileQuery.Tests.GitIgnore.GitIgnoreFileIngestionTests.GlobalExcludesFile_IsLoaded">
+            <summary>
+            An explicitly supplied global excludes file is loaded.
+            </summary>
+        </member>
+        <member name="M:Jeninnet.FileQuery.Tests.GitIgnore.GitIgnoreFileIngestionTests.NestedIgnoreFiles_AreNotReadInsideIgnoredDirectory">
+            <summary>
+            Nested ignore files inside an ignored directory are not read, matching Git.
+            </summary>
+        </member>
+        <member name="M:Jeninnet.FileQuery.Tests.GitIgnore.GitIgnoreFileIngestionTests.GitDocumentationVector_AnchoredDirectoryRule">
+            <summary>
+            Git documentation vectors keep their anchored-path semantics.
+            </summary>
+        </member>
+        <member name="M:Jeninnet.FileQuery.Tests.GitIgnore.GitIgnoreFileIngestionTests.GitDocumentationVector_AnchoredFileRule">
+            <summary>
+            A leading slash anchors a file rule to the query root.
+            </summary>
+        </member>
+        <member name="M:Jeninnet.FileQuery.Tests.GitIgnore.GitIgnoreFileIngestionTests.GitDocumentationVector_LeadingDoubleStar">
+            <summary>
+            A leading <c>**&#47;</c> matches at every depth.
+            </summary>
+        </member>
+        <member name="M:Jeninnet.FileQuery.Tests.GitIgnore.GitIgnoreFileIngestionTests.CreateRootEnvironment">
+            <summary>
+            Creates a small repository-like tree.
+            </summary>
+        </member>
+        <member name="M:Jeninnet.FileQuery.Tests.GitIgnore.GitIgnoreFileIngestionTests.QueryFiles(Jeninnet.Testing.Assertions.IO.TestEnvironment)">
+            <summary>
+            Runs an ignore-aware query and returns sorted relative paths without ignore metadata files.
+            </summary>
+            <param name="environment">The test environment.</param>
+        </member>
         <member name="T:Jeninnet.FileQuery.Tests.Integration.DependencyInjectionParityTests">
             <summary>
             Contains tests verifying parity between dependency injection and default runtime.
@@ -3247,6 +3378,53 @@
             Verifies that a <see cref="T:Jeninnet.FileQuery.Patterns.Syntax.WildcardToken"/> is correctly instantiated to represent a wildcard.
             </summary>
         </member>
+        <member name="T:Jeninnet.FileQuery.Tests.PatternSet.FileQueryPatternSetTests">
+            <summary>
+            Tests for the in-memory <see cref="T:Jeninnet.FileQuery.FileQueryPatternSet"/> API.
+            </summary>
+        </member>
+        <member name="M:Jeninnet.FileQuery.Tests.PatternSet.FileQueryPatternSetTests.IsMatch_MatchesGlobPatterns">
+            <summary>
+            A glob pattern set matches files without traversing a filesystem.
+            </summary>
+        </member>
+        <member name="M:Jeninnet.FileQuery.Tests.PatternSet.FileQueryPatternSetTests.IsMatch_PreservesGitIgnoreNegation">
+            <summary>
+            GitIgnore last-match-wins and negation are preserved.
+            </summary>
+        </member>
+        <member name="M:Jeninnet.FileQuery.Tests.PatternSet.FileQueryPatternSetTests.IsMatch_SpanOverload_DoesNotAllocate">
+            <summary>
+            The span overload is allocation-free on the matching path.
+            </summary>
+        </member>
+        <member name="M:Jeninnet.FileQuery.Tests.PatternSet.FileQueryPatternSetTests.Explain_ReturnsDecidingPattern">
+            <summary>
+            Explain identifies the deciding pattern and outcome.
+            </summary>
+        </member>
+        <member name="M:Jeninnet.FileQuery.Tests.PatternSet.FileQueryPatternSetTests.Explain_ReturnsNoMatch_ForUnmatchedPath">
+            <summary>
+            Explain reports NoMatch when no pattern applies.
+            </summary>
+        </member>
+        <member name="M:Jeninnet.FileQuery.Tests.PatternSet.FileQueryPatternSetTests.IsMatch_NormalizesBackslashes">
+            <summary>
+            Windows separators are normalized by the string overload.
+            </summary>
+        </member>
+        <member name="M:Jeninnet.FileQuery.Tests.PatternSet.FileQueryPatternSetTests.IsMatch_TrailingSlash_MarksDirectory">
+            <summary>
+            A trailing slash marks a directory, so a directory-only exclusion applies to it but not
+            to a same-named file.
+            </summary>
+        </member>
+        <member name="M:Jeninnet.FileQuery.Tests.PatternSet.FileQueryPatternSetTests.CreateGlobSet(System.String)">
+            <summary>
+            Creates a compiled Glob pattern set.
+            </summary>
+            <param name="pattern">The Glob pattern.</param>
+        </member>
         <member name="T:Jeninnet.FileQuery.Tests.Patterns.Analysis.PatternAnalyzerTests">
             <summary>
             Contains unit tests for the <see cref="T:Jeninnet.FileQuery.Patterns.Analysis.PatternAnalyzer"/> class.
@@ -3812,6 +3990,63 @@
             <summary>
             Factory helpers for constructing compiled patterns for testing.
             Wraps real compilers to avoid mocking internals.
+            </summary>
+        </member>
+        <member name="T:Jeninnet.FileQuery.Tests.Telemetry.FileQueryTelemetryTests">
+            <summary>
+            Tests for the built-in OpenTelemetry-compatible instrumentation.
+            </summary>
+        </member>
+        <member name="M:Jeninnet.FileQuery.Tests.Telemetry.FileQueryTelemetryTests.Execute_EmitsActivity_WithLowCardinalityTags">
+            <summary>
+            Synchronous execution emits a span with the stable name and low-cardinality tags.
+            </summary>
+        </member>
+        <member name="M:Jeninnet.FileQuery.Tests.Telemetry.FileQueryTelemetryTests.ExecuteAsync_EmitsAsyncActivity">
+            <summary>
+            Asynchronous execution emits the asynchronous span name.
+            </summary>
+        </member>
+        <member name="M:Jeninnet.FileQuery.Tests.Telemetry.FileQueryTelemetryTests.Execute_EmitsMetrics">
+            <summary>
+            Execution publishes query, traversal, and duration metrics.
+            </summary>
+        </member>
+        <member name="M:Jeninnet.FileQuery.Tests.Telemetry.FileQueryTelemetryTests.Execute_RecordsErrorMetric_WhenTraversalFails">
+            <summary>
+            A traversal failure increments the error counter.
+            </summary>
+        </member>
+        <member name="M:Jeninnet.FileQuery.Tests.Telemetry.FileQueryTelemetryTests.Instrumentation_DoesNotAllocate_WhenNoListenerAttached">
+            <summary>
+            Instrumentation performs no allocation when no listener is attached.
+            </summary>
+        </member>
+        <member name="M:Jeninnet.FileQuery.Tests.Telemetry.FileQueryTelemetryTests.CreateEnvironment">
+            <summary>
+            Creates a test tree with two matching files.
+            </summary>
+        </member>
+        <member name="M:Jeninnet.FileQuery.Tests.Telemetry.FileQueryTelemetryTests.CreateLongCounterListener(System.Collections.Concurrent.ConcurrentDictionary{System.String,System.Int64})">
+            <summary>
+            Registers a meter listener that accumulates long counters by instrument name.
+            </summary>
+            <param name="counters">The counter sink.</param>
+        </member>
+        <member name="M:Jeninnet.FileQuery.Tests.Telemetry.FileQueryTelemetryTests.CreateActivityListener(System.Collections.Generic.List{System.Diagnostics.Activity})">
+            <summary>
+            Registers an activity listener that records stopped activities.
+            </summary>
+            <param name="activities">The activity sink.</param>
+        </member>
+        <member name="T:Jeninnet.FileQuery.Tests.Telemetry.FileQueryTelemetryTests.ThrowingTraversalExecutor">
+            <summary>
+            A traversal executor that yields one result and then fails.
+            </summary>
+        </member>
+        <member name="T:Jeninnet.FileQuery.Tests.Telemetry.FileQueryTelemetryTests.NullPlanBuilder">
+            <summary>
+            A plan builder that returns a placeholder plan for the fake traversal.
             </summary>
         </member>
         <member name="T:Jeninnet.FileQuery.Tests.Traversal.PathRestrictionTests">

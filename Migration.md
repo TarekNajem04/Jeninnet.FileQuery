@@ -1,5 +1,37 @@
 # Migration Guide
 
+## Upgrading to v2.0.0 (hardening release)
+
+v2.0.0 is a major release. The following changes matter when upgrading:
+
+### `IFileQueryEngine` has new members
+
+Custom engine implementations must add:
+
+```csharp
+IEnumerable<FileQueryEntry> ExecuteEntries(FileQuery query);
+IAsyncEnumerable<FileQueryEntry> ExecuteEntriesAsync(FileQuery query, CancellationToken cancellationToken = default);
+```
+
+The built-in engine implements both. Callers that only use `Execute`/`ExecuteAsync` are unaffected.
+
+### New public surface (additive)
+
+- `FileQueryEntry` + `ExecuteEntries()`/`ExecuteEntriesAsync()` and the `MinSize`, `MaxSize`,
+  `ModifiedAfter`, `ModifiedBefore`, `AttributesToSkip` builder filters.
+- `FileQueryPatternSet` (`IsMatch` string/span, `Explain`) for in-memory matching.
+- `GitIgnoreOptions` + `UseGitIgnoreFiles()`; CLI `--ignore-files` / `--global-ignore`.
+- `FileQueryTelemetry` names and built-in spans/metrics.
+- `Jeninnet.FileQuery.Analyzers` NuGet package with `JNQ1001` and a code fix.
+- Native AOT smoke host / CI validation.
+
+### Behavior notes
+
+- An escaped leading `!` (`\!name`) in a GitIgnore pattern is now a literal, matching Git.
+- `dotnet-filequery --ignore-files` removes the implicit `!**` include-all fallback so loaded ignore
+  rules can exclude files.
+- Invalid metadata filter ranges now fail when the query is built.
+
 ## Upgrading from v1.0.0 / v1.1.0 to v1.2.0
 
 Jeninnet.FileQuery v1.2.0 introduces a breaking change to the `FileQueryOptions` constructor. To improve configuration validation and consistency, the constructor no longer accepts individual parameters directly. Instead, it now requires a `FileQueryOptionsConfig` record.

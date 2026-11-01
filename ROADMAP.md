@@ -31,9 +31,9 @@ To be the fastest, most predictable, and most flexible file discovery engine for
 - [x] **Enhanced Error Recovery**: Provide configurable strategies for handling IO errors (`Skip`, `Retry`, `Abort`).
 - [x] **Pattern Validation Framework**: Implement early detection and reporting for malformed patterns.
 - [x] **Improved Path Validation**: Enhance `FileQueryValidator` for eager path structure validation.
-- [ ] **OpenTelemetry Integration**: Export metrics and spans for structured observability. *(not implemented; pre-v2.0.0 hardening H-02)*
-- [ ] **AOT Compilation Validation Pipeline**: Establish strict Native AOT compatibility checks in CI to ensure zero-reflection guarantees remain unbroken. *(not implemented; pre-v2.0.0 hardening H-04)*
-- [ ] **Roslyn Analyzers for Pattern Validation**: Provide design-time warnings and code fixes for malformed GitIgnore, Glob, or Regex patterns. *(not implemented; pre-v2.0.0 hardening H-03)*
+- [ ] **OpenTelemetry Integration**: Export metrics and spans for structured observability. *(not implemented in v1.x; delivered for v2.0.0 by H-02)*
+- [ ] **AOT Compilation Validation Pipeline**: Establish strict Native AOT compatibility checks in CI to ensure zero-reflection guarantees remain unbroken. *(not implemented in v1.x; delivered for v2.0.0 by H-04)*
+- [ ] **Roslyn Analyzers for Pattern Validation**: Provide design-time warnings and code fixes for malformed GitIgnore, Glob, or Regex patterns. *(not implemented in v1.x; delivered for v2.0.0 by H-03)*
 
 ---
 
@@ -104,29 +104,29 @@ unless stated. Detailed tasks live in `private/Tasks/pre-v2-hardening/` (`TASK-H
 
 - [x] **H-01 Claims audit**: reconcile the README and roadmap with the code, qualify the
   performance/cancellation claims, and re-audit the three Phase 2 statuses below.
-- [ ] **H-02 OpenTelemetry instrumentation**: `ActivitySource` for query spans and `Meter` for
+- [x] **H-02 OpenTelemetry instrumentation**: `ActivitySource` for query spans and `Meter` for
   entries/scanned/matched counters and duration, with tests and documentation. No external
   OpenTelemetry package is required; consumers attach exporters.
-- [ ] **H-03 Roslyn analyzers for pattern validation**: design-time diagnostics and code fixes for
+- [x] **H-03 Roslyn analyzers for pattern validation**: design-time diagnostics and code fixes for
   malformed pattern literals; package, document, and test them.
-- [ ] **H-04 AOT validation pipeline**: publish and run a Native AOT sample in CI on .NET 10, with
+- [x] **H-04 AOT validation pipeline**: publish and run a Native AOT sample in CI on .NET 10, with
   trimming/AOT warnings as errors.
 
 ### One-pass results (P1 — highest user value)
 
-- [ ] **H-05 Entry metadata and filters**: `FileQueryEntry` (`Length`, `CreationTimeUtc`,
+- [x] **H-05 Entry metadata and filters**: `FileQueryEntry` (`Length`, `CreationTimeUtc`,
   `LastWriteTimeUtc`, `Attributes`, `IsDirectory`) with `ExecuteEntries()` and
   `MinSize`/`MaxSize`/`ModifiedAfter`/`ModifiedBefore`/`AttributesToSkip`. The enumeration already
   carries this data, so no extra syscalls.
 - [ ] **H-06 Directory results**: opt-in directory matches, with documented interaction with
   directory-only patterns and pruning.
-- [ ] **H-07 Single-path matcher**: public `IsMatch(string)`/`IsMatch(ReadOnlySpan<char>)` and
+- [x] **H-07 Single-path matcher**: public `IsMatch(string)`/`IsMatch(ReadOnlySpan<char>)` and
   `Explain(path)` over a compiled pattern set, for linters and IDE plugins.
 - [ ] **H-08 CLI `--json` output**: path + metadata for scripts, mirroring `fd`/`ripgrep`.
 
 ### Ecosystem and parity (P1/P2)
 
-- [ ] **H-09 `.gitignore` file ingestion**: root, nested, `.git/info/exclude`, and optional global
+- [x] **H-09 `.gitignore` file ingestion**: root, nested, `.git/info/exclude`, and optional global
   excludes, with Git-accurate scoping and negation.
 - [ ] **H-10 `IFileProvider` adapter package**: query an `IFileProvider` (ASP.NET Core, Razor,
   static files, in-memory providers).

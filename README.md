@@ -92,15 +92,16 @@ See the [Global Tool guide](./docs/guides/global-tool.md) for the full option se
 *   **Async progress snapshots.** Report live traversal statistics (entries scanned, files matched, directories visited) through `IProgress<FileQueryProgress>`.
 *   **Match audit diagnostics.** Opt-in per-entry explanations of match outcomes, including the responsible pattern and its source metadata, through `IProgress<FileQueryDiagnostic>`.
 *   **Deep cancellation (async).** `CancellationToken` propagation is verified across the async traversal and matching paths; sync cancellation is tracked in the pre-v2.0.0 hardening plan.
-*   **OpenTelemetry (planned).** `ActivitySource`/`Meter` instrumentation is scheduled in the pre-v2.0.0 hardening cycle (ROADMAP Phase 5.5).
-*   **Roslyn analyzers (planned).** Design-time pattern validation is scheduled in the pre-v2.0.0 hardening cycle (ROADMAP Phase 5.5).
+*   **OpenTelemetry-ready.** Built-in `ActivitySource`/`Meter` instrumentation exposes query spans and metrics; attach any OpenTelemetry exporter. See `docs/guides/observability-and-diagnostics.md`.
+*   **Roslyn analyzers.** `Jeninnet.FileQuery.Analyzers` validates pattern literals at design time and offers safe code fixes. See `docs/guides/roslyn-analyzers.md`.
+*   **Entry metadata.** `ExecuteEntries()` returns full/relative paths, size, timestamps, attributes, and directory state without extra file-system calls, with size/time/attribute filters.
 
 ### Performance
 
 *   **Zero-allocation matching hot path.** The matching evaluation loop is designed to avoid per-entry heap allocations, using `ReadOnlySpan<char>`, stack-allocated `ref struct` types (`PathView`, `PathSegmentEnumerator`), and index-based loops. Allocation-free matching is enforced by architecture tests.
 *   **Pooled relative-path buffering.** Relative paths are composed in a reusable `ArrayPool<char>`-backed buffer (`RelativePathBuffer`) rather than allocating a new string for every traversed entry. A `string` is materialized only for matched results.
 *   **GitIgnore literal-suffix fast path.** Eligible wildcard patterns resolve their literal suffix at compile time, allowing zero-allocation `EndsWith` rejection before recursive matching.
-*   **AOT-ready.** Reflection is completely avoided to ensure compatibility with .NET Native AOT compilation.
+*   **AOT-ready.** Reflection is completely avoided, and a Native AOT smoke host publishes and runs in CI with trimming/AOT warnings treated as errors. See `docs/guides/native-aot.md`.
 
 ---
 

@@ -19,6 +19,12 @@ Versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - **Long-Running Stability Harness**: Added `src/Jeninnet.FileQuery.Soak`, which repeats a query over a deterministic dataset, samples the managed heap after full collections, and fails on heap growth (>4 MB) or throughput degradation (>1.5× first-half mean). A 60-second Windows run completed 6,613 iterations with 0.06 MB heap growth and no leak; the `soak` CI job runs a shorter version and uploads the report.
 - **Runtime Evolution Tracking**: Added `scripts/performance/check-runtime.ps1` and `docs/performance/runtime-evolution.json` to detect .NET runtime/SDK drift against the recorded baseline, define the weekly/release re-baseline cadence, and record the current runtime (10.0.14). The benchmarks workflow now prints the drift check and uploads `runtime-info.txt` with every artifact.
 - **Enumeration Ceiling Benchmark**: Added `EnumerationCeilingBenchmark`, which measures raw BCL enumeration against engine traversal and matching on the deterministic 10,000-file tree. On Windows 11 / .NET 10.0.14, BCL enumeration took 7.29 ms, engine traversal 9.70 ms (+33%), and matching added ~0.63 ms — bounding what a native enumerator could recover.
+- **OpenTelemetry Instrumentation**: Added stable `ActivitySource` (`Jeninnet.FileQuery`, spans `FileQuery.Execute`/`FileQuery.ExecuteAsync`) and `Meter` instrumentation (`filequery.queries.*`, `filequery.entries.scanned`, `filequery.files.matched`). No external OpenTelemetry package is required; consumers attach exporters.
+- **Entry Metadata and Filters**: Added `FileQueryEntry` and `ExecuteEntries()`/`ExecuteEntriesAsync()` with full/relative paths, size, creation/last-write timestamps, attributes, and directory state. Added `MinSize`, `MaxSize`, `ModifiedAfter`, `ModifiedBefore`, and `AttributesToSkip` filters that run before matching without extra file-system calls.
+- **Single-Path Matcher**: Added `FileQueryPatternSet` with `IsMatch(string)`, allocation-free `IsMatch(ReadOnlySpan<char>)`, and `Explain(path)` for linters and IDE plugins.
+- **Git Ignore File Ingestion**: Added `UseGitIgnoreFiles()` / `GitIgnoreOptions` to load root and nested `.gitignore` files, `.git/info/exclude`, and an optional global excludes file with parent-before-child precedence, directory scoping, negation, escaped characters, and directory-only rules. The global tool opts in with `--ignore-files` and `--global-ignore`.
+- **Roslyn Analyzer**: Added the `Jeninnet.FileQuery.Analyzers` package with `JNQ1001` (malformed pattern literal) and a safe code fix that closes a character class.
+- **Native AOT Validation**: Added the `Jeninnet.FileQuery.AotSmoke` host and a `linux-x64` CI job that publishes with `PublishAot`, treats trimming/AOT warnings as errors, and runs a real query.
 
 ### Changed
 
@@ -30,6 +36,8 @@ Versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 ### Fixed
 
 - **CommandLine Regex Patterns**: `PatternBuilder.Build` now adds the required `r:` dialect prefix to patterns supplied through the `--regex` option, so regex patterns work without a manual prefix.
+- **Escaped GitIgnore Leading Characters**: An escaped leading `!` (`\!name`) is now treated as a literal instead of negation, matching Git's escape semantics.
+- **CLI Ignore-File Fallback**: `dotnet-filequery --ignore-files` no longer lets the implicit `!**` include-all fallback override the loaded ignore rules.
 
 ## [1.5.0] - 2026-08-12
 

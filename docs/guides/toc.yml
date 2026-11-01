@@ -14,3 +14,13 @@
   href: dependency-injection.md
 - name: Observability and Diagnostics
   href: observability-and-diagnostics.md
+- name: Entry Metadata and Filters
+  href: entry-metadata-and-filters.md
+- name: In-Memory Matching
+  href: in-memory-matching.md
+- name: Git Ignore Files
+  href: gitignore-files.md
+- name: Roslyn Analyzer
+  href: roslyn-analyzers.md
+- name: Native AOT
+  href: native-aot.md
