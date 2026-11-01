@@ -33,6 +33,7 @@ Versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - **Git Ignore File Ingestion**: Added `UseGitIgnoreFiles()` / `GitIgnoreOptions` to load root and nested `.gitignore` files, `.git/info/exclude`, and an optional global excludes file with parent-before-child precedence, directory scoping, negation, escaped characters, and directory-only rules. The global tool opts in with `--ignore-files` and `--global-ignore`.
 - **Roslyn Analyzer**: Added the `Jeninnet.FileQuery.Analyzers` package with `JNQ1001` (malformed pattern literal) and a safe code fix that closes a character class.
 - **Inaccessible-Entry Policy**: Added `FileQueryBuilder.IgnoreInaccessible(bool)` so callers can surface recoverable access failures instead of always skipping them. Disabling the default selects the abort recovery policy unless `WithErrorRecovery` is supplied.
+- **Traversal Controls**: Added `FileQueryBuilder.WithMaxDepth(int)` and `WithTraversal(TraversalOptions)`, exposing depth limits, DFS/BFS strategy, and symlink policy through the fluent API.
 - **Native AOT Validation**: Added the `Jeninnet.FileQuery.AotSmoke` host and a `linux-x64` CI job that publishes with `PublishAot`, treats trimming/AOT warnings as errors, and runs a real query.
 
 ### Changed
@@ -43,6 +44,7 @@ Versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - **README Coverage and Package Front Pages**: Added READMEs for every src/test/sample project and the GitHub Action, rewrote the core package README with the current API, expanded the Analyzer/Build/FileProviders pages, and added sample/test indices. No runtime change.
 - **Capability Review**: Added `docs/articles/library-capability-review.md`, comparing the library with `Microsoft.Extensions.FileSystemGlobbing`, `DotNet.Glob`, gitignore parsers, BCL enumeration, and `fd`/`ripgrep`, with a prioritized backlog and an audit of the published claims.
 - **Capability Review Refresh**: Updated the review to the v2.0.0 state: metadata/filters, `.gitignore` ingestion, single-path matching, directory results, `IFileProvider`, brace expansion, sync cancellation, JSON, analyzers, AOT, and MSBuild/SARIF are marked shipped; the claims audit is closed; Phase 2 statuses now reflect delivery by H-02/H-03/H-04; and both release checklists require the docs/claims/API checks.
+- **Documentation Refresh**: Rebuilt the documentation landing page and onboarding flow, added common recipes and error-handling guides, fixed stale API examples in quick-start/runtime/observability pages, added Runtime and Contributing navigation, and linked the published documentation from the root README.
 - **Native Enumeration Decision**: Rejected platform-specific enumeration for v2.0.0. .NET already wraps `FindFirstFileExW`/`getdents64`/`readdir`; the addressable ceiling is a fraction of the 7.29 ms BCL baseline, while three OS-specific implementations would add unsafe code, semantic drift risk, and a permanent verification matrix. The measurements and revisit criteria are recorded in `docs/performance/native-enumeration-research.md`.
 
 ### Fixed

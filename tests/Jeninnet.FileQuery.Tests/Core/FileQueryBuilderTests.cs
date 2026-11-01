@@ -148,6 +148,36 @@ public class FileQueryBuilderTests {
         Assert.AreEqual(CaseSensitivity.Insensitive, query.Options.CaseSensitivity);
     }
 
+    /// <summary>Tests WithMaxDepth_ShouldUpdateDepth_AndRejectInvalidValues.</summary>
+    [TestMethod]
+    public void WithMaxDepth_ShouldUpdateDepth_AndRejectInvalidValues() {
+        var query = FileQuery.From(_tempRoot)
+            .WithMaxDepth(2)
+            .Build();
+
+        Assert.AreEqual(2, query.Options.MaxRecursionDepth);
+
+        Assert.ThrowsExactly<ArgumentOutOfRangeException>(
+            () => FileQuery.From(_tempRoot).WithMaxDepth(-2));
+    }
+
+    /// <summary>Tests WithTraversal_ShouldApplyStrategyAndSymlinkPolicy.</summary>
+    [TestMethod]
+    public void WithTraversal_ShouldApplyStrategyAndSymlinkPolicy() {
+        var traversal = new TraversalOptions(
+            Strategy: TraversalStrategy.BreadthFirst,
+            SymlinkPolicy: SymlinkPolicy.FollowWithCycleDetection);
+
+        var query = FileQuery.From(_tempRoot)
+            .WithTraversal(traversal)
+            .Build();
+
+        Assert.AreEqual(TraversalStrategy.BreadthFirst, query.Options.Traversal.Strategy);
+        Assert.AreEqual(SymlinkPolicy.FollowWithCycleDetection, query.Options.Traversal.SymlinkPolicy);
+        Assert.ThrowsExactly<ArgumentNullException>(
+            () => FileQuery.From(_tempRoot).WithTraversal(null!));
+    }
+
     /// <summary>Tests IgnoreInaccessible_ShouldUpdateOptionAndDefaultRecovery_WhenDisabled.</summary>
     [TestMethod]
     public void IgnoreInaccessible_ShouldUpdateOptionAndDefaultRecovery_WhenDisabled() {

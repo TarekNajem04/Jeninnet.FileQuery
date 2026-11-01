@@ -29,6 +29,8 @@ public sealed class FileQueryBuilder {
     private PatternMatchingMode _patternMatchingMode = PatternMatchingMode.GitIgnore;
     private CaseSensitivity _caseSensitivity = CaseSensitivity.PlatformDefault;
     private bool _recurse = true;
+    private int _maxRecursionDepth = FileQueryOptions.UNLIMITED_RECURSION_DEPTH;
+    private TraversalOptions? _traversal;
     private bool _ignoreInaccessible = true;
     private bool _auditMatches;
     private IProgress<FileQueryDiagnostic>? _diagnostics;
@@ -294,6 +296,41 @@ public sealed class FileQueryBuilder {
     /// <returns>The current <see cref="FileQueryBuilder"/> instance for method chaining.</returns>
     public FileQueryBuilder WithoutRecursion() {
         _recurse = false;
+        return this;
+    }
+
+    /// <summary>
+    /// Limits directory traversal to the specified depth below the root.
+    /// </summary>
+    /// <param name="maxDepth">
+    /// The maximum depth. <c>0</c> visits the root only; <c>-1</c>
+    /// (<see cref="FileQueryOptions.UNLIMITED_RECURSION_DEPTH"/>) allows unlimited depth.
+    /// </param>
+    /// <returns>The current <see cref="FileQueryBuilder"/> instance for method chaining.</returns>
+    /// <exception cref="ArgumentOutOfRangeException">
+    /// Thrown when <paramref name="maxDepth"/> is less than <c>-1</c>.
+    /// </exception>
+    public FileQueryBuilder WithMaxDepth(int maxDepth) {
+        ArgumentOutOfRangeException.ThrowIfLessThan(
+            maxDepth,
+            FileQueryOptions.UNLIMITED_RECURSION_DEPTH);
+
+        _maxRecursionDepth = maxDepth;
+        return this;
+    }
+
+    /// <summary>
+    /// Configures traversal strategy and symbolic-link behavior.
+    /// </summary>
+    /// <param name="traversal">The traversal options to apply.</param>
+    /// <returns>The current <see cref="FileQueryBuilder"/> instance for method chaining.</returns>
+    /// <exception cref="ArgumentNullException">
+    /// Thrown when <paramref name="traversal"/> is <see langword="null"/>.
+    /// </exception>
+    public FileQueryBuilder WithTraversal(TraversalOptions traversal) {
+        ArgumentNullException.ThrowIfNull(traversal);
+
+        _traversal = traversal;
         return this;
     }
 
@@ -616,9 +653,11 @@ public sealed class FileQueryBuilder {
             new FileQueryOptionsConfig(
                 PatternInput: patternInput,
                 RecurseSubdirectories: _recurse,
+                MaxRecursionDepth: _maxRecursionDepth,
                 IgnoreInaccessible: _ignoreInaccessible,
                 PatternMatchingMode: _patternMatchingMode,
                 CaseSensitivity: _caseSensitivity,
+                Traversal: _traversal,
                 AuditMatches: _auditMatches,
                 Diagnostics: _diagnostics,
                 ErrorRecovery: _errorRecovery,

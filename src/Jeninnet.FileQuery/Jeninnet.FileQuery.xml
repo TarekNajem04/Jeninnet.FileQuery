@@ -708,6 +708,29 @@
             </summary>
             <returns>The current <see cref="T:Jeninnet.FileQuery.FileQueryBuilder"/> instance for method chaining.</returns>
         </member>
+        <member name="M:Jeninnet.FileQuery.FileQueryBuilder.WithMaxDepth(System.Int32)">
+            <summary>
+            Limits directory traversal to the specified depth below the root.
+            </summary>
+            <param name="maxDepth">
+            The maximum depth. <c>0</c> visits the root only; <c>-1</c>
+            (<see cref="F:Jeninnet.FileQuery.FileQueryOptions.UNLIMITED_RECURSION_DEPTH"/>) allows unlimited depth.
+            </param>
+            <returns>The current <see cref="T:Jeninnet.FileQuery.FileQueryBuilder"/> instance for method chaining.</returns>
+            <exception cref="T:System.ArgumentOutOfRangeException">
+            Thrown when <paramref name="maxDepth"/> is less than <c>-1</c>.
+            </exception>
+        </member>
+        <member name="M:Jeninnet.FileQuery.FileQueryBuilder.WithTraversal(Jeninnet.FileQuery.Traversal.TraversalOptions)">
+            <summary>
+            Configures traversal strategy and symbolic-link behavior.
+            </summary>
+            <param name="traversal">The traversal options to apply.</param>
+            <returns>The current <see cref="T:Jeninnet.FileQuery.FileQueryBuilder"/> instance for method chaining.</returns>
+            <exception cref="T:System.ArgumentNullException">
+            Thrown when <paramref name="traversal"/> is <see langword="null"/>.
+            </exception>
+        </member>
         <member name="M:Jeninnet.FileQuery.FileQueryBuilder.IgnoreCase(System.Boolean)">
             <summary>
             Controls how character casing is handled during pattern matching.

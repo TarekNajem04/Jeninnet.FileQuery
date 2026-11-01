@@ -302,6 +302,7 @@ for the full design.
 | `FileQueryBuilder.Where(...)` | Add untyped, typed, or delimited patterns |
 | `UsingHybrid/UsingGitIgnore/UsingGlob/UsingRegex` | Select interpretation and matching mode |
 | `IgnoreCase` / `IgnoreInaccessible` | Case and inaccessible-entry policy |
+| `WithRecursion` / `WithMaxDepth` / `WithTraversal` | Depth limit, DFS/BFS strategy, symlink policy |
 | `MinSize` / `MaxSize` / `ModifiedAfter` / `ModifiedBefore` / `AttributesToSkip` | Metadata filters |
 | `UseGitIgnoreFiles` | Load Git ignore files |
 | `RestrictToPaths` | Diff-aware allow-list |

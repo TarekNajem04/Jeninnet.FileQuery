@@ -1,116 +1,87 @@
 # Recursion Depth
 
-The engine provides precise control over how deeply it traverses the directory tree.
+Control how deeply the engine traverses below the query root.
 
 ---
 
-## Configuration Properties
-
-Both properties live on `FileQueryOptions`:
+## Fluent configuration
 
 ```csharp
-public sealed record FileQueryOptions
-{
-    public bool RecurseSubdirectories { get; init; } = true;
-    public int  MaxRecursionDepth     { get; init; } = -1;   // -1 = unlimited
-}
+// Unlimited depth (default)
+var all = FileQuery.From(root)
+    .WithRecursion()
+    .Build();
+
+// Root only
+var direct = FileQuery.From(root)
+    .WithoutRecursion()
+    .Build();
+
+// Root + two levels
+var shallow = FileQuery.From(root)
+    .WithMaxDepth(2)
+    .Build();
 ```
+
+`WithMaxDepth(0)` visits the root only. `WithMaxDepth(-1)` —
+`FileQueryOptions.UNLIMITED_RECURSION_DEPTH` — allows unlimited depth.
+
+`WithMaxDepth` throws `ArgumentOutOfRangeException` for values below `-1`.
 
 ---
 
-## RecurseSubdirectories
-
-When `false`, only the root directory is inspected. No subdirectories are entered regardless of `MaxRecursionDepth`.
-
-```csharp
-var options = new FileQueryOptions {
-    PatternInput          = new(patterns: ["**", "!*.cs"]),
-    RecurseSubdirectories = false   // root only
-};
-```
-
----
-
-## MaxRecursionDepth
-
-Controls the maximum depth of directory traversal. Depth is counted in directory levels below the root:
+## Depth semantics
 
 | Depth | Directories visited |
-|-------|-------------------|
+|---|---|
 | `0` | Root only |
 | `1` | Root + immediate subdirectories |
 | `2` | Root + two levels of subdirectories |
 | `-1` (default) | Unlimited |
 
-```csharp
-var options = new FileQueryOptions {
-    PatternInput          = new(patterns: ["**", "!*.cs"]),
-    RecurseSubdirectories = true,
-    MaxRecursionDepth     = 2   // root + two levels
-};
-```
-
-Using `MaxRecursionDepth` is more efficient than pattern-based depth limiting because the traversal engine stops enumerating directories that exceed the limit rather than entering them and discarding results.
+Depth-based pruning is cheaper than pattern-based depth limiting: the traversal stops enumerating
+directories that exceed the limit instead of entering them and discarding results.
 
 ---
 
-## Fluent API
+## Interaction with directory pruning
 
-The fluent builder exposes `WithRecursion` and `WithoutRecursion` for the most common cases:
+`WithMaxDepth` and directory-only patterns (`bin/`) are evaluated independently. A directory at
+depth 1 may be pruned by a pattern even when the depth limit would permit entering it.
 
-```csharp
-// Unlimited recursion (default)
-FileQuery.From(root).WithRecursion().Where(...).Build();
+A directory is pruned when **either** condition is met:
 
-// Root only
-FileQuery.From(root).WithoutRecursion().Where(...).Build();
-```
-
-For `MaxRecursionDepth`, use `FileQueryOptions` directly — the fluent builder does not expose a depth parameter to keep the API surface small.
+- its depth exceeds `MaxRecursionDepth`, or
+- its most recent pattern match is a non-negated exclusion.
 
 ---
 
-## Interaction with Directory Pruning
+## Combining with traversal options
 
-`MaxRecursionDepth` and directory-only patterns (`bin/`) are evaluated independently. A directory at depth 1 may be pruned by a pattern even when `MaxRecursionDepth` would permit entering it.
+```csharp
+var query = FileQuery.From(root)
+    .WithMaxDepth(3)
+    .WithTraversal(new TraversalOptions(
+        Strategy: TraversalStrategy.BreadthFirst,
+        SymlinkPolicy: SymlinkPolicy.FollowWithCycleDetection))
+    .Build();
+```
 
-The engine prunes a directory when **either** condition is met:
-- The directory's depth exceeds `MaxRecursionDepth`, or
-- The directory's most recent pattern match is a non-negated exclusion.
+`WithTraversal` exposes:
+
+| Option | Values |
+|---|---|
+| `Strategy` | `DepthFirst` (default), `BreadthFirst` |
+| `SymlinkPolicy` | `Ignore` (default), `Follow`, `FollowWithCycleDetection` |
+| `UseAsync` | Enables asynchronous I/O where supported |
+
+Use `FollowWithCycleDetection` for trees that may contain symlink cycles. `Follow` performs no cycle
+detection and can traverse indefinitely on a cycle.
 
 ---
 
-## Examples
+## Related
 
-### Only the root directory
-
-```csharp
-new FileQueryOptions {
-    PatternInput      = new(patterns: ["**", "!*.cs"]),
-    MaxRecursionDepth = 0
-}
-```
-
-### Exactly two levels
-
-```csharp
-new FileQueryOptions {
-    PatternInput      = new(patterns: ["**", "!*.json"]),
-    MaxRecursionDepth = 2
-}
-```
-
-### Unlimited (default)
-
-```csharp
-new FileQueryOptions {
-    PatternInput = new(patterns: ["**", "!**/*.log"])
-    // MaxRecursionDepth defaults to -1
-}
-```
-
----
-
-## Validation
-
-`MaxRecursionDepth` must be ≥ `-1`. Values below `-1` throw `ArgumentOutOfRangeException` during `FileQueryOptions.Validate()`, which is called automatically when building a query.
+- [Traversal model](traversal-model.md)
+- [Multiple roots](../guides/multiple-roots.md)
+- [Error handling and validation](../guides/error-handling-and-validation.md)
