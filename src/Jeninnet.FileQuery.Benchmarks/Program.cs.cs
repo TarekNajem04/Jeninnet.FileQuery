@@ -21,6 +21,7 @@ internal static class Program {
                 typeof(HybridMatcherBenchmark),
                 typeof(TraversalBenchmark),
                 typeof(CrossPlatformTraversalBenchmark),
+                typeof(EnumerationCeilingBenchmark),
 
                 typeof(FileQueryBenchmark),
                 typeof(TraversalStrategyBenchmark),
