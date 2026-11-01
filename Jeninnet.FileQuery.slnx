@@ -175,12 +175,14 @@
         <Project Path="src/Jeninnet.FileQuery/Jeninnet.FileQuery.csproj" />
         <Project Path="src/Jeninnet.FileQuery.CommandLine/Jeninnet.FileQuery.CommandLine.csproj" />
         <Project Path="src/Jeninnet.FileQuery.DependencyInjection/Jeninnet.FileQuery.DependencyInjection.csproj" />
+        <Project Path="src/Jeninnet.FileQuery.Tool/Jeninnet.FileQuery.Tool.csproj" />
         <Project Path="src/Jeninnet.Testing.Assertions/Jeninnet.Testing.Assertions.csproj" />
     </Folder>
 
     <Folder Name="/tests/">
         <Project Path="tests/Jeninnet.AdvancedUsage.Tests/Jeninnet.AdvancedUsage.Tests.csproj" />
         <Project Path="tests/Jeninnet.FileQuery.Tests/Jeninnet.FileQuery.Tests.csproj" />
+        <Project Path="tests/Jeninnet.FileQuery.Tool.Tests/Jeninnet.FileQuery.Tool.Tests.csproj" />
         <Project Path="tests/Jeninnet.Testing.Assertions.Tests/Jeninnet.Testing.Assertions.Tests.csproj" />
     </Folder>
 

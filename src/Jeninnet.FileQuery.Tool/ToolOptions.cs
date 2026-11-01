@@ -1,0 +1,158 @@
+﻿//
+// Copyright (c) Jeninnet.
+// Part of the Jeninnet Platform.
+// Platform Repository: https://github.com/TarekNajem04/Jeninnet.Platform/ [PENDING]
+// Solution Repository: https://github.com/TarekNajem04/Jeninnet.FileQuery [LIVE]
+// Licensed under the MIT License.
+//
+using System.CommandLine;
+using Jeninnet.FileQuery.CommandLine;
+
+namespace Jeninnet.FileQuery.Tool;
+
+/// <summary>
+/// Defines the command-line surface of the <c>dotnet-filequery</c> tool.
+/// </summary>
+internal sealed class ToolOptions : CommandLinePatternOptions {
+    private const string OPTION_NAME_ROOT = "--root";
+    private const string OPTION_ALIAS_ROOT = "-r";
+    private const string OPTION_NAME_DIALECT = "--dialect";
+    private const string OPTION_NAME_NO_RECURSIVE = "--no-recursive";
+    private const string OPTION_NAME_DEPTH = "--depth";
+    private const string OPTION_NAME_IGNORE_CASE = "--ignore-case";
+    private const string OPTION_NAME_SYMLINKS = "--symlinks";
+    private const string OPTION_NAME_RELATIVE = "--relative";
+    private const string OPTION_NAME_NULL = "--null";
+    private const string OPTION_ALIAS_NULL = "-0";
+    private const string OPTION_NAME_COUNT = "--count";
+
+    /// <summary>
+    /// Gets the positional patterns to match. Each value may contain multiple semicolon-separated patterns.
+    /// </summary>
+    public Argument<string[]> PositionalPatterns { get; }
+
+    /// <summary>
+    /// Gets the root directory option.
+    /// </summary>
+    public Option<string> Root { get; }
+
+    /// <summary>
+    /// Gets the dialect option that forces a single pattern language.
+    /// </summary>
+    public Option<string> Dialect { get; }
+
+    /// <summary>
+    /// Gets the option that disables recursion into subdirectories.
+    /// </summary>
+    public Option<bool> NoRecursive { get; }
+
+    /// <summary>
+    /// Gets the maximum recursion depth option.
+    /// </summary>
+    public Option<int?> Depth { get; }
+
+    /// <summary>
+    /// Gets the case-insensitive matching option.
+    /// </summary>
+    public Option<bool> IgnoreCase { get; }
+
+    /// <summary>
+    /// Gets the symbolic link policy option.
+    /// </summary>
+    public Option<string> Symlinks { get; }
+
+    /// <summary>
+    /// Gets the option that emits paths relative to the root directory.
+    /// </summary>
+    public Option<bool> Relative { get; }
+
+    /// <summary>
+    /// Gets the option that separates paths with a NUL character instead of a newline.
+    /// </summary>
+    public Option<bool> NullSeparated { get; }
+
+    /// <summary>
+    /// Gets the option that prints only the number of matching files.
+    /// </summary>
+    public Option<bool> Count { get; }
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="ToolOptions"/> class.
+    /// </summary>
+    public ToolOptions() {
+        PositionalPatterns = new Argument<string[]>("patterns") {
+            Description =
+                """
+                Patterns to match. Each value may contain multiple patterns separated by ';'.
+                Defaults to every file when omitted.
+                """,
+            Arity = ArgumentArity.ZeroOrMore
+        };
+
+        Root = new Option<string>(OPTION_NAME_ROOT, OPTION_ALIAS_ROOT) {
+            Description = "Root directory to search. Defaults to the current directory.",
+            DefaultValueFactory = static _ => ".",
+            Arity = ArgumentArity.ExactlyOne
+        };
+
+        Dialect = new Option<string>(OPTION_NAME_DIALECT) {
+            Description = "Force one pattern dialect: hybrid (default), gitignore, glob, or regex.",
+            DefaultValueFactory = static _ => "hybrid",
+            Arity = ArgumentArity.ExactlyOne
+        };
+
+        NoRecursive = new Option<bool>(OPTION_NAME_NO_RECURSIVE) {
+            Description = "Search only the root directory; do not descend into subdirectories.",
+            Arity = ArgumentArity.Zero
+        };
+
+        Depth = new Option<int?>(OPTION_NAME_DEPTH) {
+            Description = "Maximum recursion depth. 0 searches the root directory only.",
+            Arity = ArgumentArity.ExactlyOne
+        };
+
+        IgnoreCase = new Option<bool>(OPTION_NAME_IGNORE_CASE) {
+            Description = "Match pattern characters without case sensitivity.",
+            Arity = ArgumentArity.Zero
+        };
+
+        Symlinks = new Option<string>(OPTION_NAME_SYMLINKS) {
+            Description = "Symbolic link policy: ignore (default), follow, or follow-with-cycle-detection.",
+            DefaultValueFactory = static _ => "ignore",
+            Arity = ArgumentArity.ExactlyOne
+        };
+
+        Relative = new Option<bool>(OPTION_NAME_RELATIVE) {
+            Description = "Write paths relative to the root directory instead of absolute paths.",
+            Arity = ArgumentArity.Zero
+        };
+
+        NullSeparated = new Option<bool>(OPTION_NAME_NULL, OPTION_ALIAS_NULL) {
+            Description = "Separate output paths with a NUL character (for xargs -0 and similar tools).",
+            Arity = ArgumentArity.Zero
+        };
+
+        Count = new Option<bool>(OPTION_NAME_COUNT) {
+            Description = "Write only the number of matching files.",
+            Arity = ArgumentArity.Zero
+        };
+    }
+
+    /// <summary>
+    /// Returns all supported command-line options, including the inherited pattern options.
+    /// </summary>
+    /// <returns>The complete list of options accepted by the root command.</returns>
+    public override List<Option> GetCommandOptions() =>
+        [
+            .. base.GetCommandOptions(),
+            Root,
+            Dialect,
+            NoRecursive,
+            Depth,
+            IgnoreCase,
+            Symlinks,
+            Relative,
+            NullSeparated,
+            Count,
+        ];
+}

@@ -387,6 +387,7 @@ docs/api/
 
 # Build-generated project XML documentation files
 src/**/*.xml
+tests/**/*.xml
 archive/**/*.xml
 # AdvancedUsage evaluation output
 samples/AdvancedUsage/EvaluationResults/
