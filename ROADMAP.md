@@ -25,15 +25,15 @@ To be the fastest, most predictable, and most flexible file discovery engine for
 
 *Goal: Provide deep insights into the enumeration and matching process.*
 
-- [x] **Progress Reporting**: Support `IProgress<T>` in `EnumerateFilesAsync` for real-time scan statistics.
+- [x] **Progress Reporting**: Support `IProgress<T>` in `EnumerateFilesAsync` for real-time scan statistics. *(sync progress added by H-11)*
 - [x] **Match Diagnostics**: Introduce an optional audit mode to explain why a file was included or excluded.
-- [x] **Deep Cancellation**: Ensure `CancellationToken` propagation is verified across all hot paths. *(async paths; sync cancellation is tracked in the pre-v2.0.0 hardening plan)*
+- [x] **Deep Cancellation**: Ensure `CancellationToken` propagation is verified across all hot paths. *(sync and async; sync overloads added by H-11)*
 - [x] **Enhanced Error Recovery**: Provide configurable strategies for handling IO errors (`Skip`, `Retry`, `Abort`).
 - [x] **Pattern Validation Framework**: Implement early detection and reporting for malformed patterns.
 - [x] **Improved Path Validation**: Enhance `FileQueryValidator` for eager path structure validation.
-- [ ] **OpenTelemetry Integration**: Export metrics and spans for structured observability. *(not implemented in v1.x; delivered for v2.0.0 by H-02)*
-- [ ] **AOT Compilation Validation Pipeline**: Establish strict Native AOT compatibility checks in CI to ensure zero-reflection guarantees remain unbroken. *(not implemented in v1.x; delivered for v2.0.0 by H-04)*
-- [ ] **Roslyn Analyzers for Pattern Validation**: Provide design-time warnings and code fixes for malformed GitIgnore, Glob, or Regex patterns. *(not implemented in v1.x; delivered for v2.0.0 by H-03)*
+- [x] **OpenTelemetry Integration**: Export metrics and spans for structured observability. *(not implemented in v1.x; delivered for v2.0.0 by H-02)*
+- [x] **AOT Compilation Validation Pipeline**: Establish strict Native AOT compatibility checks in CI to ensure zero-reflection guarantees remain unbroken. *(not implemented in v1.x; delivered for v2.0.0 by H-04)*
+- [x] **Roslyn Analyzers for Pattern Validation**: Provide design-time warnings and code fixes for malformed GitIgnore, Glob, or Regex patterns. *(not implemented in v1.x; delivered for v2.0.0 by H-03)*
 
 ---
 

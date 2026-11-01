@@ -9,6 +9,10 @@ Use this checklist before tagging a release.
 - `dotnet test -c Release --no-build`
 - `dotnet format --verify-no-changes`
 - DocFX build succeeds with warnings as errors.
+- `pwsh scripts/docs/check-doc-links.ps1` passes.
+- `pwsh scripts/docs/check-readme-claims.ps1` passes.
+- `pwsh scripts/docs/check-api-reference.ps1` passes.
+- `docs/articles/library-capability-review.md` is refreshed against the release scope.
 - Benchmark dry-run succeeds in CI.
 - Full BenchmarkDotNet baseline is captured for release candidates.
 - NuGet packages are packed with symbols, README, license, SourceLink, and repository metadata.

@@ -1,8 +1,7 @@
 # Library Capability Review
 
-_Date: 2026-11-01. Scope: `Jeninnet.FileQuery` at the tip of `release/v2.0.0-prep`. Peer
-information was collected from the official docs and package pages on the same date; verify before
-relying on a specific peer detail._
+_Date: 2026-11-01. Status: refreshed after the v2.0.0 hardening cycle. Peer information was
+collected from official docs and package pages; verify a specific peer detail before relying on it._
 
 This review answers two questions:
 
@@ -10,10 +9,9 @@ This review answers two questions:
    users compare it with?
 2. Which additions would make it materially more useful, and in what order?
 
-The short answer: the engine is differentiated by its multi-dialect pipeline, determinism,
-diagnostics, and performance discipline. The biggest gaps are **trust in the published claims**
-and **one-pass results with metadata**. Both are cheaper to close than the remaining performance
-work.
+The original review identified two gaps: **trust in the published claims** and **one-pass results
+with metadata**. Both were closed during the v2.0.0 hardening cycle. The only capability still
+deliberately deferred is watch mode.
 
 ---
 
@@ -22,170 +20,125 @@ work.
 | Area | Capability |
 |---|---|
 | Pattern dialects | GitIgnore (negation, anchoring, directory-only), Glob (`*`, `**`, `?`, character classes incl. POSIX), Regex (`r:` prefix), Hybrid auto-classification |
+| Pattern features | Brace alternation `{a,b}` for Glob/GitIgnore; validation errors with position and segment |
 | Precedence | Deterministic GitIgnore → Glob → Regex, last-match-wins within GitIgnore |
 | Traversal | DFS/BFS, depth limit, symlink policies (ignore/follow/cycle-safe), inaccessible-entry recovery (skip/retry/abort) |
-| IO | `IFileSystem` abstraction (real, mock, virtual); no direct `System.IO` in the engine |
-| Observability | Async progress snapshots; per-entry audit diagnostics with the responsible pattern |
+| Results | Path-only streaming plus `FileQueryEntry` metadata (`Length`, creation/last-write timestamps, attributes, directory state, root) |
+| Filters | `MinSize`, `MaxSize`, `ModifiedAfter`, `ModifiedBefore`, `AttributesToSkip`, all applied in the existing pass |
+| Directory results | `IncludeDirectories()` yields matching directories from the same walk |
+| Single-path matching | `FileQueryPatternSet.Compile(...).IsMatch` (string/span) and `Explain` |
+| Ignore files | `UseGitIgnoreFiles()` loads root/nested `.gitignore`, `.git/info/exclude`, and an optional global excludes file with Git scoping and negation |
 | Incremental | `RestrictToPaths` allow-list; the CLI fills it from Git commits/timestamps |
+| Multiple roots | `FileQueryBatch` with deterministic order and `FileQueryEntry.RootPath` |
+| IO | `IFileSystem` abstraction (real, mock, virtual); `Jeninnet.FileQuery.FileProviders` adapts `IFileProvider` |
+| Observability | Sync and async progress, per-entry audit diagnostics, built-in `ActivitySource`/`Meter` |
+| Tooling | `dotnet-filequery` (`--json`, `--explain`, diff-aware), VS Code extension, GitHub Action |
+| Build integration | Roslyn analyzer (`JNQ1001`), MSBuild task and SARIF 2.1.0 exporter |
 | Performance | Zero-allocation matching, pooled relative paths, literal-suffix fast path, measured 10k/1M baselines |
-| Platform | .NET 10 / C# 14, AOT-ready by design (no reflection) |
-| Ecosystem | NuGet packages (core, CommandLine, DI, Tooling), `dotnet-filequery` global tool, VS Code extension, GitHub Action, ASP.NET-style DI |
-| Quality | 0-warning build, ~1,200 tests, DocFX with warnings-as-errors, cross-platform + soak baselines |
+| Platform | .NET 10 / C# 14, AOT-ready by design, Native AOT publish/run smoke test in CI |
+| Quality | 0-warning build, 1,310 tests, DocFX with warnings-as-errors, cross-platform and soak baselines |
 
 ---
 
 ## 2. Peer comparison
 
 Rows are capabilities; columns are the closest alternatives. “Reference tools” are `fd`/`ripgrep`
-— not libraries, but the behaviour users expect from a file-query tool.
+— not libraries, but the behaviour users expect from a file-query tool. `—` means the peer was not
+assessed for that row.
 
 | Capability | **Jeninnet.FileQuery** | Microsoft.Extensions.FileSystemGlobbing | DotNet.Glob | GitignoreParserNet / MAB.DotIgnore | BCL `EnumerationOptions` | fd / ripgrep |
 |---|---|---|---|---|---|---|
 | GitIgnore dialect | ✅ | ❌ | ❌ | ✅ (parse only) | ❌ | ✅ (ignore files) |
-| Glob dialect | ✅ | ✅ | ✅ | ❌ | ❌ | ✅ |
-| Regex dialect | ✅ | ❌ | ❌ | ❌ | ❌ | rg (content), not path globs |
-| Traversal included | ✅ | ✅ (`DirectoryInfoBase`) | ❌ | ❌ | ✅ | ✅ |
-| Reads `.gitignore` files | ❌ | ❌ | ❌ | ✅ (parser; nesting is manual) | ❌ | ✅ (nested + global) |
-| Single-path match without traversal | ❌ | ✅ (`Matcher.Match`) | ✅ (`Glob.IsMatch`) | ✅ (`Accepts`/`Denies`) | ❌ | n/a |
-| Entry metadata in results | ❌ (paths only) | ❌ (`Path`/`Stem` only) | ❌ | ❌ | ❌ (paths) | ✅ (JSON: size/time) |
-| Metadata filters (size/time/attributes) | ❌ | ❌ | ❌ | ❌ | attributes only | ✅ |
+| Reads `.gitignore` files | ✅ (opt-in; nested + info/exclude + global) | ❌ | ❌ | ✅ (parser; nesting is manual) | ❌ | ✅ (nested + global) |
+| Single-path match without traversal | ✅ | ✅ (`Matcher.Match`) | ✅ (`Glob.IsMatch`) | ✅ (`Accepts`/`Denies`) | ❌ | n/a |
+| Entry metadata in results | ✅ | ❌ (`Path`/`Stem` only) | ❌ | ❌ | ❌ (paths) | ✅ (JSON: size/time) |
+| Metadata filters (size/time/attributes) | ✅ | ❌ | ❌ | ❌ | attributes only | ✅ |
 | Include/exclude diagnostics | ✅ | ❌ | ❌ | ❌ | ❌ | partial (`--debug`) |
-| Progress reporting | ✅ (async) | ❌ | ❌ | ❌ | ❌ | ✅ |
-| Cancellation | ✅ (async) | n/a | n/a | n/a | ✅ | ✅ |
-| Virtual file system | ✅ (`IFileSystem`) | ✅ (`IFileProvider`, `InMemoryDirectoryInfo`) | ❌ | ❌ | n/a | n/a |
+| Progress reporting | ✅ (sync + async) | ❌ | ❌ | ❌ | ❌ | ✅ |
+| Cancellation | ✅ (sync + async) | n/a | n/a | n/a | ✅ | ✅ |
+| Virtual file system | ✅ (`IFileSystem` + `IFileProvider` adapter) | ✅ (`IFileProvider`, `InMemoryDirectoryInfo`) | ❌ | ❌ | n/a | n/a |
 | Diff-aware queries | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ (external `git` piping) |
-| AOT-ready | ✅ (design) | ✅ | ✅ | ✅ | ✅ | n/a |
+| AOT-ready | ✅ (design + CI smoke) | ✅ | ✅ | ✅ | ✅ | n/a |
 | CLI / tooling | ✅ | ❌ | ❌ | ❌ | ❌ | ✅ (tools) |
 | Target frameworks | net10.0 | netstandard2.0, net462+ | netstandard1.1+ (stale) | netstandard1.3 / net8.0 | net8+ | binaries |
 
+### Additional capabilities shipped in v2.0.0
+
+- **Directory results** from the existing traversal, with directory-only patterns, negation, and
+  pruning preserved.
+- **Brace expansion** `{a,b}` with nesting, escaping, and regex exclusion.
+- **Multiple roots** with deterministic ordering and per-entry root metadata.
+- **JSON output** from the CLI, including size, timestamps, attributes, and directory state.
+- **Roslyn analyzer** (`JNQ1001`) with a safe code fix, plus an **MSBuild task** (`JNQ2001`) and
+  **SARIF 2.1.0** export for code scanning.
+- **Built-in OpenTelemetry instrumentation** (`ActivitySource`/`Meter`) without an external package.
+- **Native AOT publish/run smoke test** in CI with trimming/AOT warnings treated as errors.
+- **`IFileProvider` adapter package** for ASP.NET Core, embedded, and in-memory providers.
+
 ### What the peers do better
 
-- **Microsoft.Extensions.FileSystemGlobbing** is the default in ASP.NET Core and works over
-  `IFileProvider`/`DirectoryInfoBase`, including `InMemoryDirectoryInfo` for tests. Since v10 it
-  supports ordered include/exclude evaluation. It is glob-only, path-only, and has no diagnostics.
+- **Microsoft.Extensions.FileSystemGlobbing** remains the default in ASP.NET Core and works over
+  `IFileProvider`/`DirectoryInfoBase`, including `InMemoryDirectoryInfo` for tests. It is glob-only,
+  path-only, and has no diagnostics; the adapter package now closes its main ecosystem advantage.
 - **DotNet.Glob** is a fast in-memory glob matcher with span support and case options; it does not
-  traverse or read ignore files, and its last stable release is old (3.1.3, with 2021 alphas).
+  traverse or read ignore files, and its last stable release is old.
 - **GitignoreParserNet** implements the GitIgnore specification closely (nested files when fed
   manually, `Accepts`/`Denies`/`Inspects`). **MAB.DotIgnore** is a simpler, older parser. Neither
   traverses or matches other dialects.
-- **fd/ripgrep** set the usability bar: `.gitignore` awareness, hidden/system filters, type filters,
-  size/time filters, JSON output, parallel traversal.
+- **fd/ripgrep** still set the usability bar for terminal workflows: `.gitignore` awareness, hidden
+  and system filters, type filters, size/time filters, JSON output, and parallel traversal.
 
 ### What Jeninnet.FileQuery does better
 
 - The **only** option in this comparison that combines three dialects with deterministic
-  precedence, traversal, diagnostics, progress, error recovery, diff-aware scans, and a virtual
-  filesystem in one pipeline.
+  precedence, traversal, metadata results, filters, diagnostics, progress, error recovery,
+  diff-aware scans, and a virtual filesystem in one pipeline.
 - **Performance discipline**: zero-allocation matching, pooled paths, a measured 10k-file ceiling,
   cross-platform and soak baselines.
-- **Build-tool surface**: `Jeninnet.FileQuery.Tooling` exposes classification/validation/
-  tokenization without executing a query — no peer offers this.
-- **Ecosystem packaging**: CLI, VS Code, GitHub Action, DI, and a versioned SDK.
+- **Build-tool surface**: Tooling, Roslyn, and MSBuild/SARIF packages share one validation model —
+  no peer offers this.
+- **Ecosystem packaging**: CLI, VS Code extension, GitHub Action, DI, and a versioned SDK.
 
 ---
 
-## 3. Credibility gaps to fix before adding features
+## 3. Claims audit (closed in v2.0.0)
 
-These are not feature requests; they are accuracy issues that affect adoption more than any
-missing capability. Each was verified against the code at the review commit.
+The original review found published claims that the code did not back. Each was resolved and is now
+covered by code, tests, and documentation.
 
-| Claim | Evidence | Recommendation |
+| Claim | Original finding | v2.0.0 resolution |
 |---|---|---|
-| **OpenTelemetry integration** (README “Observability”; ROADMAP Phase 2 `[x]`) | No `OpenTelemetry`, `ActivitySource`, `Meter`, or package reference anywhere in `src/` | Implement it (spans for queries, metrics for entries/matches) or remove the claim and reopen the roadmap item |
-| **Roslyn analyzers for pattern validation** (README; ROADMAP Phase 2 `[x]`) | No `DiagnosticAnalyzer`/`CodeFixProvider`, no analyzer package/project | Implement it (a real differentiator) or remove the claim and reopen the item |
-| **AOT compilation validation pipeline** (ROADMAP Phase 2 `[x]`) | No `PublishAot`, `NativeAot`, or AOT step in any workflow | Add a Native AOT publish + run to CI (cheap, high credibility) or reword to “AOT-ready by design” only |
-| **“1M–2M files/sec”** (README feature list) | Phase 7: 1,000,001 entries in 1.746 s warm cache ≈ **573k entries/s** | Qualify the number (hardware, warm cache, enumeration-only) or replace it with the measured range |
-| **“Deep cancellation across all hot paths”** | Only the async API accepts a `CancellationToken`; `Execute(FileQuery)` has none | Qualify as “async paths”; add sync cancellation if users need it |
+| **OpenTelemetry integration** | No `ActivitySource`, `Meter`, or package reference | H-02 added stable `ActivitySource`/`Meter` instrumentation, five tests, and a guide. No external OpenTelemetry package is required. |
+| **Roslyn analyzers** | No `DiagnosticAnalyzer`/`CodeFixProvider` or analyzer project | H-03 shipped `Jeninnet.FileQuery.Analyzers` (`JNQ1001`) with a safe code fix, tests, and a CI consumer-install job. |
+| **AOT validation pipeline** | No `PublishAot` or AOT step in CI | H-04 added the `AotSmoke` host and a linux-x64 `PublishAot` CI job that runs a real query with warnings as errors. |
+| **“1M–2M files/sec”** | Measured ~573k entries/s in a warm-cache enumeration benchmark | H-01 removed the unsupported claim and qualified the measured baseline. |
+| **“Deep cancellation across all hot paths”** | Only the async API accepted a token | H-11 added synchronous `Execute`/`ExecuteEntries` overloads with cancellation and progress parity. |
+| **Phase 2 Done statuses** | `TASK-2-07/08/09` were marked Done without code | The three tasks are documented as rejected for v1 and superseded by the completed H-02/H-03/H-04 tasks. |
 
-Consequence: the internal task board inherited the roadmap and marks `TASK-2-07` (OpenTelemetry),
-`TASK-2-08` (AOT pipeline), and `TASK-2-09` (Roslyn analyzers) as **Done**. Re-audit those three
-statuses before v2.0.0. A short “claims audit” step in the release checklist would prevent the same
-drift in the future.
+The repository now runs `scripts/docs/check-readme-claims.ps1` in the documentation workflow, and the
+release checklist requires the claims and link checks before tagging. This prevents the same drift
+from returning silently.
 
 ---
 
-## 4. Recommended additions (ranked)
+## 4. Shipped additions (v2.0.0)
 
-Impact/effort are relative to this repository (tests, docs, and quality gates included).
-
-### P1 — highest user value
-
-#### 4.1 Entry results with metadata, and metadata filters
-
-**What**: `ExecuteEntries()` (sync/async) returning `FileQueryEntry` with `FullPath`,
-`RelativePath`, `Length`, `CreationTimeUtc`, `LastWriteTimeUtc`, `Attributes`, `IsDirectory`,
-`IsSymlink`; builder filters `MinSize`, `MaxSize`, `ModifiedAfter/Before`, `AttributesToSkip`.
-
-**Why**: Users almost always need size or timestamps next to the path. Today they must call
-`FileInfo` per result — N extra metadata round-trips after the engine already enumerated the
-entries. `System.IO.Enumeration.FileSystemEntry` (the source in `FileSystem.TransformEntry`)
-already exposes `Length`, `LastWriteTimeUtc`, and `CreationTimeUtc`, so capturing them is
-**zero-extra-syscall**. `fd`/`ripgrep` expose these in JSON; no .NET peer does.
-
-**Cost**: medium (public result type, two engine entry points, filters, tests, docs).
-**Risk**: low; additive API. Keep the path-only `Execute` for compatibility and allocation parity.
-**Payoff**: the single biggest usability upgrade available.
-
-#### 4.2 `.gitignore` file ingestion
-
-**What**: `WithGitIgnoreFiles()` / `AddIgnoreFile(path)` that loads the root `.gitignore`,
-nested `.gitignore` files, `.git/info/exclude`, and (optionally) the global excludes file, with
-correct nested scoping and negation.
-
-**Why**: “point at a repo and respect its ignore files” is table stakes for repository tooling.
-`GitignoreParserNet` and the Rust `ignore` crate exist because this is hard; users currently have
-to parse files themselves and hand the patterns to the engine, losing nested-scope semantics.
-`fd`/`rg` do it natively.
-
-**Cost**: high (Git precedence/nesting rules, directory-only semantics, encoding, tests).
-**Risk**: medium; do not guess the specification — port it against the Git test cases.
-**Payoff**: removes the biggest reason to reach for another tool in repository scenarios.
-
-#### 4.3 Single-path matcher (in-memory `IsMatch`)
-
-**What**: a public compiled pattern set with `IsMatch(string relativePath)` and
-`IsMatch(ReadOnlySpan<char>)`, plus `Explain(relativePath)` returning the deciding rule.
-
-**Why**: FileSystemGlobbing (`Matcher.Match`), DotNet.Glob (`Glob.IsMatch`), and GitignoreParserNet
-(`Accepts`) all offer in-memory matching. It is the natural API for linters, IDE plugins, and
-“should this file be included?” checks without touching the disk. The Tooling SDK inspects
-patterns but does not match paths.
-
-**Cost**: low–medium (reuse the compiled matcher; expose an allocation-free context).
-**Risk**: low; additive.
-**Payoff**: makes the engine usable inside editors and analyzers, where traversal is irrelevant.
-
-#### 4.4 Directory results
-
-**What**: an option to yield directories (or entries with `IsDirectory`) instead of files only.
-
-**Why**: cleanup/sync/inventory queries need directory matches; the traversal already evaluates
-directories, but the evaluator drops them. Peers either return files only or require a separate
-walk.
-
-**Cost**: low (evaluator + result type).
-**Risk**: medium semantic questions (directory-only patterns, pruning); document clearly.
-**Payoff**: unlocks a class of queries without a second pass.
-
-### P2 — ecosystem fit
-
-| Addition | Why | Cost | Risk |
+| Addition | Priority | Status | Evidence |
 |---|---|---|---|
-| **Sync cancellation and progress** | Parity with async; console apps and UI threads | Medium | Low |
-| **`IFileProvider` adapter package** | ASP.NET Core/Razor/static-files ecosystem; FileSystemGlobbing’s main advantage | Medium (new package) | Low–medium |
-| **CLI `--json` output** | Pairs with 4.1; `fd`/`rg` parity for scripts | Low after 4.1 | Low |
-| **Brace expansion `{a,b}`** | Common glob feature (DotNet.Glob/GlobMatcher); FileSystemGlobbing lacks it | Medium | Medium (ambiguity/escapes) |
-| **Multiple roots** | Query several directories in one pipeline | Low | Low |
-| **Validation error positions** | Better editor/tooling diagnostics; API.md notes the missing index | Medium | Low |
-
-### P3 — differentiators (only with demand)
-
-| Addition | Why | Cost | Risk |
-|---|---|---|---|
-| **Watch mode** (`FileSystemWatcher` + diff set) | Continuous queries for dev tools; pairs with diff-aware | High | High (event loss, debouncing, lifecycle) |
-| **MSBuild task / SARIF exporter** | Already a roadmap candidate; evaluation-time and code-scanning value | Medium | Medium |
-| **Parallel traversal** | Raw speed on multi-core, but breaks deterministic order and can thrash network storage | High | High — **not recommended** |
-| **File content predicates** | Belongs to `ripgrep`/specialized tools; out of scope | High | High |
+| Entry metadata and filters | P1 | **Shipped** (H-05) | `FileQueryEntry`, `ExecuteEntries`, `MinSize`/`MaxSize`/`ModifiedAfter`/`ModifiedBefore`/`AttributesToSkip` |
+| `.gitignore` ingestion | P1 | **Shipped** (H-09) | `UseGitIgnoreFiles`, root/nested/info/global loading, CLI `--ignore-files` |
+| Single-path matcher | P1 | **Shipped** (H-07) | `FileQueryPatternSet.IsMatch` (string/span) and `Explain` |
+| Directory results | P1 | **Shipped** (H-06) | `IncludeDirectories()` with pruning and negation semantics |
+| Sync cancellation and progress | P2 | **Shipped** (H-11) | Sync `Execute`/`ExecuteEntries` token and progress overloads |
+| `IFileProvider` adapter | P2 | **Shipped** (H-10) | `Jeninnet.FileQuery.FileProviders`, physical/in-memory tests |
+| CLI `--json` | P2 | **Shipped** (H-08) | NDJSON with metadata, explain composition, conflict rules |
+| Brace expansion | P2 | **Shipped** (H-12) | Nested/escaped alternation, regex exclusion, bounded expansion |
+| Multiple roots | P2 | **Shipped** (H-13) | `FileQueryBatch`, `FileQueryEntry.RootPath`, ordered output |
+| Validation error positions | P2 | **Shipped** (H-14) | `PatternException.Position`/`Segment` and Tooling diagnostics |
+| MSBuild task and SARIF | P3 | **Shipped** (H-15) | `Jeninnet.FileQuery.Build`, `JNQ2001`, `SarifExporter` |
+| Watch mode | P3 | **Deferred** (H-16) | Event-loss/lifecycle risk; physical-only; revisit after Phase 6 or on demand |
+| Parallel traversal | — | **Not recommended** | Breaks deterministic ordering and can thrash network storage |
+| File-content predicates | — | **Out of scope** | Belongs to `ripgrep` and specialized search tools |
 
 ---
 
@@ -201,27 +154,28 @@ walk.
 
 ---
 
-## 6. Recommended sequence
+## 6. Next steps
 
-1. **Trust (before v2.0.0)**: fix the claims table above, re-audit the three Phase 2 items, qualify
-   the performance number, and add a claims check to the release checklist.
-2. **One-pass results (v2.x)**: 4.1 metadata + filters, 4.4 directory results, then CLI `--json`.
-3. **Ecosystem (v2.x)**: 4.2 `.gitignore` ingestion, 4.3 single-path matcher, and the
-   `IFileProvider` adapter.
-4. **.NET 11 (next release)**: execute the roadmap’s Phase 6 (multi-target `net10.0;net11.0`, CI,
-   AOT validation, re-baseline).
-
-The order is deliberate: metadata results are additive and cheap; `.gitignore` ingestion is the
-largest user-visible gap; trust fixes remove a risk that no feature can offset.
+1. **Keep the claims gate green**: run `scripts/docs/check-readme-claims.ps1`,
+   `scripts/docs/check-doc-links.ps1`, and `scripts/docs/check-api-reference.ps1` on every release.
+2. **.NET 11 (next release)**: execute Phase 6 after GA — multi-target `net10.0;net11.0`, CI,
+   AOT validation, and a performance re-baseline.
+3. **Watch mode** only if a concrete IDE/dev-tool consumer needs push updates; define event,
+   coalescing, and failure semantics before implementation.
+4. **Low-priority debt** (dead code, anchor deduplication, cycle-set comparer, broader symlink
+   policy tests) remains tracked in `private/TODO.md` and `private/TECHNICAL_DEBT.md`, not in the
+   release scope.
 
 ---
 
 ## Appendix — evidence
 
-- Claims audited: `README.md` (features, performance), `ROADMAP.md` (Phase 2), `private/API.md`.
+- Claims audited: `README.md` (features, performance), `ROADMAP.md` (Phase 2 and Phase 5.5),
+  `private/API.md`.
 - Enumeration metadata source: `src/Jeninnet.FileQuery/IO/FileSystem.cs`
   (`TransformEntry(ref System.IO.Enumeration.FileSystemEntry entry)`).
 - Ceiling measurement: `docs/performance/native-enumeration-research.md`.
 - 1M-file measurement: `docs/performance/phase7-perf-investigation.md`.
+- Test and release evidence: `private/TESTING.md`, `private/CHANGELOG.md`.
 - Peer sources: Microsoft Learn (`Microsoft.Extensions.FileSystemGlobbing.Matcher`), DotNet.Glob
   GitHub/NuGet, GitignoreParserNet NuGet/GitHub, MAB.DotIgnore NuGet, `fd`/`ripgrep` documentation.
