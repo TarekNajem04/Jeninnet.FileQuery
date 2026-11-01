@@ -4,6 +4,8 @@
   href: diff-aware-queries.md
 - name: VS Code Extension
   href: ide-extension.md
+- name: Build Tooling SDK
+  href: tooling-sdk.md
 - name: CLI Usage
   href: cli-usage.md
 - name: Dependency Injection

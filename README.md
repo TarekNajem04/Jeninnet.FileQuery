@@ -9,7 +9,7 @@
 ![NuGet Version](https://img.shields.io/nuget/v/Jeninnet.FileQuery)
 [![NuGet downloads](https://img.shields.io/nuget/dt/Jeninnet.FileQuery)](https://www.nuget.org/packages/Jeninnet.FileQuery.CommandLine/)
 
-![architecture: invariants ok](badges/architecture.svg) ![target framework: net10.0](badges/frameworks.svg) ![documented packages: 3](badges/packages.svg)
+![architecture: invariants ok](badges/architecture.svg) ![target framework: net10.0](badges/frameworks.svg) ![documented packages: 4](badges/packages.svg)
 
 **A high-performance, deterministic file discovery and filtering engine for .NET.**
 
@@ -77,6 +77,7 @@ See the [Global Tool guide](./docs/guides/global-tool.md) for the full option se
 *   **POSIX character classes.** Bracket expressions support named classes (`[:digit:]`, `[:alpha:]`, `[:alnum:]`, `[:space:]`, `[:blank:]`, `[:upper:]`, `[:lower:]`, `[:print:]`, `[:graph:]`, `[:punct:]`, `[:cntrl:]`, `[:xdigit:]`).
 *   **Compile-time validation.** Patterns are tokenized and checked against semantic and structural invariants (e.g., `**` isolation, valid character ranges) before execution. Malformed patterns produce rich diagnostics without throwing during tokenization.
 *   **Diff-aware scans.** Restrict any query to an explicit path allow-list with `RestrictToPaths`, so incremental tooling processes only the files that changed. The `dotnet-filequery` tool fills that list from a Git commit or timestamp.
+*   **Build-tool SDK.** `Jeninnet.FileQuery.Tooling` exposes classification, structural validation, and tokenization without executing a query, so MSBuild tasks, linters, and IDE plugins can reuse the engine's pattern semantics.
 
 ### Traversal
 
@@ -146,6 +147,7 @@ This repository contains the core library and its companion packages:
 *   **[DependencyInjection Integration (Jeninnet.FileQuery.DependencyInjection)](./src/Jeninnet.FileQuery.DependencyInjection/README.md)**: Configures and registers the engine and its components in standard .NET host applications.
 *   **[Global Tool (Jeninnet.FileQuery.Tool)](./src/Jeninnet.FileQuery.Tool/README.md)**: The `dotnet-filequery` terminal tool for scripting and pipelines.
 *   **[VS Code Extension](./extensions/vscode/README.md)**: Pattern tester and explainer that drives the global tool from the editor.
+*   **[Build Tooling SDK (Jeninnet.FileQuery.Tooling)](./src/Jeninnet.FileQuery.Tooling/README.md)**: Classify, validate, and tokenize patterns without executing a query.
 *   **[Documentation Suite (docs/)](./docs/README.md)**: Deep technical specifications, guides, and architectural whitepapers.
 *   **[Benchmark Suite](./src/Jeninnet.FileQuery.Benchmarks/README.md)**: Performance measurements and allocation verification.
 *   **[Samples (samples/)](./samples/AdvancedUsage/README.md)**: Practical examples showing basic to advanced usage.

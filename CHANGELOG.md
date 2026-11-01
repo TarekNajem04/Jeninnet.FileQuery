@@ -13,6 +13,7 @@ Versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - **Diff-Aware Queries**: Added `FileQueryBuilder.RestrictToPaths` and `FileQueryOptionsConfig.IncludedPaths` to restrict a query to a root-relative allow-list, skipping unmatched files before pattern matching and pruning directories that cannot contain a listed file. The `dotnet-filequery` tool exposes it through `--changed-since <revision>` and `--changed-since-date <timestamp>`, reports added, modified, renamed, and copied files, excludes deletions, and includes untracked files unless `--no-untracked` is supplied.
 - **VS Code Extension**: Added `extensions/vscode`, a dependency-free extension with *Test File Pattern* and *Explain File Pattern* commands. It drives the global tool against the selected workspace folder and reports matches or per-file include/exclude reasons in the **Jeninnet FileQuery** output channel.
 - **Explain Mode**: Added `dotnet-filequery --explain`, which writes `<include|exclude>\t<path>\t<reason>` for every evaluated file. It reports the responsible pattern kind and cannot be combined with `--count` or `--null`.
+- **Build Tooling SDK**: Added `Jeninnet.FileQuery.Tooling` with `PatternInspector.Classify`, `Validate`, and `Inspect` (automatic or forced dialect). The SDK returns SDK-defined inspection models (segments, tokens, structural flags) so build systems, linters, and IDE plugins can reuse the engine's pattern semantics without executing a query.
 
 ### Fixed
 
