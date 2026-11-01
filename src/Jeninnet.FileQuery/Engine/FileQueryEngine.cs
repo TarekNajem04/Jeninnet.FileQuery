@@ -19,9 +19,18 @@ internal sealed class FileQueryEngine(
     ITraversalExecutor traversal,
     ITraversalPlanBuilder planBuilder
 ) : IFileQueryEngine {
-    public IEnumerable<string> Execute(FileQuery query) {
-        var plan = planBuilder.Build(query);
-        return EnumeratePlan(query.Options, traversal.Execute(plan).GetEnumerator());
+    public IEnumerable<string> Execute(FileQuery query) => Execute(query, progress: null, CancellationToken.None);
+
+    public IEnumerable<string> Execute(FileQuery query, CancellationToken cancellationToken) =>
+        Execute(query, progress: null, cancellationToken);
+
+    public IEnumerable<string> Execute(
+        FileQuery query,
+        IProgress<FileQueryProgress>? progress,
+        CancellationToken cancellationToken = default
+    ) {
+        var plan = planBuilder.Build(query, progress);
+        return EnumeratePlan(query.Options, traversal.Execute(plan, cancellationToken).GetEnumerator());
     }
 
     public async IAsyncEnumerable<string> ExecuteAsync(FileQuery query, [EnumeratorCancellation] CancellationToken cancellationToken = default) {
@@ -46,9 +55,18 @@ internal sealed class FileQueryEngine(
         }
     }
 
-    public IEnumerable<FileQueryEntry> ExecuteEntries(FileQuery query) {
-        var plan = planBuilder.Build(query);
-        return EnumeratePlan(query.Options, traversal.ExecuteEntries(plan).GetEnumerator());
+    public IEnumerable<FileQueryEntry> ExecuteEntries(FileQuery query) => ExecuteEntries(query, progress: null, CancellationToken.None);
+
+    public IEnumerable<FileQueryEntry> ExecuteEntries(FileQuery query, CancellationToken cancellationToken) =>
+        ExecuteEntries(query, progress: null, cancellationToken);
+
+    public IEnumerable<FileQueryEntry> ExecuteEntries(
+        FileQuery query,
+        IProgress<FileQueryProgress>? progress,
+        CancellationToken cancellationToken = default
+    ) {
+        var plan = planBuilder.Build(query, progress);
+        return EnumeratePlan(query.Options, traversal.ExecuteEntries(plan, cancellationToken).GetEnumerator());
     }
 
     public async IAsyncEnumerable<FileQueryEntry> ExecuteEntriesAsync(

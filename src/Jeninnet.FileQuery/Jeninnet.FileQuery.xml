@@ -762,6 +762,22 @@
             </summary>
             <returns>A lazy enumerable of matching absolute file paths.</returns>
         </member>
+        <member name="M:Jeninnet.FileQuery.FileQueryBuilder.Execute(System.Threading.CancellationToken)">
+            <summary>
+            Executes the query synchronously and observes cancellation.
+            </summary>
+            <param name="cancellationToken">A token to cancel the sync enumeration.</param>
+            <returns>A lazy enumerable of matching absolute file paths.</returns>
+        </member>
+        <member name="M:Jeninnet.FileQuery.FileQueryBuilder.Execute(System.IProgress{Jeninnet.FileQuery.FileQueryProgress},System.Threading.CancellationToken)">
+            <summary>
+            Executes the query synchronously and reports traversal progress using the same snapshot shape as the async API.
+            </summary>
+            <param name="progress">The progress sink that receives traversal snapshots.</param>
+            <param name="cancellationToken">A token to cancel the sync enumeration.</param>
+            <returns>A lazy enumerable of matching absolute file paths.</returns>
+            <exception cref="T:System.ArgumentNullException">Thrown when <paramref name="progress"/> is <see langword="null"/>.</exception>
+        </member>
         <member name="M:Jeninnet.FileQuery.FileQueryBuilder.ExecuteAsync(System.Threading.CancellationToken)">
             <summary>
             Executes the query asynchronously using the configured or default engine.
@@ -782,6 +798,22 @@
             Executes the query synchronously and returns matching entries with metadata.
             </summary>
             <returns>A lazy enumerable of matching entries.</returns>
+        </member>
+        <member name="M:Jeninnet.FileQuery.FileQueryBuilder.ExecuteEntries(System.Threading.CancellationToken)">
+            <summary>
+            Executes the query synchronously and returns matching entries while observing cancellation.
+            </summary>
+            <param name="cancellationToken">A token to cancel the sync enumeration.</param>
+            <returns>A lazy enumerable of matching entries.</returns>
+        </member>
+        <member name="M:Jeninnet.FileQuery.FileQueryBuilder.ExecuteEntries(System.IProgress{Jeninnet.FileQuery.FileQueryProgress},System.Threading.CancellationToken)">
+            <summary>
+            Executes the query synchronously and returns matching entries with progress reporting.
+            </summary>
+            <param name="progress">The progress sink that receives traversal snapshots.</param>
+            <param name="cancellationToken">A token to cancel the sync enumeration.</param>
+            <returns>A lazy enumerable of matching entries.</returns>
+            <exception cref="T:System.ArgumentNullException">Thrown when <paramref name="progress"/> is <see langword="null"/>.</exception>
         </member>
         <member name="M:Jeninnet.FileQuery.FileQueryBuilder.ExecuteEntriesAsync(System.Threading.CancellationToken)">
             <summary>
@@ -1672,6 +1704,24 @@
             <param name="query">The query descriptor defining the search parameters.</param>
             <returns>An <see cref="T:System.Collections.Generic.IEnumerable`1"/> of matching file paths.</returns>
         </member>
+        <member name="M:Jeninnet.FileQuery.IFileQueryEngine.Execute(Jeninnet.FileQuery.FileQuery,System.Threading.CancellationToken)">
+            <summary>
+            Synchronous variant of <see cref="M:Jeninnet.FileQuery.IFileQueryEngine.ExecuteAsync(Jeninnet.FileQuery.FileQuery,System.Threading.CancellationToken)"/>.
+            </summary>
+            <param name="query">The query descriptor defining the search parameters.</param>
+            <param name="cancellationToken">The token to monitor for cancellation requests.</param>
+            <returns>An enumerable of matching file paths.</returns>
+        </member>
+        <member name="M:Jeninnet.FileQuery.IFileQueryEngine.Execute(Jeninnet.FileQuery.FileQuery,System.IProgress{Jeninnet.FileQuery.FileQueryProgress},System.Threading.CancellationToken)">
+            <summary>
+            Synchronous variant of <see cref="M:Jeninnet.FileQuery.IFileQueryEngine.ExecuteAsync(Jeninnet.FileQuery.FileQuery,System.IProgress{Jeninnet.FileQuery.FileQueryProgress},System.Threading.CancellationToken)"/>
+            with the same progress snapshot shape.
+            </summary>
+            <param name="query">The query descriptor defining the search parameters.</param>
+            <param name="progress">The progress sink that receives traversal snapshots.</param>
+            <param name="cancellationToken">The token to monitor for cancellation requests.</param>
+            <returns>An enumerable of matching file paths.</returns>
+        </member>
         <member name="M:Jeninnet.FileQuery.IFileQueryEngine.ExecuteAsync(Jeninnet.FileQuery.FileQuery,System.Threading.CancellationToken)">
             <summary>
             Asynchronous variant of <see cref="M:Jeninnet.FileQuery.IFileQueryEngine.Execute(Jeninnet.FileQuery.FileQuery)"/>.
@@ -1699,6 +1749,23 @@
             Metadata comes from the same entries used for matching, so this API does not perform
             additional file-system calls. Use <see cref="M:Jeninnet.FileQuery.IFileQueryEngine.Execute(Jeninnet.FileQuery.FileQuery)"/> when only paths are needed.
             </remarks>
+        </member>
+        <member name="M:Jeninnet.FileQuery.IFileQueryEngine.ExecuteEntries(Jeninnet.FileQuery.FileQuery,System.Threading.CancellationToken)">
+            <summary>
+            Synchronous entry enumeration that observes cancellation.
+            </summary>
+            <param name="query">The query descriptor defining the search parameters.</param>
+            <param name="cancellationToken">The token to monitor for cancellation requests.</param>
+            <returns>An enumerable of matching entries.</returns>
+        </member>
+        <member name="M:Jeninnet.FileQuery.IFileQueryEngine.ExecuteEntries(Jeninnet.FileQuery.FileQuery,System.IProgress{Jeninnet.FileQuery.FileQueryProgress},System.Threading.CancellationToken)">
+            <summary>
+            Synchronous entry enumeration with progress reporting.
+            </summary>
+            <param name="query">The query descriptor defining the search parameters.</param>
+            <param name="progress">The progress sink that receives traversal snapshots.</param>
+            <param name="cancellationToken">The token to monitor for cancellation requests.</param>
+            <returns>An enumerable of matching entries.</returns>
         </member>
         <member name="M:Jeninnet.FileQuery.IFileQueryEngine.ExecuteEntriesAsync(Jeninnet.FileQuery.FileQuery,System.Threading.CancellationToken)">
             <summary>
@@ -5993,13 +6060,15 @@
             The engine must not depend on traversal internals.
             </remarks>
         </member>
-        <member name="M:Jeninnet.FileQuery.Traversal.ITraversalExecutor.Execute(Jeninnet.FileQuery.Traversal.TraversalPlan)">
+        <member name="M:Jeninnet.FileQuery.Traversal.ITraversalExecutor.Execute(Jeninnet.FileQuery.Traversal.TraversalPlan,System.Threading.CancellationToken)">
             <summary>Executes directory traversal according to a prepared plan (synchronous).</summary>
             <param name="plan">The prepared traversal plan to execute.</param>
+            <param name="cancellationToken">A token to monitor for cancellation requests.</param>
         </member>
-        <member name="M:Jeninnet.FileQuery.Traversal.ITraversalExecutor.ExecuteEntries(Jeninnet.FileQuery.Traversal.TraversalPlan)">
+        <member name="M:Jeninnet.FileQuery.Traversal.ITraversalExecutor.ExecuteEntries(Jeninnet.FileQuery.Traversal.TraversalPlan,System.Threading.CancellationToken)">
             <summary>Executes directory traversal according to a prepared plan (synchronous) and yields entries with metadata.</summary>
             <param name="plan">The prepared traversal plan to execute.</param>
+            <param name="cancellationToken">A token to monitor for cancellation requests.</param>
         </member>
         <member name="M:Jeninnet.FileQuery.Traversal.ITraversalExecutor.ExecuteAsync(Jeninnet.FileQuery.Traversal.TraversalPlan,System.Threading.CancellationToken)">
             <summary>Executes directory traversal according to a prepared plan (asynchronous).</summary>
@@ -6243,17 +6312,19 @@
             <param name="pathKind">The kind of path being evaluated.</param>
             <param name="depth">The current depth in the directory traversal.</param>
         </member>
-        <member name="M:Jeninnet.FileQuery.Traversal.TraversalExecutor.Execute(Jeninnet.FileQuery.Traversal.TraversalPlan)">
+        <member name="M:Jeninnet.FileQuery.Traversal.TraversalExecutor.Execute(Jeninnet.FileQuery.Traversal.TraversalPlan,System.Threading.CancellationToken)">
             <summary>
             Executes the traversal plan and returns the matched file paths.
             </summary>
             <param name="plan">The traversal plan to execute.</param>
+            <param name="cancellationToken">Token to monitor for cancellation requests.</param>
         </member>
-        <member name="M:Jeninnet.FileQuery.Traversal.TraversalExecutor.ExecuteEntries(Jeninnet.FileQuery.Traversal.TraversalPlan)">
+        <member name="M:Jeninnet.FileQuery.Traversal.TraversalExecutor.ExecuteEntries(Jeninnet.FileQuery.Traversal.TraversalPlan,System.Threading.CancellationToken)">
             <summary>
             Executes the traversal plan and returns matched entries with their metadata.
             </summary>
             <param name="plan">The traversal plan to execute.</param>
+            <param name="cancellationToken">Token to monitor for cancellation requests.</param>
         </member>
         <member name="M:Jeninnet.FileQuery.Traversal.TraversalExecutor.ExecuteAsync(Jeninnet.FileQuery.Traversal.TraversalPlan,System.Threading.CancellationToken)">
             <summary>
@@ -6269,13 +6340,14 @@
             <param name="plan">The traversal plan to execute.</param>
             <param name="cancellationToken">Token to monitor for cancellation requests.</param>
         </member>
-        <member name="M:Jeninnet.FileQuery.Traversal.TraversalExecutor.ExecuteCore``1(Jeninnet.FileQuery.Traversal.TraversalPlan,System.Func{Jeninnet.FileQuery.IO.FileSystemEntry,Jeninnet.FileQuery.Traversal.RelativePathBuffer,``0})">
+        <member name="M:Jeninnet.FileQuery.Traversal.TraversalExecutor.ExecuteCore``1(Jeninnet.FileQuery.Traversal.TraversalPlan,System.Func{Jeninnet.FileQuery.IO.FileSystemEntry,Jeninnet.FileQuery.Traversal.RelativePathBuffer,``0},System.Threading.CancellationToken)">
             <summary>
             Shared synchronous traversal driver that projects each matched entry.
             </summary>
             <typeparam name="T">The result type.</typeparam>
             <param name="plan">The traversal plan.</param>
             <param name="project">The projection applied to each matched entry.</param>
+            <param name="cancellationToken">Token to monitor for cancellation requests.</param>
         </member>
         <member name="M:Jeninnet.FileQuery.Traversal.TraversalExecutor.ExecuteCoreAsync``1(Jeninnet.FileQuery.Traversal.TraversalPlan,System.Func{Jeninnet.FileQuery.IO.FileSystemEntry,Jeninnet.FileQuery.Traversal.RelativePathBuffer,``0},System.Threading.CancellationToken)">
             <summary>

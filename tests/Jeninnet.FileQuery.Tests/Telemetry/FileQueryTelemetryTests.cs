@@ -210,15 +210,12 @@ public sealed class FileQueryTelemetryTests {
     /// A traversal executor that yields one result and then fails.
     /// </summary>
     private sealed class ThrowingTraversalExecutor : ITraversalExecutor {
-        public IEnumerable<string> Execute(TraversalPlan plan) {
+        public IEnumerable<string> Execute(TraversalPlan plan, CancellationToken cancellationToken = default) {
             yield return "first";
             throw new IOException("simulated traversal failure");
         }
-
-        public IEnumerable<FileQueryEntry> ExecuteEntries(TraversalPlan plan) => throw new NotSupportedException();
-
         public IAsyncEnumerable<string> ExecuteAsync(TraversalPlan plan, CancellationToken cancellationToken) => throw new NotSupportedException();
-
+        public IEnumerable<FileQueryEntry> ExecuteEntries(TraversalPlan plan, CancellationToken cancellationToken = default) => throw new NotImplementedException();
         public IAsyncEnumerable<FileQueryEntry> ExecuteEntriesAsync(TraversalPlan plan, CancellationToken cancellationToken) => throw new NotSupportedException();
     }
 

@@ -130,7 +130,7 @@ unless stated. Detailed tasks live in `private/Tasks/pre-v2-hardening/` (`TASK-H
   excludes, with Git-accurate scoping and negation.
 - [ ] **H-10 `IFileProvider` adapter package**: query an `IFileProvider` (ASP.NET Core, Razor,
   static files, in-memory providers).
-- [ ] **H-11 Sync cancellation and progress**: `Execute(query, CancellationToken)` and sync progress
+- [x] **H-11 Sync cancellation and progress**: `Execute(query, CancellationToken)` and sync progress
   parity with the async API.
 - [ ] **H-12 Brace expansion** `{a,b}` for glob patterns, with escaping rules and tests.
 - [ ] **H-13 Multiple roots**: query several directories in one pipeline with deterministic order.

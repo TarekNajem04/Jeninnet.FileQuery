@@ -472,6 +472,29 @@ public sealed class FileQueryBuilder {
     public IEnumerable<string> Execute() => GetEngine().Execute(Build());
 
     /// <summary>
+    /// Executes the query synchronously and observes cancellation.
+    /// </summary>
+    /// <param name="cancellationToken">A token to cancel the sync enumeration.</param>
+    /// <returns>A lazy enumerable of matching absolute file paths.</returns>
+    public IEnumerable<string> Execute(CancellationToken cancellationToken) => GetEngine().Execute(Build(), cancellationToken);
+
+    /// <summary>
+    /// Executes the query synchronously and reports traversal progress using the same snapshot shape as the async API.
+    /// </summary>
+    /// <param name="progress">The progress sink that receives traversal snapshots.</param>
+    /// <param name="cancellationToken">A token to cancel the sync enumeration.</param>
+    /// <returns>A lazy enumerable of matching absolute file paths.</returns>
+    /// <exception cref="ArgumentNullException">Thrown when <paramref name="progress"/> is <see langword="null"/>.</exception>
+    public IEnumerable<string> Execute(
+        IProgress<FileQueryProgress> progress,
+        CancellationToken cancellationToken = default
+    ) {
+        ArgumentNullException.ThrowIfNull(progress);
+
+        return GetEngine().Execute(Build(), progress, cancellationToken);
+    }
+
+    /// <summary>
     /// Executes the query asynchronously using the configured or default engine.
     /// </summary>
     /// <param name="cancellationToken">A token to cancel the async enumeration.</param>
@@ -500,6 +523,30 @@ public sealed class FileQueryBuilder {
     public IEnumerable<FileQueryEntry> ExecuteEntries() => GetEngine().ExecuteEntries(Build());
 
     /// <summary>
+    /// Executes the query synchronously and returns matching entries while observing cancellation.
+    /// </summary>
+    /// <param name="cancellationToken">A token to cancel the sync enumeration.</param>
+    /// <returns>A lazy enumerable of matching entries.</returns>
+    public IEnumerable<FileQueryEntry> ExecuteEntries(CancellationToken cancellationToken) =>
+        GetEngine().ExecuteEntries(Build(), cancellationToken);
+
+    /// <summary>
+    /// Executes the query synchronously and returns matching entries with progress reporting.
+    /// </summary>
+    /// <param name="progress">The progress sink that receives traversal snapshots.</param>
+    /// <param name="cancellationToken">A token to cancel the sync enumeration.</param>
+    /// <returns>A lazy enumerable of matching entries.</returns>
+    /// <exception cref="ArgumentNullException">Thrown when <paramref name="progress"/> is <see langword="null"/>.</exception>
+    public IEnumerable<FileQueryEntry> ExecuteEntries(
+        IProgress<FileQueryProgress> progress,
+        CancellationToken cancellationToken = default
+    ) {
+        ArgumentNullException.ThrowIfNull(progress);
+
+        return GetEngine().ExecuteEntries(Build(), progress, cancellationToken);
+    }
+
+    /// <summary>
     /// Executes the query asynchronously and returns matching entries with metadata.
     /// </summary>
     /// <param name="cancellationToken">A token to cancel the async enumeration.</param>
@@ -514,7 +561,7 @@ public sealed class FileQueryBuilder {
     /// <para>
     /// This method validates the configuration and throws if it is inconsistent.
     /// The returned <see cref="FileQuery"/> instance contains no execution logic — it
-    /// is a pure data object passed to <see cref="IFileQueryEngine.Execute"/>.
+    /// is a pure data object passed to <see cref="IFileQueryEngine.Execute(FileQuery)"/>.
     /// </para>
     /// </remarks>
     /// <returns>An immutable <see cref="FileQuery"/> ready for execution.</returns>

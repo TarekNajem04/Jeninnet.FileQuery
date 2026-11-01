@@ -95,7 +95,7 @@ public sealed class FileQueryCommand(
                                  .Where(patterns)
                                  .Build();
 
-            var results = engine.Execute(query).ToList();
+            var results = engine.Execute(query, cancellationToken).ToList();
 
             if(results.Count == 0) {
                 Console.WriteLine("No files matched the query.");

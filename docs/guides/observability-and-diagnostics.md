@@ -1,18 +1,26 @@
 # Observability and Diagnostics
 
-Jeninnet.FileQuery provides deep insights into the enumeration and matching process through asynchronous progress reporting, detailed diagnostic audits, and configurable IO error recovery.
+Jeninnet.FileQuery provides deep insights into the enumeration and matching process through progress reporting, detailed diagnostic audits, and configurable IO error recovery.
 
 ## 1. Progress Reporting
 
-For long-running filesystem scans, you can monitor progress using `IProgress<FileQueryProgress>`.
+For long-running filesystem scans, monitor progress with `IProgress<FileQueryProgress>` on either the sync or async path. Both report the same snapshot shape and final counts.
 
 ```csharp
 var progress = new Progress<FileQueryProgress>(p => {
-    Console.WriteLine($"Processed: {p.EntriesProcessed}, Current: {p.CurrentDirectory}");
+    Console.WriteLine($"Scanned: {p.EntriesScanned}, Matched: {p.FilesMatched}, Current: {p.CurrentPath}");
 });
 
 var engine = FileQueryRuntime.Create();
+
+// Asynchronous
 await foreach (var file in engine.ExecuteAsync(query, progress, cancellationToken))
+{
+    // ...
+}
+
+// Synchronous (equivalent snapshot shape)
+foreach (var file in engine.Execute(query, progress, cancellationToken))
 {
     // ...
 }

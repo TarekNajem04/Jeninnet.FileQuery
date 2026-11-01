@@ -20,6 +20,8 @@ The built-in engine implements both. Callers that only use `Execute`/`ExecuteAsy
 - `FileQueryEntry` + `ExecuteEntries()`/`ExecuteEntriesAsync()` and the `MinSize`, `MaxSize`,
   `ModifiedAfter`, `ModifiedBefore`, `AttributesToSkip` builder filters.
 - `IncludeDirectories()` to add directory results to the existing traversal.
+- Synchronous `Execute`/`ExecuteEntries` overloads that accept `CancellationToken` and
+  `IProgress<FileQueryProgress>`; the token-free overloads remain.
 - `FileQueryPatternSet` (`IsMatch` string/span, `Explain`) for in-memory matching.
 - `GitIgnoreOptions` + `UseGitIgnoreFiles()`; CLI `--ignore-files` / `--global-ignore`.
 - `FileQueryTelemetry` names and built-in spans/metrics.

@@ -4037,6 +4037,47 @@
             Wraps real compilers to avoid mocking internals.
             </summary>
         </member>
+        <member name="T:Jeninnet.FileQuery.Tests.Sync.SyncCancellationAndProgressTests">
+            <summary>
+            Tests for synchronous cancellation and progress reporting.
+            </summary>
+        </member>
+        <member name="M:Jeninnet.FileQuery.Tests.Sync.SyncCancellationAndProgressTests.Execute_Throws_WhenTokenIsAlreadyCancelled">
+            <summary>
+            A pre-cancelled token stops the synchronous enumeration.
+            </summary>
+        </member>
+        <member name="M:Jeninnet.FileQuery.Tests.Sync.SyncCancellationAndProgressTests.Execute_ObservesCancellation_DuringEnumeration">
+            <summary>
+            Cancellation requested during enumeration stops the synchronous path promptly.
+            </summary>
+        </member>
+        <member name="M:Jeninnet.FileQuery.Tests.Sync.SyncCancellationAndProgressTests.Execute_ReportsProgress_SameShapeAsAsync">
+            <summary>
+            Synchronous progress snapshots use the same shape and final counts as the async path.
+            </summary>
+        </member>
+        <member name="M:Jeninnet.FileQuery.Tests.Sync.SyncCancellationAndProgressTests.ExecuteEntries_ReportsProgress_AndObservesCancellation">
+            <summary>
+            Synchronous entry enumeration reports progress and observes cancellation.
+            </summary>
+        </member>
+        <member name="M:Jeninnet.FileQuery.Tests.Sync.SyncCancellationAndProgressTests.Execute_Throws_WhenProgressIsNull">
+            <summary>
+            A null progress sink is rejected by the builder overloads.
+            </summary>
+        </member>
+        <member name="M:Jeninnet.FileQuery.Tests.Sync.SyncCancellationAndProgressTests.CreateEnvironment">
+            <summary>
+            Creates a tree with enough entries to observe mid-enumeration cancellation.
+            </summary>
+        </member>
+        <member name="T:Jeninnet.FileQuery.Tests.Sync.SyncCancellationAndProgressTests.RecordingProgress`1">
+            <summary>
+            Collects progress snapshots synchronously.
+            </summary>
+            <typeparam name="T">The snapshot type.</typeparam>
+        </member>
         <member name="T:Jeninnet.FileQuery.Tests.Telemetry.FileQueryTelemetryTests">
             <summary>
             Tests for the built-in OpenTelemetry-compatible instrumentation.

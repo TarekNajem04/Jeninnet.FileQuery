@@ -89,9 +89,9 @@ See the [Global Tool guide](./docs/guides/global-tool.md) for the full option se
 
 ### Observability
 
-*   **Async progress snapshots.** Report live traversal statistics (entries scanned, files matched, directories visited) through `IProgress<FileQueryProgress>`.
+*   **Progress snapshots (sync and async).** Report live traversal statistics (entries scanned, files matched, directories visited) through `IProgress<FileQueryProgress>` on either execution path.
 *   **Match audit diagnostics.** Opt-in per-entry explanations of match outcomes, including the responsible pattern and its source metadata, through `IProgress<FileQueryDiagnostic>`.
-*   **Deep cancellation (async).** `CancellationToken` propagation is verified across the async traversal and matching paths; sync cancellation is tracked in the pre-v2.0.0 hardening plan.
+*   **Deep cancellation (sync and async).** `CancellationToken` propagation is verified across both traversal paths, with cancellation observed per frame and per entry.
 *   **OpenTelemetry-ready.** Built-in `ActivitySource`/`Meter` instrumentation exposes query spans and metrics; attach any OpenTelemetry exporter. See `docs/guides/observability-and-diagnostics.md`.
 *   **Roslyn analyzers.** `Jeninnet.FileQuery.Analyzers` validates pattern literals at design time and offers safe code fixes. See `docs/guides/roslyn-analyzers.md`.
 *   **Entry metadata.** `ExecuteEntries()` returns full/relative paths, size, timestamps, attributes, and directory state without extra file-system calls, with size/time/attribute filters.

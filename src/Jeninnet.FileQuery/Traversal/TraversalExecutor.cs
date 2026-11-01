@@ -14,15 +14,17 @@ internal sealed class TraversalExecutor : ITraversalExecutor {
     /// Executes the traversal plan and returns the matched file paths.
     /// </summary>
     /// <param name="plan">The traversal plan to execute.</param>
-    public IEnumerable<string> Execute(TraversalPlan plan) =>
-        ExecuteCore(plan, static (entry, _) => entry.FullPath);
+    /// <param name="cancellationToken">Token to monitor for cancellation requests.</param>
+    public IEnumerable<string> Execute(TraversalPlan plan, CancellationToken cancellationToken = default) =>
+        ExecuteCore(plan, static (entry, _) => entry.FullPath, cancellationToken);
 
     /// <summary>
     /// Executes the traversal plan and returns matched entries with their metadata.
     /// </summary>
     /// <param name="plan">The traversal plan to execute.</param>
-    public IEnumerable<FileQueryEntry> ExecuteEntries(TraversalPlan plan) =>
-        ExecuteCore(plan, static (entry, pathBuffer) => FileQueryEntry.Create(entry, pathBuffer.RelativePath));
+    /// <param name="cancellationToken">Token to monitor for cancellation requests.</param>
+    public IEnumerable<FileQueryEntry> ExecuteEntries(TraversalPlan plan, CancellationToken cancellationToken = default) =>
+        ExecuteCore(plan, static (entry, pathBuffer) => FileQueryEntry.Create(entry, pathBuffer.RelativePath), cancellationToken);
 
     /// <summary>
     /// Executes the traversal plan asynchronously and yields the matched file paths.
@@ -61,7 +63,14 @@ internal sealed class TraversalExecutor : ITraversalExecutor {
     /// <typeparam name="T">The result type.</typeparam>
     /// <param name="plan">The traversal plan.</param>
     /// <param name="project">The projection applied to each matched entry.</param>
-    private static IEnumerable<T> ExecuteCore<T>(TraversalPlan plan, Func<FileSystemEntry, RelativePathBuffer, T> project) {
+    /// <param name="cancellationToken">Token to monitor for cancellation requests.</param>
+    private static IEnumerable<T> ExecuteCore<T>(
+        TraversalPlan plan,
+        Func<FileSystemEntry, RelativePathBuffer, T> project,
+        CancellationToken cancellationToken
+    ) {
+        cancellationToken.ThrowIfCancellationRequested();
+
         using var buffer = new TraversalFrontier();
         var visited = plan.Traversal.SymlinkPolicy is SymlinkPolicy.FollowWithCycleDetection
             ? new HashSet<string>(StringComparer.OrdinalIgnoreCase)
@@ -69,7 +78,9 @@ internal sealed class TraversalExecutor : ITraversalExecutor {
 
         visited?.Add(plan.FileSystem.ResolveRealPath(plan.RootDirectory));
 
-        foreach(var item in TraverseCore(plan, plan.RootDirectory, buffer, visited, project)) {
+        var state = new TraversalProgressState();
+
+        foreach(var item in TraverseCore(plan, plan.RootDirectory, buffer, visited, state, project, cancellationToken)) {
             yield return item;
         }
     }
@@ -174,7 +185,9 @@ internal sealed class TraversalExecutor : ITraversalExecutor {
         string startDir,
         TraversalFrontier buffer,
         HashSet<string>? visited,
-        Func<FileSystemEntry, RelativePathBuffer, T> project
+        TraversalProgressState state,
+        Func<FileSystemEntry, RelativePathBuffer, T> project,
+        CancellationToken cancellationToken
     ) {
         using var pathBuffer = new RelativePathBuffer();
         buffer.Push(new TraversalFrame(startDir, Depth: 0));
@@ -183,14 +196,20 @@ internal sealed class TraversalExecutor : ITraversalExecutor {
 
         try {
             while(!buffer.IsEmpty) {
+                cancellationToken.ThrowIfCancellationRequested();
                 var frame = TakeFrame(buffer, plan.Traversal);
+                state.DirectoriesVisited++;
+                ReportProgress(plan, state, frame.Directory);
 
                 foreach(var entry in plan.FileSystem.Enumerate(
                     frame.Directory,
                     plan.Traversal.IgnoreInaccessible,
                     plan.Traversal.ErrorRecovery
                 )) {
+                    cancellationToken.ThrowIfCancellationRequested();
+                    state.EntriesScanned++;
                     entriesScanned++;
+                    ReportProgress(plan, state, entry.FullPath);
 
                     if(
                         !TryProcessEntry(
@@ -207,7 +226,9 @@ internal sealed class TraversalExecutor : ITraversalExecutor {
                     }
 
                     if(yieldedEntry.HasValue) {
+                        state.FilesMatched++;
                         filesMatched++;
+                        ReportProgress(plan, state, yieldedEntry.Value.FullPath);
                         yield return project(yieldedEntry.Value, pathBuffer);
                     }
                 }

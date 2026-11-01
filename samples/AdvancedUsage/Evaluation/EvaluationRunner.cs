@@ -55,7 +55,7 @@ public sealed class EvaluationRunner(IFileQueryEngine engine) {
             GeneratorProgressSeverity.Info,
             "Warm-up execution started — first query run over the dataset (this may take a while)");
 
-        var warmUpMatches = engine.Execute(query).Count();
+        var warmUpMatches = engine.Execute(query, cancellationToken).Count();
 
         Report(
             progress,
@@ -74,7 +74,7 @@ public sealed class EvaluationRunner(IFileQueryEngine engine) {
             var allocatedBefore = GC.GetAllocatedBytesForCurrentThread();
 
             var stopwatch = Stopwatch.StartNew();
-            var actualMatches = engine.Execute(query).Count();
+            var actualMatches = engine.Execute(query, cancellationToken).Count();
             stopwatch.Stop();
 
             var result = new EvaluationIteration(

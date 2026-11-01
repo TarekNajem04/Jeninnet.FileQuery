@@ -20,6 +20,28 @@ public interface IFileQueryEngine {
     IEnumerable<string> Execute(FileQuery query);
 
     /// <summary>
+    /// Synchronous variant of <see cref="ExecuteAsync(FileQuery, CancellationToken)"/>.
+    /// </summary>
+    /// <param name="query">The query descriptor defining the search parameters.</param>
+    /// <param name="cancellationToken">The token to monitor for cancellation requests.</param>
+    /// <returns>An enumerable of matching file paths.</returns>
+    IEnumerable<string> Execute(FileQuery query, CancellationToken cancellationToken);
+
+    /// <summary>
+    /// Synchronous variant of <see cref="ExecuteAsync(FileQuery, IProgress{FileQueryProgress}?, CancellationToken)"/>
+    /// with the same progress snapshot shape.
+    /// </summary>
+    /// <param name="query">The query descriptor defining the search parameters.</param>
+    /// <param name="progress">The progress sink that receives traversal snapshots.</param>
+    /// <param name="cancellationToken">The token to monitor for cancellation requests.</param>
+    /// <returns>An enumerable of matching file paths.</returns>
+    IEnumerable<string> Execute(
+        FileQuery query,
+        IProgress<FileQueryProgress>? progress,
+        CancellationToken cancellationToken = default
+    );
+
+    /// <summary>
     /// Asynchronous variant of <see cref="Execute(FileQuery)"/>.
     /// </summary>
     /// <param name="query">The query descriptor defining the search parameters.</param>
@@ -50,6 +72,27 @@ public interface IFileQueryEngine {
     /// additional file-system calls. Use <see cref="Execute(FileQuery)"/> when only paths are needed.
     /// </remarks>
     IEnumerable<FileQueryEntry> ExecuteEntries(FileQuery query);
+
+    /// <summary>
+    /// Synchronous entry enumeration that observes cancellation.
+    /// </summary>
+    /// <param name="query">The query descriptor defining the search parameters.</param>
+    /// <param name="cancellationToken">The token to monitor for cancellation requests.</param>
+    /// <returns>An enumerable of matching entries.</returns>
+    IEnumerable<FileQueryEntry> ExecuteEntries(FileQuery query, CancellationToken cancellationToken);
+
+    /// <summary>
+    /// Synchronous entry enumeration with progress reporting.
+    /// </summary>
+    /// <param name="query">The query descriptor defining the search parameters.</param>
+    /// <param name="progress">The progress sink that receives traversal snapshots.</param>
+    /// <param name="cancellationToken">The token to monitor for cancellation requests.</param>
+    /// <returns>An enumerable of matching entries.</returns>
+    IEnumerable<FileQueryEntry> ExecuteEntries(
+        FileQuery query,
+        IProgress<FileQueryProgress>? progress,
+        CancellationToken cancellationToken = default
+    );
 
     /// <summary>
     /// Asynchronous variant of <see cref="ExecuteEntries(FileQuery)"/>.
