@@ -378,6 +378,13 @@ artifacts/coverage/
 .sonarqube/
 .scannerwork/
 
+# ==========================================
+# Generated Documentation (DocFX)
+# ==========================================
+
+docs/_site/
+docs/api/
+
 # Build-generated project XML documentation files
 src/**/*.xml
 archive/**/*.xml

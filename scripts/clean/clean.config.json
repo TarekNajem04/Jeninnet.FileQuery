@@ -1,6 +1,6 @@
 {
     "$schema": "./clean.schema.json",
-    "version": 1,
+    "version": 2,
 
     "directories": {
         "include": [
@@ -9,13 +9,31 @@
             "output",
             "artifacts",
             "TestResults*",
-            "*Coverage*"
+            "*Coverage*",
+            "_site",
+            ".vs",
+            ".sonarqube"
         ],
 
         "exclude": [
             ".git",
-            ".github",
-            ".vs"
+            ".github"
         ]
+    },
+
+    "files": {
+        "include": [
+            "*.user",
+            "*.suo",
+            "*.userosscache",
+            "*.coverage",
+            "*.coveragexml",
+            "*.trx",
+            "coverage*.info",
+            "Thumbs.db",
+            ".DS_Store"
+        ],
+
+        "exclude": []
     }
 }

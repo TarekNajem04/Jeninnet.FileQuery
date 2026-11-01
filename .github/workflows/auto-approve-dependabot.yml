@@ -15,12 +15,17 @@ on:
         type: number
 
 permissions:
-  contents: write
-  pull-requests: write
+  contents: read
 
 jobs:
   auto-approve:
+    # Only Dependabot PRs (or an explicit manual dispatch) are auto-approved; human PRs are never touched.
+    if: github.actor == 'dependabot[bot]' || github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
+
+    permissions:
+      contents: write
+      pull-requests: write
 
     steps:
       - name: Determine PR URL
@@ -32,6 +37,13 @@ jobs:
             echo "url=${{ github.event.pull_request.html_url }}" >> $GITHUB_OUTPUT
           fi
 
+      - name: Fetch Dependabot metadata
+        id: metadata
+        if: github.event_name == 'pull_request'
+        uses: dependabot/fetch-metadata@v3.1.0
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Approve Pull Request
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -39,6 +51,8 @@ jobs:
           gh pr review "${{ steps.pr.outputs.url }}" --approve
 
       - name: Enable Auto Merge (Squash)
+        # Major version bumps are approved but never auto-merged; they need a human decision.
+        if: github.event_name == 'workflow_dispatch' || steps.metadata.outputs.update-type != 'version-update:semver-major'
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
