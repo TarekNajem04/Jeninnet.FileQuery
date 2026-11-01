@@ -1,0 +1,136 @@
+name: Jeninnet FileQuery
+description: Runs dotnet-filequery and exposes the matching files and count as step outputs.
+author: Jeninnet
+
+branding:
+  icon: search
+  color: blue
+
+inputs:
+  patterns:
+    description: Semicolon-separated patterns. Leave empty to match every file.
+    required: false
+    default: ''
+  root:
+    description: Directory to query, relative to the workspace.
+    required: false
+    default: '.'
+  changed-since:
+    description: Only include files changed since this Git revision (requires fetch-depth 0).
+    required: false
+    default: ''
+  changed-since-date:
+    description: Only include files changed since this ISO 8601 timestamp.
+    required: false
+    default: ''
+  version:
+    description: Version of Jeninnet.FileQuery.Tool to install. Empty installs the latest.
+    required: false
+    default: ''
+  source:
+    description: Additional NuGet source for the tool package (for example artifacts/packages).
+    required: false
+    default: ''
+  output-file:
+    description: Optional path that receives the matched files, one per line.
+    required: false
+    default: ''
+
+outputs:
+  files:
+    description: Newline-separated matching paths, relative to the root.
+    value: ${{ steps.query.outputs.files }}
+  count:
+    description: Number of matching files.
+    value: ${{ steps.query.outputs.count }}
+
+runs:
+  using: composite
+  steps:
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v6.0.0
+      with:
+        dotnet-version: '10.0.x'
+
+    - name: Install Jeninnet FileQuery tool
+      shell: bash
+      env:
+        TOOL_VERSION: ${{ inputs.version }}
+        TOOL_SOURCE: ${{ inputs.source }}
+      run: |
+        set -euo pipefail
+
+        if command -v dotnet-filequery >/dev/null 2>&1; then
+          echo "dotnet-filequery is already installed: $(dotnet-filequery --version)"
+          exit 0
+        fi
+
+        args=(tool install --global Jeninnet.FileQuery.Tool)
+
+        if [ -n "$TOOL_VERSION" ]; then
+          args+=(--version "$TOOL_VERSION")
+        fi
+
+        if [ -n "$TOOL_SOURCE" ]; then
+          args+=(--add-source "$TOOL_SOURCE")
+        fi
+
+        dotnet "${args[@]}"
+        echo "$HOME/.dotnet/tools" >> "$GITHUB_PATH"
+
+    - name: Query files
+      id: query
+      shell: bash
+      env:
+        INPUT_PATTERNS: ${{ inputs.patterns }}
+        INPUT_ROOT: ${{ inputs.root }}
+        INPUT_CHANGED_SINCE: ${{ inputs['changed-since'] }}
+        INPUT_CHANGED_SINCE_DATE: ${{ inputs['changed-since-date'] }}
+        INPUT_OUTPUT_FILE: ${{ inputs['output-file'] }}
+      run: |
+        set -euo pipefail
+
+        files_file="${RUNNER_TEMP:-/tmp}/jeninnet-filequery-files.txt"
+        args=(--root "$INPUT_ROOT" --relative)
+
+        if [ -n "$INPUT_CHANGED_SINCE" ]; then
+          args+=(--changed-since "$INPUT_CHANGED_SINCE")
+        fi
+
+        if [ -n "$INPUT_CHANGED_SINCE_DATE" ]; then
+          args+=(--changed-since-date "$INPUT_CHANGED_SINCE_DATE")
+        fi
+
+        if [ -n "$INPUT_PATTERNS" ]; then
+          args+=("$INPUT_PATTERNS")
+        fi
+
+        dotnet-filequery "${args[@]}" > "$files_file"
+        count=$(wc -l < "$files_file" | tr -d ' ')
+
+        {
+          echo "count=$count"
+          echo "files<<JENINNET_FILEQUERY_EOF"
+          cat "$files_file"
+          echo "JENINNET_FILEQUERY_EOF"
+        } >> "$GITHUB_OUTPUT"
+
+        if [ -n "$INPUT_OUTPUT_FILE" ]; then
+          cp "$files_file" "$INPUT_OUTPUT_FILE"
+        fi
+
+        {
+          echo "### Jeninnet FileQuery"
+          echo ""
+          echo "Matched **$count** file(s) under \`$INPUT_ROOT\`."
+          echo ""
+          if [ "$count" -gt 0 ]; then
+            echo "<details><summary>Files</summary>"
+            echo ""
+            echo '```'
+            head -n 50 "$files_file"
+            echo '```'
+            echo ""
+            echo "</details>"
+          fi
+        } >> "$GITHUB_STEP_SUMMARY"

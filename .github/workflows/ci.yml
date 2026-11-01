@@ -13,6 +13,7 @@ on:
       - 'docs/**'
       - 'scripts/**'
       - 'extensions/**'
+      - '.github/actions/**'
       - '**.csproj'
       - '**.slnx'
       - 'Directory.Build.props'
@@ -33,6 +34,7 @@ on:
       - 'docs/**'
       - 'scripts/**'
       - 'extensions/**'
+      - '.github/actions/**'
       - '**.csproj'
       - '**.slnx'
       - 'Directory.Build.props'
@@ -209,6 +211,54 @@ jobs:
 
       - name: Run extension tests
         run: node --test "extensions/vscode/test/*.test.js"
+
+  filequery-action:
+
+    name: FileQuery Action
+
+    runs-on: ubuntu-latest
+
+    timeout-minutes: 15
+
+    steps:
+
+      - name: Checkout
+        uses: actions/checkout@v7.0.1
+
+      - name: Setup .NET SDK (global.json)
+        uses: actions/setup-dotnet@v6.0.0
+        with:
+          global-json-file: global.json
+
+      - name: Resolve the tool version
+        id: version
+        shell: bash
+        run: |
+          version=$(sed -n 's:.*<Version>\(.*\)</Version>.*:\1:p' src/Jeninnet.FileQuery.Tool/Jeninnet.FileQuery.Tool.csproj | head -n 1)
+          test -n "$version"
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+
+      - name: Pack the tool for the local source
+        run: dotnet pack src/Jeninnet.FileQuery.Tool/Jeninnet.FileQuery.Tool.csproj -c Release -o artifacts/packages
+
+      - name: Run the local action
+        id: query
+        uses: ./.github/actions/filequery
+        with:
+          patterns: '**;!*.cs'
+          root: .
+          version: ${{ steps.version.outputs.version }}
+          source: artifacts/packages
+
+      - name: Verify the action outputs
+        shell: bash
+        env:
+          COUNT: ${{ steps.query.outputs.count }}
+          FILES: ${{ steps.query.outputs.files }}
+        run: |
+          set -euo pipefail
+          test "$COUNT" -gt 0
+          grep -qx 'src/Jeninnet.FileQuery/FileQueryBuilder.cs' <<< "$FILES"
 
   package-validation:
 
