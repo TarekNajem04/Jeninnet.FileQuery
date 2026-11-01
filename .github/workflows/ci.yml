@@ -9,9 +9,17 @@ on:
     paths:
       - 'src/**'
       - 'tests/**'
+      - 'samples/**'
+      - 'docs/**'
+      - 'scripts/**'
       - '**.csproj'
-      - 'Directory.Packages.props'
+      - '**.slnx'
       - 'Directory.Build.props'
+      - 'Directory.Build.targets'
+      - 'Directory.Packages.props'
+      - 'global.json'
+      - 'README.md'
+      - '.editorconfig'
       - '.github/workflows/ci.yml'
 
   pull_request:
@@ -20,9 +28,17 @@ on:
     paths:
       - 'src/**'
       - 'tests/**'
+      - 'samples/**'
+      - 'docs/**'
+      - 'scripts/**'
       - '**.csproj'
-      - 'Directory.Packages.props'
+      - '**.slnx'
       - 'Directory.Build.props'
+      - 'Directory.Build.targets'
+      - 'Directory.Packages.props'
+      - 'global.json'
+      - 'README.md'
+      - '.editorconfig'
       - '.github/workflows/ci.yml'
 
 permissions:
@@ -47,27 +63,31 @@ jobs:
 
     runs-on: ubuntu-latest
 
+    timeout-minutes: 20
+
     steps:
 
       - name: Checkout
         uses: actions/checkout@v7.0.1
 
-      - name: Setup .NET
+      - name: Setup .NET SDK (global.json)
         uses: actions/setup-dotnet@v6.0.0
         with:
-          dotnet-version: 10.0.x
+          global-json-file: global.json
 
       - name: Restore
-        run: dotnet restore
+        run: dotnet restore Jeninnet.FileQuery.slnx
 
       - name: Verify formatting
-        run: dotnet format --verify-no-changes --no-restore
+        run: dotnet format Jeninnet.FileQuery.slnx --verify-no-changes --no-restore
 
   build-and-test:
 
     name: Build & Test (${{ matrix.os }})
 
     runs-on: ${{ matrix.os }}
+
+    timeout-minutes: 60
 
     strategy:
       fail-fast: false
@@ -85,24 +105,50 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Setup .NET
+      - name: Setup .NET SDK (global.json)
         uses: actions/setup-dotnet@v6.0.0
         with:
-          dotnet-version: 10.0.x
+          global-json-file: global.json
 
       - name: Restore
-        run: dotnet restore
+        run: dotnet restore Jeninnet.FileQuery.slnx
 
       - name: Build
-        run: dotnet build --configuration Release --no-restore
+        run: dotnet build Jeninnet.FileQuery.slnx --configuration Release --no-restore
 
       - name: Test
         run: >
-          dotnet test
+          dotnet test Jeninnet.FileQuery.slnx
           --configuration Release
           --no-build
+          --blame-hang-timeout 3m
           --logger "trx;LogFileName=results.trx"
           --results-directory TestResults/${{ matrix.os }}
+
+      - name: Collect coverage (canonical ubuntu leg)
+        if: matrix.os == 'ubuntu-latest'
+        run: |
+          set -euo pipefail
+          rm -rf artifacts/coverage
+          for project in \
+            tests/Jeninnet.FileQuery.Tests/Jeninnet.FileQuery.Tests.csproj \
+            tests/Jeninnet.AdvancedUsage.Tests/Jeninnet.AdvancedUsage.Tests.csproj \
+            tests/Jeninnet.Testing.Assertions.Tests/Jeninnet.Testing.Assertions.Tests.csproj; do
+            dotnet test "$project" \
+              -c Release \
+              --no-build \
+              --collect:"XPlat Code Coverage" \
+              --settings tests/coverage.runsettings \
+              --results-directory artifacts/coverage
+          done
+
+      - name: Upload coverage report
+        if: matrix.os == 'ubuntu-latest'
+        uses: actions/upload-artifact@v7.0.2
+        with:
+          name: coverage-report
+          path: artifacts/coverage/**/coverage.cobertura.xml
+          if-no-files-found: error
 
       - name: Upload test results
         if: failure()
@@ -117,6 +163,8 @@ jobs:
 
     runs-on: ubuntu-latest
 
+    timeout-minutes: 30
+
     needs:
       - build-and-test
 
@@ -125,20 +173,20 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v7.0.1
 
-      - name: Setup .NET
+      - name: Setup .NET SDK (global.json)
         uses: actions/setup-dotnet@v6.0.0
         with:
-          dotnet-version: 10.0.x
+          global-json-file: global.json
 
       - name: Restore
-        run: dotnet restore
+        run: dotnet restore Jeninnet.FileQuery.slnx
 
       - name: Build
-        run: dotnet build --configuration Release --no-restore
+        run: dotnet build Jeninnet.FileQuery.slnx --configuration Release --no-restore
 
       - name: Run Architecture Tests
         run: >
-          dotnet test
+          dotnet test Jeninnet.FileQuery.slnx
           --configuration Release
           --filter "FullyQualifiedName~Architecture"
 
@@ -147,6 +195,8 @@ jobs:
     name: Package Validation
 
     runs-on: ubuntu-latest
+
+    timeout-minutes: 45
 
     needs:
       - build-and-test
@@ -158,16 +208,16 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Setup .NET
+      - name: Setup .NET SDK (global.json)
         uses: actions/setup-dotnet@v6.0.0
         with:
-          dotnet-version: 10.0.x
+          global-json-file: global.json
 
       - name: Restore
-        run: dotnet restore
+        run: dotnet restore Jeninnet.FileQuery.slnx
 
       - name: Build
-        run: dotnet build --configuration Release --no-restore
+        run: dotnet build Jeninnet.FileQuery.slnx --configuration Release --no-restore
 
       - name: Pack with Validation
         run: |

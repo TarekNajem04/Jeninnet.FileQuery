@@ -9,7 +9,7 @@
 ![NuGet Version](https://img.shields.io/nuget/v/Jeninnet.FileQuery)
 [![NuGet downloads](https://img.shields.io/nuget/dt/Jeninnet.FileQuery)](https://www.nuget.org/packages/Jeninnet.FileQuery/)
 
-**Performance measurement and allocation tracking suite for [Jeninnet.FileQuery](../README.md).**
+**Performance measurement and allocation tracking suite for [Jeninnet.FileQuery](../../README.md).**
 
 This project uses **BenchmarkDotNet** to measure execution speeds, evaluate memory consumption, and verify the zero-allocation guarantees of the file discovery engine.
 

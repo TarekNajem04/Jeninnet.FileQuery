@@ -36,6 +36,8 @@ jobs:
 
     runs-on: ${{ matrix.os }}
 
+    timeout-minutes: 60
+
     strategy:
       fail-fast: false
 
@@ -50,13 +52,13 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v7.0.1
 
-      - name: Setup .NET
+      - name: Setup .NET SDK (global.json)
         uses: actions/setup-dotnet@v6.0.0
         with:
-          dotnet-version: 10.0.x
+          global-json-file: global.json
 
       - name: Restore
-        run: dotnet restore
+        run: dotnet restore Jeninnet.FileQuery.slnx
 
       - name: Run Benchmarks
         run: >

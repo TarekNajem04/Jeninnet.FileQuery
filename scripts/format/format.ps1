@@ -183,7 +183,7 @@ function Invoke-FormatCommand {
     $command = "dotnet format " + ($Arguments -join " ")
 
 
-    if (-not $Execute) {
+    if (-not $Execute -and -not $Verify) {
 
         Write-Host "Preview:" -ForegroundColor Yellow
         Write-Host $command
@@ -279,6 +279,13 @@ try {
     }
 
 
+    $verifyArguments = @()
+    if ($Verify) {
+
+        $verifyArguments = @("--verify-no-changes")
+    }
+
+
 
     if ($config.commands.format) {
 
@@ -305,7 +312,7 @@ try {
                     $solutionPath,
                     "--verbosity",
                     $config.dotnet.verbosity
-                )
+                ) + $verifyArguments
             )
     }
 
@@ -322,7 +329,7 @@ try {
                     $config.dotnet.severity,
                     "--verbosity",
                     $config.dotnet.verbosity
-                )
+                ) + $verifyArguments
             )
     }
 
@@ -339,7 +346,7 @@ try {
                     $config.dotnet.severity,
                     "--verbosity",
                     $config.dotnet.verbosity
-                )
+                ) + $verifyArguments
             )
     }
 

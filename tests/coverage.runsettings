@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RunSettings>
+  <!--
+    Coverage collection for Jeninnet.FileQuery.
+
+    Used by the canonical CI coverage leg (ubuntu) and by
+    scripts/coverage/coverage.ps1 when it is pointed at this file. The SonarCloud
+    analysis uses tests/coverage.opencover.runsettings instead, because the
+    scanner reads OpenCover reports.
+
+    Design:
+      * Cobertura is the interchange format consumed by ReportGenerator and by
+        the coverage artifact uploaded from CI.
+      * The test assemblies stay out so the metric describes the shipped
+        libraries only.
+      * `Exclude` filters are appended to coverlet's defaults
+        (coverlet.*, test platform, ...).
+  -->
+  <DataCollectionRunSettings>
+    <DataCollectors>
+      <DataCollector friendlyName="XPlat code coverage"
+                     uri="datacollector://coverlet/XPlatCodeCoverage">
+        <Configuration>
+          <Format>cobertura</Format>
+          <Exclude>[*]*.Tests*</Exclude>
+          <IncludeTestAssembly>false</IncludeTestAssembly>
+        </Configuration>
+      </DataCollector>
+    </DataCollectors>
+  </DataCollectionRunSettings>
+</RunSettings>
