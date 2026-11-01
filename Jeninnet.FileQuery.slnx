@@ -62,6 +62,17 @@
         <File Path="scripts/sonar/README.md" />
     </Folder>
 
+    <Folder Name="/extensions/">
+        <File Path="extensions/vscode/README.md" />
+        <File Path="extensions/vscode/package.json" />
+    </Folder>
+    <Folder Name="/extensions/vscode/">
+        <File Path="extensions/vscode/.vscodeignore" />
+        <File Path="extensions/vscode/src/extension.js" />
+        <File Path="extensions/vscode/src/runner.js" />
+        <File Path="extensions/vscode/test/runner.test.js" />
+    </Folder>
+
     <Folder Name="/Solution Items/">
         <File Path=".editorconfig" />
         <File Path=".gitattributes" />

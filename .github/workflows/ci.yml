@@ -12,6 +12,7 @@ on:
       - 'samples/**'
       - 'docs/**'
       - 'scripts/**'
+      - 'extensions/**'
       - '**.csproj'
       - '**.slnx'
       - 'Directory.Build.props'
@@ -31,6 +32,7 @@ on:
       - 'samples/**'
       - 'docs/**'
       - 'scripts/**'
+      - 'extensions/**'
       - '**.csproj'
       - '**.slnx'
       - 'Directory.Build.props'
@@ -190,6 +192,22 @@ jobs:
           dotnet test Jeninnet.FileQuery.slnx
           --configuration Release
           --filter "FullyQualifiedName~Architecture"
+
+  vscode-extension:
+
+    name: VS Code Extension Tests
+
+    runs-on: ubuntu-latest
+
+    timeout-minutes: 10
+
+    steps:
+
+      - name: Checkout
+        uses: actions/checkout@v7.0.1
+
+      - name: Run extension tests
+        run: node --test "extensions/vscode/test/*.test.js"
 
   package-validation:
 
