@@ -86,11 +86,33 @@ The resulting performance measurements and engineering decisions are documented 
 
 *Goal: Broaden adoption through tooling, integrations, and specialized developer workflows.*
 
-- [ ] **Dotnet Global Tool**: Release `dotnet-filequery` CLI for terminal-based file discovery and piping.
-- [ ] **IDE Extensions**: Create Visual Studio and VS Code extensions for real-time pattern testing and visualization.
-- [ ] **Diff-Aware Queries**: Support incremental scans that only process files changed since a specific Git commit or timestamp.
-- [ ] **Developer Tooling SDK**: Expose selected tokenizers and classifiers for use by other build-tool authors.
-- [ ] **Ecosystem Integrations**: Explore integrations with build systems, development tooling, CI/CD workflows, and repository analysis tools.
+- [x] **Dotnet Global Tool**: Release `dotnet-filequery` CLI for terminal-based file discovery and piping. *(v2.0.0)*
+- [x] **IDE Extensions**: Create Visual Studio and VS Code extensions for real-time pattern testing and visualization. *(VS Code shipped; Visual Studio deferred as a follow-up)*
+- [x] **Diff-Aware Queries**: Support incremental scans that only process files changed since a specific Git commit or timestamp. *(v2.0.0)*
+- [x] **Developer Tooling SDK**: Expose selected tokenizers and classifiers for use by other build-tool authors. *(v2.0.0)*
+- [x] **Ecosystem Integrations**: Explore integrations with build systems, development tooling, CI/CD workflows, and repository analysis tools. *(inventory + GitHub Action prototype)*
+
+---
+
+## Platform Support Policy
+
+- **v2.0.0 targets .NET 10.0 only.** .NET 8 reaches end of support on 2026-11-10 and .NET 9 on 2026-05-12, so neither is added as a package target. A `net8.0` target is technically feasible (one `GetAlternateLookup` fallback) but would extend support beyond Microsoft's lifecycle and add a permanent verification matrix.
+- **The release after v2.0.0 adds .NET 11.** It multi-targets `net10.0;net11.0`, keeps .NET 10 LTS as the baseline, and still does not target .NET 8/9.
+- **No `netstandard2.0` or .NET Framework targets.** The engine relies on spans, `IAsyncEnumerable`, `GeneratedRegex`, and modern file enumeration; supporting them would be a rewrite.
+
+---
+
+## Phase 6: The ".NET 11" Release (post-v2.0.0)
+
+*Goal: Adopt .NET 11 as it ships while keeping the .NET 10 LTS baseline and the current quality bar.*
+
+- [ ] **Multi-target libraries and tool**: `net10.0;net11.0` for the core, CommandLine, DependencyInjection, Tooling, and the global tool.
+- [ ] **CI matrix**: build and test both target frameworks on Windows, Linux, and macOS.
+- [ ] **AOT and trimming validation on .NET 11**: publish a sample with `PublishAot` and treat trimming warnings as errors.
+- [ ] **Performance re-baseline on .NET 11**: refresh `docs/performance/cross-platform-baseline.json`, `runtime-evolution.json`, and the soak reference.
+- [ ] **Package validation and documentation**: validate both targets, update the framework badges, README, and the supported-frameworks policy.
+
+> Capability opportunities beyond the roadmap (entry metadata, `.gitignore` ingestion, single-path matching, and others) are analysed in [`docs/articles/library-capability-review.md`](docs/articles/library-capability-review.md).
 
 ---
 
