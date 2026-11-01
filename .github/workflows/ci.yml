@@ -133,6 +133,7 @@ jobs:
           for project in \
             tests/Jeninnet.FileQuery.Tests/Jeninnet.FileQuery.Tests.csproj \
             tests/Jeninnet.AdvancedUsage.Tests/Jeninnet.AdvancedUsage.Tests.csproj \
+            tests/Jeninnet.FileQuery.Tool.Tests/Jeninnet.FileQuery.Tool.Tests.csproj \
             tests/Jeninnet.Testing.Assertions.Tests/Jeninnet.Testing.Assertions.Tests.csproj; do
             dotnet test "$project" \
               -c Release \
@@ -230,5 +231,9 @@ jobs:
             /p:EnablePackageValidation=true
 
           dotnet pack src/Jeninnet.FileQuery.DependencyInjection/Jeninnet.FileQuery.DependencyInjection.csproj \
+            -c Release \
+            /p:EnablePackageValidation=true
+
+          dotnet pack src/Jeninnet.FileQuery.Tool/Jeninnet.FileQuery.Tool.csproj \
             -c Release \
             /p:EnablePackageValidation=true

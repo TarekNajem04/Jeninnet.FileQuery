@@ -31,6 +31,7 @@ env:
     src/Jeninnet.FileQuery/Jeninnet.FileQuery.csproj
     src/Jeninnet.FileQuery.CommandLine/Jeninnet.FileQuery.CommandLine.csproj
     src/Jeninnet.FileQuery.DependencyInjection/Jeninnet.FileQuery.DependencyInjection.csproj
+    src/Jeninnet.FileQuery.Tool/Jeninnet.FileQuery.Tool.csproj
 
 concurrency:
   group: publish-${{ github.ref }}
