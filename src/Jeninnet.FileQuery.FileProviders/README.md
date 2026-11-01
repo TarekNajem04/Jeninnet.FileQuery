@@ -1,18 +1,24 @@
 # Jeninnet.FileQuery.FileProviders
 
-Query `Microsoft.Extensions.FileProviders.IFileProvider` sources with
-[Jeninnet.FileQuery](../Jeninnet.FileQuery/README.md). Physical, embedded, and in-memory providers
-share the same patterns, filters, metadata, directory results, GitIgnore ingestion, and error
-recovery. No files are copied or materialized to disk.
+![NuGet Version](https://img.shields.io/nuget/v/Jeninnet.FileQuery.FileProviders)
+![NuGet Downloads](https://img.shields.io/nuget/dt/Jeninnet.FileQuery.FileProviders?label=Jeninnet.FileQuery.FileProviders)
 
-## Installation
+Query `Microsoft.Extensions.FileProviders.IFileProvider` sources with
+[Jeninnet.FileQuery](../Jeninnet.FileQuery/README.md). ASP.NET Core static files, Razor assets,
+embedded resources, and custom in-memory providers share the same patterns, metadata filters,
+directory results, GitIgnore ingestion, and error recovery as disk queries.
+
+**No files are copied or materialized to disk.**
+
+## Install
 
 ```bash
 dotnet add package Jeninnet.FileQuery.FileProviders
 ```
 
-Install the adapter and core from the same release: the adapter uses friend access to the engine's
-internal `IFileSystem`, and mixing it with an older core package fails at runtime.
+The package references `Microsoft.Extensions.FileProviders.Abstractions`; the core library stays
+dependency-free. Install the adapter and core from the same release: the adapter uses friend access
+to the engine's internal `IFileSystem`, and mixing it with an older core package fails at runtime.
 
 ## Quick start
 
@@ -35,7 +41,49 @@ foreach (var path in files)
 ```
 
 `From(provider, root)` returns a normal `FileQueryBuilder`; `root` defaults to `/` and scopes the
-query below the provider root.
+query below the provider root:
+
+```csharp
+var css = FileProviderQuery.From(provider, "/wwwroot/css")
+    .UsingGlob()
+    .Where(PatternKind.Glob, ["**/*.css"])
+    .ExecuteEntries();
+```
+
+## ASP.NET Core registration
+
+```csharp
+builder.Services.AddSingleton<IFileProvider>(_ =>
+    new PhysicalFileProvider(builder.Environment.WebRootPath!));
+
+builder.Services.AddScoped<StaticAssetScanner>();
+```
+
+```csharp
+public sealed class StaticAssetScanner(IFileProvider provider)
+{
+    public IReadOnlyList<FileQueryEntry> FindStylesheets() =>
+        FileProviderQuery.From(provider, "/css")
+            .UsingGlob()
+            .Where(PatternKind.Glob, ["**/*.css"])
+            .MinSize(1)
+            .ExecuteEntries()
+            .ToList();
+}
+```
+
+## API
+
+| Surface | Behavior |
+|---|---|
+| `FileProviderQuery.From(provider, root = "/")` | Creates a provider-backed `FileQueryBuilder` |
+| `Execute` / `ExecuteAsync` | Path results rooted in virtual path space |
+| `ExecuteEntries` / `ExecuteEntriesAsync` | `FileQueryEntry` metadata results |
+| `IncludeDirectories` | Yield matching directories |
+| `MinSize` / `MaxSize` / `ModifiedAfter` / `ModifiedBefore` | Metadata filters |
+| `UseGitIgnoreFiles` | Load `.gitignore` files through the provider |
+| `RestrictToPaths` | Diff-aware restrictions |
+| `WithErrorRecovery` | Skip/Retry/Abort for provider failures |
 
 ## Semantics
 
@@ -50,5 +98,8 @@ query below the provider root.
 - Execute through the builder. Engines created by `FileQueryRuntime` or `AddFileQuery()` are bound
   to the physical file system.
 
-See [Querying `IFileProvider` Sources](../../docs/guides/file-provider-adapter.md) for ASP.NET Core,
-dependency injection, and limitations.
+## Related
+
+- [Querying `IFileProvider` sources](https://github.com/TarekNajem04/Jeninnet.FileQuery/blob/main/docs/guides/file-provider-adapter.md)
+- [Core package](../Jeninnet.FileQuery/README.md)
+- [Tests](../../tests/Jeninnet.FileQuery.FileProviders.Tests/README.md)

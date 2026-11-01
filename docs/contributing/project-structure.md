@@ -30,13 +30,21 @@ Jeninnet.FileQuery/
 │   ├── Jeninnet.FileQuery.Build.Tests/             MSBuild/SARIF tests
 │   └── Jeninnet.FileQuery.FileProviders.Tests/     IFileProvider adapter tests
 │
-├── samples/
+├── samples/                                        13 runnable samples + shared utilities
+│   ├── AdvancedUsage/                              DI + CLI + evaluation demo
 │   ├── BasicMatching/                              Hello-world sample
-│   ├── PatternLanguage/                            GitIgnore pattern demo
-│   ├── RecursiveTraversal/                         Deep traversal demo
+│   ├── DirectoryOnlyMatching/                      Directory-only rules
+│   ├── EntryMetadata/                              Metadata results and filters
 │   ├── HybridMatcher/                              Mixed pattern dialect demo
+│   ├── LogFiltering/                               Async streaming and cancellation
+│   ├── NegationAndRecursive/                       Recursive negation
+│   ├── NestedGlobMatching/                         Multiple recursive globs
+│   ├── PatternLanguage/                            GitIgnore pattern ordering
+│   ├── POSIXClassMatching/                         POSIX character classes
+│   ├── RecursiveTraversal/                         Deep traversal demo
+│   ├── RegexAnchoredMatching/                      Root-anchored regex
 │   ├── RegexMatching/                              Regex pattern demo
-│   └── AdvancedUsage/                              DI + CLI combined demo
+│   └── SamplesUtilities/                           Shared deterministic fixtures
 │
 ├── docs/                                           Documentation source
 ├── artifacts/                                      Build outputs (gitignored)

@@ -2,487 +2,350 @@
 
 ![GitHub Actions CI Workflow Status](https://img.shields.io/github/actions/workflow/status/TarekNajem04/Jeninnet.FileQuery/ci.yml)
 ![GitHub release](https://img.shields.io/github/v/release/TarekNajem04/Jeninnet.FileQuery)
-![GitHub contributors](https://img.shields.io/github/contributors/TarekNajem04/Jeninnet.FileQuery)
-[![GitHub stars](https://img.shields.io/github/stars/TarekNajem04/Jeninnet.FileQuery)](https://github.com/TarekNajem04/Jeninnet.FileQuery/stargazers)
 [![GitHub license](https://img.shields.io/github/license/TarekNajem04/Jeninnet.FileQuery)](https://github.com/TarekNajem04/Jeninnet.FileQuery/blob/main/LICENSE)
 
 ![NuGet Version](https://img.shields.io/nuget/v/Jeninnet.FileQuery)
 ![NuGet Downloads](https://img.shields.io/nuget/dt/Jeninnet.FileQuery?label=Jeninnet.FileQuery)
-![NuGet Downloads](https://img.shields.io/nuget/dt/Jeninnet.FileQuery.CommandLine?label=Jeninnet.FileQuery.CommandLine)
-![NuGet Downloads](https://img.shields.io/nuget/dt/Jeninnet.FileQuery.DependencyInjection?label=Jeninnet.FileQuery.DependencyInjection)
 
-Absolutely — here is the **entire unified README**, rewritten **fully in English**, **cleanly structured**, and placed **inside a single fenced code block** exactly as you requested.
-
-**Jeninnet.FileQuery** is a high‑performance, deterministic, pattern‑driven file enumeration engine for .NET.
-
-It supports GitIgnore, Glob, and flat Regex (`r:`) patterns, powered by a strict tokenization + invariant validation pipeline designed for correctness, scalability, and predictable behavior across multi‑million file trees.
-
----
-
-# Overview
-
-Jeninnet.FileQuery is not just a file filter — it is a **pattern execution engine** with:
-
-- Deterministic evaluation  
-- Zero‑ambiguity parsing rules  
-- Strict separation between scanning, validation, and execution  
-- Scalable traversal for extremely large directory trees  
-- Zero‑allocation hot paths using `ReadOnlySpan<char>`  
-
----
-
-# Key Features
-
-- High-throughput enumeration (≈570k entries/s on the reference 1M-file dataset, warm cache)
-- GitIgnore‑compatible pattern engine
-- Glob pattern support
-- Flat Regex mode (`r:` prefix)
-- Hybrid auto‑detection
-- Deterministic include/exclude precedence
-- Sync + async APIs
-- Safe traversal (ignore inaccessible directories)
-- Full diagnostics + invariant validation
-- Immutable compiled pattern sets
-- Diff-aware scans (`RestrictToPaths`) for incremental tooling
-
----
-
-# Installation
-
-```bash
-dotnet add package Jeninnet.FileQuery
-```
-
----
-
-# Quick Start
-
-## Enumerate all `.cs` files
+**Deterministic, high-performance file discovery for .NET.** One compiled pipeline for
+GitIgnore, Glob, and Regex patterns, with metadata results, directory output, `.gitignore`
+ingestion, cancellation, progress, and first-class diagnostics.
 
 ```csharp
-var engine = new FileQueryEngine();
+var files = FileQuery.From(@"C:\src\MyProject")
+    .UsingGlob()
+    .Where(PatternKind.Glob, ["**/*.cs", "!**/obj/**"])
+    .IgnoreCase()
+    .Execute();
 
-var query = new FileQuery(
-    rootPath: "C:/projects",
-    options: new FileQueryEngineOptions {
-        Patterns = new[] { "**/*.cs" }
-    }
-);
-
-IEnumerable<string> results = engine.Execute(query);
-```
-
-## Async enumeration
-
-```csharp
-await foreach (var file in engine.ExecuteAsync(
-    new FileQuery(
-        rootPath: "/src",
-        options: new FileQueryEngineOptions {
-            Patterns = new[] { "**/*.md", "!bin/" }
-        }
-    ),
-    cancellationToken
-)) {
+foreach (var file in files)
+{
     Console.WriteLine(file);
 }
 ```
 
 ---
 
-# Pattern Engines
+## Why Jeninnet.FileQuery?
 
-## 1️⃣ GitIgnore Mode
+Most file-search code starts with `Directory.GetFiles` and grows into a pile of ad-hoc
+`EndsWith`, `StartsWith`, and `Regex` checks. That approach is hard to reason about, hard to test,
+and repeats the same filesystem work for every filter.
 
-Supports full GitIgnore semantics:
+Jeninnet.FileQuery replaces it with a **compile-then-execute** pipeline:
 
-| Feature           | Example          | Meaning                  |
-| ----------------- | ---------------- | ------------------------ |
-| Wildcard          | `*`              | Match filename part      |
-| Recursive         | `**`             | Match across directories |
-| Directory-only    | `bin/`           | Match directories only   |
-| Negation          | `!src/app.cs`    | Un-ignore a path         |
-| Root anchoring    | `/src/*.cs`      | Match only from root     |
-| Character classes | `[a-z]`          | Character ranges         |
-
-Example:
-
-```
-*.cs
-!Program.cs
-bin/
-```
+- **One pattern model.** GitIgnore, Glob, and Regex rules coexist with documented precedence.
+- **Deterministic results.** The same tree, patterns, and options always produce the same order.
+- **One pass.** Metadata, size/time filters, directory results, and matching happen during the
+  same enumeration.
+- **Safe by default.** Inaccessible entries are skipped; cancellation and progress are built in.
+- **AOT-ready.** No reflection on the query path, verified by a Native AOT smoke host in CI.
 
 ---
 
-## 2️⃣Glob Mode
+## Install
 
-Filesystem-style matching:
-
-| Syntax  | Meaning                   |
-| ------- | ------------------------- |
-| `*`     | Any characters except `/` |
-| `?`     | Any single character      |
-| `**`    | Recursive directories     |
-| `[a-z]` | Character classes         |
-
-Example:
-
+```bash
+dotnet add package Jeninnet.FileQuery
 ```
-**/*.txt
-src/**/test?.md
-```
+
+Requires .NET 10 or later.
 
 ---
 
-## 3️⃣ Regex Mode (Flat)
+## Quick start
 
-Rules:
-
-- Must start with `r:`
-- No glob semantics
-- Applies to the full normalized path
-- Uses .NET Regex
-
-Example:
-
-```
-r:^src\/.*\.cs$
-```
-
----
-
-## 4️⃣ Hybrid Mode
-
-Automatic engine selection:
-
-| Pattern           | Engine    |
-| ----------------- | --------- |
-| `!bin/`           | GitIgnore |
-| `/src/*.cs`       | GitIgnore |
-| `*.txt`           | Glob      |
-| `src/**/test?.md` | Glob      |
-| `r:^data\d+$`     | Regex     |
-
----
-
-# Pattern Engine Comparison
-
-| Feature | GitIgnore | Glob | Regex (Flat) |
-|--------|-----------|-------|--------------|
-| Recursive `**` | ✔ | ✔ | ✘ |
-| `?` wildcard | ✔ | ✔ | ✘ |
-| Character classes | ✔ | ✔ | ✔ |
-| Negation `!` | ✔ | ✘ | ✘ |
-| Root anchoring `/` | ✔ | ✘ | ✘ |
-| Needs prefix | No | No | Yes (`r:`) |
-| Complexity | Medium | Low | High |
-| Best for | Git-like filtering | General file matching | Advanced constraints |
-
----
-
-# Advanced Examples
-
-## 1️⃣ Exclude a folder but include a specific file inside it
-
-```
-bin/
-!bin/tools/keep.dll
-```
-
-## 2️⃣ Match Markdown files everywhere except in `docs/`
-
-```
-**/*.md
-!docs/**
-```
-
-## 3️⃣ Match JSON files starting with a lowercase letter
-
-```
-data/[a-z]*.json
-```
-
-## 4️⃣ Regex: match `.cs` files ending with a number
-
-```
-r:^src\/.*\d+\.cs$
-```
-
-## 5️⃣ Combine GitIgnore + Glob + Regex
-
-```
-!bin/
-src/**/test?.cs
-r:^tools\/.*\.ps1$
-```
-
-## 6️⃣ Limit recursion depth
+### Path results
 
 ```csharp
-MaxRecursionDepth = 2
+using Jeninnet.FileQuery;
+using Jeninnet.FileQuery.Enums;
+
+var query = FileQuery.From(repositoryRoot)
+    .UsingGlob()
+    .Where(PatternKind.Glob, ["**/*.cs"])
+    .Build();
+
+foreach (var path in FileQueryRuntime.Create().Execute(query))
+{
+    Console.WriteLine(path);
+}
 ```
 
-## 7️⃣ Ignore access errors
+Or use the builder's terminal shortcuts:
 
 ```csharp
-IgnoreInaccessible = true
-```
-
-## 8️⃣ Restrict to changed files
-
-```csharp
-var changed = new[] { "src/Engine/FileQueryEngine.cs", "docs/index.md" };
-
-var files = FileQuery.From(repoRoot)
-    .RestrictToPaths(changed)
-    .Where("!**")
+var paths = FileQuery.From(repositoryRoot)
+    .UsingGlob()
+    .Where(PatternKind.Glob, ["**/*.cs"])
     .Execute();
 ```
 
-## 9️⃣ Match files inside alphabetic subfolders
+### Metadata results
 
-```
-src/[a-z]*/**/*.cs
+`ExecuteEntries()` returns `FileQueryEntry` values populated from the same enumeration — no extra
+`FileInfo` calls:
+
+```csharp
+var entries = FileQuery.From(repositoryRoot)
+    .UsingGlob()
+    .Where(PatternKind.Glob, ["**/*.log"])
+    .MinSize(1024)
+    .ModifiedAfter(DateTimeOffset.UtcNow.AddDays(-7))
+    .ExecuteEntries();
+
+foreach (var entry in entries)
+{
+    Console.WriteLine($"{entry.RelativePath}  {entry.Length} bytes  {entry.LastWriteTimeUtc:O}");
+}
 ```
 
-## 🔟 Regex: match multiple extensions
+`FileQueryEntry` exposes `FullPath`, `RelativePath`, `Length`, `CreationTimeUtc`,
+`LastWriteTimeUtc`, `Attributes`, `IsDirectory`, and `RootPath`.
 
-```
-r:^.*\.(cs|md|json)$
+### Async streaming and cancellation
+
+```csharp
+using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(30));
+var progress = new Progress<FileQueryProgress>(p =>
+    Console.WriteLine($"{p.EntriesScanned} scanned, {p.FilesMatched} matched"));
+
+await foreach (var path in FileQuery.From(root)
+    .UsingHybrid()
+    .Where("**", "!**/*.cs")
+    .ExecuteAsync(progress, cts.Token))
+{
+    Console.WriteLine(path);
+}
 ```
 
-## Match files inside numeric folders only
+Synchronous `Execute`/`ExecuteEntries` overloads accept the same cancellation and progress
+arguments.
 
-```
-r:^logs\/\d+\/.*\.txt$
+---
+
+## Pattern dialects
+
+| Dialect | Syntax | Example |
+|---|---|---|
+| GitIgnore | Negation, anchoring, directory-only rules, last-match-wins | `!src/**/*.cs`, `bin/` |
+| Glob | `*`, `**`, `?`, character classes, POSIX classes, braces | `**/*.{cs,vb}`, `file[[:digit:]].txt` |
+| Regex | `r:` prefix, full normalized relative path | `r:^src/.*\.cs$` |
+| Hybrid | Automatic classification per pattern | `.UsingHybrid()` |
+
+Precedence is **GitIgnore → Glob → Regex**. A GitIgnore inclusion is final; Glob and Regex can
+re-include paths excluded by GitIgnore but cannot exclude a GitIgnore inclusion.
+
+```csharp
+var query = FileQuery.From(root)
+    .UsingHybrid()
+    .Where(
+        "**",                 // exclude everything
+        "!**/*.cs",           // re-include C# files
+        "r:.*\\.(png|jpg)$")  // regex re-include for images
+    .IgnoreCase()
+    .Build();
 ```
 
-## 1️⃣1️⃣ Complex exclusion rules
+Invalid patterns fail during compilation with a `PatternException` that carries the reason and,
+when known, `Position` and `Segment`.
 
+---
+
+## Results and filters
+
+```csharp
+var query = FileQuery.From(root)
+    .UsingGlob()
+    .Where(PatternKind.Glob, ["**/*"])
+    .IncludeDirectories()                       // yield matching directories too
+    .MinSize(1)                                 // inclusive
+    .MaxSize(10 * 1024 * 1024)                  // inclusive
+    .ModifiedAfter(cutoff)                      // exclusive
+    .ModifiedBefore(DateTimeOffset.UtcNow)      // exclusive
+    .AttributesToSkip(FileAttributes.System)
+    .Build();
 ```
-**/*.cs
-!**/obj/**
-!**/bin/**
-!**/temp/**
+
+Filters run before matching and reuse the metadata already reported by the OS enumeration.
+
+---
+
+## `.gitignore` ingestion
+
+```csharp
+var query = FileQuery.From(repositoryRoot)
+    .UseGitIgnoreFiles()
+    .Build();
+```
+
+This loads, with Git-compatible scoping and negation:
+
+- the root `.gitignore`;
+- nested `.gitignore` files, parent before child;
+- `.git/info/exclude` when the root is inside a Git working tree;
+- an optional global excludes file via `GitIgnoreOptions.GlobalExcludesFile`.
+
+No Git executable is required. The CLI exposes the same behavior with `--ignore-files`.
+
+---
+
+## Incremental scans
+
+Restrict a query to paths reported by a diff, watcher, or external index:
+
+```csharp
+var query = FileQuery.From(root)
+    .UsingGitIgnore()
+    .RestrictToPaths(changedPaths)
+    .Build();
+```
+
+Paths use forward slashes and are relative to the query root. The engine skips unrelated files
+and prunes directories that cannot contain a listed path.
+
+---
+
+## Single-path matching without traversal
+
+For linters, IDE actions, and path classifiers:
+
+```csharp
+var patternSet = FileQueryPatternSet.Compile(
+    new PatternInput(
+        TypedPatterns: new Dictionary<PatternKind, IEnumerable<string>>
+        {
+            [PatternKind.GitIgnore] = ["**", "!*.cs", "!bin/"]
+        },
+        InterpretationMode: PatternInterpretationMode.Specific),
+    PatternMatchingMode.GitIgnore);
+
+bool match = patternSet.IsMatch("src/Program.cs");
+var explanation = patternSet.Explain("src/Program.cs");
+
+Console.WriteLine(explanation.Outcome); // Include
+Console.WriteLine(explanation.Reason);  // Include by GitIgnore pattern.
+```
+
+`IsMatch(ReadOnlySpan<char>)` performs no allocation on the matching path.
+
+---
+
+## Multiple roots
+
+```csharp
+var batch = FileQueryBatch.From(
+    FileQuery.From(firstRoot).UsingGlob().Where(PatternKind.Glob, ["**/*.cs"]),
+    FileQuery.From(secondRoot).UsingGlob().Where(PatternKind.Glob, ["**/*.cs"]));
+
+foreach (var entry in batch.ExecuteEntries())
+{
+    Console.WriteLine($"{entry.RootPath}: {entry.RelativePath}");
+}
+```
+
+Results are emitted in root order, and `RootPath` disambiguates identical relative paths.
+
+---
+
+## Telemetry and diagnostics
+
+- **Progress:** `IProgress<FileQueryProgress>` on sync and async execution.
+- **Match audit:** `WithDiagnostics(IProgress<FileQueryDiagnostic>)` reports the deciding pattern.
+- **OpenTelemetry-ready:** `ActivitySource` and `Meter` instrumentation under the
+  `Jeninnet.FileQuery` name. No OpenTelemetry package is required; attach your own exporter.
+
+```csharp
+var query = FileQuery.From(root)
+    .UsingGlob()
+    .Where(PatternKind.Glob, ["**/*.cs"])
+    .WithDiagnostics(new Progress<FileQueryDiagnostic>(d =>
+        Console.WriteLine($"{d.RelativePath}: {d.Outcome} ({d.Reason})")))
+    .Build();
 ```
 
 ---
 
-# ⚙️ FileQueryEngineOptions
+## Architecture at a glance
 
-| Option                | Default   | Description            |
-| --------------------- | --------- | ---------------------- |
-| Patterns              | empty     | Pattern list           |
-| RecurseSubdirectories | true      | Enable recursion       |
-| MaxRecursionDepth     | -1        | Unlimited              |
-| IgnoreInaccessible    | true      | Skip permission errors |
-| IgnoreCase            | platform  | Case sensitivity mode  |
-| PatternMatchingMode   | GitIgnore | Default engine         |
-| PatternInterpretation | Auto      | Hybrid detection       |
+```text
+FileQueryBuilder
+    → pattern classification
+    → structural validation
+    → immutable compiled pattern set
+    → traversal plan
+    → single-pass enumeration
+        → metadata filters
+        → compiled matcher
+        → diagnostics / progress
+        → path or FileQueryEntry result
+```
+
+- **Builder:** mutable configuration; `Build()` validates and produces an immutable `FileQuery`.
+- **Pattern pipeline:** classification → lexical/structural/semantic invariants → compiled
+  instruction sets.
+- **Traversal:** DFS or BFS, depth limits, symlink policies (`Ignore`, `Follow`,
+  `FollowWithCycleDetection`), error recovery (`Skip`, `Retry`, `Abort`).
+- **IO boundary:** `IFileSystem` keeps `System.IO` out of the engine and enables virtual/mock
+  filesystems. The separate `Jeninnet.FileQuery.FileProviders` package adapts `IFileProvider`.
+
+See the [architecture overview](https://github.com/TarekNajem04/Jeninnet.FileQuery/blob/main/docs/architecture/engine-architecture.md)
+for the full design.
 
 ---
 
-# Architecture
+## API at a glance
 
-```
-Raw Pattern Text
-        │
-        ▼
-PatternScanner (Tokenization only)
-        │
-        ▼
-Invariant Validation Layer
-        │
-        ▼
-CompiledPatternSet (Immutable)
-        │
-        ▼
-HybridPathMatcher
-     │
-     ├── GitIgnoreMatcher
-     ├── GlobMatcher
-     └── RegexMatcher
-```
+| Surface | Purpose |
+|---|---|
+| `FileQuery.From(root)` | Start a query with the physical filesystem |
+| `FileQueryBuilder.Where(...)` | Add untyped, typed, or delimited patterns |
+| `UsingHybrid/UsingGitIgnore/UsingGlob/UsingRegex` | Select interpretation and matching mode |
+| `IgnoreCase` / `IgnoreInaccessible` | Case and inaccessible-entry policy |
+| `MinSize` / `MaxSize` / `ModifiedAfter` / `ModifiedBefore` / `AttributesToSkip` | Metadata filters |
+| `UseGitIgnoreFiles` | Load Git ignore files |
+| `RestrictToPaths` | Diff-aware allow-list |
+| `IncludeDirectories` | Yield directories from the same walk |
+| `WithDiagnostics` / `WithErrorRecovery` | Diagnostics and IO recovery |
+| `Build` | Produce an immutable `FileQuery` |
+| `Execute` / `ExecuteAsync` | Path results |
+| `ExecuteEntries` / `ExecuteEntriesAsync` | `FileQueryEntry` metadata results |
+| `FileQueryBatch` | Multiple roots as one ordered stream |
+| `FileQueryPatternSet` | In-memory `IsMatch` / `Explain` |
+| `FileQueryRuntime.Create()` | Compose the default engine without DI |
 
 ---
 
-# Appendix A — Pattern Grammar (Extended & Complete)
+## Package family
 
-This appendix defines the **formal grammar** for all pattern engines supported by Jeninnet.FileQuery.
+| Package | Use it for |
+|---|---|
+| **Jeninnet.FileQuery** | Core engine |
+| `Jeninnet.FileQuery.CommandLine` | `System.CommandLine` pattern options |
+| `Jeninnet.FileQuery.DependencyInjection` | `AddFileQuery()` composition |
+| `Jeninnet.FileQuery.FileProviders` | Query ASP.NET Core / in-memory `IFileProvider` sources |
+| `Jeninnet.FileQuery.Tooling` | Pattern inspection without execution |
+| `Jeninnet.FileQuery.Analyzers` | Design-time `JNQ1001` diagnostics and code fix |
+| `Jeninnet.FileQuery.Build` | MSBuild validation and SARIF export |
+| `Jeninnet.FileQuery.Tool` | `dotnet-filequery` global tool |
 
----
-
-## A.1 General Structure
-
-```
-pattern        ::= gitignore | glob | regex
-```
-
----
-
-## A.2 GitIgnore Grammar
-
-```
-gitignore      ::= [negation] [root] segment ('/' segment)* [dironly]
-
-negation       ::= '!' | ε
-root           ::= '/' | ε
-dironly        ::= '/' | ε
-segment        ::= token+
-```
-
-### Tokens
-
-```
-token          ::= literal
-                 | '*'
-                 | '?'
-                 | '**'
-                 | charclass
-```
-
-### Character Classes
-
-```
-charclass      ::= '[' ['!'|'^'] classitem+ ']'
-classitem      ::= literal | literal '-' literal
-```
-
-### GitIgnore Rules
-
-- `**` may match across directories  
-- `bin/` matches directories only  
-- `/foo` anchors to root  
-- `!pattern` negates  
-- `.` and `..` forbidden  
-- Escaping supported  
+Test projects use the standalone
+[`Jeninnet.Assertions`](https://www.nuget.org/packages/Jeninnet.Assertions) package.
 
 ---
 
-## A.3 Glob Grammar
+## Documentation
 
-```
-glob           ::= [negation] segment ('/' segment)*
-negation       ::= '!' | ε
-segment        ::= token+
-```
-
-### Tokens
-
-```
-token          ::= literal | '*' | '?' | '**' | charclass
-```
-
-### Glob Rules
-
-- `*` matches any chars except `/`
-- `?` matches one char
-- `**` matches directories
-- No root anchoring
-- No directory-only suffix
+- [Quick start](https://github.com/TarekNajem04/Jeninnet.FileQuery/blob/main/docs/getting-started/quick-start.md)
+- [Pattern language](https://github.com/TarekNajem04/Jeninnet.FileQuery/blob/main/docs/specification/pattern-language.md)
+- [Entry metadata and filters](https://github.com/TarekNajem04/Jeninnet.FileQuery/blob/main/docs/guides/entry-metadata-and-filters.md)
+- [Git ignore files](https://github.com/TarekNajem04/Jeninnet.FileQuery/blob/main/docs/guides/gitignore-files.md)
+- [Directory results](https://github.com/TarekNajem04/Jeninnet.FileQuery/blob/main/docs/guides/directory-results.md)
+- [Observability and diagnostics](https://github.com/TarekNajem04/Jeninnet.FileQuery/blob/main/docs/guides/observability-and-diagnostics.md)
+- [Native AOT](https://github.com/TarekNajem04/Jeninnet.FileQuery/blob/main/docs/guides/native-aot.md)
 
 ---
 
-## A.4 Regex Grammar
+## License
 
-```
-regex          ::= 'r:' regextext
-regextext      ::= .+
-```
-
-Rules:
-
-- Must start with `r:`
-- Applies to full normalized path
-- Uses .NET Regex
-- No glob semantics
-
----
-
-## A.5 Hybrid Interpretation
-
-```
-if starts with "r:" → Regex
-else if contains GitIgnore semantics → GitIgnore
-else → Glob
-```
-
----
-
-## A.6 Token Grammar (Shared)
-
-```
-literal         ::= any character except: '*', '?', '[', ']', '/', '!'
-escaped         ::= '\' literal
-token           ::= literal | escaped | '*' | '?' | '**' | charclass
-```
-
----
-
-## A.7 Invalid Patterns
-
-| Pattern | Reason |
-|---------|--------|
-| `a**b`  | `**` must be isolated |
-| `[z-a]` | invalid range |
-| `../foo` | forbidden |
-| `./foo` | forbidden |
-| `**a` | invalid |
-
----
-
-## A.8 Grammar Summary
-
-```
-pattern        ::= gitignore | glob | regex
-
-gitignore      ::= [negation] [root] segment ('/' segment)* [dironly]
-glob           ::= [negation] segment ('/' segment)*
-regex          ::= 'r:' regextext
-
-segment        ::= token+
-token          ::= literal | '*' | '?' | '**' | charclass
-charclass      ::= '[' ['!'|'^'] classitem+ ']'
-classitem      ::= literal | literal '-' literal
-```
-
----
-
-# ❓ FAQ (Extended)
-
-### Does `*.*` work?
-Yes.
-
-### Can I un-ignore a file inside an ignored folder?
-Yes.
-
-### Is Regex mode using .NET Regex?
-Yes.
-
-### Can Hybrid Mode be disabled?
-Yes.
-
-### Can access errors be ignored?
-Yes.
-
-### Can multiple pattern types be mixed?
-Yes.
-
-### Are absolute paths allowed?
-No.
-
-### Are `.` or `..` allowed?
-No.
-
-### Can I get diagnostics for invalid patterns?
-Yes.
-
-### Does it scale?
-Yes — multi‑million file trees.
-
----
-
-# 📄 License
-
-MIT License.
+MIT. See [LICENSE](https://github.com/TarekNajem04/Jeninnet.FileQuery/blob/main/LICENSE).

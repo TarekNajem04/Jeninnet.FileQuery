@@ -170,10 +170,12 @@ This repository contains the core library and its companion packages:
 *   **[File Provider Adapter (Jeninnet.FileQuery.FileProviders)](./src/Jeninnet.FileQuery.FileProviders/README.md)**: Query physical, embedded, and in-memory `IFileProvider` sources with the same pipeline.
 *   **[Build Tooling SDK (Jeninnet.FileQuery.Tooling)](./src/Jeninnet.FileQuery.Tooling/README.md)**: Classify, validate, and tokenize patterns without executing a query.
 *   **[MSBuild Validation (Jeninnet.FileQuery.Build)](./src/Jeninnet.FileQuery.Build/README.md)**: Validate `FileQueryPatterns` during `dotnet build` and export SARIF for code scanning.
-*   **[GitHub Action](./.github/actions/filequery/action.yml)**: Runs the global tool in workflows and exposes matched files and counts as step outputs.
+*   **[Roslyn Analyzer (Jeninnet.FileQuery.Analyzers)](./src/Jeninnet.FileQuery.Analyzers/README.md)**: Design-time `JNQ1001` diagnostics and a safe code fix for pattern literals.
+*   **[GitHub Action](./.github/actions/filequery/README.md)**: Runs the global tool in workflows and exposes matched files and counts as step outputs.
 *   **[Documentation Suite (docs/)](./docs/README.md)**: Deep technical specifications, guides, and architectural whitepapers.
 *   **[Benchmark Suite](./src/Jeninnet.FileQuery.Benchmarks/README.md)**: Performance measurements and allocation verification.
-*   **[Samples (samples/)](./samples/AdvancedUsage/README.md)**: Practical examples showing basic to advanced usage.
+*   **[Samples](./samples/README.md)**: Thirteen runnable examples from hello-world to DI + evaluation.
+*   **[Test Suite](./tests/README.md)**: 1,128 tests across seven projects, with per-project guides.
 
 ---
 
