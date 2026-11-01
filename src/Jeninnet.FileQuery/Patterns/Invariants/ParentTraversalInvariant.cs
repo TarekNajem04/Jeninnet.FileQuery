@@ -14,7 +14,11 @@ internal sealed class ParentTraversalInvariant : IPatternInvariant {
     public PatternInvariantResult Validate(PatternCompilationContext context) {
         if(context.Tokens!.Any(static seg => seg.Count == 1 &&
                                      seg[0] is LiteralToken { Text: ".." })) {
-            return PatternInvariantResult.Fail("'..' traversal is not allowed.");
+            var position = PatternTextPosition.Find(context.Pattern.Text.AsSpan(), "..");
+            return PatternInvariantResult.Fail(
+                "'..' traversal is not allowed.",
+                position,
+                position is { } value ? PatternTextPosition.SegmentAt(context.Pattern.Text.AsSpan(), value) : null);
         }
 
         return PatternInvariantResult.Success;

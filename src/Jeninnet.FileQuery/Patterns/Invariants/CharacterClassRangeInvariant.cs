@@ -36,9 +36,14 @@ internal sealed class CharacterClassRangeInvariant : IPatternInvariant {
             foreach(var token in segment.OfType<CharacterClassToken>()) {
                 foreach(var range in token.Value.Elements.OfType<CharRange>()) {
                     if(range.Start > range.End) {
+                        var fragment = $"{range.Start}-{range.End}";
+                        var position = PatternTextPosition.Find(context.Pattern.Text.AsSpan(), fragment.AsSpan());
+
                         return PatternInvariantResult.Fail(
-                            $"Invalid character range '{range.Start}-{range.End}': " +
-                            $"start (U+{(int)range.Start:X4}) must not exceed end (U+{(int)range.End:X4}).");
+                            $"Invalid character range '{fragment}': " +
+                            $"start (U+{(int)range.Start:X4}) must not exceed end (U+{(int)range.End:X4}).",
+                            position,
+                            position is { } value ? PatternTextPosition.SegmentAt(context.Pattern.Text.AsSpan(), value) : null);
                     }
                 }
             }

@@ -98,6 +98,7 @@ See the [Global Tool guide](./docs/guides/global-tool.md) for the full option se
 *   **Directory results.** `IncludeDirectories()` opts into yielding matching directories from the same traversal, with directory-only and negation semantics preserved.
 *   **Multiple roots.** `FileQueryBatch` runs several roots as one deterministic stream; entry results expose `RootPath`.
 *   **Script-friendly CLI.** `dotnet-filequery --json` streams newline-delimited objects with paths, size, timestamps, attributes, and explain outcomes.
+*   **Actionable pattern errors.** `PatternException` and the Tooling SDK expose the offending character position and segment when available.
 
 ### Performance
 

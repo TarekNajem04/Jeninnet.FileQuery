@@ -3868,6 +3868,36 @@
             Verifies that <see cref="M:Jeninnet.FileQuery.Patterns.Tokenization.RecursiveWildcardReader.TryRead(System.ReadOnlySpan{System.Char},System.Int32@,Jeninnet.FileQuery.Patterns.Syntax.PatternToken@)"/> returns <c>false</c> when encountering a single-star (*) pattern, as it is not a recursive wildcard.
             </summary>
         </member>
+        <member name="T:Jeninnet.FileQuery.Tests.Patterns.Validation.PatternErrorPositionTests">
+            <summary>
+            Tests for character position and segment reporting in validation failures.
+            </summary>
+        </member>
+        <member name="M:Jeninnet.FileQuery.Tests.Patterns.Validation.PatternErrorPositionTests.PatternValidator_ReportsPositionAndSegment">
+            <summary>
+            Structural validation reports the opening-bracket position.
+            </summary>
+        </member>
+        <member name="M:Jeninnet.FileQuery.Tests.Patterns.Validation.PatternErrorPositionTests.PatternException_CarriesPosition_ForParentTraversal">
+            <summary>
+            Pattern exceptions report the offending character and segment.
+            </summary>
+        </member>
+        <member name="M:Jeninnet.FileQuery.Tests.Patterns.Validation.PatternErrorPositionTests.PatternException_CarriesPosition_ForMixedRecursiveWildcard">
+            <summary>
+            Mixed recursive wildcards report the wildcard position.
+            </summary>
+        </member>
+        <member name="M:Jeninnet.FileQuery.Tests.Patterns.Validation.PatternErrorPositionTests.PatternException_CarriesPosition_ForInvalidRegex">
+            <summary>
+            Regex failures report the expression start after the dialect prefix.
+            </summary>
+        </member>
+        <member name="M:Jeninnet.FileQuery.Tests.Patterns.Validation.PatternErrorPositionTests.PatternException_WithoutPosition_LeavesValuesNull">
+            <summary>
+            The position constructor remains additive for callers that only use messages.
+            </summary>
+        </member>
         <member name="T:Jeninnet.FileQuery.Tests.Patterns.Validation.PatternValidatorBoundaryTests">
             <summary>
             Contains boundary unit tests for the <see cref="T:Jeninnet.FileQuery.Patterns.Validation.PatternValidator"/>, ensuring robust behavior for edge cases like null inputs, unicode, and extreme lengths.

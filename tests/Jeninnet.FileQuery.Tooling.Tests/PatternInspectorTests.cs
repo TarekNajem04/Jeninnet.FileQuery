@@ -179,6 +179,18 @@ public sealed class PatternInspectorTests {
     }
 
     /// <summary>
+    /// Verifies that structural validation exposes the error position and segment.
+    /// </summary>
+    [TestMethod]
+    public void Validate_ShouldReportPositionAndSegment() {
+        var validation = PatternInspector.Validate("src/[abc");
+
+        validation.IsValid.Should().BeFalse();
+        validation.Position.Should().Be(4);
+        validation.Segment.Should().Be(1);
+    }
+
+    /// <summary>
     /// Verifies empty pattern handling.
     /// </summary>
     [TestMethod]

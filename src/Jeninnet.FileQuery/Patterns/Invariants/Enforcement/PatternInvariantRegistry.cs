@@ -37,7 +37,7 @@ internal sealed class PatternInvariantRegistry {
 
             var result = invariant.Validate(context);
             if(!result.IsSuccess) {
-                throw new PatternException(result.Message!);
+                throw new PatternException(result.Message!, result.Position, result.Segment);
             }
         }
     }

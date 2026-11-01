@@ -61,7 +61,7 @@ internal static partial class PatternClassifier {
 
         var span = pattern.AsSpan();
 
-        var (isMalformed, _) = PatternValidator.Validate(span);
+        var (isMalformed, _, _, _) = PatternValidator.Validate(span);
         if(isMalformed) {
             // Store the specific error reason in a way the compiler can access.
             // For now, we mark as Unknown and the compiler can throw based on this.

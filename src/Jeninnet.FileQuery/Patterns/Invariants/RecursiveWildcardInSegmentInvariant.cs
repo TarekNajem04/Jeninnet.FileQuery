@@ -57,10 +57,13 @@ internal sealed class RecursiveWildcardInSegmentInvariant : IPatternInvariant {
             var hasRecursive = segment.Any(static t => t is RecursiveWildcardToken);
 
             if(hasRecursive && segment.Count > 1) {
+                var position = PatternTextPosition.Find(context.Pattern.Text.AsSpan(), "**");
                 return PatternInvariantResult.Fail(
                     "In glob and GitIgnore patterns, '**' must appear as a " +
                     "standalone segment. Mixed segments such as '**a' or 'a**' " +
-                    "are not supported.");
+                    "are not supported.",
+                    position,
+                    position is { } value ? PatternTextPosition.SegmentAt(context.Pattern.Text.AsSpan(), value) : null);
             }
         }
 

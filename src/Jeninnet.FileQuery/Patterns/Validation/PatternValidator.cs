@@ -41,46 +41,53 @@ internal static partial class PatternValidator {
     ///   <item>Nonsense double-dash <c>"[--"</c>.</item>
     /// </list>
     /// </remarks>
-    public static (bool IsMalformed, string? Error) Validate(ReadOnlySpan<char> pattern) {
+    public static (bool IsMalformed, string? Error, int? Position, int? Segment) Validate(ReadOnlySpan<char> pattern) {
         if(pattern.IsEmpty) {
-            return (false, null);
+            return (false, null, null, null);
         }
 
         if(EndsWithEscape(pattern)) {
-            return (true, "Pattern ends with an unescaped backslash.");
+            return (true, "Pattern ends with an unescaped backslash.", pattern.Length - 1, PatternTextPosition.SegmentAt(pattern, pattern.Length - 1));
         }
 
         if(!pattern.Contains('[')) {
-            return (false, null);
+            return (false, null, null, null);
         }
 
+        var openingBracket = pattern.IndexOf('[');
+
         if(!pattern.Contains(']')) {
-            return (true, "Missing closing bracket ']' for an opening bracket '['.");
+            return (true, "Missing closing bracket ']' for an opening bracket '['.", openingBracket, PatternTextPosition.SegmentAt(pattern, openingBracket));
         }
 
         if(ContainsEmptyBracket(pattern)) {
-            return (true, "Empty bracket expression '[]' is not allowed.");
+            var emptyBracket = PatternTextPosition.Find(pattern, "[]")!.Value;
+            return (true, "Empty bracket expression '[]' is not allowed.", emptyBracket, PatternTextPosition.SegmentAt(pattern, emptyBracket));
         }
 
         var str = pattern.ToString();
 
-        if(DetectNestedBrackets().IsMatch(str)) {
-            return (true, "Nested brackets are not supported (e.g. '[[a-z]]').");
+        var nested = DetectNestedBrackets().Match(str);
+        if(nested.Success) {
+            return (true, "Nested brackets are not supported (e.g. '[[a-z]]').", nested.Index, PatternTextPosition.SegmentAt(pattern, nested.Index));
         }
 
-        if(InvalidRange().IsMatch(str)) {
-            return (true, "Invalid range syntax detected (e.g. '[a-]').");
+        var invalidRange = InvalidRange().Match(str);
+        if(invalidRange.Success) {
+            return (true, "Invalid range syntax detected (e.g. '[a-]').", invalidRange.Index, PatternTextPosition.SegmentAt(pattern, invalidRange.Index));
         }
 
-        if(InvalidRangeWithMissingLeftOperand().IsMatch(str)) {
-            return (true, "Range missing left operand (e.g. '[-z]').");
+        var missingLeft = InvalidRangeWithMissingLeftOperand().Match(str);
+        if(missingLeft.Success) {
+            return (true, "Range missing left operand (e.g. '[-z]').", missingLeft.Index, PatternTextPosition.SegmentAt(pattern, missingLeft.Index));
         }
 
-        if(DetectNonsenseLike().IsMatch(str)) {
-            return (true, "Nonsensical double-dash sequence detected (e.g. '[--]').");
+        var nonsense = DetectNonsenseLike().Match(str);
+        if(nonsense.Success) {
+            return (true, "Nonsensical double-dash sequence detected (e.g. '[--]').", nonsense.Index, PatternTextPosition.SegmentAt(pattern, nonsense.Index));
         }
 
-        return (false, null);
+        return (false, null, null, null);
     }
 
     public static bool IsMalformed(ReadOnlySpan<char> pattern) => Validate(pattern).IsMalformed;

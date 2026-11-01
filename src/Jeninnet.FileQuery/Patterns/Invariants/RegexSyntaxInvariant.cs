@@ -50,8 +50,11 @@ internal sealed class RegexSyntaxInvariant : IPatternInvariant {
             return PatternInvariantResult.Success;
         }
         catch(ArgumentException ex) {
+            var position = text.StartsWith(REGEX_PREFIX, StringComparison.Ordinal) ? REGEX_PREFIX.Length : 0;
             return PatternInvariantResult.Fail(
-                $"Invalid regex syntax in '{expression}': {ex.Message}");
+                $"Invalid regex syntax in '{expression}': {ex.Message}",
+                position,
+                0);
         }
     }
 }

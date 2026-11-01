@@ -37,8 +37,11 @@ internal sealed class GitIgnorePatternInvariant : IPatternInvariant {
 
         // A directory-only pattern (ending with '/') with no segments is invalid.
         if(context.State.IsDirectoryOnly && context.Tokens.Count == 0) {
+            var position = Math.Max(0, context.Pattern.Text.Length - 1);
             return PatternInvariantResult.Fail(
-                "Directory-only GitIgnore patterns must contain at least one segment.");
+                "Directory-only GitIgnore patterns must contain at least one segment.",
+                position,
+                PatternTextPosition.SegmentAt(context.Pattern.Text.AsSpan(), position));
         }
 
         // A root-anchored pattern with no body (bare "/") is invalid.
@@ -49,7 +52,9 @@ internal sealed class GitIgnorePatternInvariant : IPatternInvariant {
             context.Tokens[0].Count == 0) {
             return PatternInvariantResult.Fail(
                 "A root-anchored GitIgnore pattern must contain at least one segment " +
-                "after the leading '/'. A bare '/' is not a valid pattern.");
+                "after the leading '/'. A bare '/' is not a valid pattern.",
+                0,
+                0);
         }
 
         return PatternInvariantResult.Success;

@@ -56,8 +56,8 @@ public static class PatternInspector {
     public static PatternValidation Validate(string pattern) {
         ArgumentNullException.ThrowIfNull(pattern);
 
-        var (isMalformed, error) = PatternValidator.Validate(pattern.AsSpan());
-        return new PatternValidation(!isMalformed, error);
+        var (isMalformed, error, position, segment) = PatternValidator.Validate(pattern.AsSpan());
+        return new PatternValidation(!isMalformed, error, position, segment);
     }
 
     /// <summary>

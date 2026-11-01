@@ -12,8 +12,16 @@ namespace Jeninnet.FileQuery.Patterns.Invariants.Definition;
 /// </summary>
 /// <param name="IsSuccess">Whether the validation succeeded.</param>
 /// <param name="Message">Optional error message if validation failed.</param>
-internal readonly record struct PatternInvariantResult(bool IsSuccess, string? Message) {
+/// <param name="Position">Optional zero-based character position of the error.</param>
+/// <param name="Segment">Optional zero-based segment index of the error.</param>
+internal readonly record struct PatternInvariantResult(
+    bool IsSuccess,
+    string? Message,
+    int? Position = null,
+    int? Segment = null
+) {
     public static PatternInvariantResult Success => new(true, null);
 
-    public static PatternInvariantResult Fail(string message) => new(false, message);
+    public static PatternInvariantResult Fail(string message, int? position = null, int? segment = null) =>
+        new(false, message, position, segment);
 }

@@ -26,7 +26,15 @@ internal sealed class RecursiveWildcardRedundancyInvariant : IPatternInvariant {
 
             // Rule 1: multiple ** in same segment
             if(segment.Count(static t => t is RecursiveWildcardToken) > 1) {
-                return PatternInvariantResult.Fail("Recursive wildcard (**) must not appear more than once in the same segment.");
+                var first = PatternTextPosition.Find(context.Pattern.Text.AsSpan(), "**");
+                var second = first is { } start
+                    ? PatternTextPosition.FindAfter(context.Pattern.Text.AsSpan(), "**", start + 2)
+                    : null;
+
+                return PatternInvariantResult.Fail(
+                    "Recursive wildcard (**) must not appear more than once in the same segment.",
+                    second,
+                    second is { } value ? PatternTextPosition.SegmentAt(context.Pattern.Text.AsSpan(), value) : null);
             }
 
             var currentIsRecursive =
@@ -35,7 +43,15 @@ internal sealed class RecursiveWildcardRedundancyInvariant : IPatternInvariant {
 
             // Rule 2: adjacent ** segments
             if(previousWasRecursive && currentIsRecursive) {
-                return PatternInvariantResult.Fail("Redundant recursive wildcard (**/**) detected.");
+                var first = PatternTextPosition.Find(context.Pattern.Text.AsSpan(), "**");
+                var second = first is { } start
+                    ? PatternTextPosition.FindAfter(context.Pattern.Text.AsSpan(), "**", start + 2)
+                    : null;
+
+                return PatternInvariantResult.Fail(
+                    "Redundant recursive wildcard (**/**) detected.",
+                    second,
+                    second is { } value ? PatternTextPosition.SegmentAt(context.Pattern.Text.AsSpan(), value) : null);
             }
 
             previousWasRecursive = currentIsRecursive;

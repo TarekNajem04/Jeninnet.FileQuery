@@ -51,12 +51,32 @@ Wildcard: * | Literal: .cs
 
 ---
 
+## Error positions
+
+`PatternValidation` reports a zero-based `Position` and slash-separated `Segment` when the
+structural validator can locate the error:
+
+```csharp
+var validation = PatternInspector.Validate("src/[abc");
+// IsValid:  false
+// Error:    "Missing closing bracket ']' for an opening bracket '['."
+// Position: 4
+// Segment:  1
+```
+
+The same data is carried by `PatternException.Position` and `PatternException.Segment` when a
+pattern fails during compilation (for example, `..` traversal or a mixed `**` segment). The
+properties are `null` when no position is available, so existing exception handling remains
+source-compatible.
+
+---
+
 ## API
 
 | Member | Description |
 |---|---|
 | `PatternInspector.Classify(string)` | Returns `PatternKind.GitIgnore`, `Glob`, `Regex`, or `Unknown` for malformed input. |
-| `PatternInspector.Validate(string)` | Returns `PatternValidation` with `IsValid` and the structural `Error` message. |
+| `PatternInspector.Validate(string)` | Returns `PatternValidation` with `IsValid`, the structural `Error` message, and `Position`/`Segment` when known. |
 | `PatternInspector.Inspect(string)` | Full inspection using the automatically classified dialect. |
 | `PatternInspector.Inspect(string, PatternKind)` | Full inspection using a forced dialect (`Unknown` is rejected). |
 

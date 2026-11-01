@@ -12,4 +12,11 @@ namespace Jeninnet.FileQuery.Tooling;
 /// </summary>
 /// <param name="IsValid">Whether the pattern passed structural validation.</param>
 /// <param name="Error">The validation message when <paramref name="IsValid"/> is <see langword="false"/>.</param>
-public sealed record PatternValidation(bool IsValid, string? Error);
+/// <param name="Position">The zero-based character position of the error, when known.</param>
+/// <param name="Segment">The zero-based segment index of the error, when known.</param>
+public sealed record PatternValidation(
+    bool IsValid,
+    string? Error,
+    int? Position = null,
+    int? Segment = null
+);

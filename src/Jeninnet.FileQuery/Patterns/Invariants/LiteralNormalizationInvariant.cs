@@ -18,7 +18,10 @@ internal sealed class LiteralNormalizationInvariant : IPatternInvariant {
         var pattern = context.Pattern.Text.AsSpan();
         for(var i = 0; i < pattern.Length; i++) {
             if(char.IsControl(pattern[i])) {
-                return PatternInvariantResult.Fail("Pattern contains invalid control characters.");
+                return PatternInvariantResult.Fail(
+                    "Pattern contains invalid control characters.",
+                    i,
+                    PatternTextPosition.SegmentAt(pattern, i));
             }
         }
 

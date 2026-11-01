@@ -19,7 +19,11 @@ internal sealed class GlobPatternInvariant : IPatternInvariant {
         foreach(var segment in context.Tokens ?? []) {
             var recursive = segment.Where(static token => token is RecursiveWildcardToken).ToList();
             if(recursive.Count > 0 && segment.Count > 1) {
-                return PatternInvariantResult.Fail("In Glob patterns, '**' must appear as a standalone segment.");
+                var position = PatternTextPosition.Find(context.Pattern.Text.AsSpan(), "**");
+                return PatternInvariantResult.Fail(
+                    "In Glob patterns, '**' must appear as a standalone segment.",
+                    position,
+                    position is { } value ? PatternTextPosition.SegmentAt(context.Pattern.Text.AsSpan(), value) : null);
             }
         }
 

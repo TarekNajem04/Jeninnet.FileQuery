@@ -52,9 +52,16 @@ internal sealed class RecursiveWildcardIsolationInvariant : IPatternInvariant {
             var recursiveCount = segment.Count(static t => t is RecursiveWildcardToken);
 
             if(recursiveCount > 1) {
+                var first = PatternTextPosition.Find(context.Pattern.Text.AsSpan(), "**");
+                var second = first is { } start
+                    ? PatternTextPosition.FindAfter(context.Pattern.Text.AsSpan(), "**", start + 2)
+                    : null;
+
                 return PatternInvariantResult.Fail(
                     "A single pattern segment must not contain more than one " +
-                    "recursive wildcard ('**').");
+                    "recursive wildcard ('**').",
+                    second,
+                    second is { } value ? PatternTextPosition.SegmentAt(context.Pattern.Text.AsSpan(), value) : null);
             }
         }
 
