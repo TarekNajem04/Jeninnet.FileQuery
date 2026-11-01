@@ -39,4 +39,23 @@ public interface IFileQueryEngine {
         IProgress<FileQueryProgress>? progress,
         CancellationToken cancellationToken = default
     );
+
+    /// <summary>
+    /// Enumerates matching entries together with metadata captured from the filesystem enumeration.
+    /// </summary>
+    /// <param name="query">The query descriptor defining the search parameters.</param>
+    /// <returns>An <see cref="IEnumerable{T}"/> of matching entries.</returns>
+    /// <remarks>
+    /// Metadata comes from the same entries used for matching, so this API does not perform
+    /// additional file-system calls. Use <see cref="Execute(FileQuery)"/> when only paths are needed.
+    /// </remarks>
+    IEnumerable<FileQueryEntry> ExecuteEntries(FileQuery query);
+
+    /// <summary>
+    /// Asynchronous variant of <see cref="ExecuteEntries(FileQuery)"/>.
+    /// </summary>
+    /// <param name="query">The query descriptor defining the search parameters.</param>
+    /// <param name="cancellationToken">The token to monitor for cancellation requests.</param>
+    /// <returns>An async enumerable of matching entries.</returns>
+    IAsyncEnumerable<FileQueryEntry> ExecuteEntriesAsync(FileQuery query, CancellationToken cancellationToken = default);
 }
