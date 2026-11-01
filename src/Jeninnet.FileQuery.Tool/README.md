@@ -65,6 +65,7 @@ dotnet-filequery "**;!*.log" --null | xargs -0 wc -l
 | `--changed-since <revision>` | | Limit the query to files changed since a commit, tag, or branch. |
 | `--changed-since-date <timestamp>` | | Limit the query to files changed since an ISO 8601 timestamp. |
 | `--no-untracked` | off | Exclude untracked files from a change-set query. |
+| `--explain` | off | Write one line per file with its include/exclude outcome and reason instead of paths. |
 
 Patterns supplied through `--gitignore`, `--glob`, or `--regex` are typed explicitly and cannot be
 combined with a forced `--dialect`.
@@ -88,6 +89,21 @@ dotnet-filequery --changed-since-date 2026-10-01T00:00:00Z --no-untracked
 
 The root may be a subdirectory of the repository; change paths are rebased onto it automatically.
 See the [diff-aware guide](../../docs/guides/diff-aware-queries.md) for the full semantics.
+
+## Explaining matches
+
+`--explain` replaces the match list with one tab-separated line per file:
+
+```text
+include	src/Engine/FileQueryEngine.cs	Include by GitIgnore pattern.
+exclude	bin/Debug/app.dll	Exclude by GitIgnore pattern.
+```
+
+The first field is `include` or `exclude`, the second is the path relative to the root, and the
+third is the reason reported by the engine (including the responsible pattern kind). Directories
+are not reported. `--explain` cannot be combined with `--count` or `--null`.
+
+This is the mode used by the [VS Code extension](../../docs/guides/ide-extension.md).
 
 ## Output and exit codes
 

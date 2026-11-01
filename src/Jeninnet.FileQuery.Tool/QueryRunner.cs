@@ -25,11 +25,20 @@ internal static class QueryRunner {
         ArgumentNullException.ThrowIfNull(request);
         ArgumentNullException.ThrowIfNull(output);
 
-        var query = CreateQuery(request, ResolveIncludedPaths(request));
+        var query = CreateQuery(
+            request,
+            ResolveIncludedPaths(request),
+            request.Explain
+                ? new ImmediateProgress<FileQueryDiagnostic>(diagnostic => WriteExplanation(diagnostic, output))
+                : null);
         var engine = FileQueryRuntime.Create();
         var matches = 0L;
 
         foreach(var path in engine.Execute(query)) {
+            if(request.Explain) {
+                continue;
+            }
+
             matches++;
 
             if(request.CountOnly) {
@@ -58,8 +67,13 @@ internal static class QueryRunner {
     /// </summary>
     /// <param name="request">The validated query request.</param>
     /// <param name="includedPaths">The optional allow-list of root-relative paths.</param>
+    /// <param name="diagnostics">The optional diagnostic sink used by explain mode.</param>
     /// <returns>The query descriptor passed to the engine.</returns>
-    private static FileQuery CreateQuery(QueryRequest request, IReadOnlyCollection<string>? includedPaths) {
+    private static FileQuery CreateQuery(
+        QueryRequest request,
+        IReadOnlyCollection<string>? includedPaths,
+        IProgress<FileQueryDiagnostic>? diagnostics
+    ) {
         var patternInput = new PatternInput(
             TypedPatterns: request.TypedPatterns,
             InterpretationMode: request.InterpretationMode);
@@ -71,11 +85,38 @@ internal static class QueryRunner {
             IgnoreInaccessible: true,
             PatternMatchingMode: request.MatchingMode,
             CaseSensitivity: request.CaseSensitivity,
-            Traversal: new TraversalOptions(SymlinkPolicy: request.SymlinkPolicy)) {
+            Traversal: new TraversalOptions(SymlinkPolicy: request.SymlinkPolicy),
+            AuditMatches: diagnostics is not null,
+            Diagnostics: diagnostics) {
             IncludedPaths = includedPaths
         });
 
         return new FileQuery(request.Root, options);
+    }
+
+    /// <summary>
+    /// Writes one tab-separated explanation line for a file.
+    /// </summary>
+    /// <param name="diagnostic">The diagnostic reported by the engine.</param>
+    /// <param name="output">The writer that receives the line.</param>
+    private static void WriteExplanation(FileQueryDiagnostic diagnostic, TextWriter output) {
+        if(!string.Equals(diagnostic.EntryKind, "File", StringComparison.Ordinal)) {
+            return;
+        }
+
+        var outcome = string.Equals(diagnostic.Outcome, "Include", StringComparison.Ordinal)
+            ? "include"
+            : "exclude";
+        var reason = diagnostic.Reason
+            .Replace('\t', ' ')
+            .Replace('\r', ' ')
+            .Replace('\n', ' ');
+
+        output.Write(outcome);
+        output.Write('\t');
+        output.Write(diagnostic.RelativePath);
+        output.Write('\t');
+        output.WriteLine(reason);
     }
 
     /// <summary>

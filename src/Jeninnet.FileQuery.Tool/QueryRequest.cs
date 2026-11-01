@@ -29,6 +29,7 @@ namespace Jeninnet.FileQuery.Tool;
 /// <param name="ChangedSince">The Git revision baseline, or <see langword="null"/> when the query is not diff-aware.</param>
 /// <param name="ChangedSinceDate">The timestamp baseline, or <see langword="null"/> when not used.</param>
 /// <param name="IncludeUntracked">Whether untracked files are included in a change-set query.</param>
+/// <param name="Explain">Whether per-file include/exclude explanations replace the normal output.</param>
 internal sealed record QueryRequest(
     string Root,
     IReadOnlyDictionary<PatternKind, IEnumerable<string>> TypedPatterns,
@@ -43,7 +44,8 @@ internal sealed record QueryRequest(
     bool CountOnly,
     string? ChangedSince,
     DateTimeOffset? ChangedSinceDate,
-    bool IncludeUntracked
+    bool IncludeUntracked,
+    bool Explain
 ) {
     private const string DIALECT_HYBRID = "hybrid";
     private const string DIALECT_GITIGNORE = "gitignore";
@@ -124,6 +126,18 @@ internal sealed record QueryRequest(
             changedSinceDate = parsedTimestamp;
         }
 
+        var explain = parseResult.GetValue(options.Explain);
+
+        if(explain && parseResult.GetValue(options.Count)) {
+            error = "--explain cannot be combined with --count.";
+            return false;
+        }
+
+        if(explain && parseResult.GetValue(options.NullSeparated)) {
+            error = "--explain cannot be combined with --null.";
+            return false;
+        }
+
         var gitignore = parseResult.GetValue(options.Gitignore);
         var glob = parseResult.GetValue(options.Glob);
         var regex = parseResult.GetValue(options.RegularExpression);
@@ -159,7 +173,8 @@ internal sealed record QueryRequest(
             CountOnly: parseResult.GetValue(options.Count),
             ChangedSince: string.IsNullOrWhiteSpace(changedSince) ? null : changedSince.Trim(),
             ChangedSinceDate: changedSinceDate,
-            IncludeUntracked: !parseResult.GetValue(options.NoUntracked)
+            IncludeUntracked: !parseResult.GetValue(options.NoUntracked),
+            Explain: explain
         );
 
         return true;

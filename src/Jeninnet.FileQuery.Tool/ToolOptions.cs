@@ -28,6 +28,7 @@ internal sealed class ToolOptions : CommandLinePatternOptions {
     private const string OPTION_NAME_CHANGED_SINCE = "--changed-since";
     private const string OPTION_NAME_CHANGED_SINCE_DATE = "--changed-since-date";
     private const string OPTION_NAME_NO_UNTRACKED = "--no-untracked";
+    private const string OPTION_NAME_EXPLAIN = "--explain";
 
     /// <summary>
     /// Gets the positional patterns to match. Each value may contain multiple semicolon-separated patterns.
@@ -93,6 +94,11 @@ internal sealed class ToolOptions : CommandLinePatternOptions {
     /// Gets the option that excludes untracked files from a change-set query.
     /// </summary>
     public Option<bool> NoUntracked { get; }
+
+    /// <summary>
+    /// Gets the option that writes per-file include/exclude explanations instead of matches.
+    /// </summary>
+    public Option<bool> Explain { get; }
 
     /// <summary>
     /// Initializes a new instance of the <see cref="ToolOptions"/> class.
@@ -171,6 +177,11 @@ internal sealed class ToolOptions : CommandLinePatternOptions {
             Description = "Exclude untracked files when a --changed-since baseline is used.",
             Arity = ArgumentArity.Zero
         };
+
+        Explain = new Option<bool>(OPTION_NAME_EXPLAIN) {
+            Description = "Write one line per file with its include/exclude outcome and reason instead of matching paths.",
+            Arity = ArgumentArity.Zero
+        };
     }
 
     /// <summary>
@@ -192,5 +203,6 @@ internal sealed class ToolOptions : CommandLinePatternOptions {
             ChangedSince,
             ChangedSinceDate,
             NoUntracked,
+            Explain,
         ];
 }
