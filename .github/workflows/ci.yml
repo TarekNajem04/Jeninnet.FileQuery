@@ -141,8 +141,7 @@ jobs:
             tests/Jeninnet.FileQuery.Tooling.Tests/Jeninnet.FileQuery.Tooling.Tests.csproj \
             tests/Jeninnet.FileQuery.Analyzers.Tests/Jeninnet.FileQuery.Analyzers.Tests.csproj \
             tests/Jeninnet.FileQuery.Build.Tests/Jeninnet.FileQuery.Build.Tests.csproj \
-            tests/Jeninnet.FileQuery.FileProviders.Tests/Jeninnet.FileQuery.FileProviders.Tests.csproj \
-            tests/Jeninnet.Testing.Assertions.Tests/Jeninnet.Testing.Assertions.Tests.csproj; do
+            tests/Jeninnet.FileQuery.FileProviders.Tests/Jeninnet.FileQuery.FileProviders.Tests.csproj; do
             dotnet test "$project" \
               -c Release \
               --no-build \

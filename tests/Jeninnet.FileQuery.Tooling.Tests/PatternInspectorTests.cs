@@ -92,12 +92,10 @@ public sealed class PatternInspectorTests {
 
         inspection.Segments.Should().HaveCount(2);
         inspection.Segments[0].Tokens.Should().BeEquivalentTo(
-            [new PatternTokenInfo(PatternTokenKind.Literal, "src")]);
+            new PatternTokenInfo(PatternTokenKind.Literal, "src"));
         inspection.Segments[1].Tokens.Should().BeEquivalentTo(
-            [
-                new PatternTokenInfo(PatternTokenKind.Wildcard, "*"),
-                new PatternTokenInfo(PatternTokenKind.Literal, ".cs")
-            ]);
+            new PatternTokenInfo(PatternTokenKind.Wildcard, "*"),
+            new PatternTokenInfo(PatternTokenKind.Literal, ".cs"));
     }
 
     /// <summary>

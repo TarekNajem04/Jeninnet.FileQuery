@@ -43,7 +43,7 @@ public sealed class GitQueryTests {
             lengths[relativePath] = document.RootElement.GetProperty("length").GetInt64();
         }
 
-        paths.Should().BeEquivalentTo(["a.txt", "c.txt"]);
+        paths.Should().BeEquivalentTo("a.txt", "c.txt");
         lengths["a.txt"].Should().Be(3L);
         lengths["c.txt"].Should().Be(5L);
     }
@@ -65,7 +65,7 @@ public sealed class GitQueryTests {
         var result = Run("--root", repository.Root, "--changed-since", "HEAD", "--relative");
 
         result.ExitCode.Should().Be(0);
-        SplitLines(result.Output).Should().BeEquivalentTo(["a.txt", "c.txt"]);
+        SplitLines(result.Output).Should().BeEquivalentTo("a.txt", "c.txt");
     }
 
     /// <summary>
@@ -84,7 +84,7 @@ public sealed class GitQueryTests {
         var result = Run("--root", repository.Root, "--changed-since", "HEAD", "--relative", "**;!*.cs");
 
         result.ExitCode.Should().Be(0);
-        SplitLines(result.Output).Should().BeEquivalentTo(["b.cs"]);
+        SplitLines(result.Output).Should().BeEquivalentTo("b.cs");
     }
 
     /// <summary>
@@ -108,7 +108,7 @@ public sealed class GitQueryTests {
             "--relative");
 
         result.ExitCode.Should().Be(0);
-        SplitLines(result.Output).Should().BeEquivalentTo(["a.txt"]);
+        SplitLines(result.Output).Should().BeEquivalentTo("a.txt");
     }
 
     /// <summary>

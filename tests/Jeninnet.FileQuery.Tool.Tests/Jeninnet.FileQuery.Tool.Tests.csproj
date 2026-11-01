@@ -7,6 +7,7 @@
     </PropertyGroup>
 
     <ItemGroup>
+        <PackageReference Include="Jeninnet.Assertions" />
         <PackageReference Include="System.CommandLine" />
         <PackageReference Include="coverlet.collector">
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
@@ -23,7 +24,6 @@
 
     <ItemGroup>
         <ProjectReference Include="..\..\src\Jeninnet.FileQuery.Tool\Jeninnet.FileQuery.Tool.csproj" />
-        <ProjectReference Include="..\..\src\Jeninnet.Testing.Assertions\Jeninnet.Testing.Assertions.csproj" />
     </ItemGroup>
 
 </Project>

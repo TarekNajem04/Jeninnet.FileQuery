@@ -7,6 +7,7 @@
     </PropertyGroup>
 
     <ItemGroup>
+        <PackageReference Include="Jeninnet.Assertions" />
         <PackageReference Include="Microsoft.Extensions.FileProviders.Physical" />
         <PackageReference Include="Microsoft.NET.Test.Sdk" />
         <PackageReference Include="MSTest" />
@@ -15,7 +16,6 @@
 
     <ItemGroup>
         <ProjectReference Include="..\..\src\Jeninnet.FileQuery.FileProviders\Jeninnet.FileQuery.FileProviders.csproj" />
-        <ProjectReference Include="..\..\src\Jeninnet.Testing.Assertions\Jeninnet.Testing.Assertions.csproj" />
     </ItemGroup>
 
 </Project>

@@ -36,7 +36,7 @@ public sealed class GitChangeReaderTests {
         changeSet.Changes.Should().Contain(change =>
             change.Path == "d.txt" && change.Kind == GitChangeKind.Added);
         changeSet.Changes.Should().NotContain(change => change.Path == "c.txt");
-        changeSet.ExistingPaths.Should().BeEquivalentTo(["a.txt", "d.txt"]);
+        changeSet.ExistingPaths.Should().BeEquivalentTo("a.txt", "d.txt");
     }
 
     /// <summary>

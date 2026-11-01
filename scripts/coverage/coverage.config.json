@@ -27,8 +27,7 @@
             "+Jeninnet.FileQuery.CommandLine*",
             "+Jeninnet.FileQuery.DependencyInjection*",
             "+Jeninnet.FileQuery.Tool*",
-            "+Jeninnet.FileQuery.Tooling*",
-            "+Jeninnet.Testing.Assertions*"
+            "+Jeninnet.FileQuery.Tooling*"
         ]
     },
 

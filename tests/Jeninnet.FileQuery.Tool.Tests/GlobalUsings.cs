@@ -6,9 +6,9 @@
 // Licensed under the MIT License.
 //
 global using System.Text.Json;
+global using Jeninnet.Assertions;
+global using Jeninnet.Assertions.Extensions;
+global using Jeninnet.Assertions.IO;
 global using Jeninnet.FileQuery.Tool;
 global using Jeninnet.FileQuery.Tool.Git;
-global using Jeninnet.Testing.Assertions;
-global using Jeninnet.Testing.Assertions.Extensions;
-global using Jeninnet.Testing.Assertions.IO;
 global using Microsoft.VisualStudio.TestTools.UnitTesting;

@@ -6,8 +6,8 @@
 // Licensed under the MIT License.
 //
 global using System.Text;
+global using Jeninnet.Assertions.IO;
 global using Jeninnet.FileQuery.Enums;
 global using Jeninnet.FileQuery.FileProviders;
-global using Jeninnet.Testing.Assertions.IO;
 global using Microsoft.Extensions.FileProviders;
 global using Microsoft.VisualStudio.TestTools.UnitTesting;

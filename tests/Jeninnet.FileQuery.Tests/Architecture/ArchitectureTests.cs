@@ -205,7 +205,7 @@ public sealed class ArchitectureTests {
 
         var violations = Directory
             .EnumerateFiles(sourceRoot, "*.cs", SearchOption.AllDirectories)
-            .Where(path => !path.Contains("Jeninnet.Testing.Assertions", StringComparison.Ordinal))
+            .Where(path => !path.Contains("Jeninnet.Assertions", StringComparison.Ordinal))
             .SelectMany(path => forbiddenPatterns
                 .Where(pattern => File.ReadAllText(path).Contains(pattern, StringComparison.Ordinal))
                 .Select(pattern => $"{Path.GetRelativePath(sourceRoot, path)} contains '{pattern}'"))

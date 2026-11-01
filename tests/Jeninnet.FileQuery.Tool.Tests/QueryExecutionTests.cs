@@ -175,7 +175,7 @@ public sealed class QueryExecutionTests {
         var result = Run("--root", environment.Root, "--relative", "--no-recursive");
 
         result.ExitCode.Should().Be(0);
-        SplitLines(result.Output).Should().BeEquivalentTo(["a.txt", "b.log"]);
+        SplitLines(result.Output).Should().BeEquivalentTo("a.txt", "b.log");
     }
 
     /// <summary>
@@ -206,7 +206,7 @@ public sealed class QueryExecutionTests {
 
         var paths = result.Output.Split('\0', StringSplitOptions.RemoveEmptyEntries);
         paths.Select(static path => Path.GetFullPath(path)).Should().BeEquivalentTo(
-            [Path.GetFullPath(environment.Abs("a.txt")), Path.GetFullPath(environment.Abs("b.log"))]);
+            Path.GetFullPath(environment.Abs("a.txt")), Path.GetFullPath(environment.Abs("b.log")));
     }
 
     /// <summary>

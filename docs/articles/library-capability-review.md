@@ -36,7 +36,7 @@ deliberately deferred is watch mode.
 | Build integration | Roslyn analyzer (`JNQ1001`), MSBuild task and SARIF 2.1.0 exporter |
 | Performance | Zero-allocation matching, pooled relative paths, literal-suffix fast path, measured 10k/1M baselines |
 | Platform | .NET 10 / C# 14, AOT-ready by design, Native AOT publish/run smoke test in CI |
-| Quality | 0-warning build, 1,310 tests, DocFX with warnings-as-errors, cross-platform and soak baselines |
+| Quality | 0-warning build, 1,128 tests, DocFX with warnings-as-errors, cross-platform and soak baselines |
 
 ---
 

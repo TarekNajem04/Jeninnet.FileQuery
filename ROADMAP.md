@@ -41,7 +41,7 @@ To be the fastest, most predictable, and most flexible file discovery engine for
 
 *Goal: Elevate code quality, documentation coverage, and test infrastructure.*
 
-- [x] **Assertion Library Extraction**: Extract shared test infrastructure into `Jeninnet.Testing.Assertions` v1.0.0, a reusable, well-documented assertion library with fluent `.Should()` syntax.
+- [x] **Assertion Library Extraction**: Extract shared test infrastructure into `Jeninnet.Testing.Assertions` v1.0.0, a reusable, well-documented assertion library with fluent `.Should()` syntax. *(superseded in v2.0.0 by the standalone `Jeninnet.Assertions` package; the local project was removed)*
 - [x] **XML Documentation Completion**: Add missing XML doc elements (`<param>`, `<exception>`, `<returns>`) across all source files; eliminate all CS1591 and RCS1141 warnings.
 - [x] **Enum Hygiene**: Add explicit underlying values to all enum members to maintain binary compatibility.
 - [x] **Test Migration**: Replace `TestAssertEx.*` with fluent `.Should()` assertions across 90+ test files.

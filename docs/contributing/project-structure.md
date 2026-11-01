@@ -14,13 +14,21 @@ Jeninnet.FileQuery/
 │   ├── Jeninnet.FileQuery.CommandLine/             CLI integration
 │   ├── Jeninnet.FileQuery.DependencyInjection/     DI integration
 │   ├── Jeninnet.FileQuery.FileProviders/           IFileProvider adapter
+│   ├── Jeninnet.FileQuery.Tooling/                 Build-tooling SDK
+│   ├── Jeninnet.FileQuery.Build/                   MSBuild/SARIF integration
+│   ├── Jeninnet.FileQuery.Analyzers/               Roslyn analyzer
+│   ├── Jeninnet.FileQuery.Tool/                    Global tool
 │   ├── Jeninnet.FileQuery.Benchmarks/              BenchmarkDotNet benchmarks
-│   └── Jeninnet.Testing.Assertions/                Test assertion helpers
+│   └── Jeninnet.FileQuery.Soak/                    Stability harness
 │
 ├── tests/
 │   ├── Jeninnet.FileQuery.Tests/                   Unit and integration tests
 │   ├── Jeninnet.AdvancedUsage.Tests/               AdvancedUsage sample tests
-│   └── Jeninnet.Testing.Assertions.Tests/          Assertions library tests
+│   ├── Jeninnet.FileQuery.Tool.Tests/              CLI tool tests
+│   ├── Jeninnet.FileQuery.Tooling.Tests/           Build-tooling SDK tests
+│   ├── Jeninnet.FileQuery.Analyzers.Tests/         Roslyn analyzer tests
+│   ├── Jeninnet.FileQuery.Build.Tests/             MSBuild/SARIF tests
+│   └── Jeninnet.FileQuery.FileProviders.Tests/     IFileProvider adapter tests
 │
 ├── samples/
 │   ├── BasicMatching/                              Hello-world sample
