@@ -32,6 +32,7 @@ public sealed class FileQueryBuilder {
     private bool _auditMatches;
     private IProgress<FileQueryDiagnostic>? _diagnostics;
     private FileQueryErrorRecoveryOptions? _errorRecovery;
+    private List<string>? _includedPaths;
 
     /// <summary>
     /// Initializes a new <see cref="FileQueryBuilder"/> rooted at the specified directory.
@@ -239,6 +240,32 @@ public sealed class FileQueryBuilder {
         return this;
     }
 
+    /// <summary>
+    /// Restricts the query to an explicit allow-list of root-relative file paths.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// This is intended for incremental scans: pass the files reported by a version-control
+    /// diff and the engine skips every other file, pruning directories that cannot contain a
+    /// listed path. Paths use forward slashes and are relative to the query root; absolute
+    /// paths, parent segments (<c>..</c>), empty entries, and directory entries are rejected
+    /// when <see cref="Build"/> runs.
+    /// </para>
+    /// <para>
+    /// An empty sequence matches no files. Calling this method replaces any previously supplied
+    /// allow-list.
+    /// </para>
+    /// </remarks>
+    /// <param name="relativePaths">The root-relative file paths to include.</param>
+    /// <returns>The current <see cref="FileQueryBuilder"/> instance for method chaining.</returns>
+    /// <exception cref="ArgumentNullException">Thrown when <paramref name="relativePaths"/> is <see langword="null"/>.</exception>
+    public FileQueryBuilder RestrictToPaths(IEnumerable<string> relativePaths) {
+        ArgumentNullException.ThrowIfNull(relativePaths);
+
+        _includedPaths = [.. relativePaths];
+        return this;
+    }
+
     // =====Traversal configuration =====
 
     /// <summary>
@@ -350,6 +377,11 @@ public sealed class FileQueryBuilder {
         // Use centralized validation pipeline
         FileQueryValidator.ValidateExecution(_fileSystem, _rootPath, GetOptions());
 
+        if(_includedPaths is not null) {
+            // Validate eagerly so malformed allow-lists fail at Build instead of first execution.
+            _ = RelativePathFilter.Create(_includedPaths, _caseSensitivity.Resolve());
+        }
+
         var patternInput = new PatternInput(
             Patterns: [],
             TypedPatterns: _patternStorage.ToDictionary(
@@ -368,7 +400,9 @@ public sealed class FileQueryBuilder {
                 AuditMatches: _auditMatches,
                 Diagnostics: _diagnostics,
                 ErrorRecovery: _errorRecovery
-            )
+            ) {
+                IncludedPaths = _includedPaths
+            }
         );
 
         return new FileQuery(_rootPath, options);
@@ -393,7 +427,9 @@ public sealed class FileQueryBuilder {
                 AuditMatches: _auditMatches,
                 Diagnostics: _diagnostics,
                 ErrorRecovery: _errorRecovery
-            )
+            ) {
+                IncludedPaths = _includedPaths
+            }
         );
     }
 

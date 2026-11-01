@@ -170,6 +170,19 @@ internal sealed class TraversalExecutor : ITraversalExecutor {
         }
 
         var relativePath = pathBuffer.BuildRelativePath(plan.RootDirectory, entry);
+
+        // An allow-list restricts both matching and traversal: files outside it are never
+        // matched, and directories that cannot contain a listed file are pruned.
+        if(plan.PathFilter is not null) {
+            if(entry.IsDirectory) {
+                if(!plan.PathFilter.CanContainFiles(relativePath)) {
+                    return false;
+                }
+            } else if(!plan.PathFilter.ContainsFile(relativePath)) {
+                return false;
+            }
+        }
+
         var pathMatchContext = new PathMatchContext(
             relativePath, entry.PathKind, plan.Matching.CaseSensitivity.Resolve());
         var matchOutcome = plan.Matcher.Match(plan.CompiledPatterns, pathMatchContext);

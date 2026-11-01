@@ -43,6 +43,7 @@ Jeninnet.FileQuery is not just a file filter — it is a **pattern execution eng
 - Safe traversal (ignore inaccessible directories)
 - Full diagnostics + invariant validation
 - Immutable compiled pattern sets
+- Diff-aware scans (`RestrictToPaths`) for incremental tooling
 
 ---
 
@@ -228,13 +229,24 @@ MaxRecursionDepth = 2
 IgnoreInaccessible = true
 ```
 
-## 8️⃣ Match files inside alphabetic subfolders
+## 8️⃣ Restrict to changed files
+
+```csharp
+var changed = new[] { "src/Engine/FileQueryEngine.cs", "docs/index.md" };
+
+var files = FileQuery.From(repoRoot)
+    .RestrictToPaths(changed)
+    .Where("!**")
+    .Execute();
+```
+
+## 9️⃣ Match files inside alphabetic subfolders
 
 ```
 src/[a-z]*/**/*.cs
 ```
 
-## 9️⃣ Regex: match multiple extensions
+## 🔟 Regex: match multiple extensions
 
 ```
 r:^.*\.(cs|md|json)$

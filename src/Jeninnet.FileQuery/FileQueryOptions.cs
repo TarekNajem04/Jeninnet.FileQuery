@@ -31,7 +31,25 @@ public record FileQueryOptionsConfig(
     bool AuditMatches = false,
     IProgress<FileQueryDiagnostic>? Diagnostics = null,
     FileQueryErrorRecoveryOptions? ErrorRecovery = null
-);
+) {
+    /// <summary>
+    /// Gets the optional set of root-relative file paths that limits the query to an explicit
+    /// allow-list (for example, the files changed in a diff).
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// Paths use forward slashes and are relative to the query root. Absolute paths, parent
+    /// segments (<c>..</c>), empty entries, and directory entries are rejected when the query
+    /// is built.
+    /// </para>
+    /// <para>
+    /// When the collection is <see langword="null"/>, traversal is not restricted. An empty
+    /// collection matches no files. Directories that cannot contain an allowed path are pruned;
+    /// files that are not listed are not matched at all.
+    /// </para>
+    /// </remarks>
+    public IReadOnlyCollection<string>? IncludedPaths { get; init; }
+}
 
 /// <summary>
 /// Represents the complete, immutable configuration for a single file query execution.
@@ -81,6 +99,7 @@ public sealed record FileQueryOptions {
         ErrorRecovery = config.ErrorRecovery ?? (config.IgnoreInaccessible
             ? FileQueryErrorRecoveryOptions.Skip
             : FileQueryErrorRecoveryOptions.Abort);
+        IncludedPaths = config.IncludedPaths;
     }
 
     /// <summary>
@@ -135,6 +154,17 @@ public sealed record FileQueryOptions {
     /// Gets the configured IO error recovery policy.
     /// </summary>
     public FileQueryErrorRecoveryOptions ErrorRecovery { get; }
+
+    /// <summary>
+    /// Gets the optional root-relative allow-list of files to query, or <see langword="null"/>
+    /// when traversal is unrestricted.
+    /// </summary>
+    /// <remarks>
+    /// This is the execution form of <see cref="FileQueryOptionsConfig.IncludedPaths"/>. When it
+    /// is set, matching is only attempted for the listed files, and directories that cannot
+    /// contain a listed file are pruned.
+    /// </remarks>
+    public IReadOnlyCollection<string>? IncludedPaths { get; }
 
     /// <summary>
     /// Validates this options instance for internal consistency.

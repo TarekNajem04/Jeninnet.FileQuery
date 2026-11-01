@@ -45,6 +45,10 @@ internal sealed class TraversalPlanBuilder(IFileSystem fileSystem) : ITraversalP
         var matcher = PathMatcherFactory.Create(query.Options);
         var evaluator = new TraversalEvaluator(new TraversalDecisionProvider(traversalConfig));
 
+        var pathFilter = options.IncludedPaths is null
+            ? null
+            : RelativePathFilter.Create(options.IncludedPaths, resolvedCase);
+
         return new TraversalPlan(
             RootDirectory: fileSystem.GetFullPath(query.RootPath).TrimEnd(fileSystem.DirectorySeparator),
             FileSystem: fileSystem,
@@ -54,7 +58,8 @@ internal sealed class TraversalPlanBuilder(IFileSystem fileSystem) : ITraversalP
             CompiledPatterns: compiled,
             Evaluator: evaluator,
             Progress: progress,
-            Diagnostics: options.AuditMatches ? options.Diagnostics : null
+            Diagnostics: options.AuditMatches ? options.Diagnostics : null,
+            PathFilter: pathFilter
         );
     }
 

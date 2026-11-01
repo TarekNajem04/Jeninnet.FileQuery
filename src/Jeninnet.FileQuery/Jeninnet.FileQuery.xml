@@ -559,6 +559,27 @@
             </summary>
             <returns>The current <see cref="T:Jeninnet.FileQuery.FileQueryBuilder"/> instance for method chaining.</returns>
         </member>
+        <member name="M:Jeninnet.FileQuery.FileQueryBuilder.RestrictToPaths(System.Collections.Generic.IEnumerable{System.String})">
+            <summary>
+            Restricts the query to an explicit allow-list of root-relative file paths.
+            </summary>
+            <remarks>
+            <para>
+            This is intended for incremental scans: pass the files reported by a version-control
+            diff and the engine skips every other file, pruning directories that cannot contain a
+            listed path. Paths use forward slashes and are relative to the query root; absolute
+            paths, parent segments (<c>..</c>), empty entries, and directory entries are rejected
+            when <see cref="M:Jeninnet.FileQuery.FileQueryBuilder.Build"/> runs.
+            </para>
+            <para>
+            An empty sequence matches no files. Calling this method replaces any previously supplied
+            allow-list.
+            </para>
+            </remarks>
+            <param name="relativePaths">The root-relative file paths to include.</param>
+            <returns>The current <see cref="T:Jeninnet.FileQuery.FileQueryBuilder"/> instance for method chaining.</returns>
+            <exception cref="T:System.ArgumentNullException">Thrown when <paramref name="relativePaths"/> is <see langword="null"/>.</exception>
+        </member>
         <member name="M:Jeninnet.FileQuery.FileQueryBuilder.WithRecursion(System.Boolean)">
             <summary>
             Controls whether subdirectories are traversed during execution.
@@ -833,6 +854,24 @@
         <member name="P:Jeninnet.FileQuery.FileQueryOptionsConfig.ErrorRecovery">
             <summary>The error recovery options.</summary>
         </member>
+        <member name="P:Jeninnet.FileQuery.FileQueryOptionsConfig.IncludedPaths">
+            <summary>
+            Gets the optional set of root-relative file paths that limits the query to an explicit
+            allow-list (for example, the files changed in a diff).
+            </summary>
+            <remarks>
+            <para>
+            Paths use forward slashes and are relative to the query root. Absolute paths, parent
+            segments (<c>..</c>), empty entries, and directory entries are rejected when the query
+            is built.
+            </para>
+            <para>
+            When the collection is <see langword="null"/>, traversal is not restricted. An empty
+            collection matches no files. Directories that cannot contain an allowed path are pruned;
+            files that are not listed are not matched at all.
+            </para>
+            </remarks>
+        </member>
         <member name="T:Jeninnet.FileQuery.FileQueryOptions">
             <summary>
             Represents the complete, immutable configuration for a single file query execution.
@@ -921,6 +960,17 @@
             <summary>
             Gets the configured IO error recovery policy.
             </summary>
+        </member>
+        <member name="P:Jeninnet.FileQuery.FileQueryOptions.IncludedPaths">
+            <summary>
+            Gets the optional root-relative allow-list of files to query, or <see langword="null"/>
+            when traversal is unrestricted.
+            </summary>
+            <remarks>
+            This is the execution form of <see cref="P:Jeninnet.FileQuery.FileQueryOptionsConfig.IncludedPaths"/>. When it
+            is set, matching is only attempted for the listed files, and directories that cannot
+            contain a listed file are pruned.
+            </remarks>
         </member>
         <member name="M:Jeninnet.FileQuery.FileQueryOptions.Validate">
             <summary>
@@ -5092,6 +5142,69 @@
             </summary>
             <param name="required">The minimum number of characters the buffer must hold.</param>
         </member>
+        <member name="T:Jeninnet.FileQuery.Traversal.RelativePathFilter">
+            <summary>
+            Restricts traversal to an explicit allow-list of root-relative file paths.
+            </summary>
+            <remarks>
+            <para>
+            The filter stores the allowed file paths and every ancestor directory. File lookups compare
+            the traversal's pooled relative-path span directly, so no per-entry string is allocated.
+            </para>
+            <para>
+            Directory lookups let the executor prune subtrees that cannot contain an allowed file.
+            </para>
+            </remarks>
+        </member>
+        <member name="M:Jeninnet.FileQuery.Traversal.RelativePathFilter.#ctor(System.Collections.Generic.HashSet{System.String},System.Collections.Generic.HashSet{System.String})">
+            <summary>
+            Initializes a filter over the supplied lookup sets.
+            </summary>
+            <param name="files">The normalized allowed file paths.</param>
+            <param name="directories">The normalized ancestor directories, including the empty root.</param>
+        </member>
+        <member name="M:Jeninnet.FileQuery.Traversal.RelativePathFilter.Create(System.Collections.Generic.IEnumerable{System.String},Jeninnet.FileQuery.Enums.CaseSensitivity)">
+            <summary>
+            Creates a filter from root-relative file paths.
+            </summary>
+            <param name="includedPaths">The allowed file paths.</param>
+            <param name="caseSensitivity">The resolved case sensitivity used for lookups.</param>
+            <returns>The initialized filter.</returns>
+            <exception cref="T:System.ArgumentException">
+            Thrown when a path is empty, absolute, or contains a parent segment.
+            </exception>
+        </member>
+        <member name="M:Jeninnet.FileQuery.Traversal.RelativePathFilter.ContainsFile(System.ReadOnlySpan{System.Char})">
+            <summary>
+            Determines whether a file at <paramref name="relativePath"/> is in the allow-list.
+            </summary>
+            <param name="relativePath">The normalized root-relative file path.</param>
+            <returns><see langword="true"/> when the file is listed.</returns>
+        </member>
+        <member name="M:Jeninnet.FileQuery.Traversal.RelativePathFilter.CanContainFiles(System.ReadOnlySpan{System.Char})">
+            <summary>
+            Determines whether a directory can contain an allowed file.
+            </summary>
+            <param name="relativePath">The normalized root-relative directory path (with or without a trailing slash).</param>
+            <returns><see langword="true"/> when the directory is the root or an ancestor of a listed file.</returns>
+        </member>
+        <member name="M:Jeninnet.FileQuery.Traversal.RelativePathFilter.Normalize(System.String)">
+            <summary>
+            Normalizes a path to forward slashes and validates that it is root-relative.
+            </summary>
+            <param name="path">The path to normalize.</param>
+            <returns>The normalized path.</returns>
+            <exception cref="T:System.ArgumentException">
+            Thrown when the path is empty, absolute, or contains a parent segment.
+            </exception>
+        </member>
+        <member name="M:Jeninnet.FileQuery.Traversal.RelativePathFilter.AddAncestorDirectories(System.Collections.Generic.HashSet{System.String},System.String)">
+            <summary>
+            Adds every ancestor directory of <paramref name="filePath"/> to the lookup set.
+            </summary>
+            <param name="directories">The directory lookup set.</param>
+            <param name="filePath">The normalized file path.</param>
+        </member>
         <member name="T:Jeninnet.FileQuery.Traversal.TraversalConfiguration">
             <summary>
             Internal immutable projection of traversal-related settings.
@@ -5399,8 +5512,9 @@
             <param name="Evaluator">The traversal evaluator.</param>
             <param name="Progress">Optional progress reporter.</param>
             <param name="Diagnostics">Optional diagnostic reporter.</param>
+            <param name="PathFilter">Optional allow-list filter that restricts traversal to changed files.</param>
         </member>
-        <member name="M:Jeninnet.FileQuery.Traversal.TraversalPlan.#ctor(System.String,Jeninnet.FileQuery.IO.IFileSystem,Jeninnet.FileQuery.Traversal.TraversalConfiguration,Jeninnet.FileQuery.Matching.MatchingConfiguration,Jeninnet.FileQuery.Matching.IPathMatcher,Jeninnet.FileQuery.Matching.ICompiledPatternSet,Jeninnet.FileQuery.Traversal.ITraversalEvaluator,System.IProgress{Jeninnet.FileQuery.FileQueryProgress},System.IProgress{Jeninnet.FileQuery.FileQueryDiagnostic})">
+        <member name="M:Jeninnet.FileQuery.Traversal.TraversalPlan.#ctor(System.String,Jeninnet.FileQuery.IO.IFileSystem,Jeninnet.FileQuery.Traversal.TraversalConfiguration,Jeninnet.FileQuery.Matching.MatchingConfiguration,Jeninnet.FileQuery.Matching.IPathMatcher,Jeninnet.FileQuery.Matching.ICompiledPatternSet,Jeninnet.FileQuery.Traversal.ITraversalEvaluator,System.IProgress{Jeninnet.FileQuery.FileQueryProgress},System.IProgress{Jeninnet.FileQuery.FileQueryDiagnostic},Jeninnet.FileQuery.Traversal.RelativePathFilter)">
             <summary>
             Fully prepared immutable execution plan for a file query.
             </summary>
@@ -5417,6 +5531,7 @@
             <param name="Evaluator">The traversal evaluator.</param>
             <param name="Progress">Optional progress reporter.</param>
             <param name="Diagnostics">Optional diagnostic reporter.</param>
+            <param name="PathFilter">Optional allow-list filter that restricts traversal to changed files.</param>
         </member>
         <member name="P:Jeninnet.FileQuery.Traversal.TraversalPlan.RootDirectory">
             <summary>The root directory for traversal.</summary>
@@ -5444,6 +5559,9 @@
         </member>
         <member name="P:Jeninnet.FileQuery.Traversal.TraversalPlan.Diagnostics">
             <summary>Optional diagnostic reporter.</summary>
+        </member>
+        <member name="P:Jeninnet.FileQuery.Traversal.TraversalPlan.PathFilter">
+            <summary>Optional allow-list filter that restricts traversal to changed files.</summary>
         </member>
         <member name="T:Jeninnet.FileQuery.Traversal.TraversalPlanBuilder">
             <summary>

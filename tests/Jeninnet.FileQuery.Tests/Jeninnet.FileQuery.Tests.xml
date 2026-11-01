@@ -3814,6 +3814,79 @@
             Wraps real compilers to avoid mocking internals.
             </summary>
         </member>
+        <member name="T:Jeninnet.FileQuery.Tests.Traversal.PathRestrictionTests">
+            <summary>
+            Tests the root-relative allow-list used by diff-aware queries.
+            </summary>
+        </member>
+        <member name="M:Jeninnet.FileQuery.Tests.Traversal.PathRestrictionTests.RestrictToPaths_ShouldReturnOnlyListedFiles">
+            <summary>
+            Verifies that only the listed files are returned.
+            </summary>
+        </member>
+        <member name="M:Jeninnet.FileQuery.Tests.Traversal.PathRestrictionTests.RestrictToPaths_ShouldReturnOnlyListedFilesAsync">
+            <summary>
+            Verifies that the async path honours the allow-list.
+            </summary>
+            <returns>A task that represents the asynchronous test.</returns>
+        </member>
+        <member name="M:Jeninnet.FileQuery.Tests.Traversal.PathRestrictionTests.RestrictToPaths_ShouldCombineWithPatterns">
+            <summary>
+            Verifies that the allow-list combines with pattern matching.
+            </summary>
+        </member>
+        <member name="M:Jeninnet.FileQuery.Tests.Traversal.PathRestrictionTests.RestrictToPaths_ShouldNormalizeSeparators">
+            <summary>
+            Verifies that separators and current-directory segments are normalized.
+            </summary>
+        </member>
+        <member name="M:Jeninnet.FileQuery.Tests.Traversal.PathRestrictionTests.RestrictToPaths_ShouldMatchNothing_WhenListIsEmpty">
+            <summary>
+            Verifies that an empty allow-list matches no files.
+            </summary>
+        </member>
+        <member name="M:Jeninnet.FileQuery.Tests.Traversal.PathRestrictionTests.RestrictToPaths_ShouldThrow_WhenPathIsAbsolute">
+            <summary>
+            Verifies that an absolute path is rejected when the query is built.
+            </summary>
+        </member>
+        <member name="M:Jeninnet.FileQuery.Tests.Traversal.PathRestrictionTests.RestrictToPaths_ShouldThrow_WhenPathContainsParentSegment">
+            <summary>
+            Verifies that parent segments are rejected when the query is built.
+            </summary>
+        </member>
+        <member name="M:Jeninnet.FileQuery.Tests.Traversal.PathRestrictionTests.RestrictToPaths_ShouldRespectCaseSensitivity">
+            <summary>
+            Verifies that case-sensitive matching does not fold listed paths.
+            </summary>
+        </member>
+        <member name="M:Jeninnet.FileQuery.Tests.Traversal.PathRestrictionTests.RestrictToPaths_ShouldIgnoreCase_WhenConfigured">
+            <summary>
+            Verifies that case-insensitive matching folds listed paths.
+            </summary>
+        </member>
+        <member name="M:Jeninnet.FileQuery.Tests.Traversal.PathRestrictionTests.IncludedPaths_ShouldRestrictQuery_WhenConfiguredDirectly">
+            <summary>
+            Verifies that the option can be supplied directly on the options contract.
+            </summary>
+        </member>
+        <member name="M:Jeninnet.FileQuery.Tests.Traversal.PathRestrictionTests.CreateEnvironment">
+            <summary>
+            Creates the file tree used by these tests.
+            </summary>
+            <returns>The initialized test environment.</returns>
+        </member>
+        <member name="M:Jeninnet.FileQuery.Tests.Traversal.PathRestrictionTests.AssertPaths(System.Collections.Generic.IEnumerable{System.String},Jeninnet.Testing.Assertions.IO.TestEnvironment,System.String[])">
+            <summary>
+            Asserts that the results contain exactly the expected absolute paths.
+            </summary>
+            <param name="results">The query results.</param>
+            <param name="environment">The owning test environment.</param>
+            <param name="relativePaths">The expected paths relative to the environment root.</param>
+        </member>
+        <member name="P:Jeninnet.FileQuery.Tests.Traversal.PathRestrictionTests.TestContext">
+            <inheritdoc/>
+        </member>
         <member name="T:Jeninnet.FileQuery.Tests.Unit.Engine.DefaultEngineBuilderTests">
             <summary>
             Tests for the default engine builder ensuring it produces a working FileQuery engine.
