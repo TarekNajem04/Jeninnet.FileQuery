@@ -5,6 +5,9 @@
 // Solution Repository: https://github.com/TarekNajem04/Jeninnet.FileQuery [LIVE]
 // Licensed under the MIT License.
 //
+using System.Collections.Immutable;
+using Jeninnet.FileQuery.GitIgnore;
+
 namespace Jeninnet.FileQuery.Traversal;
 
 /// <summary>
@@ -18,6 +21,8 @@ internal sealed class TraversalPlanBuilder(IFileSystem fileSystem) : ITraversalP
 
         var options = query.Options;
         options.Validate();
+
+        var rootDirectory = fileSystem.GetFullPath(query.RootPath).TrimEnd(fileSystem.DirectorySeparator);
 
         // ===== Traversal configuration =====
         var traversalConfig = new TraversalConfiguration(
@@ -34,6 +39,10 @@ internal sealed class TraversalPlanBuilder(IFileSystem fileSystem) : ITraversalP
         var resolvedCase = options.CaseSensitivity.Resolve();
         var typedPatterns = PatternsMerger.Merge(options.PatternInput);
 
+        if(options.GitIgnoreFiles is not null) {
+            MergeGitIgnoreFiles(options, typedPatterns, rootDirectory);
+        }
+
         var matchingConfig = new MatchingConfiguration(
             TypedPatterns: typedPatterns,
             MatchingMode: options.PatternMatchingMode,
@@ -42,7 +51,11 @@ internal sealed class TraversalPlanBuilder(IFileSystem fileSystem) : ITraversalP
 
         // ===== Pattern compilation =====
         var compiled = CompiledPatternSetFactory.Create(matchingConfig);
-        var matcher = PathMatcherFactory.Create(query.Options);
+        var hasPatterns = typedPatterns.Any(static pair => !pair.Value.IsEmpty);
+        var matcher = PathMatcherFactory.Create(
+            options.PatternMatchingMode,
+            options.PatternInput.InterpretationMode,
+            hasPatterns);
         var evaluator = new TraversalEvaluator(new TraversalDecisionProvider(traversalConfig));
 
         var pathFilter = options.IncludedPaths is null
@@ -50,7 +63,7 @@ internal sealed class TraversalPlanBuilder(IFileSystem fileSystem) : ITraversalP
             : RelativePathFilter.Create(options.IncludedPaths, resolvedCase);
 
         return new TraversalPlan(
-            RootDirectory: fileSystem.GetFullPath(query.RootPath).TrimEnd(fileSystem.DirectorySeparator),
+            RootDirectory: rootDirectory,
             FileSystem: fileSystem,
             Traversal: traversalConfig,
             Matching: matchingConfig,
@@ -59,8 +72,47 @@ internal sealed class TraversalPlanBuilder(IFileSystem fileSystem) : ITraversalP
             Evaluator: evaluator,
             Progress: progress,
             Diagnostics: options.AuditMatches ? options.Diagnostics : null,
-            PathFilter: pathFilter
+            PathFilter: pathFilter,
+            EntryFilter: EntryFilter.From(options)
         );
+    }
+
+    /// <summary>
+    /// Loads Git ignore files and merges them ahead of the query's own GitIgnore patterns.
+    /// </summary>
+    /// <param name="options">The query options.</param>
+    /// <param name="typedPatterns">The typed pattern buckets to update.</param>
+    /// <param name="rootDirectory">The absolute query root.</param>
+    /// <exception cref="InvalidOperationException">
+    /// Thrown when ignore files are requested with a forced non-GitIgnore dialect.
+    /// </exception>
+    private void MergeGitIgnoreFiles(
+        FileQueryOptions options,
+        Dictionary<PatternKind, ImmutableArray<string>> typedPatterns,
+        string rootDirectory
+    ) {
+        if(options.GitIgnoreFiles is null) {
+            return;
+        }
+
+        if(options.PatternInput.InterpretationMode is PatternInterpretationMode.Specific &&
+            options.PatternMatchingMode is not PatternMatchingMode.GitIgnore) {
+            throw new InvalidOperationException(
+                "Git ignore files can only be loaded when GitIgnore semantics are active. " +
+                "Use hybrid interpretation or the GitIgnore matching mode.");
+        }
+
+        var loaded = GitIgnoreFileLoader.Load(options.GitIgnoreFiles, fileSystem, rootDirectory);
+
+        if(loaded.Count == 0) {
+            return;
+        }
+
+        var existing = typedPatterns.TryGetValue(PatternKind.GitIgnore, out var current)
+            ? current
+            : ImmutableArray<string>.Empty;
+
+        typedPatterns[PatternKind.GitIgnore] = [.. loaded, .. existing];
     }
 
     private void Validate(FileQuery query) {

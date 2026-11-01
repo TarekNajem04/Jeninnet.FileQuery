@@ -93,6 +93,12 @@ internal sealed class FileSystem : IFileSystem {
     /// <inheritdoc/>
     public bool DirectoryExists(string path) => Directory.Exists(path);
 
+    /// <inheritdoc/>
+    public bool FileExists(string path) => File.Exists(path);
+
+    /// <inheritdoc/>
+    public string[] ReadAllLines(string path) => File.ReadAllLines(path);
+
     /// <summary>
     /// Retrieves attributes for the given path directly from the OS.
     /// </summary>
@@ -207,7 +213,12 @@ internal sealed class FileSystem : IFileSystem {
     /// <returns>The file system entry used by the engine.</returns>
     private static FileSystemEntry TransformEntry(ref SystemFileSystemEntry entry) {
         var path = entry.ToFullPath();
-        return new FileSystemEntry(path, entry.Attributes);
+        return new FileSystemEntry(
+            path,
+            entry.Attributes,
+            entry.Length,
+            entry.CreationTimeUtc.UtcDateTime,
+            entry.LastWriteTimeUtc.UtcDateTime);
     }
 
     private static bool TryEnsureAccessible(

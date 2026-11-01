@@ -204,6 +204,10 @@ public sealed class FileQueryObservabilityTests {
 
         public bool DirectoryExists(string path) => path == Root;
 
+        public bool FileExists(string path) => false;
+
+        public string[] ReadAllLines(string path) => [];
+
         public string ResolveRealPath(string path) => path;
 
         public char DirectorySeparator => System.IO.Path.DirectorySeparatorChar;
@@ -267,6 +271,10 @@ public sealed class FileQueryObservabilityTests {
         public FileAttributes GetAttributes(string path) => path == LockedDirectory ? FileAttributes.Directory : FileAttributes.Normal;
 
         public bool DirectoryExists(string path) => path == Root;
+
+        public bool FileExists(string path) => false;
+
+        public string[] ReadAllLines(string path) => [];
 
         public string ResolveRealPath(string path) => path;
 

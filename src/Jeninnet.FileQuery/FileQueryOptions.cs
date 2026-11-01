@@ -20,6 +20,12 @@ namespace Jeninnet.FileQuery;
 /// <param name="AuditMatches">Whether to audit matches.</param>
 /// <param name="Diagnostics">The diagnostics progress reporter.</param>
 /// <param name="ErrorRecovery">The error recovery options.</param>
+/// <param name="MinSize">The inclusive minimum entry size in bytes, or <see langword="null"/> for no lower bound.</param>
+/// <param name="MaxSize">The inclusive maximum entry size in bytes, or <see langword="null"/> for no upper bound.</param>
+/// <param name="ModifiedAfter">The exclusive lower last-write boundary, or <see langword="null"/> for no lower bound.</param>
+/// <param name="ModifiedBefore">The exclusive upper last-write boundary, or <see langword="null"/> for no upper bound.</param>
+/// <param name="AttributesToSkip">Attribute flags that exclude an entry (and prune a matching directory).</param>
+/// <param name="GitIgnoreFiles">The optional Git ignore-file loading settings.</param>
 public record FileQueryOptionsConfig(
     PatternInput PatternInput,
     bool RecurseSubdirectories = true,
@@ -30,7 +36,13 @@ public record FileQueryOptionsConfig(
     TraversalOptions? Traversal = null,
     bool AuditMatches = false,
     IProgress<FileQueryDiagnostic>? Diagnostics = null,
-    FileQueryErrorRecoveryOptions? ErrorRecovery = null
+    FileQueryErrorRecoveryOptions? ErrorRecovery = null,
+    long? MinSize = null,
+    long? MaxSize = null,
+    DateTimeOffset? ModifiedAfter = null,
+    DateTimeOffset? ModifiedBefore = null,
+    FileAttributes AttributesToSkip = FileAttributes.None,
+    GitIgnoreOptions? GitIgnoreFiles = null
 ) {
     /// <summary>
     /// Gets the optional set of root-relative file paths that limits the query to an explicit
@@ -100,6 +112,12 @@ public sealed record FileQueryOptions {
             ? FileQueryErrorRecoveryOptions.Skip
             : FileQueryErrorRecoveryOptions.Abort);
         IncludedPaths = config.IncludedPaths;
+        MinSize = config.MinSize;
+        MaxSize = config.MaxSize;
+        ModifiedAfter = config.ModifiedAfter;
+        ModifiedBefore = config.ModifiedBefore;
+        AttributesToSkip = config.AttributesToSkip;
+        GitIgnoreFiles = config.GitIgnoreFiles;
     }
 
     /// <summary>
@@ -167,6 +185,45 @@ public sealed record FileQueryOptions {
     public IReadOnlyCollection<string>? IncludedPaths { get; }
 
     /// <summary>
+    /// Gets the inclusive minimum entry size in bytes, or <see langword="null"/> when no lower bound is configured.
+    /// </summary>
+    /// <remarks>Size filters apply to files only; directories are never rejected based on size.</remarks>
+    public long? MinSize { get; }
+
+    /// <summary>
+    /// Gets the inclusive maximum entry size in bytes, or <see langword="null"/> when no upper bound is configured.
+    /// </summary>
+    /// <remarks>Size filters apply to files only; directories are never rejected based on size.</remarks>
+    public long? MaxSize { get; }
+
+    /// <summary>
+    /// Gets the exclusive lower last-write boundary, or <see langword="null"/> when no lower bound is configured.
+    /// </summary>
+    /// <remarks>Time filters apply to files only; directories are never rejected based on time.</remarks>
+    public DateTimeOffset? ModifiedAfter { get; }
+
+    /// <summary>
+    /// Gets the exclusive upper last-write boundary, or <see langword="null"/> when no upper bound is configured.
+    /// </summary>
+    /// <remarks>Time filters apply to files only; directories are never rejected based on time.</remarks>
+    public DateTimeOffset? ModifiedBefore { get; }
+
+    /// <summary>
+    /// Gets the attribute flags that exclude an entry, or <see cref="FileAttributes.None"/> when no
+    /// attribute filter is configured.
+    /// </summary>
+    /// <remarks>
+    /// An entry is skipped when any configured flag is set. Directories matching the filter are
+    /// pruned, so their contents are not traversed.
+    /// </remarks>
+    public FileAttributes AttributesToSkip { get; }
+
+    /// <summary>
+    /// Gets the Git ignore-file loading settings, or <see langword="null"/> when ignore files are not loaded.
+    /// </summary>
+    public GitIgnoreOptions? GitIgnoreFiles { get; }
+
+    /// <summary>
     /// Validates this options instance for internal consistency.
     /// </summary>
     /// <exception cref="ArgumentOutOfRangeException">
@@ -176,5 +233,39 @@ public sealed record FileQueryOptions {
     internal void Validate() {
         ArgumentOutOfRangeException.ThrowIfLessThan(MaxRecursionDepth, UNLIMITED_RECURSION_DEPTH);
         ErrorRecovery.Validate();
+        ValidateSizeRange(MinSize, MaxSize);
+        ValidateModifiedRange(ModifiedAfter, ModifiedBefore);
+    }
+
+    /// <summary>
+    /// Validates the optional size boundaries.
+    /// </summary>
+    /// <param name="minSize">The inclusive minimum size.</param>
+    /// <param name="maxSize">The inclusive maximum size.</param>
+    private static void ValidateSizeRange(long? minSize, long? maxSize) {
+        if(minSize is < 0) {
+            throw new ArgumentOutOfRangeException(nameof(minSize), minSize, "The minimum size cannot be negative.");
+        }
+
+        if(maxSize is < 0) {
+            throw new ArgumentOutOfRangeException(nameof(maxSize), maxSize, "The maximum size cannot be negative.");
+        }
+
+        if(minSize is { } min && maxSize is { } max && min > max) {
+            throw new ArgumentException("The minimum size cannot exceed the maximum size.", nameof(minSize));
+        }
+    }
+
+    /// <summary>
+    /// Validates the optional last-write boundaries.
+    /// </summary>
+    /// <param name="after">The exclusive lower boundary.</param>
+    /// <param name="before">The exclusive upper boundary.</param>
+    private static void ValidateModifiedRange(DateTimeOffset? after, DateTimeOffset? before) {
+        if(after is { } afterValue && before is { } beforeValue && afterValue >= beforeValue) {
+            throw new ArgumentException(
+                "The 'ModifiedAfter' boundary must be earlier than the 'ModifiedBefore' boundary.",
+                nameof(after));
+        }
     }
 }

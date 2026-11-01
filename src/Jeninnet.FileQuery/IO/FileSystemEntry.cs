@@ -13,9 +13,15 @@ namespace Jeninnet.FileQuery.IO;
 /// </summary>
 /// <param name="FullPath">The full absolute path of the filesystem entry.</param>
 /// <param name="Attributes">The raw file attribute flags associated with this entry.</param>
+/// <param name="Length">The entry length in bytes as reported by the enumeration.</param>
+/// <param name="CreationTimeUtc">The creation time in UTC as reported by the enumeration.</param>
+/// <param name="LastWriteTimeUtc">The last-write time in UTC as reported by the enumeration.</param>
 internal readonly record struct FileSystemEntry(
     string FullPath,
-    FileAttributes Attributes
+    FileAttributes Attributes,
+    long Length = 0,
+    DateTime CreationTimeUtc = default,
+    DateTime LastWriteTimeUtc = default
 ) {
     /// <summary>
     /// Gets the full absolute path of the filesystem entry.

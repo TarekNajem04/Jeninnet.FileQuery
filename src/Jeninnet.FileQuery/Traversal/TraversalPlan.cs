@@ -24,6 +24,7 @@ namespace Jeninnet.FileQuery.Traversal;
 /// <param name="Progress">Optional progress reporter.</param>
 /// <param name="Diagnostics">Optional diagnostic reporter.</param>
 /// <param name="PathFilter">Optional allow-list filter that restricts traversal to changed files.</param>
+/// <param name="EntryFilter">Optional metadata filter applied before pattern matching.</param>
 internal sealed record TraversalPlan(
     string RootDirectory,
     IFileSystem FileSystem,
@@ -34,5 +35,6 @@ internal sealed record TraversalPlan(
     ITraversalEvaluator Evaluator,
     IProgress<FileQueryProgress>? Progress,
     IProgress<FileQueryDiagnostic>? Diagnostics,
-    RelativePathFilter? PathFilter
+    RelativePathFilter? PathFilter,
+    EntryFilter EntryFilter
 );

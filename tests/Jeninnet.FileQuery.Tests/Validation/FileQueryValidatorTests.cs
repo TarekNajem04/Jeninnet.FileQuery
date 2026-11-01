@@ -15,6 +15,10 @@ public sealed class FileQueryValidatorTests {
     private sealed class DummyFileSystem : IFileSystem {
         public bool DirectoryExists(string path) => path == "C:\\valid";
 
+        public bool FileExists(string path) => false;
+
+        public string[] ReadAllLines(string path) => throw new NotImplementedException();
+
         public string GetFullPath(string path) => path;
 
         public string GetFullPath(string path, string basePath) => throw new NotImplementedException();

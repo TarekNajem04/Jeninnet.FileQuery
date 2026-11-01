@@ -33,6 +33,12 @@ public sealed class FileQueryBuilder {
     private IProgress<FileQueryDiagnostic>? _diagnostics;
     private FileQueryErrorRecoveryOptions? _errorRecovery;
     private List<string>? _includedPaths;
+    private long? _minSize;
+    private long? _maxSize;
+    private DateTimeOffset? _modifiedAfter;
+    private DateTimeOffset? _modifiedBefore;
+    private FileAttributes _attributesToSkip = FileAttributes.None;
+    private GitIgnoreOptions? _gitIgnoreFiles;
 
     /// <summary>
     /// Initializes a new <see cref="FileQueryBuilder"/> rooted at the specified directory.
@@ -329,6 +335,107 @@ public sealed class FileQueryBuilder {
         return this;
     }
 
+    // =====Metadata filters =====
+
+    /// <summary>
+    /// Restricts files to a minimum size, inclusive.
+    /// </summary>
+    /// <remarks>
+    /// Size filters use the size already reported by the directory enumeration and are applied
+    /// before pattern matching. Directories are never rejected by a size filter.
+    /// </remarks>
+    /// <param name="bytes">The minimum size in bytes. Must be zero or greater.</param>
+    /// <returns>The current <see cref="FileQueryBuilder"/> instance for method chaining.</returns>
+    /// <exception cref="ArgumentOutOfRangeException">Thrown when <paramref name="bytes"/> is negative.</exception>
+    public FileQueryBuilder MinSize(long bytes) {
+        ArgumentOutOfRangeException.ThrowIfNegative(bytes);
+
+        _minSize = bytes;
+        return this;
+    }
+
+    /// <summary>
+    /// Restricts files to a maximum size, inclusive.
+    /// </summary>
+    /// <remarks>
+    /// Size filters use the size already reported by the directory enumeration and are applied
+    /// before pattern matching. Directories are never rejected by a size filter.
+    /// </remarks>
+    /// <param name="bytes">The maximum size in bytes. Must be zero or greater.</param>
+    /// <returns>The current <see cref="FileQueryBuilder"/> instance for method chaining.</returns>
+    /// <exception cref="ArgumentOutOfRangeException">Thrown when <paramref name="bytes"/> is negative.</exception>
+    public FileQueryBuilder MaxSize(long bytes) {
+        ArgumentOutOfRangeException.ThrowIfNegative(bytes);
+
+        _maxSize = bytes;
+        return this;
+    }
+
+    /// <summary>
+    /// Restricts files to those last written strictly after a timestamp.
+    /// </summary>
+    /// <remarks>
+    /// The timestamp is compared against the last-write time reported by the enumeration.
+    /// Directories are never rejected by a time filter.
+    /// </remarks>
+    /// <param name="timestamp">The exclusive lower last-write boundary.</param>
+    /// <returns>The current <see cref="FileQueryBuilder"/> instance for method chaining.</returns>
+    public FileQueryBuilder ModifiedAfter(DateTimeOffset timestamp) {
+        _modifiedAfter = timestamp;
+        return this;
+    }
+
+    /// <summary>
+    /// Restricts files to those last written strictly before a timestamp.
+    /// </summary>
+    /// <remarks>
+    /// The timestamp is compared against the last-write time reported by the enumeration.
+    /// Directories are never rejected by a time filter.
+    /// </remarks>
+    /// <param name="timestamp">The exclusive upper last-write boundary.</param>
+    /// <returns>The current <see cref="FileQueryBuilder"/> instance for method chaining.</returns>
+    public FileQueryBuilder ModifiedBefore(DateTimeOffset timestamp) {
+        _modifiedBefore = timestamp;
+        return this;
+    }
+
+    /// <summary>
+    /// Skips files and directories that carry any of the specified attributes.
+    /// </summary>
+    /// <remarks>
+    /// A matching directory is pruned, so its contents are not traversed. This mirrors the
+    /// attribute-skipping behavior of the operating-system enumeration while keeping all
+    /// metadata available to the result APIs.
+    /// </remarks>
+    /// <param name="attributes">The attribute flags that exclude an entry.</param>
+    /// <returns>The current <see cref="FileQueryBuilder"/> instance for method chaining.</returns>
+    public FileQueryBuilder AttributesToSkip(FileAttributes attributes) {
+        _attributesToSkip = attributes;
+        return this;
+    }
+
+    /// <summary>
+    /// Loads Git ignore files into the query: the root <c>.gitignore</c>, nested
+    /// <c>.gitignore</c> files, <c>.git/info/exclude</c>, and an optional global excludes file.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// Loaded rules are appended before the query's own GitIgnore patterns, so explicit patterns
+    /// always take precedence. Deeper ignore files are appended after their parents, preserving
+    /// Git's last-match-wins behavior.
+    /// </para>
+    /// <para>
+    /// Nested ignore files are scoped to their directory. A query using a forced Glob or Regex
+    /// dialect cannot load ignore files; use hybrid interpretation or <see cref="UsingGitIgnore"/>.
+    /// </para>
+    /// </remarks>
+    /// <param name="options">The loading options, or <see langword="null"/> for the defaults.</param>
+    /// <returns>The current <see cref="FileQueryBuilder"/> instance for method chaining.</returns>
+    public FileQueryBuilder UseGitIgnoreFiles(GitIgnoreOptions? options = null) {
+        _gitIgnoreFiles = options ?? new GitIgnoreOptions();
+        return this;
+    }
+
     // =====Terminal operations =====
 
     /// <summary>
@@ -358,6 +465,20 @@ public sealed class FileQueryBuilder {
 
         return GetEngine().ExecuteAsync(Build(), progress, cancellationToken);
     }
+
+    /// <summary>
+    /// Executes the query synchronously and returns matching entries with metadata.
+    /// </summary>
+    /// <returns>A lazy enumerable of matching entries.</returns>
+    public IEnumerable<FileQueryEntry> ExecuteEntries() => GetEngine().ExecuteEntries(Build());
+
+    /// <summary>
+    /// Executes the query asynchronously and returns matching entries with metadata.
+    /// </summary>
+    /// <param name="cancellationToken">A token to cancel the async enumeration.</param>
+    /// <returns>An async enumerable of matching entries.</returns>
+    public IAsyncEnumerable<FileQueryEntry> ExecuteEntriesAsync(CancellationToken cancellationToken = default) =>
+        GetEngine().ExecuteEntriesAsync(Build(), cancellationToken);
 
     /// <summary>
     /// Builds the immutable <see cref="FileQuery"/> descriptor from the current configuration.
@@ -399,7 +520,13 @@ public sealed class FileQueryBuilder {
                 CaseSensitivity: _caseSensitivity,
                 AuditMatches: _auditMatches,
                 Diagnostics: _diagnostics,
-                ErrorRecovery: _errorRecovery
+                ErrorRecovery: _errorRecovery,
+                MinSize: _minSize,
+                MaxSize: _maxSize,
+                ModifiedAfter: _modifiedAfter,
+                ModifiedBefore: _modifiedBefore,
+                AttributesToSkip: _attributesToSkip,
+                GitIgnoreFiles: _gitIgnoreFiles
             ) {
                 IncludedPaths = _includedPaths
             }
@@ -426,7 +553,13 @@ public sealed class FileQueryBuilder {
                 CaseSensitivity: _caseSensitivity,
                 AuditMatches: _auditMatches,
                 Diagnostics: _diagnostics,
-                ErrorRecovery: _errorRecovery
+                ErrorRecovery: _errorRecovery,
+                MinSize: _minSize,
+                MaxSize: _maxSize,
+                ModifiedAfter: _modifiedAfter,
+                ModifiedBefore: _modifiedBefore,
+                AttributesToSkip: _attributesToSkip,
+                GitIgnoreFiles: _gitIgnoreFiles
             ) {
                 IncludedPaths = _includedPaths
             }
