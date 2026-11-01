@@ -11,7 +11,10 @@ While CI provides excellent relative validation, release candidates should ideal
 Run:
 
 ```bash
-dotnet run -c Release --project benchmarks/Jeninnet.FileQuery.Benchmarks.csproj
+dotnet run -c Release --project src/Jeninnet.FileQuery.Benchmarks/Jeninnet.FileQuery.Benchmarks.csproj
 ```
 
 Store the exported results under `artifacts/benchmarks/<version>/` and summarize notable regressions or improvements in the release notes.
+
+The controlled cross-platform reference (deterministic 10,000-file tree, Windows/Linux/macOS
+policy) is recorded in [Cross-Platform Baseline](cross-platform-baseline.md).

@@ -15,6 +15,7 @@ Versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - **Explain Mode**: Added `dotnet-filequery --explain`, which writes `<include|exclude>\t<path>\t<reason>` for every evaluated file. It reports the responsible pattern kind and cannot be combined with `--count` or `--null`.
 - **Build Tooling SDK**: Added `Jeninnet.FileQuery.Tooling` with `PatternInspector.Classify`, `Validate`, and `Inspect` (automatic or forced dialect). The SDK returns SDK-defined inspection models (segments, tokens, structural flags) so build systems, linters, and IDE plugins can reuse the engine's pattern semantics without executing a query.
 - **GitHub Action**: Added the composite action `.github/actions/filequery`. It installs or reuses the global tool, runs a query (optionally diff-aware), exposes `files` and `count` outputs, writes a job summary, and is verified end to end by the `filequery-action` CI job.
+- **Cross-Platform Baseline**: Added `CrossPlatformTraversalBenchmark`, which measures traversal and matching over a deterministic 10,000-file tree so results are comparable across operating systems. Recorded the Windows reference run (`MediumRun`), the official Windows/Ubuntu/macOS artifacts from the scheduled pipeline, the analysis, and a machine-readable baseline with a 25% regression policy.
 
 ### Fixed
 

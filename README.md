@@ -125,6 +125,10 @@ Key findings from the investigation:
 
 Further native filesystem enumeration was not introduced because the measured benefit did not justify the additional platform-specific complexity and maintenance risk. The detailed investigation methodology and per-phase measurements are documented under [`docs/performance/`](./docs/performance/).
 
+### Cross-Platform Baseline
+
+Traversal behaviour is compared on Windows x64, Ubuntu x64, and macOS Arm64 using a deterministic 10,000-file tree (`CrossPlatformTraversalBenchmark`) plus the scheduled three-OS benchmark artifacts. The recorded baseline, analysis, and the 25% regression policy live in the [cross-platform baseline](./docs/performance/cross-platform-baseline.md).
+
 ---
 
 ## 📊 Repo Stats
