@@ -6,6 +6,7 @@
 // Licensed under the MIT License.
 //
 using System.CommandLine;
+using System.Globalization;
 using Jeninnet.FileQuery.CommandLine;
 using Jeninnet.FileQuery.Enums;
 
@@ -25,6 +26,9 @@ namespace Jeninnet.FileQuery.Tool;
 /// <param name="RelativePaths">Whether output paths are relative to <paramref name="Root"/>.</param>
 /// <param name="NullSeparated">Whether output paths are separated by a NUL character.</param>
 /// <param name="CountOnly">Whether only the match count is written.</param>
+/// <param name="ChangedSince">The Git revision baseline, or <see langword="null"/> when the query is not diff-aware.</param>
+/// <param name="ChangedSinceDate">The timestamp baseline, or <see langword="null"/> when not used.</param>
+/// <param name="IncludeUntracked">Whether untracked files are included in a change-set query.</param>
 internal sealed record QueryRequest(
     string Root,
     IReadOnlyDictionary<PatternKind, IEnumerable<string>> TypedPatterns,
@@ -36,7 +40,10 @@ internal sealed record QueryRequest(
     SymlinkPolicy SymlinkPolicy,
     bool RelativePaths,
     bool NullSeparated,
-    bool CountOnly
+    bool CountOnly,
+    string? ChangedSince,
+    DateTimeOffset? ChangedSinceDate,
+    bool IncludeUntracked
 ) {
     private const string DIALECT_HYBRID = "hybrid";
     private const string DIALECT_GITIGNORE = "gitignore";
@@ -94,6 +101,29 @@ internal sealed record QueryRequest(
             return false;
         }
 
+        var changedSince = parseResult.GetValue(options.ChangedSince);
+        var changedSinceDateValue = parseResult.GetValue(options.ChangedSinceDate);
+
+        if(!string.IsNullOrWhiteSpace(changedSince) && !string.IsNullOrWhiteSpace(changedSinceDateValue)) {
+            error = "Use either --changed-since or --changed-since-date, not both.";
+            return false;
+        }
+
+        DateTimeOffset? changedSinceDate = null;
+
+        if(!string.IsNullOrWhiteSpace(changedSinceDateValue)) {
+            if(!DateTimeOffset.TryParse(
+                changedSinceDateValue,
+                CultureInfo.InvariantCulture,
+                DateTimeStyles.AssumeLocal,
+                out var parsedTimestamp)) {
+                error = $"Invalid --changed-since-date value '{changedSinceDateValue}'. Use an ISO 8601 timestamp.";
+                return false;
+            }
+
+            changedSinceDate = parsedTimestamp;
+        }
+
         var gitignore = parseResult.GetValue(options.Gitignore);
         var glob = parseResult.GetValue(options.Glob);
         var regex = parseResult.GetValue(options.RegularExpression);
@@ -126,7 +156,10 @@ internal sealed record QueryRequest(
             SymlinkPolicy: symlinkPolicy,
             RelativePaths: parseResult.GetValue(options.Relative),
             NullSeparated: parseResult.GetValue(options.NullSeparated),
-            CountOnly: parseResult.GetValue(options.Count)
+            CountOnly: parseResult.GetValue(options.Count),
+            ChangedSince: string.IsNullOrWhiteSpace(changedSince) ? null : changedSince.Trim(),
+            ChangedSinceDate: changedSinceDate,
+            IncludeUntracked: !parseResult.GetValue(options.NoUntracked)
         );
 
         return true;

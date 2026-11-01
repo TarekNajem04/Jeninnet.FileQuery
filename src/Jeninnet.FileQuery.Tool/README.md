@@ -62,9 +62,32 @@ dotnet-filequery "**;!*.log" --null | xargs -0 wc -l
 | `--relative` | off | Emit paths relative to the root. |
 | `-0`, `--null` | off | Separate paths with a NUL character instead of a newline. |
 | `--count` | off | Write only the number of matching files. |
+| `--changed-since <revision>` | | Limit the query to files changed since a commit, tag, or branch. |
+| `--changed-since-date <timestamp>` | | Limit the query to files changed since an ISO 8601 timestamp. |
+| `--no-untracked` | off | Exclude untracked files from a change-set query. |
 
 Patterns supplied through `--gitignore`, `--glob`, or `--regex` are typed explicitly and cannot be
 combined with a forced `--dialect`.
+
+## Diff-aware queries
+
+`--changed-since` and `--changed-since-date` restrict the query to the files Git reports between
+the baseline and the working tree. Untracked files count as added unless `--no-untracked` is
+supplied; deleted files are never returned because they no longer exist.
+
+```bash
+# Everything that changed since the last five commits
+dotnet-filequery --changed-since HEAD~5 --relative
+
+# Only changed C# files
+dotnet-filequery --changed-since origin/main "**;!*.cs"
+
+# Changes since a date, ignoring untracked files
+dotnet-filequery --changed-since-date 2026-10-01T00:00:00Z --no-untracked
+```
+
+The root may be a subdirectory of the repository; change paths are rebased onto it automatically.
+See the [diff-aware guide](../../docs/guides/diff-aware-queries.md) for the full semantics.
 
 ## Output and exit codes
 

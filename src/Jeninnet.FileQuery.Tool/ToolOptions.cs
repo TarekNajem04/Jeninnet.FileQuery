@@ -25,6 +25,9 @@ internal sealed class ToolOptions : CommandLinePatternOptions {
     private const string OPTION_NAME_NULL = "--null";
     private const string OPTION_ALIAS_NULL = "-0";
     private const string OPTION_NAME_COUNT = "--count";
+    private const string OPTION_NAME_CHANGED_SINCE = "--changed-since";
+    private const string OPTION_NAME_CHANGED_SINCE_DATE = "--changed-since-date";
+    private const string OPTION_NAME_NO_UNTRACKED = "--no-untracked";
 
     /// <summary>
     /// Gets the positional patterns to match. Each value may contain multiple semicolon-separated patterns.
@@ -75,6 +78,21 @@ internal sealed class ToolOptions : CommandLinePatternOptions {
     /// Gets the option that prints only the number of matching files.
     /// </summary>
     public Option<bool> Count { get; }
+
+    /// <summary>
+    /// Gets the option that limits the query to files changed since a Git revision.
+    /// </summary>
+    public Option<string?> ChangedSince { get; }
+
+    /// <summary>
+    /// Gets the option that limits the query to files changed since a timestamp.
+    /// </summary>
+    public Option<string?> ChangedSinceDate { get; }
+
+    /// <summary>
+    /// Gets the option that excludes untracked files from a change-set query.
+    /// </summary>
+    public Option<bool> NoUntracked { get; }
 
     /// <summary>
     /// Initializes a new instance of the <see cref="ToolOptions"/> class.
@@ -136,6 +154,23 @@ internal sealed class ToolOptions : CommandLinePatternOptions {
             Description = "Write only the number of matching files.",
             Arity = ArgumentArity.Zero
         };
+
+        ChangedSince = new Option<string?>(OPTION_NAME_CHANGED_SINCE) {
+            Description = "Limit the query to files changed since a commit, tag, or branch (includes untracked files).",
+            DefaultValueFactory = static _ => default,
+            Arity = ArgumentArity.ExactlyOne
+        };
+
+        ChangedSinceDate = new Option<string?>(OPTION_NAME_CHANGED_SINCE_DATE) {
+            Description = "Limit the query to files changed since an ISO 8601 timestamp (uses the last commit before it).",
+            DefaultValueFactory = static _ => default,
+            Arity = ArgumentArity.ExactlyOne
+        };
+
+        NoUntracked = new Option<bool>(OPTION_NAME_NO_UNTRACKED) {
+            Description = "Exclude untracked files when a --changed-since baseline is used.",
+            Arity = ArgumentArity.Zero
+        };
     }
 
     /// <summary>
@@ -154,5 +189,8 @@ internal sealed class ToolOptions : CommandLinePatternOptions {
             Relative,
             NullSeparated,
             Count,
+            ChangedSince,
+            ChangedSinceDate,
+            NoUntracked,
         ];
 }

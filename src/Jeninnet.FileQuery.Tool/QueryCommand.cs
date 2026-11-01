@@ -8,6 +8,7 @@
 using System.CommandLine;
 using System.Text.RegularExpressions;
 using Jeninnet.FileQuery.Patterns.Exceptions;
+using Jeninnet.FileQuery.Tool.Git;
 
 namespace Jeninnet.FileQuery.Tool;
 
@@ -57,5 +58,6 @@ internal static class QueryCommand {
             or ArgumentException
             or InvalidOperationException
             or PatternException
+            or GitException
             or RegexMatchTimeoutException;
 }

@@ -41,6 +41,7 @@ internal static class CliApplication {
           dotnet-filequery --glob "**/*.md" --root ./docs
           dotnet-filequery --gitignore "**;!*.cs;!*.csproj" --depth 3
           dotnet-filequery --dialect regex "\.Tests\.cs$" --count
+          dotnet-filequery --changed-since HEAD~5 --count
           dotnet-filequery "**;!*.log" --null | xargs -0 wc -l
         """;
 

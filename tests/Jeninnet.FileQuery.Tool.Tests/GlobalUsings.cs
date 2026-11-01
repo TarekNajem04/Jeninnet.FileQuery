@@ -6,6 +6,7 @@
 // Licensed under the MIT License.
 //
 global using Jeninnet.FileQuery.Tool;
+global using Jeninnet.FileQuery.Tool.Git;
 global using Jeninnet.Testing.Assertions;
 global using Jeninnet.Testing.Assertions.Extensions;
 global using Jeninnet.Testing.Assertions.IO;
