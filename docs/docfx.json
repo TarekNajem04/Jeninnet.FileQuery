@@ -41,12 +41,6 @@
             }
         ],
 
-        "resource": [
-            {
-                "files": [ "images/**" ]
-            }
-        ],
-
         "output": "_site",
 
         "template": [ "default", "modern" ],
@@ -54,8 +48,6 @@
         "globalMetadata": {
             "_appName": "Jeninnet.FileQuery",
             "_appTitle": "Jeninnet.FileQuery Documentation",
-            "_appFaviconPath": "images/favicon.ico",
-            "_appLogoPath": "images/logo.svg",
             "_enableSearch": true,
             "_disableContribution": false,
             "_gitContribute": {

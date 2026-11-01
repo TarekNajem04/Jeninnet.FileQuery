@@ -9,6 +9,8 @@
 ![NuGet Version](https://img.shields.io/nuget/v/Jeninnet.FileQuery)
 [![NuGet downloads](https://img.shields.io/nuget/dt/Jeninnet.FileQuery)](https://www.nuget.org/packages/Jeninnet.FileQuery.CommandLine/)
 
+![architecture: invariants ok](badges/architecture.svg) ![target framework: net10.0](badges/frameworks.svg) ![documented packages: 3](badges/packages.svg)
+
 **A high-performance, deterministic file discovery and filtering engine for .NET.**
 
 Jeninnet.FileQuery combines three pattern dialects — **GitIgnore**, **Glob**, and **Regular Expressions** — into a single, deterministic query pipeline. Patterns are tokenized, validated against structural invariants, and compiled into immutable instruction sets before any filesystem work begins. The compiled matchers then evaluate every entry through one unified pipeline where GitIgnore, Glob, and Regex rules coexist with well-defined precedence. The result is predictable, scalable file discovery across Windows, Linux, and macOS — decoupled from `System.IO` through the [`IFileSystem`](./src/Jeninnet.FileQuery/IO/IFileSystem.cs) abstraction.
