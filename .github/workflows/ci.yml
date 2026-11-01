@@ -260,6 +260,39 @@ jobs:
           test "$COUNT" -gt 0
           grep -qx 'src/Jeninnet.FileQuery/FileQueryBuilder.cs' <<< "$FILES"
 
+  soak:
+
+    name: Long-Running Stability
+
+    runs-on: ubuntu-latest
+
+    timeout-minutes: 15
+
+    steps:
+
+      - name: Checkout
+        uses: actions/checkout@v7.0.1
+
+      - name: Setup .NET SDK (global.json)
+        uses: actions/setup-dotnet@v6.0.0
+        with:
+          global-json-file: global.json
+
+      - name: Run soak harness
+        run: >
+          dotnet run
+          --project src/Jeninnet.FileQuery.Soak/Jeninnet.FileQuery.Soak.csproj
+          --configuration Release
+          -- --duration-seconds 20 --warmup-seconds 3 --directories 50 --files-per-directory 50 --output artifacts/soak
+
+      - name: Upload soak report
+        if: always()
+        uses: actions/upload-artifact@v7.0.2
+        with:
+          name: soak-report
+          path: artifacts/soak/
+          if-no-files-found: warn
+
   package-validation:
 
     name: Package Validation
