@@ -43,6 +43,7 @@
     <ItemGroup>
         <InternalsVisibleTo Include="Jeninnet.FileQuery.DependencyInjection" />
         <InternalsVisibleTo Include="Jeninnet.FileQuery.CommandLine" />
+        <InternalsVisibleTo Include="Jeninnet.FileQuery.Tooling" />
         <InternalsVisibleTo Include="Jeninnet.FileQuery.Benchmarks" />
         <InternalsVisibleTo Include="Jeninnet.FileQuery.Tests" />
     </ItemGroup>
