@@ -1,3 +1,15 @@
+<!--Directory.Build.targets-->
 <Project>
+
+    <!-- Deterministic, source-linked builds on CI (GitHub Actions sets CI=true). -->
+    <PropertyGroup Condition="'$(CI)' == 'true'">
+        <ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
+    </PropertyGroup>
+
+    <!-- Ensure the local package output folder exists before any pack -->
+    <Target Name="EnsureLocalPackagesDirectory"
+            BeforeTargets="Pack">
+        <MakeDir Directories="$(PackageOutputPath)" />
+    </Target>
 
 </Project>
