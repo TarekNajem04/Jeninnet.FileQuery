@@ -96,6 +96,7 @@ See the [Global Tool guide](./docs/guides/global-tool.md) for the full option se
 *   **Roslyn analyzers.** `Jeninnet.FileQuery.Analyzers` validates pattern literals at design time and offers safe code fixes. See `docs/guides/roslyn-analyzers.md`.
 *   **Entry metadata.** `ExecuteEntries()` returns full/relative paths, size, timestamps, attributes, and directory state without extra file-system calls, with size/time/attribute filters.
 *   **Directory results.** `IncludeDirectories()` opts into yielding matching directories from the same traversal, with directory-only and negation semantics preserved.
+*   **Multiple roots.** `FileQueryBatch` runs several roots as one deterministic stream; entry results expose `RootPath`.
 *   **Script-friendly CLI.** `dotnet-filequery --json` streams newline-delimited objects with paths, size, timestamps, attributes, and explain outcomes.
 
 ### Performance

@@ -3298,6 +3298,41 @@
             Verifies that <see cref="M:Jeninnet.FileQuery.Matching.PathMatchContext.GetStringComparison"/> returns the correct <see cref="T:System.StringComparison"/> based on the sensitivity.
             </summary>
         </member>
+        <member name="T:Jeninnet.FileQuery.Tests.MultipleRoots.FileQueryBatchTests">
+            <summary>
+            Tests for executing several roots as one ordered batch.
+            </summary>
+        </member>
+        <member name="M:Jeninnet.FileQuery.Tests.MultipleRoots.FileQueryBatchTests.Execute_PreservesRootOrder_AndPerRootOrdering">
+            <summary>
+            Paths are grouped by root in caller-supplied order.
+            </summary>
+        </member>
+        <member name="M:Jeninnet.FileQuery.Tests.MultipleRoots.FileQueryBatchTests.ExecuteEntries_ExposesRootPath">
+            <summary>
+            Entry results expose the producing root, making identical relative paths unambiguous.
+            </summary>
+        </member>
+        <member name="M:Jeninnet.FileQuery.Tests.MultipleRoots.FileQueryBatchTests.ExecuteEntriesAsync_MatchesSyncResults">
+            <summary>
+            The asynchronous batch returns the same entries as the synchronous batch.
+            </summary>
+        </member>
+        <member name="M:Jeninnet.FileQuery.Tests.MultipleRoots.FileQueryBatchTests.Execute_UsesEachQueryConfiguration">
+            <summary>
+            Each root keeps its own pattern configuration.
+            </summary>
+        </member>
+        <member name="M:Jeninnet.FileQuery.Tests.MultipleRoots.FileQueryBatchTests.Execute_ObservesCancellation">
+            <summary>
+            A pre-cancelled token stops the batch before the first root.
+            </summary>
+        </member>
+        <member name="M:Jeninnet.FileQuery.Tests.MultipleRoots.FileQueryBatchTests.Execute_EmptyBatch_ReturnsEmpty">
+            <summary>
+            Empty batches produce no results.
+            </summary>
+        </member>
         <member name="T:Jeninnet.FileQuery.Tests.PatternEngine.AdvancedPatternClassifierComprehensiveTests">
             <summary>
             Unit tests for AdvancedPatternClassifier using MSTest.

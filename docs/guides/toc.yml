@@ -20,6 +20,8 @@
   href: entry-metadata-and-filters.md
 - name: Directory Results
   href: directory-results.md
+- name: Multiple Roots
+  href: multiple-roots.md
 - name: In-Memory Matching
   href: in-memory-matching.md
 - name: Git Ignore Files

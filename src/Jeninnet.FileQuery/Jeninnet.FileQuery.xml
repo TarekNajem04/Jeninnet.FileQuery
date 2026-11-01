@@ -442,6 +442,82 @@
             <param name="rootPath">The root directory path.</param>
             <param name="options">The query configuration options.</param>
         </member>
+        <member name="T:Jeninnet.FileQuery.FileQueryBatch">
+            <summary>
+            Executes several built queries as one ordered batch.
+            </summary>
+            <remarks>
+            <para>
+            Queries are executed in the order supplied. Results from one root are emitted completely
+            before the next root starts, so per-root ordering is deterministic and the same as a
+            standalone query. Absolute paths are unambiguous; entry results additionally expose
+            <see cref="P:Jeninnet.FileQuery.FileQueryEntry.RootPath"/>.
+            </para>
+            <para>
+            Each query keeps its own options, including error recovery, so a failure in one root follows
+            that query's configured policy and does not change the policies of the other roots.
+            </para>
+            </remarks>
+        </member>
+        <member name="M:Jeninnet.FileQuery.FileQueryBatch.#ctor(System.Collections.Generic.IReadOnlyList{Jeninnet.FileQuery.FileQuery})">
+            <summary>
+            Initializes a batch from already built queries.
+            </summary>
+            <param name="queries">The queries in execution order.</param>
+        </member>
+        <member name="P:Jeninnet.FileQuery.FileQueryBatch.Roots">
+            <summary>
+            Gets the root directory of each query in execution order.
+            </summary>
+        </member>
+        <member name="M:Jeninnet.FileQuery.FileQueryBatch.From(Jeninnet.FileQuery.FileQueryBuilder[])">
+            <summary>
+            Builds and groups several fluent queries into one batch.
+            </summary>
+            <param name="builders">The builders to build, in execution order.</param>
+            <returns>The batch.</returns>
+            <exception cref="T:System.ArgumentNullException">Thrown when <paramref name="builders"/> is <see langword="null"/>.</exception>
+            <remarks>Each builder is built immediately, so later mutations do not affect the batch.</remarks>
+        </member>
+        <member name="M:Jeninnet.FileQuery.FileQueryBatch.Create(System.Collections.Generic.IEnumerable{Jeninnet.FileQuery.FileQuery})">
+            <summary>
+            Creates a batch from already built queries.
+            </summary>
+            <param name="queries">The queries in execution order.</param>
+            <returns>The batch.</returns>
+            <exception cref="T:System.ArgumentNullException">Thrown when <paramref name="queries"/> or one of its items is <see langword="null"/>.</exception>
+        </member>
+        <member name="M:Jeninnet.FileQuery.FileQueryBatch.Execute(System.IProgress{Jeninnet.FileQuery.FileQueryProgress},System.Threading.CancellationToken)">
+            <summary>
+            Executes every query in order and yields absolute paths.
+            </summary>
+            <param name="progress">Optional progress sink; counters restart for each root.</param>
+            <param name="cancellationToken">A token to cancel the batch.</param>
+            <returns>A lazy enumerable of matching absolute paths.</returns>
+        </member>
+        <member name="M:Jeninnet.FileQuery.FileQueryBatch.ExecuteEntries(System.IProgress{Jeninnet.FileQuery.FileQueryProgress},System.Threading.CancellationToken)">
+            <summary>
+            Executes every query in order and yields entries with metadata and root information.
+            </summary>
+            <param name="progress">Optional progress sink; counters restart for each root.</param>
+            <param name="cancellationToken">A token to cancel the batch.</param>
+            <returns>A lazy enumerable of matching entries.</returns>
+        </member>
+        <member name="M:Jeninnet.FileQuery.FileQueryBatch.ExecuteAsync(System.IProgress{Jeninnet.FileQuery.FileQueryProgress},System.Threading.CancellationToken)">
+            <summary>
+            Executes every query in order asynchronously and yields absolute paths.
+            </summary>
+            <param name="progress">Optional progress sink; counters restart for each root.</param>
+            <param name="cancellationToken">A token to cancel the batch.</param>
+            <returns>An async enumerable of matching absolute paths.</returns>
+        </member>
+        <member name="M:Jeninnet.FileQuery.FileQueryBatch.ExecuteEntriesAsync(System.Threading.CancellationToken)">
+            <summary>
+            Executes every query in order asynchronously and yields entries with metadata.
+            </summary>
+            <param name="cancellationToken">A token to cancel the batch.</param>
+            <returns>An async enumerable of matching entries.</returns>
+        </member>
         <member name="T:Jeninnet.FileQuery.FileQueryBuilder">
             <summary>
             Provides a fluent API for configuring file system queries.
@@ -1008,17 +1084,27 @@
         <member name="P:Jeninnet.FileQuery.FileQueryEntry.Attributes">
             <summary>The file attribute flags reported by the enumeration.</summary>
         </member>
+        <member name="P:Jeninnet.FileQuery.FileQueryEntry.RootPath">
+            <summary>
+            Gets the query root that produced this entry.
+            </summary>
+            <remarks>
+            This is set for every entry and is especially useful for multi-root batches, where the
+            same relative path can occur below different roots.
+            </remarks>
+        </member>
         <member name="P:Jeninnet.FileQuery.FileQueryEntry.IsDirectory">
             <summary>
             Gets a value indicating whether the entry represents a directory.
             </summary>
         </member>
-        <member name="M:Jeninnet.FileQuery.FileQueryEntry.Create(Jeninnet.FileQuery.IO.FileSystemEntry,System.ReadOnlySpan{System.Char})">
+        <member name="M:Jeninnet.FileQuery.FileQueryEntry.Create(Jeninnet.FileQuery.IO.FileSystemEntry,System.ReadOnlySpan{System.Char},System.String)">
             <summary>
             Creates a public entry from an internal enumeration entry and its relative path.
             </summary>
             <param name="entry">The internal filesystem entry.</param>
             <param name="relativePath">The root-relative path; directories may carry a trailing slash.</param>
+            <param name="rootPath">The query root that produced the entry.</param>
             <returns>The immutable public entry.</returns>
         </member>
         <member name="T:Jeninnet.FileQuery.FileQueryErrorAction">

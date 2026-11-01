@@ -24,7 +24,10 @@ internal sealed class TraversalExecutor : ITraversalExecutor {
     /// <param name="plan">The traversal plan to execute.</param>
     /// <param name="cancellationToken">Token to monitor for cancellation requests.</param>
     public IEnumerable<FileQueryEntry> ExecuteEntries(TraversalPlan plan, CancellationToken cancellationToken = default) =>
-        ExecuteCore(plan, static (entry, pathBuffer) => FileQueryEntry.Create(entry, pathBuffer.RelativePath), cancellationToken);
+        ExecuteCore(
+            plan,
+            (entry, pathBuffer) => FileQueryEntry.Create(entry, pathBuffer.RelativePath, plan.RootDirectory),
+            cancellationToken);
 
     /// <summary>
     /// Executes the traversal plan asynchronously and yields the matched file paths.
@@ -51,7 +54,7 @@ internal sealed class TraversalExecutor : ITraversalExecutor {
     ) {
         await foreach(var item in ExecuteCoreAsync(
             plan,
-            static (entry, pathBuffer) => FileQueryEntry.Create(entry, pathBuffer.RelativePath),
+            (entry, pathBuffer) => FileQueryEntry.Create(entry, pathBuffer.RelativePath, plan.RootDirectory),
             cancellationToken).ConfigureAwait(false)) {
             yield return item;
         }

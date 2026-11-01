@@ -37,6 +37,15 @@ public sealed record FileQueryEntry(
     FileAttributes Attributes
 ) {
     /// <summary>
+    /// Gets the query root that produced this entry.
+    /// </summary>
+    /// <remarks>
+    /// This is set for every entry and is especially useful for multi-root batches, where the
+    /// same relative path can occur below different roots.
+    /// </remarks>
+    public string RootPath { get; init; } = string.Empty;
+
+    /// <summary>
     /// Gets a value indicating whether the entry represents a directory.
     /// </summary>
     public bool IsDirectory => (Attributes & FileAttributes.Directory) is not 0;
@@ -46,8 +55,9 @@ public sealed record FileQueryEntry(
     /// </summary>
     /// <param name="entry">The internal filesystem entry.</param>
     /// <param name="relativePath">The root-relative path; directories may carry a trailing slash.</param>
+    /// <param name="rootPath">The query root that produced the entry.</param>
     /// <returns>The immutable public entry.</returns>
-    internal static FileQueryEntry Create(FileSystemEntry entry, ReadOnlySpan<char> relativePath) {
+    internal static FileQueryEntry Create(FileSystemEntry entry, ReadOnlySpan<char> relativePath, string rootPath) {
         var normalized = entry.IsDirectory && relativePath.Length > 0 && relativePath[^1] == '/'
             ? relativePath[..^1]
             : relativePath;
@@ -58,6 +68,8 @@ public sealed record FileQueryEntry(
             entry.Length,
             entry.CreationTimeUtc,
             entry.LastWriteTimeUtc,
-            entry.Attributes);
+            entry.Attributes) {
+            RootPath = rootPath
+        };
     }
 }

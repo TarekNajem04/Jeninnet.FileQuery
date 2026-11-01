@@ -133,7 +133,7 @@ unless stated. Detailed tasks live in `private/Tasks/pre-v2-hardening/` (`TASK-H
 - [x] **H-11 Sync cancellation and progress**: `Execute(query, CancellationToken)` and sync progress
   parity with the async API.
 - [ ] **H-12 Brace expansion** `{a,b}` for glob patterns, with escaping rules and tests.
-- [ ] **H-13 Multiple roots**: query several directories in one pipeline with deterministic order.
+- [x] **H-13 Multiple roots**: query several directories in one pipeline with deterministic order.
 - [ ] **H-14 Validation error positions**: surface the offending index/segment in
   `PatternException`/Tooling diagnostics.
 - [ ] **H-15 MSBuild task and SARIF exporter**: evaluation-time validation and code-scanning output.
