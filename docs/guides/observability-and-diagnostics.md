@@ -52,8 +52,9 @@ required by `Jeninnet.FileQuery`; consumers attach exporters.
 | Async span | `FileQuery.ExecuteAsync` |
 
 Span tags use low-cardinality values only: `filequery.interpretation`, `filequery.matching_mode`,
-`filequery.case_sensitivity`, `filequery.recurse`, `filequery.strategy`,
-`filequery.symlink_policy`, `filequery.pattern_count`, and `filequery.outcome`.
+`filequery.case_sensitivity`, `filequery.recurse`, `filequery.include_directories`,
+`filequery.strategy`, `filequery.symlink_policy`, `filequery.pattern_count`, and
+`filequery.outcome`.
 
 Metrics:
 

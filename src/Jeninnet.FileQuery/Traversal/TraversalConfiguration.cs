@@ -11,6 +11,7 @@ namespace Jeninnet.FileQuery.Traversal;
 /// Internal immutable projection of traversal-related settings.
 /// </summary>
 /// <param name="RecurseSubdirectories">Whether to recurse into subdirectories.</param>
+/// <param name="IncludeDirectories">Whether included directories are yielded as results.</param>
 /// <param name="MaxRecursionDepth">The maximum recursion depth.</param>
 /// <param name="IgnoreInaccessible">Whether to ignore inaccessible directories.</param>
 /// <param name="Strategy">The traversal strategy.</param>
@@ -19,6 +20,7 @@ namespace Jeninnet.FileQuery.Traversal;
 /// <param name="ErrorRecovery">The error recovery options.</param>
 internal sealed record TraversalConfiguration(
     bool RecurseSubdirectories,
+    bool IncludeDirectories,
     int MaxRecursionDepth,
     bool IgnoreInaccessible,
     TraversalStrategy Strategy,

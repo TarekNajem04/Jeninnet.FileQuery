@@ -36,6 +36,9 @@ foreach (var entry in entries)
 
 The path-only `Execute()` API is unchanged and keeps its allocation profile.
 
+To include directories in the result stream, add `IncludeDirectories()`; see
+[Directory Results](directory-results.md).
+
 ---
 
 ## Filters

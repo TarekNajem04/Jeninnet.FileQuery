@@ -27,6 +27,7 @@ internal sealed class TraversalPlanBuilder(IFileSystem fileSystem) : ITraversalP
         // ===== Traversal configuration =====
         var traversalConfig = new TraversalConfiguration(
             options.RecurseSubdirectories,
+            options.IncludeDirectories,
             options.MaxRecursionDepth,
             options.IgnoreInaccessible,
             options.Traversal.Strategy,

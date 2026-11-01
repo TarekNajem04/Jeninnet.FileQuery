@@ -149,17 +149,17 @@ internal sealed class TraversalExecutor : ITraversalExecutor {
                             buffer,
                             visited,
                             pathBuffer,
-                            out var yieldedFile
+                            out var yieldedEntry
                         )
                     ) {
                         continue;
                     }
 
-                    if(yieldedFile.HasValue) {
+                    if(yieldedEntry.HasValue) {
                         state.FilesMatched++;
                         filesMatched++;
-                        ReportProgress(plan, state, yieldedFile.Value.FullPath);
-                        yield return project(yieldedFile.Value, pathBuffer);
+                        ReportProgress(plan, state, yieldedEntry.Value.FullPath);
+                        yield return project(yieldedEntry.Value, pathBuffer);
                     }
                 }
             }
@@ -200,15 +200,15 @@ internal sealed class TraversalExecutor : ITraversalExecutor {
                             buffer,
                             visited,
                             pathBuffer,
-                            out var yieldedFile
+                            out var yieldedEntry
                         )
                     ) {
                         continue;
                     }
 
-                    if(yieldedFile.HasValue) {
+                    if(yieldedEntry.HasValue) {
                         filesMatched++;
-                        yield return project(yieldedFile.Value, pathBuffer);
+                        yield return project(yieldedEntry.Value, pathBuffer);
                     }
                 }
             }
@@ -237,7 +237,7 @@ internal sealed class TraversalExecutor : ITraversalExecutor {
     /// <param name="buffer">The traversal frontier buffer.</param>
     /// <param name="visited">The set of visited directory paths (for symlink cycle detection).</param>
     /// <param name="pathBuffer">The reusable buffer used to compose the root-relative path.</param>
-    /// <param name="yieldedFile">The resulting entry if a file was matched.</param>
+    /// <param name="yieldedEntry">The resulting entry if a result was matched.</param>
     private static bool TryProcessEntry(
         TraversalPlan plan,
         FileSystemEntry entry,
@@ -245,9 +245,9 @@ internal sealed class TraversalExecutor : ITraversalExecutor {
         TraversalFrontier buffer,
         HashSet<string>? visited,
         RelativePathBuffer pathBuffer,
-        out FileSystemEntry? yieldedFile
+        out FileSystemEntry? yieldedEntry
     ) {
-        yieldedFile = null;
+        yieldedEntry = null;
 
         if(IsIgnoredSymlink(entry, plan.Traversal)) {
             return false;
@@ -313,7 +313,7 @@ internal sealed class TraversalExecutor : ITraversalExecutor {
         }
 
         if(decision.ShouldYield) {
-            yieldedFile = entry;
+            yieldedEntry = entry;
         }
 
         return true;

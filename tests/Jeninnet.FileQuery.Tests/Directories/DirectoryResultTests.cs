@@ -1,0 +1,182 @@
+﻿//
+// Copyright (c) Jeninnet.
+// Part of the Jeninnet Platform.
+// Platform Repository: https://github.com/TarekNajem04/Jeninnet.Platform/ [PENDING]
+// Solution Repository: https://github.com/TarekNajem04/Jeninnet.FileQuery [LIVE]
+// Licensed under the MIT License.
+//
+namespace Jeninnet.FileQuery.Tests.Directories;
+
+/// <summary>
+/// Tests for the opt-in directory result mode.
+/// </summary>
+[TestClass]
+public sealed class DirectoryResultTests {
+    private static readonly string[] ALL_RESULTS =
+    [
+        "bin",
+        "bin/tool.exe",
+        "file.txt",
+        "keep",
+        "keep/keep.txt",
+        "src",
+        "src/a.cs",
+        "src/nested",
+        "src/nested/b.cs"
+    ];
+
+    private static readonly string[] REINCLUDED_KEEP =
+    [
+        "keep",
+        "keep/keep.txt"
+    ];
+
+    /// <summary>
+    /// The default path-only API still returns files only.
+    /// </summary>
+    [TestMethod]
+    public void Execute_ByDefault_ReturnsFilesOnly() {
+        using var environment = CreateEnvironment();
+
+        var paths = FileQuery.From(environment.Root)
+            .Execute()
+            .Select(path => Relative(environment.Root, path))
+            .ToArray();
+
+        Assert.IsFalse(paths.Contains("src", StringComparer.Ordinal));
+        Assert.IsFalse(paths.Contains("src/nested", StringComparer.Ordinal));
+        Assert.IsTrue(paths.Contains("src/a.cs", StringComparer.Ordinal));
+    }
+
+    /// <summary>
+    /// Enabling directory results adds directories to the same traversal.
+    /// </summary>
+    [TestMethod]
+    public void Execute_IncludeDirectories_ReturnsFilesAndDirectories() {
+        using var environment = CreateEnvironment();
+
+        var paths = FileQuery.From(environment.Root)
+            .IncludeDirectories()
+            .Execute()
+            .Select(path => Relative(environment.Root, path))
+            .OrderBy(static path => path, StringComparer.Ordinal)
+            .ToArray();
+
+        CollectionAssert.AreEquivalent(ALL_RESULTS, paths);
+    }
+
+    /// <summary>
+    /// Entry results mark directories without a trailing slash in the relative path.
+    /// </summary>
+    [TestMethod]
+    public void ExecuteEntries_IncludeDirectories_MarksDirectoryEntries() {
+        using var environment = CreateEnvironment();
+
+        var entries = FileQuery.From(environment.Root)
+            .IncludeDirectories()
+            .ExecuteEntries()
+            .ToArray();
+
+        var directory = entries.Single(entry => entry.RelativePath == "src/nested");
+        var file = entries.Single(entry => entry.RelativePath == "src/nested/b.cs");
+
+        Assert.IsTrue(directory.IsDirectory);
+        Assert.IsFalse(file.IsDirectory);
+        Assert.IsFalse(directory.RelativePath.EndsWith('/'));
+    }
+
+    /// <summary>
+    /// Directory-only patterns and negation decide directory results and prune excluded subtrees.
+    /// </summary>
+    [TestMethod]
+    public void IncludeDirectories_DirectoryOnlyNegation_PrunesExcludedSubtrees() {
+        using var environment = CreateEnvironment();
+
+        var entries = FileQuery.From(environment.Root)
+            .UsingGitIgnore()
+            .Where(PatternKind.GitIgnore, ["**", "!keep/"])
+            .IncludeDirectories()
+            .ExecuteEntries()
+            .Select(entry => entry.RelativePath)
+            .OrderBy(static path => path, StringComparer.Ordinal)
+            .ToArray();
+
+        CollectionAssert.AreEqual(REINCLUDED_KEEP, entries);
+    }
+
+    /// <summary>
+    /// A directory-only exclusion removes the directory and its subtree.
+    /// </summary>
+    [TestMethod]
+    public void IncludeDirectories_DirectoryOnlyExclusion_RemovesSubtree() {
+        using var environment = CreateEnvironment();
+
+        var entries = FileQuery.From(environment.Root)
+            .UsingGitIgnore()
+            .Where(PatternKind.GitIgnore, ["bin/"])
+            .IncludeDirectories()
+            .ExecuteEntries()
+            .Select(entry => entry.RelativePath)
+            .ToArray();
+
+        Assert.IsFalse(entries.Contains("bin", StringComparer.Ordinal));
+        Assert.IsFalse(entries.Contains("bin/tool.exe", StringComparer.Ordinal));
+        Assert.IsTrue(entries.Contains("keep/keep.txt", StringComparer.Ordinal));
+    }
+
+    /// <summary>
+    /// Async entry enumeration returns the same directory results.
+    /// </summary>
+    [TestMethod]
+    public async Task ExecuteEntriesAsync_IncludeDirectories_MatchesSyncResults() {
+        using var environment = CreateEnvironment();
+        var builder = FileQuery.From(environment.Root).IncludeDirectories();
+
+        var sync = builder.ExecuteEntries()
+            .Select(static entry => $"{entry.RelativePath}|{entry.IsDirectory}")
+            .OrderBy(static value => value, StringComparer.Ordinal)
+            .ToArray();
+        var asyncResults = new List<string>();
+
+        await foreach(var entry in builder.ExecuteEntriesAsync()) {
+            asyncResults.Add($"{entry.RelativePath}|{entry.IsDirectory}");
+        }
+
+        CollectionAssert.AreEqual(sync, asyncResults.OrderBy(static value => value, StringComparer.Ordinal).ToArray());
+    }
+
+    /// <summary>
+    /// Explicitly disabling directory results restores the default behavior.
+    /// </summary>
+    [TestMethod]
+    public void IncludeDirectories_False_ReturnsFilesOnly() {
+        using var environment = CreateEnvironment();
+
+        var paths = FileQuery.From(environment.Root)
+            .IncludeDirectories(false)
+            .Execute()
+            .Select(path => Relative(environment.Root, path))
+            .ToArray();
+
+        Assert.IsFalse(paths.Contains("src", StringComparer.Ordinal));
+        Assert.IsTrue(paths.Contains("src/a.cs", StringComparer.Ordinal));
+    }
+
+    /// <summary>
+    /// Creates a tree with files and nested directories.
+    /// </summary>
+    private static TestEnvironment CreateEnvironment() {
+        var environment = new TestEnvironment();
+        environment.CreateFiles(
+            "file.txt",
+            "src/a.cs",
+            "src/nested/b.cs",
+            "bin/tool.exe",
+            "keep/keep.txt");
+
+        return environment;
+    }
+
+    private static string Relative(string root, string path) =>
+        Path.GetRelativePath(root, path).Replace('\\', '/');
+}

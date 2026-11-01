@@ -733,6 +733,29 @@
             <param name="options">The loading options, or <see langword="null"/> for the defaults.</param>
             <returns>The current <see cref="T:Jeninnet.FileQuery.FileQueryBuilder"/> instance for method chaining.</returns>
         </member>
+        <member name="M:Jeninnet.FileQuery.FileQueryBuilder.IncludeDirectories(System.Boolean)">
+            <summary>
+            Includes matching directories in the result stream in addition to files.
+            </summary>
+            <remarks>
+            <para>
+            Disabled by default. When enabled, the traversal yields a directory after evaluating the
+            same match outcome used to decide whether to descend. Directory-only rules such as
+            <c>bin/</c> and negations such as <c>!keep/</c> therefore apply directly to directory
+            results, and an excluded directory is still pruned unless a negated rule could re-include
+            content below it.
+            </para>
+            <para>
+            No second traversal is performed; directory results come from the existing walk. Entry
+            results expose <see cref="P:Jeninnet.FileQuery.FileQueryEntry.IsDirectory"/> for callers that need to separate
+            directories from files.
+            </para>
+            </remarks>
+            <param name="includeDirectories">
+            <see langword="true"/> to yield included directories; <see langword="false"/> to return files only.
+            </param>
+            <returns>The current <see cref="T:Jeninnet.FileQuery.FileQueryBuilder"/> instance for method chaining.</returns>
+        </member>
         <member name="M:Jeninnet.FileQuery.FileQueryBuilder.Execute">
             <summary>
             Executes the query synchronously using the configured or default engine.
@@ -1018,8 +1041,9 @@
             <param name="ModifiedBefore">The exclusive upper last-write boundary, or <see langword="null"/> for no upper bound.</param>
             <param name="AttributesToSkip">Attribute flags that exclude an entry (and prune a matching directory).</param>
             <param name="GitIgnoreFiles">The optional Git ignore-file loading settings.</param>
+            <param name="IncludeDirectories">Whether included directories are yielded alongside files.</param>
         </member>
-        <member name="M:Jeninnet.FileQuery.FileQueryOptionsConfig.#ctor(Jeninnet.FileQuery.PatternInput,System.Boolean,System.Int32,System.Boolean,Jeninnet.FileQuery.Enums.PatternMatchingMode,Jeninnet.FileQuery.Enums.CaseSensitivity,Jeninnet.FileQuery.Traversal.TraversalOptions,System.Boolean,System.IProgress{Jeninnet.FileQuery.FileQueryDiagnostic},Jeninnet.FileQuery.FileQueryErrorRecoveryOptions,System.Nullable{System.Int64},System.Nullable{System.Int64},System.Nullable{System.DateTimeOffset},System.Nullable{System.DateTimeOffset},System.IO.FileAttributes,Jeninnet.FileQuery.GitIgnoreOptions)">
+        <member name="M:Jeninnet.FileQuery.FileQueryOptionsConfig.#ctor(Jeninnet.FileQuery.PatternInput,System.Boolean,System.Int32,System.Boolean,Jeninnet.FileQuery.Enums.PatternMatchingMode,Jeninnet.FileQuery.Enums.CaseSensitivity,Jeninnet.FileQuery.Traversal.TraversalOptions,System.Boolean,System.IProgress{Jeninnet.FileQuery.FileQueryDiagnostic},Jeninnet.FileQuery.FileQueryErrorRecoveryOptions,System.Nullable{System.Int64},System.Nullable{System.Int64},System.Nullable{System.DateTimeOffset},System.Nullable{System.DateTimeOffset},System.IO.FileAttributes,Jeninnet.FileQuery.GitIgnoreOptions,System.Boolean)">
             <summary>
             Configuration for creating a <see cref="T:Jeninnet.FileQuery.FileQueryOptions"/>.
             </summary>
@@ -1039,6 +1063,7 @@
             <param name="ModifiedBefore">The exclusive upper last-write boundary, or <see langword="null"/> for no upper bound.</param>
             <param name="AttributesToSkip">Attribute flags that exclude an entry (and prune a matching directory).</param>
             <param name="GitIgnoreFiles">The optional Git ignore-file loading settings.</param>
+            <param name="IncludeDirectories">Whether included directories are yielded alongside files.</param>
         </member>
         <member name="P:Jeninnet.FileQuery.FileQueryOptionsConfig.PatternInput">
             <summary>The pattern input that defines which files to include or exclude.</summary>
@@ -1087,6 +1112,9 @@
         </member>
         <member name="P:Jeninnet.FileQuery.FileQueryOptionsConfig.GitIgnoreFiles">
             <summary>The optional Git ignore-file loading settings.</summary>
+        </member>
+        <member name="P:Jeninnet.FileQuery.FileQueryOptionsConfig.IncludeDirectories">
+            <summary>Whether included directories are yielded alongside files.</summary>
         </member>
         <member name="P:Jeninnet.FileQuery.FileQueryOptionsConfig.IncludedPaths">
             <summary>
@@ -1244,6 +1272,16 @@
             <summary>
             Gets the Git ignore-file loading settings, or <see langword="null"/> when ignore files are not loaded.
             </summary>
+        </member>
+        <member name="P:Jeninnet.FileQuery.FileQueryOptions.IncludeDirectories">
+            <summary>
+            Gets a value indicating whether included directories are yielded as results.
+            </summary>
+            <remarks>
+            Disabled by default, so path-only queries keep returning files only. When enabled, a
+            directory is yielded when the matcher includes it; directory-only rules and negation
+            therefore decide directory results using the same last-match-wins semantics as files.
+            </remarks>
         </member>
         <member name="M:Jeninnet.FileQuery.FileQueryOptions.Validate">
             <summary>
@@ -6085,6 +6123,7 @@
             Internal immutable projection of traversal-related settings.
             </summary>
             <param name="RecurseSubdirectories">Whether to recurse into subdirectories.</param>
+            <param name="IncludeDirectories">Whether included directories are yielded as results.</param>
             <param name="MaxRecursionDepth">The maximum recursion depth.</param>
             <param name="IgnoreInaccessible">Whether to ignore inaccessible directories.</param>
             <param name="Strategy">The traversal strategy.</param>
@@ -6092,11 +6131,12 @@
             <param name="UseAsync">Whether to use asynchronous traversal.</param>
             <param name="ErrorRecovery">The error recovery options.</param>
         </member>
-        <member name="M:Jeninnet.FileQuery.Traversal.TraversalConfiguration.#ctor(System.Boolean,System.Int32,System.Boolean,Jeninnet.FileQuery.Enums.TraversalStrategy,Jeninnet.FileQuery.Enums.SymlinkPolicy,System.Boolean,Jeninnet.FileQuery.FileQueryErrorRecoveryOptions)">
+        <member name="M:Jeninnet.FileQuery.Traversal.TraversalConfiguration.#ctor(System.Boolean,System.Boolean,System.Int32,System.Boolean,Jeninnet.FileQuery.Enums.TraversalStrategy,Jeninnet.FileQuery.Enums.SymlinkPolicy,System.Boolean,Jeninnet.FileQuery.FileQueryErrorRecoveryOptions)">
             <summary>
             Internal immutable projection of traversal-related settings.
             </summary>
             <param name="RecurseSubdirectories">Whether to recurse into subdirectories.</param>
+            <param name="IncludeDirectories">Whether included directories are yielded as results.</param>
             <param name="MaxRecursionDepth">The maximum recursion depth.</param>
             <param name="IgnoreInaccessible">Whether to ignore inaccessible directories.</param>
             <param name="Strategy">The traversal strategy.</param>
@@ -6106,6 +6146,9 @@
         </member>
         <member name="P:Jeninnet.FileQuery.Traversal.TraversalConfiguration.RecurseSubdirectories">
             <summary>Whether to recurse into subdirectories.</summary>
+        </member>
+        <member name="P:Jeninnet.FileQuery.Traversal.TraversalConfiguration.IncludeDirectories">
+            <summary>Whether included directories are yielded as results.</summary>
         </member>
         <member name="P:Jeninnet.FileQuery.Traversal.TraversalConfiguration.MaxRecursionDepth">
             <summary>The maximum recursion depth.</summary>
@@ -6235,7 +6278,7 @@
             <param name="buffer">The traversal frontier buffer.</param>
             <param name="visited">The set of visited directory paths (for symlink cycle detection).</param>
             <param name="pathBuffer">The reusable buffer used to compose the root-relative path.</param>
-            <param name="yieldedFile">The resulting entry if a file was matched.</param>
+            <param name="yieldedEntry">The resulting entry if a result was matched.</param>
         </member>
         <member name="M:Jeninnet.FileQuery.Traversal.TraversalExecutor.HasPotentialReInclusionInside(Jeninnet.FileQuery.Matching.ICompiledPatternSet,System.ReadOnlySpan{System.Char},System.StringComparison)">
             <summary>

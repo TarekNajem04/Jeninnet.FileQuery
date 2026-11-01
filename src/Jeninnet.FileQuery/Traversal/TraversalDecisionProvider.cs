@@ -25,7 +25,7 @@ internal sealed class TraversalDecisionProvider : ITraversalDecisionProvider {
                 );
 
             return new TraversalDecision(
-                ShouldYield: false,
+                ShouldYield: _traversalConfiguration.IncludeDirectories && outcome is MatchOutcome.Include,
                 ShouldTraverse: shouldTraverse
             );
         }

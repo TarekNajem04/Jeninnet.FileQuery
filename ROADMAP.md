@@ -118,7 +118,7 @@ unless stated. Detailed tasks live in `private/Tasks/pre-v2-hardening/` (`TASK-H
   `LastWriteTimeUtc`, `Attributes`, `IsDirectory`) with `ExecuteEntries()` and
   `MinSize`/`MaxSize`/`ModifiedAfter`/`ModifiedBefore`/`AttributesToSkip`. The enumeration already
   carries this data, so no extra syscalls.
-- [ ] **H-06 Directory results**: opt-in directory matches, with documented interaction with
+- [x] **H-06 Directory results**: opt-in directory matches, with documented interaction with
   directory-only patterns and pruning.
 - [x] **H-07 Single-path matcher**: public `IsMatch(string)`/`IsMatch(ReadOnlySpan<char>)` and
   `Explain(path)` over a compiled pattern set, for linters and IDE plugins.

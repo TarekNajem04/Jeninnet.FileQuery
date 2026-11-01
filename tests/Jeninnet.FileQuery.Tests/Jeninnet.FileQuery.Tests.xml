@@ -1652,6 +1652,51 @@
             Tests that the default engine builder creates a working engine.
             </summary>
         </member>
+        <member name="T:Jeninnet.FileQuery.Tests.Directories.DirectoryResultTests">
+            <summary>
+            Tests for the opt-in directory result mode.
+            </summary>
+        </member>
+        <member name="M:Jeninnet.FileQuery.Tests.Directories.DirectoryResultTests.Execute_ByDefault_ReturnsFilesOnly">
+            <summary>
+            The default path-only API still returns files only.
+            </summary>
+        </member>
+        <member name="M:Jeninnet.FileQuery.Tests.Directories.DirectoryResultTests.Execute_IncludeDirectories_ReturnsFilesAndDirectories">
+            <summary>
+            Enabling directory results adds directories to the same traversal.
+            </summary>
+        </member>
+        <member name="M:Jeninnet.FileQuery.Tests.Directories.DirectoryResultTests.ExecuteEntries_IncludeDirectories_MarksDirectoryEntries">
+            <summary>
+            Entry results mark directories without a trailing slash in the relative path.
+            </summary>
+        </member>
+        <member name="M:Jeninnet.FileQuery.Tests.Directories.DirectoryResultTests.IncludeDirectories_DirectoryOnlyNegation_PrunesExcludedSubtrees">
+            <summary>
+            Directory-only patterns and negation decide directory results and prune excluded subtrees.
+            </summary>
+        </member>
+        <member name="M:Jeninnet.FileQuery.Tests.Directories.DirectoryResultTests.IncludeDirectories_DirectoryOnlyExclusion_RemovesSubtree">
+            <summary>
+            A directory-only exclusion removes the directory and its subtree.
+            </summary>
+        </member>
+        <member name="M:Jeninnet.FileQuery.Tests.Directories.DirectoryResultTests.ExecuteEntriesAsync_IncludeDirectories_MatchesSyncResults">
+            <summary>
+            Async entry enumeration returns the same directory results.
+            </summary>
+        </member>
+        <member name="M:Jeninnet.FileQuery.Tests.Directories.DirectoryResultTests.IncludeDirectories_False_ReturnsFilesOnly">
+            <summary>
+            Explicitly disabling directory results restores the default behavior.
+            </summary>
+        </member>
+        <member name="M:Jeninnet.FileQuery.Tests.Directories.DirectoryResultTests.CreateEnvironment">
+            <summary>
+            Creates a tree with files and nested directories.
+            </summary>
+        </member>
         <member name="T:Jeninnet.FileQuery.Tests.Entries.FileQueryEntryTests">
             <summary>
             Tests for <see cref="T:Jeninnet.FileQuery.FileQueryEntry"/> result APIs and metadata filters.

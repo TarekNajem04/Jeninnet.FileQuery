@@ -90,6 +90,7 @@ internal static class FileQueryInstrumentation {
         activity.SetTag("filequery.matching_mode", options.PatternMatchingMode.ToString());
         activity.SetTag("filequery.case_sensitivity", options.CaseSensitivity.ToString());
         activity.SetTag("filequery.recurse", options.RecurseSubdirectories);
+        activity.SetTag("filequery.include_directories", options.IncludeDirectories);
         activity.SetTag("filequery.strategy", options.Traversal.Strategy.ToString());
         activity.SetTag("filequery.symlink_policy", options.Traversal.SymlinkPolicy.ToString());
         activity.SetTag("filequery.pattern_count", CountPatterns(options.PatternInput));

@@ -39,6 +39,7 @@ public sealed class FileQueryBuilder {
     private DateTimeOffset? _modifiedBefore;
     private FileAttributes _attributesToSkip = FileAttributes.None;
     private GitIgnoreOptions? _gitIgnoreFiles;
+    private bool _includeDirectories;
 
     /// <summary>
     /// Initializes a new <see cref="FileQueryBuilder"/> rooted at the specified directory.
@@ -436,6 +437,32 @@ public sealed class FileQueryBuilder {
         return this;
     }
 
+    /// <summary>
+    /// Includes matching directories in the result stream in addition to files.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// Disabled by default. When enabled, the traversal yields a directory after evaluating the
+    /// same match outcome used to decide whether to descend. Directory-only rules such as
+    /// <c>bin/</c> and negations such as <c>!keep/</c> therefore apply directly to directory
+    /// results, and an excluded directory is still pruned unless a negated rule could re-include
+    /// content below it.
+    /// </para>
+    /// <para>
+    /// No second traversal is performed; directory results come from the existing walk. Entry
+    /// results expose <see cref="FileQueryEntry.IsDirectory"/> for callers that need to separate
+    /// directories from files.
+    /// </para>
+    /// </remarks>
+    /// <param name="includeDirectories">
+    /// <see langword="true"/> to yield included directories; <see langword="false"/> to return files only.
+    /// </param>
+    /// <returns>The current <see cref="FileQueryBuilder"/> instance for method chaining.</returns>
+    public FileQueryBuilder IncludeDirectories(bool includeDirectories = true) {
+        _includeDirectories = includeDirectories;
+        return this;
+    }
+
     // =====Terminal operations =====
 
     /// <summary>
@@ -526,7 +553,8 @@ public sealed class FileQueryBuilder {
                 ModifiedAfter: _modifiedAfter,
                 ModifiedBefore: _modifiedBefore,
                 AttributesToSkip: _attributesToSkip,
-                GitIgnoreFiles: _gitIgnoreFiles
+                GitIgnoreFiles: _gitIgnoreFiles,
+                IncludeDirectories: _includeDirectories
             ) {
                 IncludedPaths = _includedPaths
             }
@@ -559,7 +587,8 @@ public sealed class FileQueryBuilder {
                 ModifiedAfter: _modifiedAfter,
                 ModifiedBefore: _modifiedBefore,
                 AttributesToSkip: _attributesToSkip,
-                GitIgnoreFiles: _gitIgnoreFiles
+                GitIgnoreFiles: _gitIgnoreFiles,
+                IncludeDirectories: _includeDirectories
             ) {
                 IncludedPaths = _includedPaths
             }

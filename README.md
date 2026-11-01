@@ -95,6 +95,7 @@ See the [Global Tool guide](./docs/guides/global-tool.md) for the full option se
 *   **OpenTelemetry-ready.** Built-in `ActivitySource`/`Meter` instrumentation exposes query spans and metrics; attach any OpenTelemetry exporter. See `docs/guides/observability-and-diagnostics.md`.
 *   **Roslyn analyzers.** `Jeninnet.FileQuery.Analyzers` validates pattern literals at design time and offers safe code fixes. See `docs/guides/roslyn-analyzers.md`.
 *   **Entry metadata.** `ExecuteEntries()` returns full/relative paths, size, timestamps, attributes, and directory state without extra file-system calls, with size/time/attribute filters.
+*   **Directory results.** `IncludeDirectories()` opts into yielding matching directories from the same traversal, with directory-only and negation semantics preserved.
 
 ### Performance
 

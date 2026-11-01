@@ -26,6 +26,7 @@ namespace Jeninnet.FileQuery;
 /// <param name="ModifiedBefore">The exclusive upper last-write boundary, or <see langword="null"/> for no upper bound.</param>
 /// <param name="AttributesToSkip">Attribute flags that exclude an entry (and prune a matching directory).</param>
 /// <param name="GitIgnoreFiles">The optional Git ignore-file loading settings.</param>
+/// <param name="IncludeDirectories">Whether included directories are yielded alongside files.</param>
 public record FileQueryOptionsConfig(
     PatternInput PatternInput,
     bool RecurseSubdirectories = true,
@@ -42,7 +43,8 @@ public record FileQueryOptionsConfig(
     DateTimeOffset? ModifiedAfter = null,
     DateTimeOffset? ModifiedBefore = null,
     FileAttributes AttributesToSkip = FileAttributes.None,
-    GitIgnoreOptions? GitIgnoreFiles = null
+    GitIgnoreOptions? GitIgnoreFiles = null,
+    bool IncludeDirectories = false
 ) {
     /// <summary>
     /// Gets the optional set of root-relative file paths that limits the query to an explicit
@@ -118,6 +120,7 @@ public sealed record FileQueryOptions {
         ModifiedBefore = config.ModifiedBefore;
         AttributesToSkip = config.AttributesToSkip;
         GitIgnoreFiles = config.GitIgnoreFiles;
+        IncludeDirectories = config.IncludeDirectories;
     }
 
     /// <summary>
@@ -222,6 +225,16 @@ public sealed record FileQueryOptions {
     /// Gets the Git ignore-file loading settings, or <see langword="null"/> when ignore files are not loaded.
     /// </summary>
     public GitIgnoreOptions? GitIgnoreFiles { get; }
+
+    /// <summary>
+    /// Gets a value indicating whether included directories are yielded as results.
+    /// </summary>
+    /// <remarks>
+    /// Disabled by default, so path-only queries keep returning files only. When enabled, a
+    /// directory is yielded when the matcher includes it; directory-only rules and negation
+    /// therefore decide directory results using the same last-match-wins semantics as files.
+    /// </remarks>
+    public bool IncludeDirectories { get; }
 
     /// <summary>
     /// Validates this options instance for internal consistency.
