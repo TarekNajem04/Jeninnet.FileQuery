@@ -188,6 +188,7 @@
         <Project Path="src/Jeninnet.FileQuery.DependencyInjection/Jeninnet.FileQuery.DependencyInjection.csproj" />
         <Project Path="src/Jeninnet.FileQuery.Tool/Jeninnet.FileQuery.Tool.csproj" />
         <Project Path="src/Jeninnet.FileQuery.Tooling/Jeninnet.FileQuery.Tooling.csproj" />
+        <Project Path="src/Jeninnet.FileQuery.Soak/Jeninnet.FileQuery.Soak.csproj" />
         <Project Path="src/Jeninnet.Testing.Assertions/Jeninnet.Testing.Assertions.csproj" />
     </Folder>
 
