@@ -10,6 +10,7 @@ Versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 ### Added
 
 - **Global Tool**: Added `Jeninnet.FileQuery.Tool`, the `dotnet-filequery` .NET global tool. It exposes the engine in the terminal with Hybrid, GitIgnore, Glob, and Regex patterns plus `--root`, `--depth`, `--no-recursive`, `--ignore-case`, `--symlinks`, `--relative`, `--null`, and `--count`, and streams deterministic output for pipelines. Includes 28 tests, a package README, and a documentation guide.
+- **Diff-Aware Queries**: Added `FileQueryBuilder.RestrictToPaths` and `FileQueryOptionsConfig.IncludedPaths` to restrict a query to a root-relative allow-list, skipping unmatched files before pattern matching and pruning directories that cannot contain a listed file. The `dotnet-filequery` tool exposes it through `--changed-since <revision>` and `--changed-since-date <timestamp>`, reports added, modified, renamed, and copied files, excludes deletions, and includes untracked files unless `--no-untracked` is supplied.
 
 ### Fixed
 

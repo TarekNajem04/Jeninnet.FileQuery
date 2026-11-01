@@ -75,6 +75,9 @@ dotnet-filequery --dialect glob "**/*.json"
 | `--depth <n>` | Maximum depth; `0` searches the root only. |
 | `--ignore-case` | Case-insensitive matching. |
 | `--symlinks <policy>` | `ignore` (default), `follow`, or `follow-with-cycle-detection`. |
+| `--changed-since <revision>` | Only files changed since a commit, tag, or branch. |
+| `--changed-since-date <timestamp>` | Only files changed since an ISO 8601 timestamp. |
+| `--no-untracked` | Exclude untracked files from a change-set query. |
 
 `--no-recursive` and `--depth` are mutually exclusive.
 
@@ -118,6 +121,22 @@ dotnet-filequery --dialect regex "\.Tests\.cs$" --count
 | `2` | The command line was invalid. |
 
 Errors are written to standard error, so they never contaminate piped output.
+
+---
+
+## Diff-aware queries
+
+`--changed-since` and `--changed-since-date` restrict the query to the files Git reports between
+the baseline and the working tree. The root may be a repository subdirectory; change paths are
+rebased automatically, and deleted files are never returned.
+
+```bash
+dotnet-filequery --changed-since HEAD~5
+dotnet-filequery --changed-since origin/main "**;!*.cs" --count
+dotnet-filequery --changed-since-date 2026-10-01T00:00:00Z --no-untracked
+```
+
+See [Diff-Aware Queries](diff-aware-queries.md) for the full semantics.
 
 ---
 

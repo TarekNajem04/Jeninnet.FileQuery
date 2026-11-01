@@ -76,6 +76,7 @@ See the [Global Tool guide](./docs/guides/global-tool.md) for the full option se
 *   **Deterministic precedence.** GitIgnore inclusions take final precedence over Glob and Regex sub-sets. A GitIgnore inclusion is final; Glob and Regex matchers can re-include paths excluded by GitIgnore but cannot exclude paths that GitIgnore has included.
 *   **POSIX character classes.** Bracket expressions support named classes (`[:digit:]`, `[:alpha:]`, `[:alnum:]`, `[:space:]`, `[:blank:]`, `[:upper:]`, `[:lower:]`, `[:print:]`, `[:graph:]`, `[:punct:]`, `[:cntrl:]`, `[:xdigit:]`).
 *   **Compile-time validation.** Patterns are tokenized and checked against semantic and structural invariants (e.g., `**` isolation, valid character ranges) before execution. Malformed patterns produce rich diagnostics without throwing during tokenization.
+*   **Diff-aware scans.** Restrict any query to an explicit path allow-list with `RestrictToPaths`, so incremental tooling processes only the files that changed. The `dotnet-filequery` tool fills that list from a Git commit or timestamp.
 
 ### Traversal
 
