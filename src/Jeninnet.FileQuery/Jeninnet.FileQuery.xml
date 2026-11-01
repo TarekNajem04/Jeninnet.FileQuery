@@ -718,6 +718,23 @@
             </param>
             <returns>The current <see cref="T:Jeninnet.FileQuery.FileQueryBuilder"/> instance for method chaining.</returns>
         </member>
+        <member name="M:Jeninnet.FileQuery.FileQueryBuilder.IgnoreInaccessible(System.Boolean)">
+            <summary>
+            Controls whether inaccessible files and directories are skipped during traversal.
+            </summary>
+            <remarks>
+            <para>
+            Enabled by default. When disabled, recoverable IO failures follow
+            <see cref="M:Jeninnet.FileQuery.FileQueryBuilder.WithErrorRecovery(Jeninnet.FileQuery.FileQueryErrorRecoveryOptions)"/> instead of being skipped; the default abort policy then
+            surfaces the failure to the caller.
+            </para>
+            </remarks>
+            <param name="ignoreInaccessible">
+            <see langword="true"/> to skip inaccessible entries (default); <see langword="false"/> to
+            treat them as recoverable errors.
+            </param>
+            <returns>The current <see cref="T:Jeninnet.FileQuery.FileQueryBuilder"/> instance for method chaining.</returns>
+        </member>
         <member name="M:Jeninnet.FileQuery.FileQueryBuilder.WithDiagnostics(System.IProgress{Jeninnet.FileQuery.FileQueryDiagnostic})">
             <summary>
             Enables optional match diagnostics for each evaluated filesystem entry.
@@ -2034,9 +2051,6 @@
             Gets the raw file attribute flags associated with this entry.
             </summary>
         </member>
-        <member name="P:Jeninnet.FileQuery.IO.FileSystemEntry.IsNone">
-            <summary>Indicates whether no attributes are set.</summary>
-        </member>
         <member name="P:Jeninnet.FileQuery.IO.FileSystemEntry.IsReadOnly">
             <summary>Indicates whether the entry is marked as read-only.</summary>
         </member>
@@ -2749,6 +2763,19 @@
             <param name="patterns">The set of compiled patterns to match.</param>
             <param name="context">The path context containing path information and options.</param>
         </member>
+        <member name="M:Jeninnet.FileQuery.Matching.Compiled.RegexInstructionMatcher.MatchWithTimeout(System.Text.RegularExpressions.Regex,System.ReadOnlySpan{System.Char},System.String)">
+            <summary>
+            Executes a regex match and converts a match timeout into a domain-level
+            <see cref="T:Jeninnet.FileQuery.Patterns.Exceptions.PatternException"/>.
+            </summary>
+            <param name="regex">The compiled regular expression.</param>
+            <param name="path">The normalized path to match.</param>
+            <param name="patternText">The source pattern, used in the error message.</param>
+            <returns><see langword="true"/> when the expression matches the path.</returns>
+            <exception cref="T:Jeninnet.FileQuery.Patterns.Exceptions.PatternException">
+            Thrown when the expression exceeds its configured match timeout.
+            </exception>
+        </member>
         <member name="M:Jeninnet.FileQuery.Matching.Compiled.RegexInstructionMatcher.GetOrCreateRegex(System.String,Jeninnet.FileQuery.Enums.CaseSensitivity)">
             <summary>
             Retrieves a compiled <see cref="T:System.Text.RegularExpressions.Regex"/> for the given expression text
@@ -2810,13 +2837,14 @@
             <param name="pos">The current position in the text.</param>
             <param name="cmp">The string comparison mode.</param>
         </member>
-        <member name="M:Jeninnet.FileQuery.Matching.Compiled.SegmentInstructionMatcher.CharacterClassMatches(Jeninnet.FileQuery.Patterns.Syntax.CharacterClasses.CharacterClass,System.Char)">
+        <member name="M:Jeninnet.FileQuery.Matching.Compiled.SegmentInstructionMatcher.CharacterClassMatches(Jeninnet.FileQuery.Patterns.Syntax.CharacterClasses.CharacterClass,System.Char,System.StringComparison)">
             <summary>
             Returns <see langword="true"/> when character <paramref name="c"/>
             satisfies the <see cref="T:Jeninnet.FileQuery.Patterns.Syntax.CharacterClasses.CharacterClass"/> definition.
             </summary>
             <param name="cls">The character class definition.</param>
             <param name="c">The character to test.</param>
+            <param name="cmp">The string comparison mode; ignore-case modes make literals and ranges case-insensitive.</param>
             <remarks>
             <para>
             <strong>Allocation fix:</strong> The previous implementation used
@@ -2825,18 +2853,54 @@
             (a <c>char</c>), which causes the C# compiler to hoist <paramref name="c"/>
             into a heap-allocated display class (closure object) on every call.
             Replaced with a manual <c>for</c> loop that calls
-            <see cref="M:Jeninnet.FileQuery.Matching.Compiled.SegmentInstructionMatcher.MatchesElement(Jeninnet.FileQuery.Patterns.Syntax.CharacterClasses.ICharacterClassElement,System.Char)"/> directly — no closure, no LINQ overhead,
+            <see cref="M:Jeninnet.FileQuery.Matching.Compiled.SegmentInstructionMatcher.MatchesElement(Jeninnet.FileQuery.Patterns.Syntax.CharacterClasses.ICharacterClassElement,System.Char,System.Boolean)"/> directly — no closure, no LINQ overhead,
             and an early <c>break</c> as soon as a matching element is found.
+            </para>
+            <para>
+            POSIX categories such as <c>[:upper:]</c> and <c>[:lower:]</c> keep their
+            category semantics under ignore-case comparisons; only literals and ranges
+            are folded.
             </para>
             </remarks>
         </member>
-        <member name="M:Jeninnet.FileQuery.Matching.Compiled.SegmentInstructionMatcher.MatchesElement(Jeninnet.FileQuery.Patterns.Syntax.CharacterClasses.ICharacterClassElement,System.Char)">
+        <member name="M:Jeninnet.FileQuery.Matching.Compiled.SegmentInstructionMatcher.IsIgnoreCase(System.StringComparison)">
+            <summary>
+            Determines whether a <see cref="T:System.StringComparison"/> folds character casing.
+            </summary>
+            <param name="cmp">The comparison mode.</param>
+            <returns><see langword="true"/> for an ignore-case comparison.</returns>
+        </member>
+        <member name="M:Jeninnet.FileQuery.Matching.Compiled.SegmentInstructionMatcher.MatchesElement(Jeninnet.FileQuery.Patterns.Syntax.CharacterClasses.ICharacterClassElement,System.Char,System.Boolean)">
             <summary>
             Pattern-matches a single <see cref="T:Jeninnet.FileQuery.Patterns.Syntax.CharacterClasses.ICharacterClassElement"/> against
             character <paramref name="c"/>.
             </summary>
             <param name="element">The character class element.</param>
             <param name="c">The character to test.</param>
+            <param name="ignoreCase">Whether literals and ranges should fold casing.</param>
+        </member>
+        <member name="M:Jeninnet.FileQuery.Matching.Compiled.SegmentInstructionMatcher.MatchesLiteral(System.Char,System.Char,System.Boolean)">
+            <summary>
+            Matches a literal character, optionally folding casing.
+            </summary>
+            <param name="pattern">The literal pattern character.</param>
+            <param name="c">The input character.</param>
+            <param name="ignoreCase">Whether to compare case-insensitively.</param>
+        </member>
+        <member name="M:Jeninnet.FileQuery.Matching.Compiled.SegmentInstructionMatcher.MatchesRange(Jeninnet.FileQuery.Patterns.Syntax.CharacterClasses.CharRange,System.Char,System.Boolean)">
+            <summary>
+            Matches an inclusive range, optionally folding the input character.
+            </summary>
+            <param name="range">The inclusive range.</param>
+            <param name="c">The input character.</param>
+            <param name="ignoreCase">Whether to test both case variants of <paramref name="c"/>.</param>
+        </member>
+        <member name="M:Jeninnet.FileQuery.Matching.Compiled.SegmentInstructionMatcher.IsInRange(Jeninnet.FileQuery.Patterns.Syntax.CharacterClasses.CharRange,System.Char)">
+            <summary>
+            Tests whether <paramref name="c"/> falls inside an inclusive range.
+            </summary>
+            <param name="range">The inclusive range.</param>
+            <param name="c">The input character.</param>
         </member>
         <member name="M:Jeninnet.FileQuery.Matching.Compiled.SegmentInstructionMatcher.MatchesPosixClass(System.String,System.Char)">
             <summary>

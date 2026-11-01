@@ -29,6 +29,7 @@ public sealed class FileQueryBuilder {
     private PatternMatchingMode _patternMatchingMode = PatternMatchingMode.GitIgnore;
     private CaseSensitivity _caseSensitivity = CaseSensitivity.PlatformDefault;
     private bool _recurse = true;
+    private bool _ignoreInaccessible = true;
     private bool _auditMatches;
     private IProgress<FileQueryDiagnostic>? _diagnostics;
     private FileQueryErrorRecoveryOptions? _errorRecovery;
@@ -312,6 +313,26 @@ public sealed class FileQueryBuilder {
     }
 
     /// <summary>
+    /// Controls whether inaccessible files and directories are skipped during traversal.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// Enabled by default. When disabled, recoverable IO failures follow
+    /// <see cref="WithErrorRecovery"/> instead of being skipped; the default abort policy then
+    /// surfaces the failure to the caller.
+    /// </para>
+    /// </remarks>
+    /// <param name="ignoreInaccessible">
+    /// <see langword="true"/> to skip inaccessible entries (default); <see langword="false"/> to
+    /// treat them as recoverable errors.
+    /// </param>
+    /// <returns>The current <see cref="FileQueryBuilder"/> instance for method chaining.</returns>
+    public FileQueryBuilder IgnoreInaccessible(bool ignoreInaccessible = true) {
+        _ignoreInaccessible = ignoreInaccessible;
+        return this;
+    }
+
+    /// <summary>
     /// Enables optional match diagnostics for each evaluated filesystem entry.
     /// </summary>
     /// <param name="diagnostics">The diagnostic sink that receives audit entries.</param>
@@ -569,43 +590,15 @@ public sealed class FileQueryBuilder {
     /// Thrown when the root path is null or whitespace.
     /// </exception>
     public FileQuery Build() {
+        var options = GetOptions();
+
         // Use centralized validation pipeline
-        FileQueryValidator.ValidateExecution(_fileSystem, _rootPath, GetOptions());
+        FileQueryValidator.ValidateExecution(_fileSystem, _rootPath, options);
 
         if(_includedPaths is not null) {
             // Validate eagerly so malformed allow-lists fail at Build instead of first execution.
             _ = RelativePathFilter.Create(_includedPaths, _caseSensitivity.Resolve());
         }
-
-        var patternInput = new PatternInput(
-            Patterns: [],
-            TypedPatterns: _patternStorage.ToDictionary(
-                static kvp => kvp.Key,
-                static kvp => (IEnumerable<string>)kvp.Value),
-            InterpretationMode: _interpretationMode
-        );
-
-        var options = new FileQueryOptions(
-            new FileQueryOptionsConfig(
-                PatternInput: patternInput,
-                RecurseSubdirectories: _recurse,
-                IgnoreInaccessible: true,
-                PatternMatchingMode: _patternMatchingMode,
-                CaseSensitivity: _caseSensitivity,
-                AuditMatches: _auditMatches,
-                Diagnostics: _diagnostics,
-                ErrorRecovery: _errorRecovery,
-                MinSize: _minSize,
-                MaxSize: _maxSize,
-                ModifiedAfter: _modifiedAfter,
-                ModifiedBefore: _modifiedBefore,
-                AttributesToSkip: _attributesToSkip,
-                GitIgnoreFiles: _gitIgnoreFiles,
-                IncludeDirectories: _includeDirectories
-            ) {
-                IncludedPaths = _includedPaths
-            }
-        );
 
         return new FileQuery(_rootPath, options);
     }
@@ -623,7 +616,7 @@ public sealed class FileQueryBuilder {
             new FileQueryOptionsConfig(
                 PatternInput: patternInput,
                 RecurseSubdirectories: _recurse,
-                IgnoreInaccessible: true,
+                IgnoreInaccessible: _ignoreInaccessible,
                 PatternMatchingMode: _patternMatchingMode,
                 CaseSensitivity: _caseSensitivity,
                 AuditMatches: _auditMatches,

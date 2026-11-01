@@ -89,12 +89,13 @@ The default `Ignore` is the safe choice. `Follow` is appropriate for filesystems
 ## Inaccessible Directories
 
 ```csharp
-var options = new FileQueryOptions {
-    IgnoreInaccessible = true   // default — skip locked / denied directories
-};
+var query = FileQuery.From(root)
+    .IgnoreInaccessible(false)   // default: true — skip locked / denied directories
+    .WithErrorRecovery(FileQueryErrorRecoveryOptions.Abort)
+    .Build();
 ```
 
-When `true`, directories that throw `UnauthorizedAccessException`, `IOException`, or `DirectoryNotFoundException` are silently skipped and traversal continues. When `false`, the exception propagates to the caller.
+When `IgnoreInaccessible` is `true` (the default), directories and files that throw `UnauthorizedAccessException`, `IOException`, or `DirectoryNotFoundException` are silently skipped and traversal continues. When it is `false`, those failures become recoverable errors; the default error-recovery policy is then `Abort`, so they propagate to the caller. Pass `WithErrorRecovery(...)` to choose `Skip` or `Retry` explicitly.
 
 ---
 

@@ -28,12 +28,13 @@ Recommended required status checks:
 - `Build & Test (windows-latest)`
 - `Build & Test (macos-latest)`
 - `Architecture Tests`
-- `Samples`
+- `VS Code Extension Tests`
+- `FileQuery Action`
+- `Native AOT Smoke (linux-x64)`
+- `Analyzer Package`
+- `Long-Running Stability`
 - `Package Validation`
-- `Benchmarks (Dry Run)`
-- `Dependency Review`
-- `CodeQL`
-- `Build Docs`
+- `Build Documentation`
 
 ## Repository Settings
 

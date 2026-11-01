@@ -148,6 +148,22 @@ public class FileQueryBuilderTests {
         Assert.AreEqual(CaseSensitivity.Insensitive, query.Options.CaseSensitivity);
     }
 
+    /// <summary>Tests IgnoreInaccessible_ShouldUpdateOptionAndDefaultRecovery_WhenDisabled.</summary>
+    [TestMethod]
+    public void IgnoreInaccessible_ShouldUpdateOptionAndDefaultRecovery_WhenDisabled() {
+        var explicitFalse = FileQuery.From(_tempRoot)
+            .IgnoreInaccessible(false)
+            .Build();
+
+        Assert.IsFalse(explicitFalse.Options.IgnoreInaccessible);
+        Assert.AreEqual(FileQueryErrorAction.Abort, explicitFalse.Options.ErrorRecovery.Action);
+
+        var defaulted = FileQuery.From(_tempRoot).Build();
+
+        Assert.IsTrue(defaulted.Options.IgnoreInaccessible);
+        Assert.AreEqual(FileQueryErrorAction.Skip, defaulted.Options.ErrorRecovery.Action);
+    }
+
     /// <summary>Tests ValidatePatternType_ShouldThrowInvalidOperationException_WhenModeAndKindConflict_AllCases.</summary>
     [TestMethod]
     public void ValidatePatternType_ShouldThrowInvalidOperationException_WhenModeAndKindConflict_AllCases() {

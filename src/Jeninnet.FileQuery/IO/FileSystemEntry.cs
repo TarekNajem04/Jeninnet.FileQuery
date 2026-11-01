@@ -33,9 +33,6 @@ internal readonly record struct FileSystemEntry(
     /// </summary>
     public FileAttributes Attributes { get; } = Attributes;
 
-    /// <summary>Indicates whether no attributes are set.</summary>
-    public bool IsNone => (Attributes & FileAttributes.None) is not 0;
-
     /// <summary>Indicates whether the entry is marked as read-only.</summary>
     public bool IsReadOnly => (Attributes & FileAttributes.ReadOnly) is not 0;
 

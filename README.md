@@ -87,6 +87,7 @@ See the [Global Tool guide](./docs/guides/global-tool.md) for the full option se
 *   **Symlink policies.** Control symbolic link behavior with `Ignore`, `Follow`, or `FollowWithCycleDetection`.
 *   **Decoupled filesystem.** The [`IFileSystem`](./src/Jeninnet.FileQuery/IO/IFileSystem.cs) interface decouples all IO, enabling virtual or mock filesystems for cloud workloads and test isolation.
 *   **Configurable error recovery.** Handle IO errors with `Skip`, `Retry(n)`, or `Abort` strategies through `FileQueryErrorRecoveryOptions`.
+*   **Inaccessible-entry policy.** `IgnoreInaccessible(false)` surfaces recoverable access failures instead of silently skipping them; the default stays skip-and-continue.
 
 ### Observability
 

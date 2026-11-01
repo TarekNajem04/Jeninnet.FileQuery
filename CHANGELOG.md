@@ -32,6 +32,7 @@ Versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - **File Provider Adapter**: Added `Jeninnet.FileQuery.FileProviders` with `FileProviderQuery.From(IFileProvider, root)` so physical, embedded, and in-memory providers use the same matching, metadata, directory-result, and GitIgnore pipeline without materializing files.
 - **Git Ignore File Ingestion**: Added `UseGitIgnoreFiles()` / `GitIgnoreOptions` to load root and nested `.gitignore` files, `.git/info/exclude`, and an optional global excludes file with parent-before-child precedence, directory scoping, negation, escaped characters, and directory-only rules. The global tool opts in with `--ignore-files` and `--global-ignore`.
 - **Roslyn Analyzer**: Added the `Jeninnet.FileQuery.Analyzers` package with `JNQ1001` (malformed pattern literal) and a safe code fix that closes a character class.
+- **Inaccessible-Entry Policy**: Added `FileQueryBuilder.IgnoreInaccessible(bool)` so callers can surface recoverable access failures instead of always skipping them. Disabling the default selects the abort recovery policy unless `WithErrorRecovery` is supplied.
 - **Native AOT Validation**: Added the `Jeninnet.FileQuery.AotSmoke` host and a `linux-x64` CI job that publishes with `PublishAot`, treats trimming/AOT warnings as errors, and runs a real query.
 
 ### Changed
@@ -46,6 +47,10 @@ Versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - **CommandLine Regex Patterns**: `PatternBuilder.Build` now adds the required `r:` dialect prefix to patterns supplied through the `--regex` option, so regex patterns work without a manual prefix.
 - **Escaped GitIgnore Leading Characters**: An escaped leading `!` (`\!name`) is now treated as a literal instead of negation, matching Git's escape semantics.
 - **CLI Ignore-File Fallback**: `dotnet-filequery --ignore-files` no longer lets the implicit `!**` include-all fallback override the loaded ignore rules.
+- **Character-Class Case Folding**: `IgnoreCase()` now folds literals and ranges inside character classes, so `[a-z]` matches `A`–`Z` as expected. POSIX categories keep their category semantics.
+- **Regex Match Timeouts**: A `RegexMatchTimeoutException` during matching is now surfaced as a `PatternException` with the offending pattern instead of leaking an infrastructure exception.
+- **Malformed Pattern Diagnostics**: Untyped patterns that fail structural validation now report the specific reason and position instead of the generic "No compiler registered for pattern type 'Unknown'" message.
+- **Empty Pattern Analysis**: `PatternAnalysisResult.Empty()` now reports `IsEmpty: true`, matching its contract.
 
 ## [1.5.0] - 2026-08-12
 
