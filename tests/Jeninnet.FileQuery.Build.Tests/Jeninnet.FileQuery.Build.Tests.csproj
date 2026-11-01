@@ -1,0 +1,22 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <OutputType>Exe</OutputType>
+        <IsTestProject>true</IsTestProject>
+        <IsPackable>false</IsPackable>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Microsoft.Build.Utilities.Core" />
+        <PackageReference Include="Microsoft.NET.Test.Sdk" />
+        <PackageReference Include="MSTest" />
+        <PackageReference Include="MSTest.TestAdapter" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\..\src\Jeninnet.FileQuery.Build\Jeninnet.FileQuery.Build.csproj" />
+        <ProjectReference Include="..\..\src\Jeninnet.FileQuery.Tooling\Jeninnet.FileQuery.Tooling.csproj" />
+        <ProjectReference Include="..\..\src\Jeninnet.Testing.Assertions\Jeninnet.Testing.Assertions.csproj" />
+    </ItemGroup>
+
+</Project>

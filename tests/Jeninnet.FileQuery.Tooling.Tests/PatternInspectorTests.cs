@@ -5,6 +5,8 @@
 // Solution Repository: https://github.com/TarekNajem04/Jeninnet.FileQuery [LIVE]
 // Licensed under the MIT License.
 //
+using System.Text.Json;
+
 namespace Jeninnet.FileQuery.Tooling.Tests;
 
 /// <summary>
@@ -205,6 +207,44 @@ public sealed class PatternInspectorTests {
         invalid.IsValid.Should().BeFalse();
         invalid.Position.Should().Be(4);
         invalid.Segment.Should().Be(1);
+    }
+
+    /// <summary>
+    /// Verifies SARIF export of a located diagnostic.
+    /// </summary>
+    [TestMethod]
+    public void SarifExporter_ShouldWriteValidSarifWithLocation() {
+        var json = SarifExporter.ToJson([
+            new PatternDiagnostic("src/[abc", "Missing closing bracket.", 4, 1, @"src\My File.cs", 12, 5)
+        ]);
+
+        using var document = JsonDocument.Parse(json);
+        var root = document.RootElement;
+        var run = root.GetProperty("runs")[0];
+        var result = run.GetProperty("results")[0];
+        var location = result.GetProperty("locations")[0].GetProperty("physicalLocation");
+        var region = location.GetProperty("region");
+
+        Assert.AreEqual("2.1.0", root.GetProperty("version").GetString());
+        Assert.AreEqual(SarifExporter.RuleId, run.GetProperty("tool").GetProperty("driver").GetProperty("rules")[0].GetProperty("id").GetString());
+        Assert.AreEqual(SarifExporter.RuleId, result.GetProperty("ruleId").GetString());
+        Assert.AreEqual("src/My%20File.cs", location.GetProperty("artifactLocation").GetProperty("uri").GetString());
+        Assert.AreEqual(12, region.GetProperty("startLine").GetInt32());
+        Assert.AreEqual(5, region.GetProperty("startColumn").GetInt32());
+        Assert.AreEqual(1, result.GetProperty("properties").GetProperty("segment").GetInt32());
+    }
+
+    /// <summary>
+    /// Verifies SARIF export without a source location.
+    /// </summary>
+    [TestMethod]
+    public void SarifExporter_ShouldWriteEmptyResults() {
+        var json = SarifExporter.ToJson([]);
+
+        using var document = JsonDocument.Parse(json);
+        var results = document.RootElement.GetProperty("runs")[0].GetProperty("results");
+
+        Assert.AreEqual(0, results.GetArrayLength());
     }
 
     /// <summary>

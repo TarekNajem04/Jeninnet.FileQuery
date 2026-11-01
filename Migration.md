@@ -25,6 +25,7 @@ The built-in engine implements both. Callers that only use `Execute`/`ExecuteAsy
 - `FileQueryBatch` for multiple roots, and `FileQueryEntry.RootPath` on entry results.
 - `PatternException.Position`/`Segment` and `PatternValidation.Position`/`Segment` (additive; `null` when unknown).
 - Brace alternation (`{a,b}`) in non-regex patterns; regex quantifiers are unchanged.
+- `Jeninnet.FileQuery.Build` MSBuild validation/SARIF package and `SarifExporter` in the Tooling SDK.
 - `FileQueryPatternSet` (`IsMatch` string/span, `Explain`) for in-memory matching.
 - `GitIgnoreOptions` + `UseGitIgnoreFiles()`; CLI `--ignore-files` / `--global-ignore`.
 - `FileQueryTelemetry` names and built-in spans/metrics.

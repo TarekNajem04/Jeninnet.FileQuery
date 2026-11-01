@@ -30,5 +30,7 @@
   href: gitignore-files.md
 - name: Roslyn Analyzer
   href: roslyn-analyzers.md
+- name: MSBuild Validation and SARIF
+  href: msbuild-validation.md
 - name: Native AOT
   href: native-aot.md

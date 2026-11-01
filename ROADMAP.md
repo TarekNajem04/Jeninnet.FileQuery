@@ -136,7 +136,7 @@ unless stated. Detailed tasks live in `private/Tasks/pre-v2-hardening/` (`TASK-H
 - [x] **H-13 Multiple roots**: query several directories in one pipeline with deterministic order.
 - [x] **H-14 Validation error positions**: surface the offending index/segment in
   `PatternException`/Tooling diagnostics.
-- [ ] **H-15 MSBuild task and SARIF exporter**: evaluation-time validation and code-scanning output.
+- [x] **H-15 MSBuild task and SARIF exporter**: evaluation-time validation and code-scanning output.
 
 ### Deferred (P3)
 

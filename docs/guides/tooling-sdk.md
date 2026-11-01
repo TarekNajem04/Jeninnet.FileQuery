@@ -79,6 +79,7 @@ source-compatible.
 | `PatternInspector.Validate(string)` | Returns `PatternValidation` with `IsValid`, the structural `Error` message, and `Position`/`Segment` when known. |
 | `PatternInspector.Inspect(string)` | Full inspection using the automatically classified dialect. |
 | `PatternInspector.Inspect(string, PatternKind)` | Full inspection using a forced dialect (`Unknown` is rejected). |
+| `SarifExporter.ToJson(IEnumerable<PatternDiagnostic>)` | SARIF 2.1.0 projection for code scanning. |
 
 `PatternInspection` contains:
 

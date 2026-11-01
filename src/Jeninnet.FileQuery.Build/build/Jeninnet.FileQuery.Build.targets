@@ -1,0 +1,22 @@
+<Project>
+
+    <PropertyGroup>
+        <FileQuerySarifOutput Condition="'$(FileQuerySarifOutput)' == ''"></FileQuerySarifOutput>
+    </PropertyGroup>
+
+    <ItemGroup Condition="'$(FileQueryPatterns)' != ''">
+        <FileQueryPattern Include="$(FileQueryPatterns)" />
+    </ItemGroup>
+
+    <UsingTask TaskName="Jeninnet.FileQuery.Build.Tasks.ValidateFileQueryPatternsTask"
+               AssemblyFile="$(MSBuildThisFileDirectory)../tasks/net10.0/Jeninnet.FileQuery.Build.dll" />
+
+    <Target Name="ValidateFileQueryPatterns"
+            BeforeTargets="CoreCompile"
+            Condition="'@(FileQueryPattern)' != ''">
+        <ValidateFileQueryPatternsTask Patterns="@(FileQueryPattern)"
+                                        SarifOutput="$(FileQuerySarifOutput)"
+                                        ProjectDirectory="$(MSBuildProjectDirectory)" />
+    </Target>
+
+</Project>
