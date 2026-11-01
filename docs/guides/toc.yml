@@ -6,6 +6,8 @@
   href: ide-extension.md
 - name: Build Tooling SDK
   href: tooling-sdk.md
+- name: Ecosystem Integrations
+  href: integrations.md
 - name: CLI Usage
   href: cli-usage.md
 - name: Dependency Injection
