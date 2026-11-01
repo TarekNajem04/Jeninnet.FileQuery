@@ -139,6 +139,7 @@ jobs:
             tests/Jeninnet.AdvancedUsage.Tests/Jeninnet.AdvancedUsage.Tests.csproj \
             tests/Jeninnet.FileQuery.Tool.Tests/Jeninnet.FileQuery.Tool.Tests.csproj \
             tests/Jeninnet.FileQuery.Tooling.Tests/Jeninnet.FileQuery.Tooling.Tests.csproj \
+            tests/Jeninnet.FileQuery.Analyzers.Tests/Jeninnet.FileQuery.Analyzers.Tests.csproj \
             tests/Jeninnet.Testing.Assertions.Tests/Jeninnet.Testing.Assertions.Tests.csproj; do
             dotnet test "$project" \
               -c Release \
@@ -259,6 +260,118 @@ jobs:
           set -euo pipefail
           test "$COUNT" -gt 0
           grep -qx 'src/Jeninnet.FileQuery/FileQueryBuilder.cs' <<< "$FILES"
+
+  aot-smoke:
+
+    name: Native AOT Smoke (linux-x64)
+
+    runs-on: ubuntu-latest
+
+    timeout-minutes: 30
+
+    needs:
+      - build-and-test
+
+    steps:
+
+      - name: Checkout
+        uses: actions/checkout@v7.0.1
+
+      - name: Setup .NET SDK (global.json)
+        uses: actions/setup-dotnet@v6.0.0
+        with:
+          global-json-file: global.json
+
+      - name: Install Native AOT prerequisites
+        run: sudo apt-get update && sudo apt-get install -y clang zlib1g-dev
+
+      - name: Restore
+        run: dotnet restore src/Jeninnet.FileQuery.AotSmoke/Jeninnet.FileQuery.AotSmoke.csproj -r linux-x64
+
+      - name: Publish Native AOT smoke host
+        run: >
+          dotnet publish src/Jeninnet.FileQuery.AotSmoke/Jeninnet.FileQuery.AotSmoke.csproj
+          --configuration Release
+          --runtime linux-x64
+          --self-contained true
+          -p:PublishAot=true
+          -p:TrimmerSingleWarn=false
+          -p:IlcTreatWarningsAsErrors=true
+          --output artifacts/aot
+
+      - name: Run the AOT-compiled binary
+        run: ./artifacts/aot/Jeninnet.FileQuery.AotSmoke
+
+  analyzer-package:
+
+    name: Analyzer Package
+
+    runs-on: ubuntu-latest
+
+    timeout-minutes: 25
+
+    needs:
+      - build-and-test
+
+    steps:
+
+      - name: Checkout
+        uses: actions/checkout@v7.0.1
+
+      - name: Setup .NET SDK (global.json)
+        uses: actions/setup-dotnet@v6.0.0
+        with:
+          global-json-file: global.json
+
+      - name: Pack the library and analyzer
+        run: |
+          set -euo pipefail
+          dotnet pack src/Jeninnet.FileQuery/Jeninnet.FileQuery.csproj -c Release -o artifacts/packages
+          dotnet pack src/Jeninnet.FileQuery.Analyzers/Jeninnet.FileQuery.Analyzers.csproj -c Release -o artifacts/packages
+
+      - name: Verify the analyzer package contents
+        run: |
+          set -euo pipefail
+          package=$(find artifacts/packages -maxdepth 1 -name 'Jeninnet.FileQuery.Analyzers.*.nupkg' | head -n 1)
+          test -n "$package"
+          unzip -l "$package" | grep -q 'analyzers/dotnet/cs/Jeninnet.FileQuery.Analyzers.dll'
+          unzip -l "$package" | grep -q 'analyzers/dotnet/cs/Jeninnet.FileQuery.Analyzers.CodeFix.dll'
+
+      - name: Build a consumer with the analyzer installed
+        shell: bash
+        run: |
+          set -euo pipefail
+          version=$(sed -n 's:.*<Version>\(.*\)</Version>.*:\1:p' src/Jeninnet.FileQuery.Analyzers/Jeninnet.FileQuery.Analyzers.csproj | head -n 1)
+          mkdir -p artifacts/analyzer-consumer
+          cd artifacts/analyzer-consumer
+          dotnet new classlib --framework net10.0 --no-restore
+          dotnet add package Jeninnet.FileQuery --version "$version" --source ../../artifacts/packages
+          dotnet add package Jeninnet.FileQuery.Analyzers --version "$version" --source ../../artifacts/packages
+          rm Class1.cs
+
+          cat > Class1.cs <<'EOF'
+          using Jeninnet.FileQuery;
+
+          public static class Consumer
+          {
+              public static FileQuery Valid() => FileQuery.From(".").UsingGitIgnore().Where("**;!*.cs").Build();
+          }
+          EOF
+          dotnet build -warnaserror
+
+          cat > Class1.cs <<'EOF'
+          using Jeninnet.FileQuery;
+
+          public static class Consumer
+          {
+              public static FileQuery Invalid() => FileQuery.From(".").UsingGitIgnore().Where("src/[a-z.cs").Build();
+          }
+          EOF
+          if dotnet build -warnaserror > malformed.log 2>&1; then
+            echo "Expected the malformed pattern build to fail."
+            exit 1
+          fi
+          grep -q 'JNQ1001' malformed.log
 
   soak:
 

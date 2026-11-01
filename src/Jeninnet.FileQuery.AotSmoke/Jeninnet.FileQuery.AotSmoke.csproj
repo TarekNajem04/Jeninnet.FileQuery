@@ -1,0 +1,25 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <OutputType>Exe</OutputType>
+        <Version>1.5.0</Version>
+
+        <!-- Native AOT validation: publish this host with -r linux-x64 in CI. -->
+        <PublishAot>true</PublishAot>
+        <PublishTrimmed>true</PublishTrimmed>
+        <TrimMode>full</TrimMode>
+        <InvariantGlobalization>true</InvariantGlobalization>
+        <IsAotCompatible>true</IsAotCompatible>
+        <TrimmerSingleWarn>false</TrimmerSingleWarn>
+        <IlcTreatWarningsAsErrors>true</IlcTreatWarningsAsErrors>
+
+        <Description>
+            Native AOT smoke host: publishes with PublishAot and verifies that a real query returns the expected files.
+        </Description>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\Jeninnet.FileQuery\Jeninnet.FileQuery.csproj" />
+    </ItemGroup>
+
+</Project>
