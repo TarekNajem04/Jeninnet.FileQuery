@@ -8,12 +8,28 @@
 
 ![NuGet Version](https://img.shields.io/nuget/v/Jeninnet.FileQuery)
 [![NuGet downloads](https://img.shields.io/nuget/dt/Jeninnet.FileQuery)](https://www.nuget.org/packages/Jeninnet.FileQuery.CommandLine/)
+[![Documentation](https://img.shields.io/badge/docs-online-1f6feb)](https://tareknajem04.github.io/Jeninnet.FileQuery/)
 
 ![architecture: invariants ok](badges/architecture.svg) ![target framework: net10.0](badges/frameworks.svg) ![documented packages: 5](badges/packages.svg)
 
 **A high-performance, deterministic file discovery and filtering engine for .NET.**
 
 Jeninnet.FileQuery combines three pattern dialects — **GitIgnore**, **Glob**, and **Regular Expressions** — into a single, deterministic query pipeline. Patterns are tokenized, validated against structural invariants, and compiled into immutable instruction sets before any filesystem work begins. The compiled matchers then evaluate every entry through one unified pipeline where GitIgnore, Glob, and Regex rules coexist with well-defined precedence. The result is predictable, scalable file discovery across Windows, Linux, and macOS — decoupled from `System.IO` through the [`IFileSystem`](./src/Jeninnet.FileQuery/IO/IFileSystem.cs) abstraction.
+
+---
+
+## 📚 Documentation
+
+**Full documentation:** [tareknajem04.github.io/Jeninnet.FileQuery](https://tareknajem04.github.io/Jeninnet.FileQuery/)
+
+| Start with | Link |
+|---|---|
+| Install and run your first query | [Installation](https://tareknajem04.github.io/Jeninnet.FileQuery/getting-started/installation.html) · [Quick start](https://tareknajem04.github.io/Jeninnet.FileQuery/getting-started/quick-start.html) |
+| Learn the pattern language | [Basic patterns](https://tareknajem04.github.io/Jeninnet.FileQuery/getting-started/basic-patterns.html) · [Pattern reference](https://tareknajem04.github.io/Jeninnet.FileQuery/reference/pattern-overview.html) |
+| Copy a ready-made query | [Common recipes](https://tareknajem04.github.io/Jeninnet.FileQuery/getting-started/common-recipes.html) |
+| Query metadata, directories, or `.gitignore` | [Metadata](https://tareknajem04.github.io/Jeninnet.FileQuery/guides/entry-metadata-and-filters.html) · [Directories](https://tareknajem04.github.io/Jeninnet.FileQuery/guides/directory-results.html) · [Git ignore](https://tareknajem04.github.io/Jeninnet.FileQuery/guides/gitignore-files.html) |
+| Use the CLI or ASP.NET Core | [Global tool](https://tareknajem04.github.io/Jeninnet.FileQuery/guides/global-tool.html) · [IFileProvider](https://tareknajem04.github.io/Jeninnet.FileQuery/guides/file-provider-adapter.html) |
+| Understand an error | [Error handling](https://tareknajem04.github.io/Jeninnet.FileQuery/guides/error-handling-and-validation.html) |
 
 ---
 
@@ -83,8 +99,8 @@ See the [Global Tool guide](./docs/guides/global-tool.md) for the full option se
 
 ### Traversal
 
-*   **Depth-first or breadth-first.** Choose between stack-based (`DepthFirst`) or queue-based (`BreadthFirst`) traversal strategies through `TraversalOptions`.
-*   **Symlink policies.** Control symbolic link behavior with `Ignore`, `Follow`, or `FollowWithCycleDetection`.
+*   **Depth-first or breadth-first.** Choose between stack-based (`DepthFirst`) or queue-based (`BreadthFirst`) traversal strategies through `WithTraversal(...)`, and cap depth with `WithMaxDepth(...)`.
+*   **Symlink policies.** Control symbolic link behavior with `Ignore`, `Follow`, or `FollowWithCycleDetection` through `TraversalOptions`.
 *   **Decoupled filesystem.** The [`IFileSystem`](./src/Jeninnet.FileQuery/IO/IFileSystem.cs) interface decouples all IO, enabling virtual or mock filesystems for cloud workloads and test isolation.
 *   **Configurable error recovery.** Handle IO errors with `Skip`, `Retry(n)`, or `Abort` strategies through `FileQueryErrorRecoveryOptions`.
 *   **Inaccessible-entry policy.** `IgnoreInaccessible(false)` surfaces recoverable access failures instead of silently skipping them; the default stays skip-and-continue.
@@ -175,7 +191,7 @@ This repository contains the core library and its companion packages:
 *   **[Documentation Suite (docs/)](./docs/README.md)**: Deep technical specifications, guides, and architectural whitepapers.
 *   **[Benchmark Suite](./src/Jeninnet.FileQuery.Benchmarks/README.md)**: Performance measurements and allocation verification.
 *   **[Samples](./samples/README.md)**: Thirteen runnable examples from hello-world to DI + evaluation.
-*   **[Test Suite](./tests/README.md)**: 1,128 tests across seven projects, with per-project guides.
+*   **[Test Suite](./tests/README.md)**: 1,130 tests across seven projects, with per-project guides.
 
 ---
 

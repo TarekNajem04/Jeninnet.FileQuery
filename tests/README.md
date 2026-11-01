@@ -5,7 +5,7 @@ point at one dependency boundary instead of a monolith.
 
 | Project | Tests | Focus |
 |---|---|---|
-| [Jeninnet.FileQuery.Tests](./Jeninnet.FileQuery.Tests/README.md) | 1,026 | Core engine, patterns, traversal, metadata, GitIgnore, telemetry, architecture |
+| [Jeninnet.FileQuery.Tests](./Jeninnet.FileQuery.Tests/README.md) | 1,028 | Core engine, patterns, traversal, metadata, GitIgnore, telemetry, architecture |
 | [Jeninnet.FileQuery.Tool.Tests](./Jeninnet.FileQuery.Tool.Tests/README.md) | 52 | `dotnet-filequery` CLI and Git-aware queries |
 | [Jeninnet.FileQuery.Tooling.Tests](./Jeninnet.FileQuery.Tooling.Tests/README.md) | 20 | Pattern inspection SDK |
 | [Jeninnet.AdvancedUsage.Tests](./Jeninnet.AdvancedUsage.Tests/README.md) | 11 | Dataset generator and evaluation options |
@@ -13,7 +13,7 @@ point at one dependency boundary instead of a monolith.
 | [Jeninnet.FileQuery.FileProviders.Tests](./Jeninnet.FileQuery.FileProviders.Tests/README.md) | 7 | `IFileProvider` adapter |
 | [Jeninnet.FileQuery.Build.Tests](./Jeninnet.FileQuery.Build.Tests/README.md) | 5 | MSBuild task and SARIF |
 
-**Total: 1,128 tests.**
+**Total: 1,130 tests.**
 
 ## Run everything
 

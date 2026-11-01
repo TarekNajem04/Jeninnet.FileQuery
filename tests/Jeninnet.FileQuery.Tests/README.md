@@ -2,7 +2,7 @@
 
 The test suite for the **Jeninnet.FileQuery** library. This project contains unit, integration, architectural, and regression tests that verify the correctness and consistency of the production codebase.
 
-**1,026 tests** cover classification, compilation, matching, traversal, metadata, directory results, multiple roots, GitIgnore ingestion, cancellation, progress, diagnostics, and contract invariants.
+**1,028 tests** cover classification, compilation, matching, traversal, metadata, directory results, multiple roots, GitIgnore ingestion, cancellation, progress, diagnostics, and contract invariants.
 
 This README is written for contributors who want to understand the test structure, add new test scenarios, or maintain consistency across the project.
 

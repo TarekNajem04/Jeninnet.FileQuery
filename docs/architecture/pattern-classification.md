@@ -31,7 +31,7 @@ The `PatternAnalyzer` performs a single-pass scan of the pattern to detect these
 
 ## Malformed Patterns
 
-Before classification, `PatternValidator.IsMalformed` is called. Patterns that fail validation are classified as `PatternKind.Unknown`. The compilation pipeline has no compiler registered for `Unknown`, so a `PatternException` is raised immediately.
+Before classification, `PatternValidator` is called. Patterns that fail validation are classified as `PatternKind.Unknown`; the compilation pipeline then surfaces a `PatternException` containing the validator's concrete reason plus `Position` and `Segment` when known. The classifier never throws for malformed input.
 
 Conditions that produce `Unknown`:
 - Trailing unescaped backslash (`\`)

@@ -4,3 +4,5 @@
   href: installation.md
 - name: Basic Patterns
   href: basic-patterns.md
+- name: Common Recipes
+  href: common-recipes.md

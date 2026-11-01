@@ -1,0 +1,10 @@
+- name: Contributing Guide
+  href: contributing-guide.md
+- name: Project Structure
+  href: project-structure.md
+- name: Testing
+  href: testing.md
+- name: Testing and Release Plan
+  href: testing-and-release-plan.md
+- name: Release Checklist
+  href: release-checklist.md

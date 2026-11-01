@@ -1,18 +1,43 @@
 # Quick Start
 
-This page shows the most common usage patterns. Five minutes is enough to get from installation to a working query.
+Five minutes from installation to a working query. Every example uses the current v2.0.0 API.
+
+Most snippets assume:
+
+```csharp
+using Jeninnet.FileQuery;
+using Jeninnet.FileQuery.Enums;
+```
+
+Add `using Jeninnet.FileQuery.Traversal;` for `TraversalOptions`, and
+`using Microsoft.Extensions.FileProviders;` for the provider example.
 
 ---
 
-## 1 — Enumerate All Files
+## 1 — Install and run your first query
 
-The simplest query: enumerate every file under a root directory.
+```bash
+dotnet add package Jeninnet.FileQuery
+```
 
 ```csharp
 using Jeninnet.FileQuery;
 
+var files = FileQuery.From(@"C:\repo").Execute();
+
+foreach (var file in files)
+{
+    Console.WriteLine(file);
+}
+```
+
+`FileQuery.From(...).Execute()` is the shortest path: it builds and executes with the default
+engine. Use `Build()` + `FileQueryRuntime.Create()` when you want to reuse an engine or compose it
+through dependency injection:
+
+```csharp
+var query = FileQuery.From(@"C:\repo").Build();
 var engine = FileQueryRuntime.Create();
-var query  = FileQuery.From(@"C:\repo").Build();
 
 foreach (var file in engine.Execute(query))
 {
@@ -20,129 +45,201 @@ foreach (var file in engine.Execute(query))
 }
 ```
 
-`Build()` validates the root directory immediately. If `C:\repo` does not exist,
-it throws `DirectoryNotFoundException` before execution starts. Create or verify
-the root path before building reusable queries.
+`Build()` validates the root immediately and throws `DirectoryNotFoundException` when it does not
+exist.
 
 ---
 
-## 2 — Include Only Matching Files
+## 2 — Include only matching files
 
-Use the fluent API to specify patterns. The `Where(...)` method accepts any combination of GitIgnore, Glob, and Regex patterns.
+Patterns are ordered GitIgnore-style rules: `**` excludes everything, `!` re-includes.
 
 ```csharp
 var query = FileQuery.From(@"C:\repo")
-                     .Where(
-                         "**",           // exclude everything by default
-                         "!src/**/*.cs"  // include only .cs files under src/
-                     )
-                     .Build();
+    .Where("**", "!**/*.cs")
+    .Build();
+```
 
-var results = engine.Execute(query).ToList();
+For Glob-only or Regex-only queries, select the dialect explicitly:
+
+```csharp
+var glob = FileQuery.From(root)
+    .UsingGlob()
+    .Where(PatternKind.Glob, ["**/*.cs"])
+    .Execute();
+
+var regex = FileQuery.From(root)
+    .UsingRegex()
+    .Where("r:^src/.*\\.cs$")
+    .Execute();
+```
+
+Hybrid mode (the default) classifies each pattern automatically:
+
+```csharp
+var mixed = FileQuery.From(root)
+    .UsingHybrid()
+    .Where(
+        "**",                       // exclude everything
+        "!src/**/*.cs",             // re-include source files
+        "r:.*\\.(png|jpg)$")        // re-include images by regex
+    .Execute();
 ```
 
 ---
 
-## 3 — Exclude Directories
+## 3 — Exclude directories
 
-Directory-only patterns end with `/`. They prevent the traversal engine from descending into matched directories.
+A trailing `/` marks a directory-only rule. It prunes the subtree during traversal.
 
 ```csharp
-var query = FileQuery.From(@"C:\repo")
-                     .Where(
-                         "bin/",         // skip bin/ directories entirely
-                         "obj/",         // skip obj/ directories entirely
-                         "!**/*.cs"      // include all .cs files elsewhere
-                     )
-                     .Build();
+var query = FileQuery.From(root)
+    .Where("bin/", "obj/", "!**/*.cs")
+    .Build();
 ```
 
 ---
 
-## 4 — Case-Insensitive Matching
+## 4 — Read metadata and filter in the same pass
+
+`ExecuteEntries()` returns `FileQueryEntry` values populated from the enumeration, so no extra
+`FileInfo` calls are made.
 
 ```csharp
-var query = FileQuery.From(@"C:\repo")
-                     .Where("**", "!**/*.TXT")
-                     .IgnoreCase()
-                     .Build();
-```
+var entries = FileQuery.From(root)
+    .UsingGlob()
+    .Where(PatternKind.Glob, ["**/*.log"])
+    .MinSize(1_024)
+    .ModifiedAfter(DateTimeOffset.UtcNow.AddDays(-7))
+    .ExecuteEntries();
 
-`IgnoreCase()` makes the pattern `!**/*.TXT` match `file.txt`, `File.TXT`, and `FILE.Txt` equally.
-
----
-
-## 5 — Limit Recursion Depth
-
-```csharp
-var options = new FileQueryOptions {
-    PatternInput      = new(patterns: ["**", "!*.cs"]),
-    MaxRecursionDepth = 2   // root + two levels deep
-};
-
-var results = engine.Execute(new(rootPath, options)).ToList();
-```
-
-`MaxRecursionDepth = 0` returns only files in the root directory.
-`MaxRecursionDepth = -1` (the default) allows unlimited depth.
-
----
-
-## 6 — Async Enumeration
-
-All queries support `IAsyncEnumerable<string>` for use in async pipelines:
-
-```csharp
-await foreach (var file in engine.ExecuteAsync(query, cancellationToken))
+foreach (var entry in entries)
 {
-    await ProcessAsync(file);
+    Console.WriteLine($"{entry.RelativePath}  {entry.Length} bytes");
 }
 ```
 
+Available filters: `MinSize`, `MaxSize`, `ModifiedAfter`, `ModifiedBefore`, `AttributesToSkip`.
+
 ---
 
-## 7 — Mix Pattern Languages
-
-Combine GitIgnore, Glob, and Regex patterns in one rule set:
+## 5 — Include directories in the results
 
 ```csharp
-var query = FileQuery.From(@"C:\repo")
-                     .UsingHybrid()
-                     .Where(
-                         "**",                    // exclude everything
-                         "!src/**/*.cs",          // include source files (GitIgnore)
-                         "r:^src/.*Engine.*\\.cs$" // include Engine classes (Regex)
-                     )
-                     .Build();
+var results = FileQuery.From(root)
+    .IncludeDirectories()
+    .ExecuteEntries();
+
+foreach (var entry in results.Where(e => e.IsDirectory))
+{
+    Console.WriteLine(entry.RelativePath);
+}
 ```
+
+Directories come from the same walk; directory-only rules and negation still apply.
 
 ---
 
-## 8 — Using the Options Record Directly
-
-For advanced configuration, construct `FileQueryOptions` directly:
+## 6 — Respect `.gitignore`
 
 ```csharp
-var options = new FileQueryOptions {
-    PatternInput = new(
-        patterns: ["**", "!**/*.cs", "!**/*.md"]
-    ),
-    RecurseSubdirectories = true,
-    IgnoreInaccessible    = true,
-    CaseSensitivity       = CaseSensitivity.Insensitive,
-    Traversal = new TraversalOptions(
-        Strategy:      TraversalStrategy.BreadthFirst,
-        SymlinkPolicy: SymlinkPolicy.Ignore
-    )
-};
-
-var results = engine.Execute(new(rootPath, options)).Order().ToList();
+var query = FileQuery.From(repositoryRoot)
+    .UseGitIgnoreFiles()
+    .Build();
 ```
+
+This loads the root and nested `.gitignore` files, `.git/info/exclude`, and an optional global
+excludes file with Git-compatible scoping and negation. No Git executable is required.
 
 ---
 
-## Next Steps
+## 7 — Async streaming, cancellation, and progress
 
-- [Basic Patterns](basic-patterns.md) — a detailed walkthrough of the pattern language
-- [Pattern Language Reference](../specification/pattern-language.md) — complete syntax specification
-- [Architecture Overview](../architecture/engine-architecture.md) — how the engine works internally
+```csharp
+using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(30));
+
+var progress = new Progress<FileQueryProgress>(p =>
+    Console.WriteLine($"{p.EntriesScanned} scanned, {p.FilesMatched} matched"));
+
+await foreach (var file in FileQuery.From(root)
+    .UsingGlob()
+    .Where(PatternKind.Glob, ["**/*.cs"])
+    .ExecuteAsync(progress, cts.Token))
+{
+    await ProcessAsync(file, cts.Token);
+}
+```
+
+Synchronous `Execute`/`ExecuteEntries` accept the same `IProgress<FileQueryProgress>` and
+`CancellationToken` arguments.
+
+---
+
+## 8 — Query several roots
+
+```csharp
+var batch = FileQueryBatch.From(
+    FileQuery.From(firstRoot).UsingGlob().Where(PatternKind.Glob, ["**/*.cs"]),
+    FileQuery.From(secondRoot).UsingGlob().Where(PatternKind.Glob, ["**/*.cs"]));
+
+foreach (var entry in batch.ExecuteEntries())
+{
+    Console.WriteLine($"{entry.RootPath}: {entry.RelativePath}");
+}
+```
+
+Each entry exposes `RootPath`, so identical relative paths remain unambiguous.
+
+---
+
+## 9 — Match a single path without traversal
+
+```csharp
+var patternSet = FileQueryPatternSet.Compile(
+    new PatternInput(
+        TypedPatterns: new Dictionary<PatternKind, IEnumerable<string>>
+        {
+            [PatternKind.GitIgnore] = ["**", "!**/*.cs", "!bin/"]
+        },
+        InterpretationMode: PatternInterpretationMode.Specific),
+    PatternMatchingMode.GitIgnore);
+
+bool isSource = patternSet.IsMatch("src/Program.cs");
+var explanation = patternSet.Explain("src/Program.cs");
+
+Console.WriteLine($"{isSource}: {explanation.Reason}");
+```
+
+`IsMatch(ReadOnlySpan<char>)` is allocation-free and intended for linters, IDE actions, and path
+classifiers.
+
+---
+
+## 10 — Query an ASP.NET Core `IFileProvider`
+
+```bash
+dotnet add package Jeninnet.FileQuery.FileProviders
+```
+
+```csharp
+using var provider = new PhysicalFileProvider(webRoot);
+
+var assets = FileProviderQuery.From(provider)
+    .UsingGlob()
+    .Where(PatternKind.Glob, ["**/*.css"])
+    .Execute();
+```
+
+The adapter supports physical, embedded, and in-memory providers without copying files to disk.
+
+---
+
+## Next steps
+
+- [Basic patterns](basic-patterns.md) — the pattern language in detail.
+- [Common recipes](common-recipes.md) — copy-paste queries for frequent tasks.
+- [Entry metadata and filters](../guides/entry-metadata-and-filters.md)
+- [Git ignore files](../guides/gitignore-files.md)
+- [Error handling and validation](../guides/error-handling-and-validation.md)
+- [Pattern reference](../reference/pattern-overview.md)
+- [Engine architecture](../architecture/engine-architecture.md)

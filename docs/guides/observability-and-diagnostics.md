@@ -28,24 +28,31 @@ foreach (var file in engine.Execute(query, progress, cancellationToken))
 
 ## 2. Match Diagnostics (Audit Mode)
 
-To understand *why* a file was included or excluded, enable Audit mode in `FileQueryOptions`.
+To understand *why* a file was included or excluded, attach a diagnostics sink with
+`WithDiagnostics`. The engine invokes it for every evaluated entry while traversal runs.
 
 ```csharp
-var options = new FileQueryOptions(
-    patternInput: myPatterns,
-    auditMatches: true // Enable diagnostics
-);
-
-var engine = FileQueryRuntime.Create();
-await foreach (var result in engine.ExecuteAsync(new(root, options)))
+var diagnostics = new Progress<FileQueryDiagnostic>(d =>
 {
-    // Access diagnostics for this match
-    foreach (var diagnostic in result.Diagnostics)
-    {
-        Console.WriteLine($"{result.Path}: {diagnostic.Message} (Pattern: {diagnostic.Pattern})");
-    }
+    Console.WriteLine($"{d.RelativePath}: {d.Outcome} — {d.Reason}");
+    Console.WriteLine($"  pattern: {d.Pattern ?? "(none)"} ({d.PatternKind?.ToString() ?? "n/a"})");
+});
+
+var query = FileQuery.From(root)
+    .UsingHybrid()
+    .Where("**", "!**/*.cs")
+    .WithDiagnostics(diagnostics)
+    .Build();
+
+foreach (var file in FileQueryRuntime.Create().Execute(query))
+{
+    Console.WriteLine(file);
 }
 ```
+
+`FileQueryDiagnostic` also exposes `Path`, `EntryKind`, `PatternIndex`, and optional metadata
+(`Length`, timestamps, attributes, `IsDirectory`). Audit mode adds per-entry overhead; enable it for
+diagnosis, not for hot production scans.
 
 ## 3. OpenTelemetry Instrumentation
 

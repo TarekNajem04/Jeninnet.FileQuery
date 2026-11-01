@@ -1,78 +1,93 @@
 # Documentation Directory
 
-Welcome to the **Jeninnet.FileQuery** documentation suite. This directory contains comprehensive articles, guides, reference sheets, and architectural specifications.
+Source for the published documentation at
+[tareknajem04.github.io/Jeninnet.FileQuery](https://tareknajem04.github.io/Jeninnet.FileQuery/).
+The site is built with DocFX from this directory.
 
----
+## Start here
 
-## Getting Started
+- [Documentation home](./index.md)
+- [Installation](./getting-started/installation.md)
+- [Quick start](./getting-started/quick-start.md)
+- [Basic patterns](./getting-started/basic-patterns.md)
+- [Common recipes](./getting-started/common-recipes.md)
 
-*   **[System Specification](./system-specification.md)**: Master architectural constraints and invariant contracts.
+## Guides
 
-*   **[Installation](./getting-started/installation.md)**: Nuget instructions and package dependencies.
-*   **[Quick Start Guide](./getting-started/quick-start.md)**: First steps with the fluent builder API.
-*   **[Basic Patterns](./getting-started/basic-patterns.md)**: Core matching rules.
+- [Git ignore files](./guides/gitignore-files.md)
+- [Entry metadata and filters](./guides/entry-metadata-and-filters.md)
+- [Directory results](./guides/directory-results.md)
+- [Multiple roots](./guides/multiple-roots.md)
+- [In-memory matching](./guides/in-memory-matching.md)
+- [File provider adapter](./guides/file-provider-adapter.md)
+- [Brace expansion](./guides/brace-expansion.md)
+- [Diff-aware queries](./guides/diff-aware-queries.md)
+- [Dependency injection](./guides/dependency-injection.md)
+- [Observability and diagnostics](./guides/observability-and-diagnostics.md)
+- [Error handling and validation](./guides/error-handling-and-validation.md)
+- [Global tool](./guides/global-tool.md)
+- [CLI usage](./guides/cli-usage.md)
+- [JSON output](./guides/json-output.md)
+- [Roslyn analyzer](./guides/roslyn-analyzers.md)
+- [MSBuild validation and SARIF](./guides/msbuild-validation.md)
+- [Tooling SDK](./guides/tooling-sdk.md)
+- [Native AOT](./guides/native-aot.md)
+- [Ecosystem integrations](./guides/integrations.md)
+- [VS Code extension](./guides/ide-extension.md)
 
----
+## Reference
 
-## Reference & Pattern Dialects
+- [Pattern overview](./reference/pattern-overview.md)
+- [GitIgnore patterns](./reference/gitignore-patterns.md)
+- [Glob patterns](./reference/glob-patterns.md)
+- [Regex patterns](./reference/regex-patterns.md)
+- [Pattern precedence](./reference/pattern-precedence.md)
+- [Pattern semantics](./reference/pattern-semantics.md)
+- [Pattern language specification](./specification/pattern-language.md)
 
-*   **[Pattern Overview](./reference/pattern-overview.md)**: Dialect classification.
-*   **[GitIgnore Patterns](./reference/gitignore-patterns.md)**: Rule sets and final inclusion logic.
-*   **[Glob Patterns](./reference/glob-patterns.md)**: Shell globs and bracket expression matching.
-*   **[Regex Patterns](./reference/regex-patterns.md)**: Working with explicit regular expressions.
-*   **[Pattern Semantics](./reference/pattern-semantics.md)**: Comprehensive comparison matrix.
-*   **[Pattern Precedence](./reference/pattern-precedence.md)**: Order evaluation rules.
-*   **[Pattern Language Specification](./specification/pattern-language.md)**: Formal dialect rules.
+## Runtime and architecture
 
----
-
-## Architecture & Internals
-
-*   **[Engine Architecture](./architecture/engine-architecture.md)**: Subsystem layering and orchestration.
-*   **[Hybrid Matcher](./architecture/hybrid-matcher.md)**: Pattern composition and routing details.
-*   **[Matching Layer](./architecture/matching-layer.md)**: Matcher contracts and execution modes.
-*   **[Pattern Modes](./architecture/pattern-modes.md)**: Interpretation mode behaviors.
-*   **[Pattern Tokenization](./architecture/pattern-tokenization.md)**: Scanner, readers, and token streams.
-*   **[Pattern Classification](./architecture/pattern-classification.md)**: Automatically sorting input strings.
-*   **[Matcher Invariants](./architecture/matcher-invariants.md)**: Validating tokens without throwing exceptions.
-*   **[Public API and Options](./architecture/public-api-options.md)**: Model configurations and properties.
-*   **[Internal Visibility](./architecture/internal-visibility.md)**: Enforcing compilation encapsulation.
-
----
-
-## Traversal Runtime
-
-*   **[FileQuery Runtime](./runtime/filequery-runtime.md)**: The core execute logic.
-*   **[Traversal Model](./runtime/traversal-model.md)**: Queue/stack structures during filesystem walks.
-*   **[Recursion Depth Options](./runtime/recursion-depth.md)**: Limiting and guarding folders.
-*   **[Case Sensitivity Runtime](./runtime/case-sensitivity.md)**: Casing rules per operating system.
-*   **Observability Runtime**: Async progress reporting uses `FileQueryProgress`; audit mode emits `FileQueryDiagnostic`; IO recovery uses `FileQueryErrorRecoveryOptions`.
-
----
+- [FileQuery runtime](./runtime/filequery-runtime.md)
+- [Traversal model](./runtime/traversal-model.md)
+- [Case sensitivity](./runtime/case-sensitivity.md)
+- [Recursion depth](./runtime/recursion-depth.md)
+- [Engine architecture](./architecture/engine-architecture.md)
+- [Hybrid matcher](./architecture/hybrid-matcher.md)
+- [Matcher invariants](./architecture/matcher-invariants.md)
+- [Public API options](./architecture/public-api-options.md)
 
 ## Performance
 
-*   **[Design for Performance](./performance/design-for-performance.md)**: Core design patterns for high throughput.
-*   **[Allocation Strategy](./performance/allocation-strategy.md)**: Keeping hot paths allocation-free.
-*   **[Matcher Performance](./performance/matcher-performance.md)**: Internal benchmarks and segment matches.
-*   **[Traversal Performance Model](./performance/traversal-model.md)**: High-speed traversal details.
-*   **[Benchmarking Guide](./performance/benchmarking.md)**: Recreating measurements.
-*   **[Release Baselines](./performance/release-benchmark-baseline.md)**: Documented execution speeds.
+- [Design for performance](./performance/design-for-performance.md)
+- [Allocation strategy](./performance/allocation-strategy.md)
+- [Benchmarking](./performance/benchmarking.md)
+- [Cross-platform baseline](./performance/cross-platform-baseline.md)
+- [Long-running stability](./performance/long-running-stability.md)
+- [Runtime evolution](./performance/runtime-evolution.md)
+- [Native enumeration research](./performance/native-enumeration-research.md)
 
----
+## Articles
 
-## Integrations & Extensions
+- [Introducing Jeninnet.FileQuery](./articles/introducing-jeninnet-filequery.md)
+- [Library capability review](./articles/library-capability-review.md)
 
-*   **[CommandLine Integration](./guides/command-line-integration.md)**: Using CLI argument structures.
-*   **[Dependency Injection Guide](./guides/dependency-injection.md)**: Managing registry configurations.
+## Contributing
 
----
+- [Contributing guide](./contributing/contributing-guide.md)
+- [Project structure](./contributing/project-structure.md)
+- [Testing](./contributing/testing.md)
+- [Testing and release plan](./contributing/testing-and-release-plan.md)
+- [Release checklist](./contributing/release-checklist.md)
 
-## Contributing & Plans
+## Building the docs
 
-*   **[Contributing Guide](./contributing/contributing-guide.md)**: Submitting changes.
-*   **[Project Structure Guide](./contributing/project-structure.md)**: Solution layouts.
-*   **[Testing Guidelines](./contributing/testing.md)**: Ensuring zero-allocation matching checks pass.
-*   **[Testing and Release Plan](./contributing/testing-and-release-plan.md)**: Core QA procedures.
-*   **[Release Checklist](./contributing/release-checklist.md)**: Pre-flight verifications.
-*   **[Refactor Tracking](./architecture-refactor-tracking.md)**: Current roadmap changes.
+```bash
+dotnet tool restore
+dotnet docfx docs/docfx.json --warningsAsErrors
+```
+
+The generated site is written to `docs/_site`. The docs workflow also runs:
+
+- `scripts/docs/check-doc-links.ps1`
+- `scripts/docs/check-readme-claims.ps1`
+- `scripts/docs/check-api-reference.ps1`

@@ -16,6 +16,8 @@
   href: dependency-injection.md
 - name: Observability and Diagnostics
   href: observability-and-diagnostics.md
+- name: Error Handling and Validation
+  href: error-handling-and-validation.md
 - name: Entry Metadata and Filters
   href: entry-metadata-and-filters.md
 - name: Directory Results

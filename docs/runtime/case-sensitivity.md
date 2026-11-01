@@ -1,6 +1,7 @@
 # Case Sensitivity
 
-Pattern matching in Jeninnet.FileQuery supports three case sensitivity modes, controlled by `FileQueryOptions.CaseSensitivity`.
+Pattern matching supports three case-sensitivity modes, controlled by the fluent `IgnoreCase`
+method or by `CaseSensitivity` in the options configuration.
 
 ---
 
@@ -19,89 +20,75 @@ public enum CaseSensitivity
 
 ## PlatformDefault (the default)
 
-When `CaseSensitivity.PlatformDefault` is used, the engine detects the operating system at runtime and applies the conventional behaviour:
+When `PlatformDefault` is used, the engine resolves the conventional filesystem behavior:
 
 | OS | Resolved mode |
-|----|--------------|
+|---|---|
 | Linux | `Sensitive` |
 | Windows | `Insensitive` |
 | macOS | `Insensitive` |
 
-This matches the default behaviour of the underlying filesystem on each platform. A pattern written on Windows will behave consistently when the same code runs on Linux — as long as the explicit `Sensitive` or `Insensitive` mode is set.
-
-> **Cross-platform recommendation:** For applications that must behave identically on all platforms, set `CaseSensitivity.Sensitive` explicitly. Do not rely on `PlatformDefault` if portability matters.
-
----
-
-## Setting Case Sensitivity
-
-### Via the fluent API
-
-```csharp
-var query = FileQuery.From(root)
-                     .Where("**", "!*.TXT")
-                     .IgnoreCase()           // sets Insensitive
-                     .Build();
-```
-
-```csharp
-var query = FileQuery.From(root)
-                     .Where("**", "!*.TXT")
-                     .IgnoreCase(false)      // sets Sensitive
-                     .Build();
-```
-
-### Via FileQueryOptions
-
-```csharp
-var options = new FileQueryOptions {
-    PatternInput    = new(patterns: ["**", "!*.txt"]),
-    CaseSensitivity = CaseSensitivity.Insensitive
-};
-```
+> **Cross-platform recommendation:** set `IgnoreCase(false)` when the same behavior is required on
+> every platform. Do not rely on `PlatformDefault` for portable output.
 
 ---
 
-## Effect on Each Matcher
+## Setting case sensitivity
 
-**GitIgnoreMatcher and GlobMatcher**
+```csharp
+var insensitive = FileQuery.From(root)
+    .Where("**", "!**/*.TXT")
+    .IgnoreCase()          // Insensitive
+    .Build();
 
-Case sensitivity is passed as a `StringComparison` value to all segment comparisons. `CaseSensitivity.Insensitive` maps to `StringComparison.OrdinalIgnoreCase`; `Sensitive` maps to `StringComparison.Ordinal`.
+var sensitive = FileQuery.From(root)
+    .Where("**", "!**/*.TXT")
+    .IgnoreCase(false)     // Sensitive
+    .Build();
+```
 
-**RegexInstructionMatcher**
-
-When `Insensitive` is set, `RegexOptions.IgnoreCase` is added to the compiled `Regex`. The cache key includes the `CaseSensitivity` value, so a sensitive and an insensitive call to the same pattern each receive their own compiled `Regex` instance.
+`IgnoreCase()` makes `!**/*.TXT` match `file.txt`, `File.TXT`, and `FILE.Txt` equally.
 
 ---
 
-## Examples
+## What is folded
+
+- Literal segments and character-class **literals** (`[a]`).
+- Character-class **ranges** (`[a-z]` matches `A`–`Z`).
+- Negated classes fold before negation (`[!a-z]` excludes both cases).
+
+POSIX categories keep their category semantics: `[:upper:]` remains uppercase-only and
+`[:lower:]` remains lowercase-only even when `IgnoreCase()` is enabled.
 
 ```csharp
-// Insensitive: matches FILE.TXT, file.txt, File.Txt
-var options = new FileQueryOptions {
-    PatternInput    = new(patterns: ["**", "!file.txt"]),
-    CaseSensitivity = CaseSensitivity.Insensitive
-};
-```
-
-```csharp
-// Sensitive: only matches exactly "file.txt"
-var options = new FileQueryOptions {
-    PatternInput    = new(patterns: ["**", "!file.txt"]),
-    CaseSensitivity = CaseSensitivity.Sensitive
-};
-```
-
-```csharp
-// Platform default: Insensitive on Windows/macOS, Sensitive on Linux
-var options = new FileQueryOptions {
-    PatternInput    = new(patterns: ["**", "!file.txt"]),
-    CaseSensitivity = CaseSensitivity.PlatformDefault
-};
+var files = FileQuery.From(root)
+    .UsingGlob()
+    .Where(PatternKind.Glob, ["**/[a-z].txt"])
+    .IgnoreCase()          // also matches A.txt, Z.txt
+    .Execute();
 ```
 
 ---
 
-## Path Normalization and Case
+## Effect on each matcher
 
-Path normalization (`PathUtilities.Normalize`) does not change the case of path characters — it only converts separators. Drive letter prefixes are uppercased on Windows (`c:\` → `C:/`), but directory and file name characters are left as-is. Case folding is the exclusive responsibility of the matcher, controlled by the `CaseSensitivity` setting.
+**GitIgnore and Glob**
+
+Case sensitivity is passed as a `StringComparison` to segment comparisons.
+`Insensitive` maps to `StringComparison.OrdinalIgnoreCase`; `Sensitive` maps to
+`StringComparison.Ordinal`. Character classes fold literals and ranges as described above.
+
+**Regex**
+
+When `Insensitive` is set, `RegexOptions.IgnoreCase` is added to the compiled `Regex`. The cache key
+includes `CaseSensitivity`, so sensitive and insensitive calls to the same expression use separate
+compiled instances.
+
+---
+
+## Related
+
+- [Quick start](../getting-started/quick-start.md)
+- [Glob patterns](../reference/glob-patterns.md)
+- [Regex patterns](../reference/regex-patterns.md)
+- [Pattern precedence](../reference/pattern-precedence.md)
