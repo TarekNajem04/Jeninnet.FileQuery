@@ -42,6 +42,35 @@ public sealed class FileQueryPatternSetTests {
     }
 
     /// <summary>
+    /// Character-class literals and ranges honour the requested case sensitivity.
+    /// </summary>
+    [TestMethod]
+    public void IsMatch_CharacterClass_HonoursCaseSensitivity() {
+        var insensitive = FileQueryPatternSet.Compile(
+            new PatternInput(
+                TypedPatterns: new Dictionary<PatternKind, IEnumerable<string>> {
+                    [PatternKind.Glob] = ["[a-z].txt"]
+                },
+                InterpretationMode: PatternInterpretationMode.Specific),
+            PatternMatchingMode.Glob,
+            CaseSensitivity.Insensitive);
+        var sensitive = FileQueryPatternSet.Compile(
+            new PatternInput(
+                TypedPatterns: new Dictionary<PatternKind, IEnumerable<string>> {
+                    [PatternKind.Glob] = ["[a-z].txt"]
+                },
+                InterpretationMode: PatternInterpretationMode.Specific),
+            PatternMatchingMode.Glob,
+            CaseSensitivity.Sensitive);
+
+        Assert.IsTrue(insensitive.IsMatch("A.txt"));
+        Assert.IsTrue(insensitive.IsMatch("z.txt"));
+        Assert.IsFalse(insensitive.IsMatch("1.txt"));
+        Assert.IsFalse(sensitive.IsMatch("A.txt"));
+        Assert.IsTrue(sensitive.IsMatch("a.txt"));
+    }
+
+    /// <summary>
     /// The span overload is allocation-free on the matching path.
     /// </summary>
     [TestMethod]

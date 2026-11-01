@@ -93,12 +93,34 @@ internal sealed class RegexInstructionMatcher : PathMatcher {
             var regex = GetOrCreateRegex(regexText, context.CaseSensitivity);
 
             // Full-path match: the entire normalized path must satisfy the expression.
-            if(regex.IsMatch(context.Path)) {
+            if(MatchWithTimeout(regex, context.Path, regexText)) {
                 return MatchResult.Success();
             }
         }
 
         return MatchResult.Fail();
+    }
+
+    /// <summary>
+    /// Executes a regex match and converts a match timeout into a domain-level
+    /// <see cref="PatternException"/>.
+    /// </summary>
+    /// <param name="regex">The compiled regular expression.</param>
+    /// <param name="path">The normalized path to match.</param>
+    /// <param name="patternText">The source pattern, used in the error message.</param>
+    /// <returns><see langword="true"/> when the expression matches the path.</returns>
+    /// <exception cref="PatternException">
+    /// Thrown when the expression exceeds its configured match timeout.
+    /// </exception>
+    internal static bool MatchWithTimeout(Regex regex, ReadOnlySpan<char> path, string patternText) {
+        try {
+            return regex.IsMatch(path);
+        }
+        catch(RegexMatchTimeoutException ex) {
+            throw new PatternException(
+                $"Regex pattern '{patternText}' exceeded the configured match timeout.",
+                ex);
+        }
     }
 
     /// <summary>

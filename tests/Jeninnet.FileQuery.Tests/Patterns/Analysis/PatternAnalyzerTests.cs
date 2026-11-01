@@ -30,4 +30,14 @@ public class PatternAnalyzerTests {
         var result = analyzer.Analyze("foo/");
         Assert.IsTrue(result.HasGitIgnoreSyntax);
     }
+
+    /// <summary>An empty pattern produces an empty analysis result.</summary>
+    [TestMethod]
+    public void Analyze_EmptyPattern_ReturnsEmptyResult() {
+        var analyzer = new PatternAnalyzer();
+
+        var result = analyzer.Analyze("");
+
+        Assert.IsTrue(result.IsEmpty);
+    }
 }

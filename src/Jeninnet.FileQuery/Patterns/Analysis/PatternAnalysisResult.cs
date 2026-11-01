@@ -39,7 +39,7 @@ internal readonly record struct PatternAnalysisResult(
     bool HasBraceAlternation = false
 ) {
     public static PatternAnalysisResult Empty() => new(
-        IsEmpty: false,
+        IsEmpty: true,
         IsRegex: false,
         IsNegated: false,
         HasBackslash: false,

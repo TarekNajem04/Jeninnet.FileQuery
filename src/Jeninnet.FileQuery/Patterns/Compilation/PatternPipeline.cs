@@ -55,6 +55,15 @@ internal sealed class PatternPipeline {
     public ICompiledPattern Compile(ClassifiedPattern pattern) {
         ArgumentNullException.ThrowIfNull(pattern);
 
+        if(pattern.Type is PatternKind.Unknown) {
+            var (_, error, position, segment) = PatternValidator.Validate(pattern.Text.AsSpan());
+            var message = error is not null
+                ? $"Invalid pattern '{pattern.Text}': {error}"
+                : $"Pattern '{pattern.Text}' could not be classified.";
+
+            throw new PatternException(message, position, segment);
+        }
+
         var context = new PatternCompilationContext(pattern);
         var syntax = PatternSyntaxProfile.GetProfileForPatternType(pattern.Type);
 

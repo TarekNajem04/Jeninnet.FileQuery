@@ -70,6 +70,18 @@ public sealed class PatternErrorPositionTests {
         Assert.IsNull(exception.Segment);
     }
 
+    /// <summary>
+    /// Malformed untyped patterns report the concrete validation reason and position.
+    /// </summary>
+    [TestMethod]
+    public void PatternException_ReportsReason_ForMalformedUntypedPattern() {
+        var exception = Assert.ThrowsExactly<PatternException>(() => CompileHybrid("src/[abc"));
+
+        StringAssert.Contains(exception.Message, "Missing closing bracket");
+        Assert.AreEqual(4, exception.Position);
+        Assert.AreEqual(1, exception.Segment);
+    }
+
     private static void CompileGlob(string pattern) =>
         _ = FileQueryPatternSet.Compile(
             new PatternInput(
@@ -87,4 +99,7 @@ public sealed class PatternErrorPositionTests {
                 },
                 InterpretationMode: PatternInterpretationMode.Specific),
             PatternMatchingMode.Regex);
+
+    private static void CompileHybrid(string pattern) =>
+        _ = FileQueryPatternSet.Compile([pattern]);
 }

@@ -201,8 +201,7 @@ internal static partial class PatternValidator {
     /// regex matches <c>[[</c> at the start of any POSIX class and incorrectly
     /// classifies the pattern as malformed, causing
     /// <see cref="PatternKind.Unknown"/> to be returned by the classifier
-    /// and a <em>"No compiler registered for pattern type Unknown"</em>
-    /// <see cref="PatternException"/> to be thrown at compile time.
+    /// and a descriptive <see cref="PatternException"/> to be thrown at compile time.
     /// </para>
     /// <para>
     /// <strong>Examples:</strong>

@@ -160,4 +160,19 @@ public class RegexPathMatcherTests {
         // RegexPathMatcher hardcodes IsIncluded = true, ignoring the pattern's negation status.
         Assert.IsTrue(result.IsSuccess(), "because RegexPathMatcher hardcodes IsIncluded=true and ignores the pattern's IsNegated property.");
     }
+
+    /// <summary>
+    /// A regex match timeout is surfaced as a pattern exception with the source pattern.
+    /// </summary>
+    [TestMethod]
+    public void IsMatch_RegexTimeout_ThrowsPatternException() {
+        var regex = new Regex("(a+)+$", RegexOptions.Compiled, TimeSpan.FromMilliseconds(1));
+        var path = new string('a', 64) + "b";
+
+        var exception = Assert.ThrowsExactly<PatternException>(
+            () => RegexInstructionMatcher.MatchWithTimeout(regex, path.AsSpan(), "(a+)+$"));
+
+        StringAssert.Contains(exception.Message, "match timeout");
+        Assert.IsInstanceOfType<RegexMatchTimeoutException>(exception.InnerException);
+    }
 }

@@ -19,7 +19,7 @@ public sealed class PatternValidatorTests {
     /// This was the root cause of the EndToEnd_PosixDigitClass_MatchesCorrectly failure:
     /// DetectNestedBrackets fired on <c>[[</c>, returned malformed=true,
     /// PatternClassifier returned Unknown, and the pipeline threw
-    /// "No compiler registered for pattern type Unknown".
+    /// a descriptive pattern exception.
     /// </summary>
     [TestMethod]
     public void IsMalformed_PosixDigitClass_IsNotMalformed() => AssertNotMalformed("[[:digit:]]");
@@ -119,8 +119,7 @@ public sealed class PatternValidatorTests {
     /// <summary>
     /// PatternClassifier must not return <see cref="PatternKind.Unknown"/>
     /// for a pattern containing a POSIX class.
-    /// Returning Unknown causes "No compiler registered for pattern type Unknown"
-    /// at runtime.
+    /// Returning Unknown causes a pattern exception at runtime.
     /// </summary>
     [TestMethod]
     public void Classifier_PatternWithPosixClass_DoesNotReturnUnknown() {
@@ -130,8 +129,7 @@ public sealed class PatternValidatorTests {
             PatternKind.Unknown,
             kind,
             "A pattern containing a POSIX class must not be classified as Unknown. " +
-            "Unknown causes a PatternException at compile time because no compiler " +
-            "is registered for that kind."
+            "Unknown causes a PatternException at compile time."
         );
     }
 
