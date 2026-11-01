@@ -150,3 +150,4 @@ then the controlled reference is Windows and the three-OS evidence is the checko
 - [Benchmarking](benchmarking.md) — how the suite and workflow are structured.
 - [Release Benchmark Baseline](release-benchmark-baseline.md) — the v1.5 large-scale results.
 - [Traversal Model](traversal-model.md) — the traversal design behind these numbers.
+- [Native Enumeration Research](native-enumeration-research.md) — why platform-specific enumeration was rejected.

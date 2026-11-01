@@ -133,6 +133,8 @@ Long-running stability is validated by a dedicated soak harness that repeats que
 
 Runtime updates are tracked against the benchmark baseline: `scripts/performance/check-runtime.ps1` detects drift, and the [runtime evolution](./docs/performance/runtime-evolution.md) page defines when benchmarks are re-run and how the baseline is refreshed.
 
+Platform-specific enumeration was measured against the managed path and **rejected** for v2.0.0: .NET's BCL already wraps the native APIs, so the addressable gain does not justify three OS-specific implementations. The ceiling benchmark, cost/risk analysis, and revisit criteria are in the [native enumeration research](./docs/performance/native-enumeration-research.md).
+
 ---
 
 ## 📊 Repo Stats

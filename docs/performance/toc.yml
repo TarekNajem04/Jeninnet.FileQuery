@@ -8,6 +8,8 @@
   href: long-running-stability.md
 - name: Runtime Evolution
   href: runtime-evolution.md
+- name: Native Enumeration Research
+  href: native-enumeration-research.md
 - name: Design for Performance
   href: design-for-performance.md
 - name: Matcher Performance

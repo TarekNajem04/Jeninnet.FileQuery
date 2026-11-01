@@ -18,6 +18,11 @@ Versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - **Cross-Platform Baseline**: Added `CrossPlatformTraversalBenchmark`, which measures traversal and matching over a deterministic 10,000-file tree so results are comparable across operating systems. Recorded the Windows reference run (`MediumRun`), the official Windows/Ubuntu/macOS artifacts from the scheduled pipeline, the analysis, and a machine-readable baseline with a 25% regression policy.
 - **Long-Running Stability Harness**: Added `src/Jeninnet.FileQuery.Soak`, which repeats a query over a deterministic dataset, samples the managed heap after full collections, and fails on heap growth (>4 MB) or throughput degradation (>1.5× first-half mean). A 60-second Windows run completed 6,613 iterations with 0.06 MB heap growth and no leak; the `soak` CI job runs a shorter version and uploads the report.
 - **Runtime Evolution Tracking**: Added `scripts/performance/check-runtime.ps1` and `docs/performance/runtime-evolution.json` to detect .NET runtime/SDK drift against the recorded baseline, define the weekly/release re-baseline cadence, and record the current runtime (10.0.14). The benchmarks workflow now prints the drift check and uploads `runtime-info.txt` with every artifact.
+- **Enumeration Ceiling Benchmark**: Added `EnumerationCeilingBenchmark`, which measures raw BCL enumeration against engine traversal and matching on the deterministic 10,000-file tree. On Windows 11 / .NET 10.0.14, BCL enumeration took 7.29 ms, engine traversal 9.70 ms (+33%), and matching added ~0.63 ms — bounding what a native enumerator could recover.
+
+### Changed
+
+- **Native Enumeration Decision**: Rejected platform-specific enumeration for v2.0.0. .NET already wraps `FindFirstFileExW`/`getdents64`/`readdir`; the addressable ceiling is a fraction of the 7.29 ms BCL baseline, while three OS-specific implementations would add unsafe code, semantic drift risk, and a permanent verification matrix. The measurements and revisit criteria are recorded in `docs/performance/native-enumeration-research.md`.
 
 ### Fixed
 
