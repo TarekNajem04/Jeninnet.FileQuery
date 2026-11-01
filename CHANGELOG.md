@@ -5,6 +5,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 Versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Added
+
+- **Global Tool**: Added `Jeninnet.FileQuery.Tool`, the `dotnet-filequery` .NET global tool. It exposes the engine in the terminal with Hybrid, GitIgnore, Glob, and Regex patterns plus `--root`, `--depth`, `--no-recursive`, `--ignore-case`, `--symlinks`, `--relative`, `--null`, and `--count`, and streams deterministic output for pipelines. Includes 28 tests, a package README, and a documentation guide.
+
+### Fixed
+
+- **CommandLine Regex Patterns**: `PatternBuilder.Build` now adds the required `r:` dialect prefix to patterns supplied through the `--regex` option, so regex patterns work without a manual prefix.
+
 ## [1.5.0] - 2026-08-12
 
 ### Added

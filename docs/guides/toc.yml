@@ -1,3 +1,5 @@
+- name: Global Tool
+  href: global-tool.md
 - name: CLI Usage
   href: cli-usage.md
 - name: Dependency Injection

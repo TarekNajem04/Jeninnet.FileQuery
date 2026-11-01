@@ -53,6 +53,19 @@ foreach (var file in files)
 }
 ```
 
+### Global Tool
+
+The same engine is available as a terminal tool:
+
+```bash
+dotnet tool install --global Jeninnet.FileQuery.Tool
+
+dotnet-filequery "**;!*.cs"           # every C# file
+dotnet-filequery --count --root src  # count files under src
+```
+
+See the [Global Tool guide](./docs/guides/global-tool.md) for the full option set and pipeline examples.
+
 ---
 
 ## ✨ Features
@@ -130,6 +143,7 @@ This repository contains the core library and its companion packages:
 *   **[Core Engine (Jeninnet.FileQuery)](./src/Jeninnet.FileQuery/README.md)**: The main matching runtime, builders, and parser pipeline.
 *   **[CommandLine Integration (Jeninnet.FileQuery.CommandLine)](./src/Jeninnet.FileQuery.CommandLine/README.md)**: Bridges command-line arguments (using `System.CommandLine`) to file query patterns.
 *   **[DependencyInjection Integration (Jeninnet.FileQuery.DependencyInjection)](./src/Jeninnet.FileQuery.DependencyInjection/README.md)**: Configures and registers the engine and its components in standard .NET host applications.
+*   **[Global Tool (Jeninnet.FileQuery.Tool)](./src/Jeninnet.FileQuery.Tool/README.md)**: The `dotnet-filequery` terminal tool for scripting and pipelines.
 *   **[Documentation Suite (docs/)](./docs/README.md)**: Deep technical specifications, guides, and architectural whitepapers.
 *   **[Benchmark Suite](./src/Jeninnet.FileQuery.Benchmarks/README.md)**: Performance measurements and allocation verification.
 *   **[Samples (samples/)](./samples/AdvancedUsage/README.md)**: Practical examples showing basic to advanced usage.
