@@ -5,7 +5,25 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 Versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [2.0.0] - 2026-11-02
+
+### Breaking Changes
+
+- **`IFileQueryEngine` contract expanded**: custom engine implementations must add six new members:
+  `Execute(query, CancellationToken)`, `Execute(query, IProgress<FileQueryProgress>, CancellationToken)`,
+  `ExecuteEntries(query)`, `ExecuteEntries(query, CancellationToken)`,
+  `ExecuteEntries(query, IProgress<FileQueryProgress>, CancellationToken)`, and
+  `ExecuteEntriesAsync(query, CancellationToken)`. The built-in engine already implements them.
+  See [Migration.md](Migration.md#upgrading-to-v200).
+- **Regex timeout exception changed**: an expired `Regex` match now throws `PatternException` with the
+  source pattern and an inner `RegexMatchTimeoutException`, instead of leaking the timeout exception.
+  Update `catch(RegexMatchTimeoutException)` blocks.
+- **Case-insensitive character classes now fold**: `IgnoreCase()` makes `[a-z]` match `A`–`Z`
+  (and literals inside classes fold too). Queries that depended on the previous, narrower behavior
+  can return additional matches.
+- **Malformed-pattern diagnostics changed**: untyped malformed patterns now report the concrete
+  validator reason plus `Position`/`Segment` instead of the generic “No compiler registered” message.
+  Code that matches exception text should use the typed position data instead.
 
 ### Added
 
@@ -41,6 +59,7 @@ Versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 - **Documentation Accuracy**: Corrected unbacked claims (OpenTelemetry integration, Roslyn analyzers, AOT validation pipeline), qualified the throughput and sync-cancellation statements, and scheduled the missing capabilities in ROADMAP Phase 5.5 (pre-v2.0.0 hardening). The affected Phase 2 items were reopened and the task-board statuses reclassified.
 - **Platform Support Policy**: v2.0.0 remains .NET 10-only. .NET 8 (end of support 2026-11-10) and .NET 9 (end of support 2026-05-12) are not targeted. The release after v2.0.0 adds .NET 11 through `net10.0;net11.0` multi-targeting (ROADMAP Phase 6).
+- **Package Version 2.0.0**: all product packages now use `2.0.0`; `FileProviders` must be installed with the matching core version because the adapter uses friend access to the engine's internal `IFileSystem`.
 - **Standalone Assertions Package**: Replaced the in-repo `Jeninnet.Testing.Assertions` project and its 182-test suite with the published `Jeninnet.Assertions` 1.0.0 package. Test projects now consume the external package; product packages and runtime behavior are unchanged.
 - **README Coverage and Package Front Pages**: Added READMEs for every src/test/sample project and the GitHub Action, rewrote the core package README with the current API, expanded the Analyzer/Build/FileProviders pages, and added sample/test indices. No runtime change.
 - **Capability Review**: Added `docs/articles/library-capability-review.md`, comparing the library with `Microsoft.Extensions.FileSystemGlobbing`, `DotNet.Glob`, gitignore parsers, BCL enumeration, and `fd`/`ripgrep`, with a prioritized backlog and an audit of the published claims.
@@ -57,6 +76,10 @@ Versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - **Regex Match Timeouts**: A `RegexMatchTimeoutException` during matching is now surfaced as a `PatternException` with the offending pattern instead of leaking an infrastructure exception.
 - **Malformed Pattern Diagnostics**: Untyped patterns that fail structural validation now report the specific reason and position instead of the generic "No compiler registered for pattern type 'Unknown'" message.
 - **Empty Pattern Analysis**: `PatternAnalysisResult.Empty()` now reports `IsEmpty: true`, matching its contract.
+
+### Removed
+
+- **In-repo assertions project**: removed `src/Jeninnet.Testing.Assertions` and its 182-test suite; test projects now use the standalone `Jeninnet.Assertions` 1.0.0 package. Product packages have no dependency on it.
 
 ## [1.5.0] - 2026-08-12
 

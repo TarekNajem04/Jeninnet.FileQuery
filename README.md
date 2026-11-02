@@ -174,7 +174,12 @@ Platform-specific enumeration was measured against the managed path and **reject
 
 ## Upgrading
 
-If you are upgrading from v1.0.0 or v1.1.0 to v1.2.0, please see the [Migration Guide](Migration.md) for important breaking changes regarding `FileQueryOptions`.
+Upgrading from v1.x to **v2.0.0**? The [`IFileQueryEngine` contract expanded](Migration.md#upgrading-to-v200)
+and regex timeout/case-folding behavior changed. See the [Migration Guide](Migration.md) for the full
+checklist.
+
+If you are upgrading from v1.0.0 or v1.1.0 to v1.2.0, the `FileQueryOptions` constructor change is
+also documented there.
 
 ---
 
