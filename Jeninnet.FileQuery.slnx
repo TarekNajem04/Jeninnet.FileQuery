@@ -24,12 +24,8 @@
     </Folder>
     <Folder Name="/.github/actions/filequery/">
         <File Path=".github/actions/filequery/action.yml" />
-        <File Path=".github/actions/filequery/README.md" />
     </Folder>
 
-    <Folder Name="/scripts/">
-        <File Path="scripts/README.md" />
-    </Folder>
     <Folder Name="/scripts/badges/">
         <File Path="scripts/badges/generate.ps1" />
     </Folder>
@@ -37,18 +33,15 @@
         <File Path="scripts/clean/clean.config.json" />
         <File Path="scripts/clean/clean.ps1" />
         <File Path="scripts/clean/clean.schema.json" />
-        <File Path="scripts/clean/README.md" />
     </Folder>
     <Folder Name="/scripts/common/">
         <File Path="scripts/common/Common.psd1" />
         <File Path="scripts/common/Common.psm1" />
-        <File Path="scripts/common/README.md" />
     </Folder>
     <Folder Name="/scripts/coverage/">
         <File Path="scripts/coverage/coverage.config.json" />
         <File Path="scripts/coverage/coverage.ps1" />
         <File Path="scripts/coverage/coverage.schema.json" />
-        <File Path="scripts/coverage/README.md" />
     </Folder>
     <Folder Name="/scripts/docs/">
         <File Path="scripts/docs/check-api-reference.ps1" />
@@ -59,18 +52,15 @@
         <File Path="scripts/format/format.config.json" />
         <File Path="scripts/format/format.ps1" />
         <File Path="scripts/format/format.schema.json" />
-        <File Path="scripts/format/README.md" />
     </Folder>
     <Folder Name="/scripts/performance/">
         <File Path="scripts/performance/check-runtime.ps1" />
     </Folder>
     <Folder Name="/scripts/sonar/">
         <File Path="scripts/sonar/preview.ps1" />
-        <File Path="scripts/sonar/README.md" />
     </Folder>
 
     <Folder Name="/extensions/">
-        <File Path="extensions/vscode/README.md" />
         <File Path="extensions/vscode/package.json" />
     </Folder>
     <Folder Name="/extensions/vscode/">
@@ -99,7 +89,6 @@
 
     <Folder Name="/doc/">
         <File Path="docs/ARCHITECTURE_NOTICE.md" />
-        <File Path="docs/README.md" />
         <File Path="docs/architecture-refactor-tracking.md" />
         <File Path="docs/command-line-integration.md" />
         <File Path="docs/docfx.json" />
@@ -237,19 +226,6 @@
         <Project Path="src/Jeninnet.FileQuery.Analyzers.CodeFix/Jeninnet.FileQuery.Analyzers.CodeFix.csproj" />
         <Project Path="src/Jeninnet.FileQuery.Build/Jeninnet.FileQuery.Build.csproj" />
         <Project Path="src/Jeninnet.FileQuery.FileProviders/Jeninnet.FileQuery.FileProviders.csproj" />
-        <File Path="src/Jeninnet.FileQuery/README.md" />
-        <File Path="src/Jeninnet.FileQuery/Patterns/README.md" />
-        <File Path="src/Jeninnet.FileQuery.Analyzers/README.md" />
-        <File Path="src/Jeninnet.FileQuery.Analyzers.CodeFix/README.md" />
-        <File Path="src/Jeninnet.FileQuery.AotSmoke/README.md" />
-        <File Path="src/Jeninnet.FileQuery.Benchmarks/README.md" />
-        <File Path="src/Jeninnet.FileQuery.Build/README.md" />
-        <File Path="src/Jeninnet.FileQuery.CommandLine/README.md" />
-        <File Path="src/Jeninnet.FileQuery.DependencyInjection/README.md" />
-        <File Path="src/Jeninnet.FileQuery.FileProviders/README.md" />
-        <File Path="src/Jeninnet.FileQuery.Soak/README.md" />
-        <File Path="src/Jeninnet.FileQuery.Tool/README.md" />
-        <File Path="src/Jeninnet.FileQuery.Tooling/README.md" />
     </Folder>
 
     <Folder Name="/tests/">
@@ -260,14 +236,6 @@
         <Project Path="tests/Jeninnet.FileQuery.Analyzers.Tests/Jeninnet.FileQuery.Analyzers.Tests.csproj" />
         <Project Path="tests/Jeninnet.FileQuery.Build.Tests/Jeninnet.FileQuery.Build.Tests.csproj" />
         <Project Path="tests/Jeninnet.FileQuery.FileProviders.Tests/Jeninnet.FileQuery.FileProviders.Tests.csproj" />
-        <File Path="tests/README.md" />
-        <File Path="tests/Jeninnet.AdvancedUsage.Tests/README.md" />
-        <File Path="tests/Jeninnet.FileQuery.Tests/README.md" />
-        <File Path="tests/Jeninnet.FileQuery.Tool.Tests/README.md" />
-        <File Path="tests/Jeninnet.FileQuery.Tooling.Tests/README.md" />
-        <File Path="tests/Jeninnet.FileQuery.Analyzers.Tests/README.md" />
-        <File Path="tests/Jeninnet.FileQuery.Build.Tests/README.md" />
-        <File Path="tests/Jeninnet.FileQuery.FileProviders.Tests/README.md" />
     </Folder>
 
     <Folder Name="/samples/">
@@ -285,21 +253,6 @@
         <Project Path="samples/RegexAnchoredMatching/RegexAnchoredMatching.csproj" />
         <Project Path="samples/RegexMatching/RegexMatching.csproj" />
         <Project Path="samples/SamplesUtilities/SamplesUtilities.csproj" />
-        <File Path="samples/README.md" />
-        <File Path="samples/AdvancedUsage/README.md" />
-        <File Path="samples/BasicMatching/README.md" />
-        <File Path="samples/DirectoryOnlyMatching/README.md" />
-        <File Path="samples/EntryMetadata/README.md" />
-        <File Path="samples/HybridMatcher/README.md" />
-        <File Path="samples/LogFiltering/README.md" />
-        <File Path="samples/NegationAndRecursive/README.md" />
-        <File Path="samples/NestedGlobMatching/README.md" />
-        <File Path="samples/PatternLanguage/README.md" />
-        <File Path="samples/POSIXClassMatching/README.md" />
-        <File Path="samples/RecursiveTraversal/README.md" />
-        <File Path="samples/RegexAnchoredMatching/README.md" />
-        <File Path="samples/RegexMatching/README.md" />
-        <File Path="samples/SamplesUtilities/README.md" />
     </Folder>
 
     <Folder Name="/benchmarks/">

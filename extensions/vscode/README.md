@@ -3,6 +3,8 @@
 Test [Jeninnet.FileQuery](../../src/Jeninnet.FileQuery/README.md) patterns against your workspace
 without leaving the editor, and see why each file is included or excluded.
 
+Full guide: [Jeninnet FileQuery for VS Code](../../docs/guides/ide-extension.md).
+
 ## Requirements
 
 - VS Code 1.85 or newer.

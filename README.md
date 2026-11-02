@@ -191,7 +191,7 @@ This repository contains the core library and its companion packages:
 *   **[CommandLine Integration (Jeninnet.FileQuery.CommandLine)](./src/Jeninnet.FileQuery.CommandLine/README.md)**: Bridges command-line arguments (using `System.CommandLine`) to file query patterns.
 *   **[DependencyInjection Integration (Jeninnet.FileQuery.DependencyInjection)](./src/Jeninnet.FileQuery.DependencyInjection/README.md)**: Configures and registers the engine and its components in standard .NET host applications.
 *   **[Global Tool (Jeninnet.FileQuery.Tool)](./src/Jeninnet.FileQuery.Tool/README.md)**: The `dotnet-filequery` terminal tool for scripting and pipelines.
-*   **[VS Code Extension](./extensions/vscode/README.md)**: Pattern tester and explainer that drives the global tool from the editor.
+*   **[VS Code Extension](./docs/guides/ide-extension.md)**: Pattern tester and explainer that drives the global tool from the editor.
 *   **[File Provider Adapter (Jeninnet.FileQuery.FileProviders)](./src/Jeninnet.FileQuery.FileProviders/README.md)**: Query physical, embedded, and in-memory `IFileProvider` sources with the same pipeline.
 *   **[Build Tooling SDK (Jeninnet.FileQuery.Tooling)](./src/Jeninnet.FileQuery.Tooling/README.md)**: Classify, validate, and tokenize patterns without executing a query.
 *   **[MSBuild Validation (Jeninnet.FileQuery.Build)](./src/Jeninnet.FileQuery.Build/README.md)**: Validate `FileQueryPatterns` during `dotnet build` and export SARIF for code scanning.

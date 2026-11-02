@@ -100,7 +100,7 @@ Read [Engine architecture](architecture/engine-architecture.md) for the full des
 - [Tooling SDK](guides/tooling-sdk.md)
 - [Native AOT](guides/native-aot.md)
 - [Ecosystem integrations](guides/integrations.md)
-- [VS Code extension](guides/ide-extension.md)
+- [Jeninnet FileQuery for VS Code](guides/ide-extension.md)
 
 ### Reference
 - [Pattern overview](reference/pattern-overview.md)

@@ -33,7 +33,7 @@ The site is built with DocFX from this directory.
 - [Tooling SDK](./guides/tooling-sdk.md)
 - [Native AOT](./guides/native-aot.md)
 - [Ecosystem integrations](./guides/integrations.md)
-- [VS Code extension](./guides/ide-extension.md)
+- [Jeninnet FileQuery for VS Code](./guides/ide-extension.md)
 
 ## Reference
 

@@ -2,7 +2,7 @@
   href: global-tool.md
 - name: Diff-Aware Queries
   href: diff-aware-queries.md
-- name: VS Code Extension
+- name: Jeninnet FileQuery for VS Code
   href: ide-extension.md
 - name: Build Tooling SDK
   href: tooling-sdk.md
