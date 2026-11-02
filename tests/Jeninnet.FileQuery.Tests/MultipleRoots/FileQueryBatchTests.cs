@@ -30,7 +30,7 @@ public sealed class FileQueryBatchTests {
 
         firstPaths.Should().NotBeEmpty();
         secondPaths.Should().NotBeEmpty();
-        (secondPaths.All(path => path.StartsWith(second.Root, StringComparison.Ordinal))).Should().BeTrue();
+        secondPaths.All(path => path.StartsWith(second.Root, StringComparison.Ordinal)).Should().BeTrue();
         firstPaths.Should().Equal(FileQueryRuntime.Create().Execute(batchQuery(first), TestContext.CancellationToken));
         secondPaths.Should().Equal(FileQueryRuntime.Create().Execute(batchQuery(second), TestContext.CancellationToken));
 
@@ -55,9 +55,9 @@ public sealed class FileQueryBatchTests {
         var entries = batch.ExecuteEntries(cancellationToken: TestContext.CancellationToken).Where(static entry => entry.RelativePath == "a.txt").ToArray();
 
         entries.Should().HaveCount(2);
-        (entries.Select(static entry => entry.RootPath)).Should().BeEquivalentTo((IEnumerable<string>)[first.Root, second.Root]);
-        (entries.Single(entry => entry.RootPath == first.Root).FullPath).Should().Be(Path.Combine(first.Root, "a.txt"));
-        (entries.Single(entry => entry.RootPath == second.Root).FullPath).Should().Be(Path.Combine(second.Root, "a.txt"));
+        entries.Select(static entry => entry.RootPath).Should().BeEquivalentTo((IEnumerable<string>)[first.Root, second.Root]);
+        entries.Single(entry => entry.RootPath == first.Root).FullPath.Should().Be(Path.Combine(first.Root, "a.txt"));
+        entries.Single(entry => entry.RootPath == second.Root).FullPath.Should().Be(Path.Combine(second.Root, "a.txt"));
     }
 
     /// <summary>
@@ -113,7 +113,7 @@ public sealed class FileQueryBatchTests {
 
         cancellation.Cancel();
 
-        FluentActions.Invoking(() => { _ = batch.Execute(cancellationToken: cancellation.Token).ToList(); }).Should().ThrowExactly<OperationCanceledException>();
+        FluentActions.Invoking(() => _ = batch.Execute(cancellationToken: cancellation.Token).ToList()).Should().ThrowExactly<OperationCanceledException>();
     }
 
     /// <summary>
@@ -124,8 +124,8 @@ public sealed class FileQueryBatchTests {
         var batch = FileQueryBatch.Create([]);
 
         batch.Roots.Should().BeEmpty();
-        (batch.Execute(cancellationToken: TestContext.CancellationToken)).Should().BeEmpty();
-        (batch.ExecuteEntries(cancellationToken: TestContext.CancellationToken)).Should().BeEmpty();
+        batch.Execute(cancellationToken: TestContext.CancellationToken).Should().BeEmpty();
+        batch.ExecuteEntries(cancellationToken: TestContext.CancellationToken).Should().BeEmpty();
     }
 
     private static TestEnvironment CreateFirstRoot() {

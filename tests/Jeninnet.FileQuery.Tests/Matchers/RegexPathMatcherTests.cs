@@ -30,10 +30,10 @@ public class RegexPathMatcherTests {
         var patterns = Compile(patterns: [@"r:^src\/.*\.cs$"]);
 
         // Act & Assert
-        (matcher.Match(patterns, CreateFileContext(path: "src/file.cs")).IsSuccess()).Should().BeTrue();
-        (matcher.Match(patterns, CreateFileContext(path: "src/sub/app.cs")).IsSuccess()).Should().BeTrue();
-        (matcher.Match(patterns, CreateFileContext(path: "src/file.txt")).IsSuccess()).Should().BeFalse();
-        (matcher.Match(patterns, CreateFileContext(path: "root/src/file.cs")).IsSuccess()).Should().BeFalse(because: "because of ^ anchoring");
+        matcher.Match(patterns, CreateFileContext(path: "src/file.cs")).IsSuccess().Should().BeTrue();
+        matcher.Match(patterns, CreateFileContext(path: "src/sub/app.cs")).IsSuccess().Should().BeTrue();
+        matcher.Match(patterns, CreateFileContext(path: "src/file.txt")).IsSuccess().Should().BeFalse();
+        matcher.Match(patterns, CreateFileContext(path: "root/src/file.cs")).IsSuccess().Should().BeFalse(because: "because of ^ anchoring");
     }
 
     /// <summary>
@@ -46,7 +46,7 @@ public class RegexPathMatcherTests {
         var patterns = Compile(patterns: [@"r:^a-non-existent-file\.txt$"]);
 
         // Act & Assert
-        (matcher.Match(patterns, CreateFileContext(path: "some/random/path.log")).IsSuccess()).Should().BeFalse();
+        matcher.Match(patterns, CreateFileContext(path: "some/random/path.log")).IsSuccess().Should().BeFalse();
     }
 
     /// <summary>
@@ -59,9 +59,9 @@ public class RegexPathMatcherTests {
         var patterns = Compile(patterns: [@"r:.*data\d+$"]);
 
         // Act & Assert
-        (matcher.Match(patterns, CreateFileContext(path: "project/data1")).IsSuccess()).Should().BeTrue();
-        (matcher.Match(patterns, CreateFileContext(path: "data007")).IsSuccess()).Should().BeTrue();
-        (matcher.Match(patterns, CreateFileContext(path: "data")).IsSuccess()).Should().BeFalse(because: "Regex requires at least one digit");
+        matcher.Match(patterns, CreateFileContext(path: "project/data1")).IsSuccess().Should().BeTrue();
+        matcher.Match(patterns, CreateFileContext(path: "data007")).IsSuccess().Should().BeTrue();
+        matcher.Match(patterns, CreateFileContext(path: "data")).IsSuccess().Should().BeFalse(because: "Regex requires at least one digit");
     }
 
     /// <summary>
@@ -74,8 +74,8 @@ public class RegexPathMatcherTests {
         var patterns = Compile(patterns: [@"r:^FILE\.TXT$"]);
 
         // Act & Assert
-        (matcher.Match(patterns, CreateFileContext(path: "FILE.TXT")).IsSuccess()).Should().BeTrue();
-        (matcher.Match(patterns, CreateFileContext(path: "file.txt")).IsUnmatched()).Should().BeTrue();
+        matcher.Match(patterns, CreateFileContext(path: "FILE.TXT")).IsSuccess().Should().BeTrue();
+        matcher.Match(patterns, CreateFileContext(path: "file.txt")).IsUnmatched().Should().BeTrue();
     }
 
     /// <summary>
@@ -88,8 +88,8 @@ public class RegexPathMatcherTests {
         var patterns = Compile(patterns: [@"r:^FILE\.TXT$"]);
 
         // Act & Assert
-        (matcher.Match(patterns, CreateFileContext(path: "FILE.TXT", caseSensitivity: CaseSensitivity.Insensitive)).IsSuccess()).Should().BeTrue();
-        (matcher.Match(patterns, CreateFileContext(path: "file.txt", caseSensitivity: CaseSensitivity.Insensitive)).IsSuccess()).Should().BeTrue();
+        matcher.Match(patterns, CreateFileContext(path: "FILE.TXT", caseSensitivity: CaseSensitivity.Insensitive)).IsSuccess().Should().BeTrue();
+        matcher.Match(patterns, CreateFileContext(path: "file.txt", caseSensitivity: CaseSensitivity.Insensitive)).IsSuccess().Should().BeTrue();
     }
 
     /// <summary>
@@ -105,9 +105,9 @@ public class RegexPathMatcherTests {
         ]);
 
         // Act & Assert
-        (matcher.Match(patterns, CreateFileContext(path: "app.log")).IsSuccess()).Should().BeTrue(because: "should match first pattern");
-        (matcher.Match(patterns, CreateFileContext(path: "cache.tmp")).IsSuccess()).Should().BeTrue(because: "should match second pattern");
-        (matcher.Match(patterns, CreateFileContext(path: "no.match")).IsSuccess()).Should().BeFalse();
+        matcher.Match(patterns, CreateFileContext(path: "app.log")).IsSuccess().Should().BeTrue(because: "should match first pattern");
+        matcher.Match(patterns, CreateFileContext(path: "cache.tmp")).IsSuccess().Should().BeTrue(because: "should match second pattern");
+        matcher.Match(patterns, CreateFileContext(path: "no.match")).IsSuccess().Should().BeFalse();
     }
 
     /// <summary>
@@ -121,8 +121,8 @@ public class RegexPathMatcherTests {
 
         // Act & Assert
         // Should match regardless of whether the path represents a file or directory
-        (matcher.Match(patterns, CreateFileContext(path: "project/data")).IsSuccess()).Should().BeTrue();
-        (matcher.Match(patterns, CreateDirectoryContext(path: "project/data")).IsSuccess()).Should().BeTrue();
+        matcher.Match(patterns, CreateFileContext(path: "project/data")).IsSuccess().Should().BeTrue();
+        matcher.Match(patterns, CreateDirectoryContext(path: "project/data")).IsSuccess().Should().BeTrue();
     }
 
     /// <summary>

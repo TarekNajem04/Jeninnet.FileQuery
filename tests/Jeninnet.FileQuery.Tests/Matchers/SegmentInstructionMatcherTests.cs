@@ -21,8 +21,8 @@ public class SegmentInstructionMatcherTests {
         {
             new CharacterClassToken(new CharacterClass(false, [new PosixClass("digit")]))
         };
-        (SegmentInstructionMatcher.MatchSegment("1", tokens, StringComparison.Ordinal)).Should().BeTrue();
-        (SegmentInstructionMatcher.MatchSegment("a", tokens, StringComparison.Ordinal)).Should().BeFalse();
+        SegmentInstructionMatcher.MatchSegment("1", tokens, StringComparison.Ordinal).Should().BeTrue();
+        SegmentInstructionMatcher.MatchSegment("a", tokens, StringComparison.Ordinal).Should().BeFalse();
     }
 
     /// <summary>
@@ -34,7 +34,7 @@ public class SegmentInstructionMatcherTests {
         {
             new CharacterClassToken(new CharacterClass(false, [new PosixClass("unknown")]))
         };
-        (SegmentInstructionMatcher.MatchSegment("a", tokens, StringComparison.Ordinal)).Should().BeFalse();
+        SegmentInstructionMatcher.MatchSegment("a", tokens, StringComparison.Ordinal).Should().BeFalse();
     }
 
     /// <summary>
@@ -46,8 +46,8 @@ public class SegmentInstructionMatcherTests {
         {
             new CharacterClassToken(new CharacterClass(true, [new CharLiteral('a')]))
         };
-        (SegmentInstructionMatcher.MatchSegment("b", tokens, StringComparison.Ordinal)).Should().BeTrue();
-        (SegmentInstructionMatcher.MatchSegment("a", tokens, StringComparison.Ordinal)).Should().BeFalse();
+        SegmentInstructionMatcher.MatchSegment("b", tokens, StringComparison.Ordinal).Should().BeTrue();
+        SegmentInstructionMatcher.MatchSegment("a", tokens, StringComparison.Ordinal).Should().BeFalse();
     }
 
     /// <summary>
@@ -64,10 +64,10 @@ public class SegmentInstructionMatcherTests {
             new CharacterClassToken(new CharacterClass(false, [new CharRange('A', 'Z')]))
         };
 
-        (SegmentInstructionMatcher.MatchSegment("A", lowerRange, StringComparison.OrdinalIgnoreCase)).Should().BeTrue();
-        (SegmentInstructionMatcher.MatchSegment("a", upperRange, StringComparison.OrdinalIgnoreCase)).Should().BeTrue();
-        (SegmentInstructionMatcher.MatchSegment("A", lowerRange, StringComparison.Ordinal)).Should().BeFalse();
-        (SegmentInstructionMatcher.MatchSegment("a", upperRange, StringComparison.Ordinal)).Should().BeFalse();
+        SegmentInstructionMatcher.MatchSegment("A", lowerRange, StringComparison.OrdinalIgnoreCase).Should().BeTrue();
+        SegmentInstructionMatcher.MatchSegment("a", upperRange, StringComparison.OrdinalIgnoreCase).Should().BeTrue();
+        SegmentInstructionMatcher.MatchSegment("A", lowerRange, StringComparison.Ordinal).Should().BeFalse();
+        SegmentInstructionMatcher.MatchSegment("a", upperRange, StringComparison.Ordinal).Should().BeFalse();
     }
 
     /// <summary>
@@ -80,8 +80,8 @@ public class SegmentInstructionMatcherTests {
             new CharacterClassToken(new CharacterClass(false, [new CharLiteral('a')]))
         };
 
-        (SegmentInstructionMatcher.MatchSegment("A", tokens, StringComparison.OrdinalIgnoreCase)).Should().BeTrue();
-        (SegmentInstructionMatcher.MatchSegment("A", tokens, StringComparison.Ordinal)).Should().BeFalse();
+        SegmentInstructionMatcher.MatchSegment("A", tokens, StringComparison.OrdinalIgnoreCase).Should().BeTrue();
+        SegmentInstructionMatcher.MatchSegment("A", tokens, StringComparison.Ordinal).Should().BeFalse();
     }
 
     /// <summary>
@@ -94,8 +94,8 @@ public class SegmentInstructionMatcherTests {
             new CharacterClassToken(new CharacterClass(true, [new CharRange('a', 'z')]))
         };
 
-        (SegmentInstructionMatcher.MatchSegment("A", tokens, StringComparison.OrdinalIgnoreCase)).Should().BeFalse();
-        (SegmentInstructionMatcher.MatchSegment("1", tokens, StringComparison.OrdinalIgnoreCase)).Should().BeTrue();
+        SegmentInstructionMatcher.MatchSegment("A", tokens, StringComparison.OrdinalIgnoreCase).Should().BeFalse();
+        SegmentInstructionMatcher.MatchSegment("1", tokens, StringComparison.OrdinalIgnoreCase).Should().BeTrue();
     }
 
     /// <summary>
@@ -108,7 +108,7 @@ public class SegmentInstructionMatcherTests {
             new CharacterClassToken(new CharacterClass(false, [new PosixClass("upper")]))
         };
 
-        (SegmentInstructionMatcher.MatchSegment("A", tokens, StringComparison.OrdinalIgnoreCase)).Should().BeTrue();
-        (SegmentInstructionMatcher.MatchSegment("a", tokens, StringComparison.OrdinalIgnoreCase)).Should().BeFalse();
+        SegmentInstructionMatcher.MatchSegment("A", tokens, StringComparison.OrdinalIgnoreCase).Should().BeTrue();
+        SegmentInstructionMatcher.MatchSegment("a", tokens, StringComparison.OrdinalIgnoreCase).Should().BeFalse();
     }
 }

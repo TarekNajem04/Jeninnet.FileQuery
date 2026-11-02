@@ -149,7 +149,7 @@ public sealed class ArchitectureTests {
         var projectFile = Path.Combine(FindRepositoryRoot(), "src", "Jeninnet.FileQuery", "Jeninnet.FileQuery.csproj");
         var projectXml = File.ReadAllText(projectFile);
 
-        (projectXml.Contains("<ProjectReference", StringComparison.Ordinal)).Should().BeFalse(because: "Core library project must not reference optional integration projects.");
+        projectXml.Contains("<ProjectReference", StringComparison.Ordinal).Should().BeFalse(because: "Core library project must not reference optional integration projects.");
     }
 
     /// <summary>Tests OptionalPackages_Must_Not_Expose_Core_Internal_Types_Through_Public_Api.</summary>
@@ -233,7 +233,7 @@ public sealed class ArchitectureTests {
         var fileSystemPath = Path.Combine(sourceRoot, "Jeninnet.FileQuery", "IO", "FileSystem.cs");
         var source = File.ReadAllText(fileSystemPath);
 
-        (source.Contains("Task.Run", StringComparison.Ordinal)).Should().BeFalse(because: "FileSystem async enumeration must not offload per-entry synchronous filesystem calls with Task.Run.");
+        source.Contains("Task.Run", StringComparison.Ordinal).Should().BeFalse(because: "FileSystem async enumeration must not offload per-entry synchronous filesystem calls with Task.Run.");
     }
 
     /// <summary>Tests CompiledPattern_Constructors_Must_Not_Be_Public.</summary>

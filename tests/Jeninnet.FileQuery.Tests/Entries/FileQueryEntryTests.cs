@@ -48,7 +48,7 @@ public sealed class FileQueryEntryTests {
             .ExecuteEntries(TestContext.CancellationToken)
             .ToArray();
 
-        (entries.Select(static entry => entry.RelativePath)).Should().BeEquivalentTo(_nestedEntries);
+        entries.Select(static entry => entry.RelativePath).Should().BeEquivalentTo(_nestedEntries);
     }
 
     /// <summary>
@@ -68,7 +68,7 @@ public sealed class FileQueryEntryTests {
             asyncEntries.Add(entry.RelativePath);
         }
 
-        (asyncEntries.OrderBy(static path => path, StringComparer.Ordinal)).Should().Equal(sync);
+        asyncEntries.OrderBy(static path => path, StringComparer.Ordinal).Should().Equal(sync);
     }
 
     /// <summary>
@@ -142,9 +142,9 @@ public sealed class FileQueryEntryTests {
             ModifiedBeforeUtc: null,
             AttributesToSkip: FileAttributes.ReadOnly);
 
-        (filter.ShouldInclude(new FileSystemEntry("readonly.txt", FileAttributes.ReadOnly))).Should().BeFalse();
-        (filter.ShouldInclude(new FileSystemEntry("normal.txt", FileAttributes.Normal))).Should().BeTrue();
-        (filter.ShouldInclude(new FileSystemEntry("readonly-dir", FileAttributes.ReadOnly | FileAttributes.Directory))).Should().BeFalse();
+        filter.ShouldInclude(new FileSystemEntry("readonly.txt", FileAttributes.ReadOnly)).Should().BeFalse();
+        filter.ShouldInclude(new FileSystemEntry("normal.txt", FileAttributes.Normal)).Should().BeTrue();
+        filter.ShouldInclude(new FileSystemEntry("readonly-dir", FileAttributes.ReadOnly | FileAttributes.Directory)).Should().BeFalse();
     }
 
     /// <summary>
@@ -161,8 +161,8 @@ public sealed class FileQueryEntryTests {
             ModifiedAfter: _recentTimestamp,
             ModifiedBefore: _oldTimestamp));
 
-        FluentActions.Invoking(() => sizeOptions.Validate()).Should().ThrowExactly<ArgumentException>();
-        FluentActions.Invoking(() => timeOptions.Validate()).Should().ThrowExactly<ArgumentException>();
+        FluentActions.Invoking(sizeOptions.Validate).Should().ThrowExactly<ArgumentException>();
+        FluentActions.Invoking(timeOptions.Validate).Should().ThrowExactly<ArgumentException>();
     }
 
     private static readonly DateTimeOffset _oldTimestamp = new(2020, 1, 1, 0, 0, 0, TimeSpan.Zero);

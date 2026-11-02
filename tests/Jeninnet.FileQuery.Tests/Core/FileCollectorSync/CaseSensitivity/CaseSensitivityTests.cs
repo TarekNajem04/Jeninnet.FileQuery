@@ -63,7 +63,7 @@ public class CaseSensitivityTests {
             : StringComparison.OrdinalIgnoreCase;
 
         TestAssertEx.HasCount(result, 1);
-        (result.Single().EndsWith("file.txt", stringComparison)).Should().BeTrue();
+        result.Single().EndsWith("file.txt", stringComparison).Should().BeTrue();
     }
 
     /// <summary>

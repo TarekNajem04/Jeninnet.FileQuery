@@ -27,7 +27,7 @@ public sealed class PatternValidatorBoundaryTests {
     [TestMethod]
     public void Should_NotBeMalformed_When_UnicodeCharacters() =>
         // Boundary: Ensure it handles non-ASCII characters gracefully.
-        (PatternValidator.IsMalformed("file-🌸.txt".AsSpan())).Should().BeFalse();
+        PatternValidator.IsMalformed("file-🌸.txt".AsSpan()).Should().BeFalse();
 
     /// <summary>
     /// Verifies that an extremely long pattern does not cause stack overflow or performance issues.
@@ -45,7 +45,7 @@ public sealed class PatternValidatorBoundaryTests {
     [TestMethod]
     public void Should_NotBeMalformed_When_ComplexMixedPattern() =>
         // Boundary: Complex combination.
-        (PatternValidator.IsMalformed("!**/[a-z[:digit:]]/{sub,dir}/file-🌸.txt".AsSpan())).Should().BeFalse();
+        PatternValidator.IsMalformed("!**/[a-z[:digit:]]/{sub,dir}/file-🌸.txt".AsSpan()).Should().BeFalse();
 
     /// <summary>
     /// Verifies that null input does not throw and returns false for stray bracket detection.

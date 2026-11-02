@@ -148,12 +148,12 @@ public sealed class RegressionTests {
         var contextNoMatch = FileContext("test/Program.cs");
 
         // Both sets must match the same path.
-        (matcher.Match(patternSetA, contextMatch)).Should().Be(MatchOutcome.Include, because: "First compiled set must match 'src/Program.cs'.");
-        (matcher.Match(patternSetB, contextMatch)).Should().Be(MatchOutcome.Include, because: "Second compiled set (independently compiled) must also match 'src/Program.cs'.");
+        matcher.Match(patternSetA, contextMatch).Should().Be(MatchOutcome.Include, because: "First compiled set must match 'src/Program.cs'.");
+        matcher.Match(patternSetB, contextMatch).Should().Be(MatchOutcome.Include, because: "Second compiled set (independently compiled) must also match 'src/Program.cs'.");
 
         // Both sets must reject the same non-matching path.
-        (matcher.Match(patternSetA, contextNoMatch)).Should().Be(MatchOutcome.NoMatch, because: "First compiled set must not match 'test/Program.cs'.");
-        (matcher.Match(patternSetB, contextNoMatch)).Should().Be(MatchOutcome.NoMatch, because: "Second compiled set must not match 'test/Program.cs'.");
+        matcher.Match(patternSetA, contextNoMatch).Should().Be(MatchOutcome.NoMatch, because: "First compiled set must not match 'test/Program.cs'.");
+        matcher.Match(patternSetB, contextNoMatch).Should().Be(MatchOutcome.NoMatch, because: "Second compiled set must not match 'test/Program.cs'.");
     }
 
     /// <summary>
@@ -167,13 +167,13 @@ public sealed class RegressionTests {
         var patterns = CompileRegex(pattern);
 
         // Insensitive: lowercase subject must match.
-        (matcher.Match(patterns, FileContext("data_archive.log", CaseSensitivity.Insensitive))).Should().Be(MatchOutcome.Include, because: "Insensitive: 'data_archive.log' must match '^DATA_.*\\.log$'.");
+        matcher.Match(patterns, FileContext("data_archive.log", CaseSensitivity.Insensitive)).Should().Be(MatchOutcome.Include, because: "Insensitive: 'data_archive.log' must match '^DATA_.*\\.log$'.");
 
         // Sensitive: lowercase subject must NOT match uppercase pattern.
-        (matcher.Match(patterns, FileContext("data_archive.log", CaseSensitivity.Sensitive))).Should().Be(MatchOutcome.NoMatch, because: "Sensitive: 'data_archive.log' must NOT match '^DATA_.*\\.log$'.");
+        matcher.Match(patterns, FileContext("data_archive.log", CaseSensitivity.Sensitive)).Should().Be(MatchOutcome.NoMatch, because: "Sensitive: 'data_archive.log' must NOT match '^DATA_.*\\.log$'.");
 
         // Insensitive again: still must match (correct cache entry reused).
-        (matcher.Match(patterns, FileContext("data_archive.log", CaseSensitivity.Insensitive))).Should().Be(MatchOutcome.Include, because: "Insensitive (second call): must still match using the correct cached Regex.");
+        matcher.Match(patterns, FileContext("data_archive.log", CaseSensitivity.Insensitive)).Should().Be(MatchOutcome.Include, because: "Insensitive (second call): must still match using the correct cached Regex.");
     }
 }
 

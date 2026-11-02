@@ -26,6 +26,6 @@ public class FileQueryOptionsTests {
         );
 
         // Act & Assert
-        FluentActions.Invoking(() => options.Validate()).Should().Throw<ArgumentOutOfRangeException>();
+        FluentActions.Invoking(options.Validate).Should().Throw<ArgumentOutOfRangeException>();
     }
 }

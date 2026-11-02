@@ -21,9 +21,9 @@ public sealed class FileSystemGuardsTests {
     public void ShouldSkip_RetryWithDefaultIgnore_RetriesBeforeSkipping() {
         var retry = FileQueryErrorRecoveryOptions.Retry(2);
 
-        (FileSystemGuards.ShouldSkip(ignoreInaccessible: true, errorRecovery: retry, attempt: 0, attempts: 3)).Should().BeFalse();
-        (FileSystemGuards.ShouldSkip(ignoreInaccessible: true, errorRecovery: retry, attempt: 1, attempts: 3)).Should().BeFalse();
-        (FileSystemGuards.ShouldSkip(ignoreInaccessible: true, errorRecovery: retry, attempt: 2, attempts: 3)).Should().BeTrue();
-        (FileSystemGuards.ShouldSkip(ignoreInaccessible: false, errorRecovery: retry, attempt: 2, attempts: 3)).Should().BeFalse();
+        FileSystemGuards.ShouldSkip(ignoreInaccessible: true, errorRecovery: retry, attempt: 0, attempts: 3).Should().BeFalse();
+        FileSystemGuards.ShouldSkip(ignoreInaccessible: true, errorRecovery: retry, attempt: 1, attempts: 3).Should().BeFalse();
+        FileSystemGuards.ShouldSkip(ignoreInaccessible: true, errorRecovery: retry, attempt: 2, attempts: 3).Should().BeTrue();
+        FileSystemGuards.ShouldSkip(ignoreInaccessible: false, errorRecovery: retry, attempt: 2, attempts: 3).Should().BeFalse();
     }
 }

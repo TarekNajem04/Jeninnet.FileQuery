@@ -30,9 +30,9 @@ public class GitIgnoreLiteralSuffixTests {
     /// </summary>
     [TestMethod]
     public void Should_ResolveTrailingLiteralRun_When_LastSegmentEndsWithLiterals() {
-        (Compile(["**/*.cs"]).Patterns[0].LiteralSuffix).Should().Be(".cs");
-        (Compile(["!**/*.generated.cs"]).Patterns[0].LiteralSuffix).Should().Be(".generated.cs");
-        (Compile(["**/build"]).Patterns[0].LiteralSuffix).Should().Be("build");
+        Compile(["**/*.cs"]).Patterns[0].LiteralSuffix.Should().Be(".cs");
+        Compile(["!**/*.generated.cs"]).Patterns[0].LiteralSuffix.Should().Be(".generated.cs");
+        Compile(["**/build"]).Patterns[0].LiteralSuffix.Should().Be("build");
     }
 
     /// <summary>
@@ -41,10 +41,10 @@ public class GitIgnoreLiteralSuffixTests {
     /// </summary>
     [TestMethod]
     public void Should_ResolveNoSuffix_When_LastSegmentEndsWithWildcard() {
-        (Compile(["**/*"]).Patterns[0].LiteralSuffix).Should().Be(string.Empty);
-        (Compile(["**/*?"]).Patterns[0].LiteralSuffix).Should().Be(string.Empty);
-        (Compile(["**"]).Patterns[0].LiteralSuffix).Should().Be(string.Empty);
-        (Compile(["src/**/*.[ab]"]).Patterns[0].LiteralSuffix).Should().Be(string.Empty);
+        Compile(["**/*"]).Patterns[0].LiteralSuffix.Should().Be(string.Empty);
+        Compile(["**/*?"]).Patterns[0].LiteralSuffix.Should().Be(string.Empty);
+        Compile(["**"]).Patterns[0].LiteralSuffix.Should().Be(string.Empty);
+        Compile(["src/**/*.[ab]"]).Patterns[0].LiteralSuffix.Should().Be(string.Empty);
     }
 
     /// <summary>
@@ -54,10 +54,10 @@ public class GitIgnoreLiteralSuffixTests {
     /// </summary>
     [TestMethod]
     public void Should_ResolveOnlyTrailingTokens_When_EarlierTokensAreWildcards() {
-        (LiteralSuffixResolver.Resolve([[new WildcardToken(), new LiteralToken(".cs")]])).Should().Be(".cs");
-        (LiteralSuffixResolver.Resolve([[new LiteralToken("a"), new WildcardToken(), new LiteralToken("b.cs")]])).Should().Be("b.cs");
-        (LiteralSuffixResolver.Resolve([[new LiteralToken("log"), new WildcardToken()]])).Should().Be(string.Empty);
-        (LiteralSuffixResolver.Resolve([[new WildcardToken(), new SingleCharToken(), new LiteralToken("x")]])).Should().Be("x");
+        LiteralSuffixResolver.Resolve([[new WildcardToken(), new LiteralToken(".cs")]]).Should().Be(".cs");
+        LiteralSuffixResolver.Resolve([[new LiteralToken("a"), new WildcardToken(), new LiteralToken("b.cs")]]).Should().Be("b.cs");
+        LiteralSuffixResolver.Resolve([[new LiteralToken("log"), new WildcardToken()]]).Should().Be(string.Empty);
+        LiteralSuffixResolver.Resolve([[new WildcardToken(), new SingleCharToken(), new LiteralToken("x")]]).Should().Be("x");
     }
 
     /// <summary>
@@ -65,8 +65,8 @@ public class GitIgnoreLiteralSuffixTests {
     /// </summary>
     [TestMethod]
     public void Should_ResolveSuffix_When_LiteralRunContainsEscapedCharacters() {
-        (LiteralSuffixResolver.Resolve([[new WildcardToken(), new EscapeToken('*')]])).Should().Be("*");
-        (LiteralSuffixResolver.Resolve([[new EscapeToken('*'), new LiteralToken(".cs")]])).Should().Be("*.cs");
+        LiteralSuffixResolver.Resolve([[new WildcardToken(), new EscapeToken('*')]]).Should().Be("*");
+        LiteralSuffixResolver.Resolve([[new EscapeToken('*'), new LiteralToken(".cs")]]).Should().Be("*.cs");
     }
 
     /// <summary>
@@ -75,8 +75,8 @@ public class GitIgnoreLiteralSuffixTests {
     /// </summary>
     [TestMethod]
     public void Should_ResolveNoSuffix_When_PatternIsDirectoryOnly() {
-        (Compile(["*.cs/"]).Patterns[0].LiteralSuffix).Should().Be(string.Empty);
-        (Compile(["/a/"]).Patterns[0].LiteralSuffix).Should().Be(string.Empty);
+        Compile(["*.cs/"]).Patterns[0].LiteralSuffix.Should().Be(string.Empty);
+        Compile(["/a/"]).Patterns[0].LiteralSuffix.Should().Be(string.Empty);
     }
 
     /// <summary>
@@ -88,11 +88,11 @@ public class GitIgnoreLiteralSuffixTests {
         var matcher = CreateMatcher();
         var patterns = Compile(patterns: ["**/*.cs"]);
 
-        (matcher.Match(patterns, CreateFileContext(path: "file.cs")).IsSuccess()).Should().BeFalse(because: "file.cs should be excluded.");
-        (matcher.Match(patterns, CreateFileContext(path: "dir/sub/file.cs")).IsSuccess()).Should().BeFalse(because: "Deep file.cs should be excluded.");
-        (matcher.Match(patterns, CreateFileContext(path: "file.txt")).IsSuccess()).Should().BeTrue(because: "file.txt should not be excluded (fast-path rejection).");
-        (matcher.Match(patterns, CreateFileContext(path: "dir/file.txt")).IsSuccess()).Should().BeTrue(because: "Nested file.txt should not be excluded (fast-path rejection).");
-        (matcher.Match(patterns, CreateFileContext(path: "a.cs/file.txt")).IsSuccess()).Should().BeTrue(because: "file.txt under a .cs directory should not be excluded.");
+        matcher.Match(patterns, CreateFileContext(path: "file.cs")).IsSuccess().Should().BeFalse(because: "file.cs should be excluded.");
+        matcher.Match(patterns, CreateFileContext(path: "dir/sub/file.cs")).IsSuccess().Should().BeFalse(because: "Deep file.cs should be excluded.");
+        matcher.Match(patterns, CreateFileContext(path: "file.txt")).IsSuccess().Should().BeTrue(because: "file.txt should not be excluded (fast-path rejection).");
+        matcher.Match(patterns, CreateFileContext(path: "dir/file.txt")).IsSuccess().Should().BeTrue(because: "Nested file.txt should not be excluded (fast-path rejection).");
+        matcher.Match(patterns, CreateFileContext(path: "a.cs/file.txt")).IsSuccess().Should().BeTrue(because: "file.txt under a .cs directory should not be excluded.");
     }
 
     /// <summary>
@@ -104,10 +104,10 @@ public class GitIgnoreLiteralSuffixTests {
         var matcher = CreateMatcher();
         var patterns = Compile(patterns: ["**/*.cs", "!**/*.generated.cs"]);
 
-        (matcher.Match(patterns, CreateFileContext(path: "a.generated.cs")).IsSuccess()).Should().BeTrue(because: "generated file should be re-included.");
-        (matcher.Match(patterns, CreateFileContext(path: "dir/sub/b.generated.cs")).IsSuccess()).Should().BeTrue(because: "Deep generated file should be re-included.");
-        (matcher.Match(patterns, CreateFileContext(path: "b.cs")).IsSuccess()).Should().BeFalse(because: "Plain .cs file should stay excluded.");
-        (matcher.Match(patterns, CreateFileContext(path: "b.generated.txt")).IsSuccess()).Should().BeTrue(because: "Non-.cs file matches no rule and stays included.");
+        matcher.Match(patterns, CreateFileContext(path: "a.generated.cs")).IsSuccess().Should().BeTrue(because: "generated file should be re-included.");
+        matcher.Match(patterns, CreateFileContext(path: "dir/sub/b.generated.cs")).IsSuccess().Should().BeTrue(because: "Deep generated file should be re-included.");
+        matcher.Match(patterns, CreateFileContext(path: "b.cs")).IsSuccess().Should().BeFalse(because: "Plain .cs file should stay excluded.");
+        matcher.Match(patterns, CreateFileContext(path: "b.generated.txt")).IsSuccess().Should().BeTrue(because: "Non-.cs file matches no rule and stays included.");
     }
 
     /// <summary>
@@ -118,8 +118,8 @@ public class GitIgnoreLiteralSuffixTests {
         var matcher = CreateMatcher();
         var patterns = Compile(patterns: ["**/*.CS"]);
 
-        (matcher.Match(patterns, CreateFileContext(path: "file.cs")).IsSuccess()).Should().BeTrue(because: "Case-sensitive: 'file.cs' must not be excluded by '**/*.CS'.");
-        (matcher.Match(patterns, CreateFileContext(path: "file.cs", CaseSensitivity.Insensitive)).IsSuccess()).Should().BeFalse(because: "Case-insensitive: 'file.cs' must be excluded by '**/*.CS'.");
+        matcher.Match(patterns, CreateFileContext(path: "file.cs")).IsSuccess().Should().BeTrue(because: "Case-sensitive: 'file.cs' must not be excluded by '**/*.CS'.");
+        matcher.Match(patterns, CreateFileContext(path: "file.cs", CaseSensitivity.Insensitive)).IsSuccess().Should().BeFalse(because: "Case-insensitive: 'file.cs' must be excluded by '**/*.CS'.");
     }
 
     /// <summary>
@@ -131,8 +131,8 @@ public class GitIgnoreLiteralSuffixTests {
         var matcher = CreateMatcher();
         var patterns = Compile(patterns: ["**/*\\*"]);
 
-        (matcher.Match(patterns, CreateFileContext(path: "dir/a*")).IsSuccess()).Should().BeFalse(because: "File ending with literal '*' should be excluded.");
-        (matcher.Match(patterns, CreateFileContext(path: "dir/ab")).IsSuccess()).Should().BeTrue(because: "File without '*' should not be excluded (fast-path rejection).");
+        matcher.Match(patterns, CreateFileContext(path: "dir/a*")).IsSuccess().Should().BeFalse(because: "File ending with literal '*' should be excluded.");
+        matcher.Match(patterns, CreateFileContext(path: "dir/ab")).IsSuccess().Should().BeTrue(because: "File without '*' should not be excluded (fast-path rejection).");
     }
 
     /// <summary>
@@ -144,8 +144,8 @@ public class GitIgnoreLiteralSuffixTests {
         var matcher = CreateMatcher();
         var patterns = Compile(patterns: ["**/*.cs", "!**/*.cs?"]);
 
-        (matcher.Match(patterns, CreateFileContext(path: "deep/a.csx")).IsSuccess()).Should().BeTrue(because: "a.csx matches '!**/*.cs?' and is re-included.");
-        (matcher.Match(patterns, CreateFileContext(path: "deep/a.cs")).IsSuccess()).Should().BeFalse(because: "a.cs matches '**/*.cs' only and stays excluded.");
+        matcher.Match(patterns, CreateFileContext(path: "deep/a.csx")).IsSuccess().Should().BeTrue(because: "a.csx matches '!**/*.cs?' and is re-included.");
+        matcher.Match(patterns, CreateFileContext(path: "deep/a.cs")).IsSuccess().Should().BeFalse(because: "a.cs matches '**/*.cs' only and stays excluded.");
     }
 
     /// <summary>
@@ -158,11 +158,11 @@ public class GitIgnoreLiteralSuffixTests {
         var matcher = CreateMatcher();
         var patterns = Compile(patterns: ["**", "!*.cs/"]);
 
-        (matcher.Match(patterns, CreateDirectoryContext(path: "file.cs")).IsSuccess()).Should().BeTrue(because: "Directory 'file.cs' should be re-included by '!*.cs/'.");
-        (matcher.Match(patterns, CreateFileContext(path: "file.cs")).IsSuccess()).Should().BeFalse(because: "File 'file.cs' should not be affected by the directory-only rule.");
+        matcher.Match(patterns, CreateDirectoryContext(path: "file.cs")).IsSuccess().Should().BeTrue(because: "Directory 'file.cs' should be re-included by '!*.cs/'.");
+        matcher.Match(patterns, CreateFileContext(path: "file.cs")).IsSuccess().Should().BeFalse(because: "File 'file.cs' should not be affected by the directory-only rule.");
 
         var anchored = Compile(patterns: ["/a/"]);
-        (matcher.Match(anchored, CreateFileContext(path: "a/b")).IsSuccess()).Should().BeFalse(because: "Existing semantics: anchored '/a/' excludes descendant file 'a/b'.");
+        matcher.Match(anchored, CreateFileContext(path: "a/b")).IsSuccess().Should().BeFalse(because: "Existing semantics: anchored '/a/' excludes descendant file 'a/b'.");
     }
 
     /// <summary>
@@ -174,10 +174,10 @@ public class GitIgnoreLiteralSuffixTests {
         var matcher = CreateMatcher();
         var patterns = Compile(patterns: ["src/*.generated.cs"]);
 
-        (matcher.Match(patterns, CreateFileContext(path: "src/foo.generated.cs")).IsSuccess()).Should().BeFalse(because: "src/foo.generated.cs should be excluded.");
-        (matcher.Match(patterns, CreateFileContext(path: "src/foo.cs")).IsSuccess()).Should().BeTrue(because: "src/foo.cs should not be excluded (fast-path rejection).");
-        (matcher.Match(patterns, CreateFileContext(path: "lib/foo.generated.cs")).IsSuccess()).Should().BeTrue(because: "Other directory should not be excluded.");
-        (matcher.Match(patterns, CreateFileContext(path: "src/deep/foo.generated.cs")).IsSuccess()).Should().BeTrue(because: "Deeper nesting should not be excluded without a recursive wildcard.");
+        matcher.Match(patterns, CreateFileContext(path: "src/foo.generated.cs")).IsSuccess().Should().BeFalse(because: "src/foo.generated.cs should be excluded.");
+        matcher.Match(patterns, CreateFileContext(path: "src/foo.cs")).IsSuccess().Should().BeTrue(because: "src/foo.cs should not be excluded (fast-path rejection).");
+        matcher.Match(patterns, CreateFileContext(path: "lib/foo.generated.cs")).IsSuccess().Should().BeTrue(because: "Other directory should not be excluded.");
+        matcher.Match(patterns, CreateFileContext(path: "src/deep/foo.generated.cs")).IsSuccess().Should().BeTrue(because: "Deeper nesting should not be excluded without a recursive wildcard.");
     }
 
     /// <summary>
@@ -189,8 +189,8 @@ public class GitIgnoreLiteralSuffixTests {
         var matcher = CreateMatcher();
         var patterns = Compile(patterns: ["**/*.cs"]);
 
-        (matcher.Match(patterns, CreateDirectoryContext(path: "generated.cs")).IsSuccess()).Should().BeFalse(because: "Directory 'generated.cs' should be excluded.");
-        (matcher.Match(patterns, CreateDirectoryContext(path: "sub/generated.cs/")).IsSuccess()).Should().BeFalse(because: "Trailing-slash directory 'sub/generated.cs/' should be excluded.");
-        (matcher.Match(patterns, CreateDirectoryContext(path: "sub/readme/")).IsSuccess()).Should().BeTrue(because: "Directory 'sub/readme/' should not be excluded (fast-path rejection).");
+        matcher.Match(patterns, CreateDirectoryContext(path: "generated.cs")).IsSuccess().Should().BeFalse(because: "Directory 'generated.cs' should be excluded.");
+        matcher.Match(patterns, CreateDirectoryContext(path: "sub/generated.cs/")).IsSuccess().Should().BeFalse(because: "Trailing-slash directory 'sub/generated.cs/' should be excluded.");
+        matcher.Match(patterns, CreateDirectoryContext(path: "sub/readme/")).IsSuccess().Should().BeTrue(because: "Directory 'sub/readme/' should not be excluded (fast-path rejection).");
     }
 }

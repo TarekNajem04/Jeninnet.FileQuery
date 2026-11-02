@@ -27,23 +27,23 @@ public class PathUtilitiesCoverageTests {
     [TestMethod]
     public void PathUtilities_UncRoot_EdgeCases() {
         // UNC roots should keep their trailing slash
-        (PathUtilities.Normalize("//server/share/", true)).Should().Be("//server/share/");
-        (PathUtilities.Normalize("//server/share", true)).Should().Be("//server/share");
+        PathUtilities.Normalize("//server/share/", true).Should().Be("//server/share/");
+        PathUtilities.Normalize("//server/share", true).Should().Be("//server/share");
 
         // Not a root, should be trimmed
-        (PathUtilities.Normalize("//server/share/folder/", true)).Should().Be("//server/share/folder");
+        PathUtilities.Normalize("//server/share/folder/", true).Should().Be("//server/share/folder");
 
         // Invalid UNC (no share)
-        (PathUtilities.Normalize("//server", true)).Should().Be("//server");
+        PathUtilities.Normalize("//server", true).Should().Be("//server");
     }
 
     /// <summary>Tests PathUtilities_CountSegments_EdgeCases.</summary>
     [TestMethod]
     public void PathUtilities_CountSegments_EdgeCases() {
-        (PathUtilities.CountSegments("".AsSpan(), false)).Should().Be(0);
-        (PathUtilities.CountSegments("a".AsSpan(), false)).Should().Be(1);
-        (PathUtilities.CountSegments("a/b".AsSpan(), false)).Should().Be(2);
-        (PathUtilities.CountSegments("a/b/".AsSpan(), true)).Should().Be(2);
+        PathUtilities.CountSegments("".AsSpan(), false).Should().Be(0);
+        PathUtilities.CountSegments("a".AsSpan(), false).Should().Be(1);
+        PathUtilities.CountSegments("a/b".AsSpan(), false).Should().Be(2);
+        PathUtilities.CountSegments("a/b/".AsSpan(), true).Should().Be(2);
     }
 
     /// <summary>Tests PathUtilities_SplitNormalizedPath_EdgeCases.</summary>

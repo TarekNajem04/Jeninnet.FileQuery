@@ -134,12 +134,12 @@ public sealed class DatasetGeneratorCapacityTests {
             var exception = FluentActions.Invoking(() => DatasetGenerator.BuildRuntimeCapacities(invalidTarget)).Should().ThrowExactly<ArgumentOutOfRangeException>().Which;
 
             exception.ParamName.Should().Be("targetFileCount");
-            (exception.Message.Contains("divisible by 100", StringComparison.OrdinalIgnoreCase)).Should().BeTrue(because: "The exception message must explain the divisibility constraint.");
+            exception.Message.Contains("divisible by 100", StringComparison.OrdinalIgnoreCase).Should().BeTrue(because: "The exception message must explain the divisibility constraint.");
         }
     }
 
     private static void AssertSumsToTarget(IReadOnlyList<ExtensionDefinition> capacities, int targetFileCount) =>
-        (capacities.Sum(static extension => extension.MaximumCount)).Should().Be(targetFileCount, because: "The sum of all extension capacities must equal the target file count.");
+        capacities.Sum(static extension => extension.MaximumCount).Should().Be(targetFileCount, because: "The sum of all extension capacities must equal the target file count.");
 
     private static void AssertMaximumCount(
         IReadOnlyList<ExtensionDefinition> capacities,

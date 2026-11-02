@@ -179,7 +179,7 @@ public sealed class PathUtilitiesUncTests {
         const string input = @"\\server\share\file.txt";
         const string expected = "//server/share/file.txt";
 
-        (PathUtilities.Normalize(input).Replace('\\', '/')).Should().Be(expected, because: "Backslashes must become forward slashes and '//' must not be collapsed to '/'.");
+        PathUtilities.Normalize(input).Replace('\\', '/').Should().Be(expected, because: "Backslashes must become forward slashes and '//' must not be collapsed to '/'.");
     }
 
     /// <summary>
@@ -262,7 +262,7 @@ public sealed class PathUtilitiesUncTests {
         const string input = @"C:\Users\Test\";
         const string expected = "C:/Users/Test/";
 
-        (PathUtilities.Normalize(input, trimTrailingSlash: false)).Should().Be(expected, because: "trimTrailingSlash: false must preserve a trailing slash on non-root paths.");
+        PathUtilities.Normalize(input, trimTrailingSlash: false).Should().Be(expected, because: "trimTrailingSlash: false must preserve a trailing slash on non-root paths.");
     }
 
     /// <summary>
@@ -274,7 +274,7 @@ public sealed class PathUtilitiesUncTests {
         const string input = @"\\server\share\folder\";
         const string expected = "//server/share/folder/";
 
-        (PathUtilities.Normalize(input, trimTrailingSlash: false)).Should().Be(expected, because: "trimTrailingSlash: false must preserve trailing slash on non-root UNC paths.");
+        PathUtilities.Normalize(input, trimTrailingSlash: false).Should().Be(expected, because: "trimTrailingSlash: false must preserve trailing slash on non-root UNC paths.");
     }
 
     /// <summary>
@@ -298,12 +298,12 @@ public sealed class PathUtilitiesUncTests {
     /// <summary>Tests Normalize_LocalPath_DuplicateSlashesCollapsed.</summary>
     [TestMethod]
     public void Normalize_LocalPath_DuplicateSlashesCollapsed() =>
-        (PathUtilities.Normalize(@"C:\\Users//Test\\file.txt")).Should().Be("C:/Users/Test/file.txt");
+        PathUtilities.Normalize(@"C:\\Users//Test\\file.txt").Should().Be("C:/Users/Test/file.txt");
 
     /// <summary>Tests Normalize_DriveRoot_TrailingSlashPreserved.</summary>
     [TestMethod]
     public void Normalize_DriveRoot_TrailingSlashPreserved() =>
-        (PathUtilities.Normalize("C:/")).Should().Be("C:/");
+        PathUtilities.Normalize("C:/").Should().Be("C:/");
 
     /// <summary>Tests Normalize_NullOrEmpty_ThrowsArgumentException.</summary>
     [TestMethod]

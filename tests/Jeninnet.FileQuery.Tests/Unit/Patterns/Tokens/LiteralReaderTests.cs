@@ -21,7 +21,7 @@ public sealed class LiteralReaderTests {
     public void Should_ReturnFalse_When_Empty() {
         var pattern = "".AsSpan();
         var i = 0;
-        (_reader.TryRead(pattern, ref i, out _)).Should().BeFalse();
+        _reader.TryRead(pattern, ref i, out _).Should().BeFalse();
     }
 
     /// <summary>
@@ -31,7 +31,7 @@ public sealed class LiteralReaderTests {
     public void Should_ReturnFalse_When_StartsWildcard() {
         var pattern = "*abc".AsSpan();
         var i = 0;
-        (_reader.TryRead(pattern, ref i, out _)).Should().BeFalse();
+        _reader.TryRead(pattern, ref i, out _).Should().BeFalse();
     }
 
     /// <summary>
@@ -41,7 +41,7 @@ public sealed class LiteralReaderTests {
     public void Should_ReturnTrueAndToken_When_Literal() {
         var pattern = "abc".AsSpan();
         var i = 0;
-        (_reader.TryRead(pattern, ref i, out var token)).Should().BeTrue();
+        _reader.TryRead(pattern, ref i, out var token).Should().BeTrue();
         i.Should().Be(3);
         token.Should().BeAssignableTo<LiteralToken>();
         ((LiteralToken)token).Text.Should().Be("abc");
@@ -54,7 +54,7 @@ public sealed class LiteralReaderTests {
     public void Should_StopAtWildcard_When_LiteralWithWildcard() {
         var pattern = "abc*def".AsSpan();
         var i = 0;
-        (_reader.TryRead(pattern, ref i, out var token)).Should().BeTrue();
+        _reader.TryRead(pattern, ref i, out var token).Should().BeTrue();
         i.Should().Be(3);
         token.Should().BeAssignableTo<LiteralToken>();
         ((LiteralToken)token).Text.Should().Be("abc");

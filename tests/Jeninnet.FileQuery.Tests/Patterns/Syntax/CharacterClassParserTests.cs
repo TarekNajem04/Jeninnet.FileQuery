@@ -68,7 +68,7 @@ public sealed class CharacterClassParserTests {
         var result = CharacterClassParser.Parse(input, ref i);
 
         result.Elements.Should().HaveCount(1);
-        var range = (CharRange)(result.Elements[0]);
+        var range = (CharRange)result.Elements[0];
         range.Start.Should().Be('a');
         range.End.Should().Be('z');
     }
@@ -85,7 +85,7 @@ public sealed class CharacterClassParserTests {
 
         result.IsNegated.Should().BeTrue();
         result.Elements.Should().HaveCount(3);
-        (result.Elements.All(static e => e is CharLiteral)).Should().BeTrue();
+        result.Elements.All(static e => e is CharLiteral).Should().BeTrue();
     }
 
     /// <summary>
@@ -112,7 +112,7 @@ public sealed class CharacterClassParserTests {
 
         var result = CharacterClassParser.Parse(input, ref i);
 
-        var first = (CharLiteral)(result.Elements[0]);
+        var first = (CharLiteral)result.Elements[0];
         first.Value.Should().Be('-', because: "'-' at the start of a class must be treated as a literal.");
     }
 
@@ -128,7 +128,7 @@ public sealed class CharacterClassParserTests {
 
         var result = CharacterClassParser.Parse(input, ref i);
 
-        var first = (CharLiteral)(result.Elements[0]);
+        var first = (CharLiteral)result.Elements[0];
         first.Value.Should().Be(']', because: "']' at the start of a class must be treated as a literal.");
 
         result.Elements.Should().HaveCount(4, because: "']', 'a', 'b', 'c'.");
@@ -147,7 +147,7 @@ public sealed class CharacterClassParserTests {
 
         result.Elements.Should().HaveCount(2);
         result.Elements[0].Should().BeAssignableTo<CharLiteral>();
-        var dash = (CharLiteral)(result.Elements[1]);
+        var dash = (CharLiteral)result.Elements[1];
         dash.Value.Should().Be('-', because: "'-' immediately before ']' must be a literal, not a range delimiter.");
     }
 
@@ -178,7 +178,7 @@ public sealed class CharacterClassParserTests {
         var result = CharacterClassParser.Parse(input, ref i);
 
         result.Elements.Should().HaveCount(1);
-        var posix = (PosixClass)(result.Elements[0]);
+        var posix = (PosixClass)result.Elements[0];
         posix.Name.Should().Be("digit");
         i.Should().Be(11);
     }
@@ -193,7 +193,7 @@ public sealed class CharacterClassParserTests {
 
         var result = CharacterClassParser.Parse(input, ref i);
 
-        var posix = (PosixClass)(result.Elements[0]);
+        var posix = (PosixClass)result.Elements[0];
         posix.Name.Should().Be("alpha");
     }
 
@@ -210,7 +210,7 @@ public sealed class CharacterClassParserTests {
 
         result.Elements.Should().HaveCount(2);
         result.Elements[0].Should().BeAssignableTo<PosixClass>();
-        var lit = (CharLiteral)(result.Elements[1]);
+        var lit = (CharLiteral)result.Elements[1];
         lit.Value.Should().Be('_');
     }
 

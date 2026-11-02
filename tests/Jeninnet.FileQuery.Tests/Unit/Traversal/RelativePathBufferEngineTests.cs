@@ -37,7 +37,7 @@ public class RelativePathBufferEngineTests {
         results.Should().Contain(static x => x.EndsWith(System.IO.Path.Combine("sub", "c.txt"), StringComparison.Ordinal));
 
         foreach(var result in results) {
-            (result.StartsWith(env.Root, StringComparison.Ordinal)).Should().BeTrue();
+            result.StartsWith(env.Root, StringComparison.Ordinal).Should().BeTrue();
             File.Exists(result).Should().BeTrue(because: $"Result '{result}' must be a real file path.");
         }
     }

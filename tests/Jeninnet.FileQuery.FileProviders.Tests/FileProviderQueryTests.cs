@@ -29,7 +29,7 @@ public sealed class FileProviderQueryTests {
         var aborting = FileProviderQuery.From(provider)
             .WithErrorRecovery(FileQueryErrorRecoveryOptions.Abort);
 
-        FluentActions.Invoking(() => { _ = aborting.Execute(TestContext.CancellationToken).ToArray(); }).Should().ThrowExactly<UnauthorizedAccessException>();
+        FluentActions.Invoking(() => _ = aborting.Execute(TestContext.CancellationToken).ToArray()).Should().ThrowExactly<UnauthorizedAccessException>();
     }
 
     /// <summary>
@@ -59,10 +59,10 @@ public sealed class FileProviderQueryTests {
             .OrderBy(static entry => entry.RelativePath, StringComparer.Ordinal)
             .ToArray();
 
-        (entries.Select(static entry => entry.RelativePath)).Should().Equal(_physicalMatches);
-        (entries.All(static entry => entry.Length > 0)).Should().BeTrue();
-        (entries.All(static entry => entry.LastWriteTimeUtc > DateTime.MinValue)).Should().BeTrue();
-        (entries.All(static entry => entry.RootPath == "/")).Should().BeTrue();
+        entries.Select(static entry => entry.RelativePath).Should().Equal(_physicalMatches);
+        entries.All(static entry => entry.Length > 0).Should().BeTrue();
+        entries.All(static entry => entry.LastWriteTimeUtc > DateTime.MinValue).Should().BeTrue();
+        entries.All(static entry => entry.RootPath == "/").Should().BeTrue();
     }
 
     /// <summary>
@@ -103,7 +103,7 @@ public sealed class FileProviderQueryTests {
             .OrderBy(static entry => entry.RelativePath, StringComparer.Ordinal)
             .ToArray();
 
-        (entries.Select(static entry => entry.RelativePath)).Should().Equal(_memoryMatches);
+        entries.Select(static entry => entry.RelativePath).Should().Equal(_memoryMatches);
         entries[0].Length.Should().Be("class B {}".Length);
     }
 

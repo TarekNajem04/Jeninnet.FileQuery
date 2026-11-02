@@ -19,7 +19,7 @@ public sealed class FileQueryPatternSetTests {
     public void IsMatch_MatchesGlobPatterns() {
         var patternSet = CreateGlobSet("**/*.cs");
 
-        (patternSet.IsMatch("src/Program.cs")).Should().BeTrue();
+        patternSet.IsMatch("src/Program.cs").Should().BeTrue();
         patternSet.IsMatch("Program.cs").Should().BeTrue();
         patternSet.IsMatch("README.md").Should().BeFalse();
     }
@@ -54,8 +54,8 @@ public sealed class FileQueryPatternSetTests {
                 InterpretationMode: PatternInterpretationMode.Specific),
             PatternMatchingMode.GitIgnore);
 
-        (patternSet.IsMatch("src/a.cs")).Should().BeFalse();
-        (patternSet.IsMatch("other/src/a.cs")).Should().BeTrue();
+        patternSet.IsMatch("src/a.cs").Should().BeFalse();
+        patternSet.IsMatch("other/src/a.cs").Should().BeTrue();
     }
 
     /// <summary>
@@ -181,11 +181,11 @@ public sealed class FileQueryPatternSetTests {
                 InterpretationMode: PatternInterpretationMode.Specific),
             PatternMatchingMode.GitIgnore);
 
-        (patternSet.IsMatch("bin/")).Should().BeFalse();
+        patternSet.IsMatch("bin/").Should().BeFalse();
         patternSet.IsMatch("bin").Should().BeTrue();
-        (patternSet.IsMatch("bin/x.cs")).Should().BeFalse();
-        (patternSet.IsMatch("other/bin/x.cs")).Should().BeFalse();
-        (patternSet.IsMatch("other/bin")).Should().BeTrue();
+        patternSet.IsMatch("bin/x.cs").Should().BeFalse();
+        patternSet.IsMatch("other/bin/x.cs").Should().BeFalse();
+        patternSet.IsMatch("other/bin").Should().BeTrue();
     }
 
     /// <summary>
@@ -197,7 +197,7 @@ public sealed class FileQueryPatternSetTests {
             new PatternInput(),
             PatternMatchingMode.GitIgnore);
 
-        (patternSet.IsMatch("src/Program.cs")).Should().BeTrue();
+        patternSet.IsMatch("src/Program.cs").Should().BeTrue();
         patternSet.IsMatch("").Should().BeFalse();
         patternSet.Explain("").Outcome.Should().Be(FileQueryMatchOutcome.Exclude);
     }
@@ -213,7 +213,7 @@ public sealed class FileQueryPatternSetTests {
                 Patterns: ["**", "!keep/", "keep/file.txt"]),
             PatternMatchingMode.GitIgnore);
 
-        (patternSet.IsMatch("keep/file.txt")).Should().BeFalse();
+        patternSet.IsMatch("keep/file.txt").Should().BeFalse();
     }
 
     /// <summary>
@@ -227,8 +227,8 @@ public sealed class FileQueryPatternSetTests {
                 Patterns: ["**", "!keep/"]),
             PatternMatchingMode.GitIgnore);
 
-        (patternSet.IsMatch("keep/file.txt")).Should().BeTrue();
-        (patternSet.IsMatch("other/keep/inside.txt")).Should().BeTrue();
+        patternSet.IsMatch("keep/file.txt").Should().BeTrue();
+        patternSet.IsMatch("other/keep/inside.txt").Should().BeTrue();
     }
 
     /// <summary>
@@ -342,14 +342,12 @@ public sealed class FileQueryPatternSetTests {
     /// </summary>
     [TestMethod]
     public void PatternInput_RejectsEmptyAndWhitespacePatterns() {
-        FluentActions.Invoking(() => { _ = new PatternInput(Patterns: [""]); }).Should().ThrowExactly<ArgumentException>();
-        FluentActions.Invoking(() => { _ = new PatternInput(Patterns: ["   "]); }).Should().ThrowExactly<ArgumentException>();
-        FluentActions.Invoking(() => {
-            _ = new PatternInput(
+        FluentActions.Invoking(() => _ = new PatternInput(Patterns: [""])).Should().ThrowExactly<ArgumentException>();
+        FluentActions.Invoking(() => _ = new PatternInput(Patterns: ["   "])).Should().ThrowExactly<ArgumentException>();
+        FluentActions.Invoking(() => _ = new PatternInput(
                 TypedPatterns: new Dictionary<PatternKind, IEnumerable<string>> {
                     [PatternKind.GitIgnore] = [" "]
-                });
-        }).Should().ThrowExactly<ArgumentException>();
+                })).Should().ThrowExactly<ArgumentException>();
     }
 
     /// <summary>
@@ -357,19 +355,17 @@ public sealed class FileQueryPatternSetTests {
     /// </summary>
     [TestMethod]
     public void PatternInput_RejectsUndefinedInterpretationMode() =>
-        FluentActions.Invoking(() => { _ = new PatternInput(InterpretationMode: (PatternInterpretationMode)99); }).Should().ThrowExactly<ArgumentOutOfRangeException>();
+        FluentActions.Invoking(() => _ = new PatternInput(InterpretationMode: (PatternInterpretationMode)99)).Should().ThrowExactly<ArgumentOutOfRangeException>();
 
     /// <summary>
     /// Undefined pattern kinds are rejected at the public boundary.
     /// </summary>
     [TestMethod]
     public void PatternInput_RejectsUndefinedPatternKind() =>
-        FluentActions.Invoking(() => {
-            _ = new PatternInput(
+        FluentActions.Invoking(() => _ = new PatternInput(
                 TypedPatterns: new Dictionary<PatternKind, IEnumerable<string>> {
                     [(PatternKind)99] = ["*.cs"]
-                });
-        }).Should().ThrowExactly<ArgumentOutOfRangeException>();
+                })).Should().ThrowExactly<ArgumentOutOfRangeException>();
 
     /// <summary>
     /// Undefined case-sensitivity and matching-mode values are rejected.

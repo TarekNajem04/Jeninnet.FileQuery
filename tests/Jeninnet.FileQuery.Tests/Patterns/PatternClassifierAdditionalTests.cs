@@ -19,8 +19,8 @@ public class PatternClassifierAdditionalTests {
     public void Classify_HandleVariousPrefixes() {
         // Test cases based on code review of PatternClassifier
         PatternClassifier.Classify("!foo").Should().Be(PatternKind.GitIgnore);
-        (PatternClassifier.Classify("/foo")).Should().Be(PatternKind.GitIgnore);
-        (PatternClassifier.Classify("foo/")).Should().Be(PatternKind.GitIgnore);
-        (PatternClassifier.Classify("**/foo")).Should().Be(PatternKind.GitIgnore);
+        PatternClassifier.Classify("/foo").Should().Be(PatternKind.GitIgnore);
+        PatternClassifier.Classify("foo/").Should().Be(PatternKind.GitIgnore);
+        PatternClassifier.Classify("**/foo").Should().Be(PatternKind.GitIgnore);
     }
 }

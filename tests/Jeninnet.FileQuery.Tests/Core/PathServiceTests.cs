@@ -18,11 +18,11 @@ public class PathUtilitiesTests {
 
     /// <summary>Tests Normalize_ShouldRemoveDoubleSeparators.</summary>
     [TestMethod]
-    public void Normalize_ShouldRemoveDoubleSeparators() => (PathUtilities.Normalize(@"C:\\foo//bar")).Should().Be("C:/foo/bar");
+    public void Normalize_ShouldRemoveDoubleSeparators() => PathUtilities.Normalize(@"C:\\foo//bar").Should().Be("C:/foo/bar");
 
     /// <summary>Tests Normalize_ShouldPreserveRoot.</summary>
     [TestMethod]
-    public void Normalize_ShouldPreserveRoot() => (PathUtilities.Normalize("C:/")).Should().Be("C:/");
+    public void Normalize_ShouldPreserveRoot() => PathUtilities.Normalize("C:/").Should().Be("C:/");
 
     /// <summary>Tests BuildRelativePath_ShouldHandleDirectoryTrailingSlash.</summary>
     [TestMethod]
@@ -49,5 +49,5 @@ public class PathUtilitiesTests {
 
     /// <summary>Tests CountSegments_ShouldReturnZeroForEmptyPath.</summary>
     [TestMethod]
-    public void CountSegments_ShouldReturnZeroForEmptyPath() => (PathUtilities.CountSegments([], false)).Should().Be(0);
+    public void CountSegments_ShouldReturnZeroForEmptyPath() => PathUtilities.CountSegments([], false).Should().Be(0);
 }

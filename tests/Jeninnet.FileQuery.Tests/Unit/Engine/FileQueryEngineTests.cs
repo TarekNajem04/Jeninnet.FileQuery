@@ -156,8 +156,8 @@ public class FileQueryEngineTests {
         var matcher = CreateMatcher();
         var patterns = Compile(["*.cs", "!Program.cs"]);
 
-        (matcher.Match(patterns, CreateFileContext("Test.cs")).IsSuccess()).Should().BeFalse();
-        (matcher.Match(patterns, CreateFileContext("Program.cs")).IsSuccess()).Should().BeTrue();
+        matcher.Match(patterns, CreateFileContext("Test.cs")).IsSuccess().Should().BeFalse();
+        matcher.Match(patterns, CreateFileContext("Program.cs")).IsSuccess().Should().BeTrue();
     }
 
     /// <summary>
@@ -168,8 +168,8 @@ public class FileQueryEngineTests {
         var matcher = CreateMatcher();
         var patterns = Compile(["obj/"]);
 
-        (matcher.Match(patterns, CreateDirectoryContext("obj")).IsSuccess()).Should().BeFalse();
-        (matcher.Match(patterns, CreateFileContext("obj")).IsSuccess()).Should().BeTrue();
+        matcher.Match(patterns, CreateDirectoryContext("obj")).IsSuccess().Should().BeFalse();
+        matcher.Match(patterns, CreateFileContext("obj")).IsSuccess().Should().BeTrue();
     }
 
     /// <summary>

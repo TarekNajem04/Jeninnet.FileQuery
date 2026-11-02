@@ -18,14 +18,14 @@ public sealed class PatternClassifierTests {
     [TestMethod]
     public void Should_HandleAllBranches_When_Classified() {
         // Unknown (Malformed)
-        (PatternClassifier.Classify("[a-z")).Should().Be(PatternKind.Unknown);
+        PatternClassifier.Classify("[a-z").Should().Be(PatternKind.Unknown);
 
         // Empty
         PatternClassifier.Classify("").Should().Be(PatternKind.GitIgnore);
 
         // Regex
-        (PatternClassifier.Classify("r:.*")).Should().Be(PatternKind.Regex);
-        (PatternClassifier.Classify("regex:^.*$")).Should().Be(PatternKind.GitIgnore);
+        PatternClassifier.Classify("r:.*").Should().Be(PatternKind.Regex);
+        PatternClassifier.Classify("regex:^.*$").Should().Be(PatternKind.GitIgnore);
         PatternClassifier.Classify("regex:").Should().Be(PatternKind.GitIgnore);
 
         // Glob (Stray bracket)
@@ -45,7 +45,7 @@ public sealed class PatternClassifierTests {
         PatternClassifier.Classify("!foo").Should().Be(PatternKind.GitIgnore);
 
         // GitIgnore (Wildcard)
-        (PatternClassifier.Classify("*")).Should().Be(PatternKind.GitIgnore);
+        PatternClassifier.Classify("*").Should().Be(PatternKind.GitIgnore);
 
         // Literal
         PatternClassifier.Classify("foo").Should().Be(PatternKind.GitIgnore);

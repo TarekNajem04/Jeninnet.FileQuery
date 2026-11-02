@@ -43,9 +43,9 @@ public sealed class DirectoryResultTests {
             .Select(path => Relative(environment.Root, path))
             .ToArray();
 
-        (paths.Contains("src", StringComparer.Ordinal)).Should().BeFalse();
-        (paths.Contains("src/nested", StringComparer.Ordinal)).Should().BeFalse();
-        (paths.Contains("src/a.cs", StringComparer.Ordinal)).Should().BeTrue();
+        paths.Contains("src", StringComparer.Ordinal).Should().BeFalse();
+        paths.Contains("src/nested", StringComparer.Ordinal).Should().BeFalse();
+        paths.Contains("src/a.cs", StringComparer.Ordinal).Should().BeTrue();
     }
 
     /// <summary>
@@ -82,7 +82,7 @@ public sealed class DirectoryResultTests {
 
         directory.IsDirectory.Should().BeTrue();
         file.IsDirectory.Should().BeFalse();
-        (directory.RelativePath.EndsWith('/')).Should().BeFalse();
+        directory.RelativePath.EndsWith('/').Should().BeFalse();
     }
 
     /// <summary>
@@ -119,9 +119,9 @@ public sealed class DirectoryResultTests {
             .Select(entry => entry.RelativePath)
             .ToArray();
 
-        (entries.Contains("bin", StringComparer.Ordinal)).Should().BeFalse();
-        (entries.Contains("bin/tool.exe", StringComparer.Ordinal)).Should().BeFalse();
-        (entries.Contains("keep/keep.txt", StringComparer.Ordinal)).Should().BeTrue();
+        entries.Contains("bin", StringComparer.Ordinal).Should().BeFalse();
+        entries.Contains("bin/tool.exe", StringComparer.Ordinal).Should().BeFalse();
+        entries.Contains("keep/keep.txt", StringComparer.Ordinal).Should().BeTrue();
     }
 
     /// <summary>
@@ -142,7 +142,7 @@ public sealed class DirectoryResultTests {
             asyncResults.Add($"{entry.RelativePath}|{entry.IsDirectory}");
         }
 
-        (asyncResults.OrderBy(static value => value, StringComparer.Ordinal)).Should().Equal(sync);
+        asyncResults.OrderBy(static value => value, StringComparer.Ordinal).Should().Equal(sync);
     }
 
     /// <summary>
@@ -158,8 +158,8 @@ public sealed class DirectoryResultTests {
             .Select(path => Relative(environment.Root, path))
             .ToArray();
 
-        (paths.Contains("src", StringComparer.Ordinal)).Should().BeFalse();
-        (paths.Contains("src/a.cs", StringComparer.Ordinal)).Should().BeTrue();
+        paths.Contains("src", StringComparer.Ordinal).Should().BeFalse();
+        paths.Contains("src/a.cs", StringComparer.Ordinal).Should().BeTrue();
     }
 
     /// <summary>

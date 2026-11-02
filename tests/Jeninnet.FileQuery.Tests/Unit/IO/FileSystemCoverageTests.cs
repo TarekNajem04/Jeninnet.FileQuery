@@ -32,7 +32,7 @@ public class FileSystemCoverageTests {
     public void Should_CallStandardIO_When_DirectoryExistsChecked() {
         using var env = new TestEnvironment();
         FileSystem.Instance.DirectoryExists(env.Root).Should().BeTrue();
-        (FileSystem.Instance.DirectoryExists(System.IO.Path.Combine(env.Root, "non-existent"))).Should().BeFalse();
+        FileSystem.Instance.DirectoryExists(System.IO.Path.Combine(env.Root, "non-existent")).Should().BeFalse();
     }
 
     /// <summary>

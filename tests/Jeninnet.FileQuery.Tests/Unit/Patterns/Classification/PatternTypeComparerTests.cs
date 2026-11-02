@@ -18,7 +18,7 @@ public sealed class PatternTypeComparerTests {
     [TestMethod]
     public void Should_ReturnTrue_When_SameKindCompared() {
         var comparer = new PatternTypeComparer();
-        (comparer.Equals(PatternKind.Glob, PatternKind.Glob)).Should().BeTrue();
+        comparer.Equals(PatternKind.Glob, PatternKind.Glob).Should().BeTrue();
     }
 
     /// <summary>
@@ -27,7 +27,7 @@ public sealed class PatternTypeComparerTests {
     [TestMethod]
     public void Should_ReturnFalse_When_DifferentKindCompared() {
         var comparer = new PatternTypeComparer();
-        (comparer.Equals(PatternKind.Glob, PatternKind.Regex)).Should().BeFalse();
+        comparer.Equals(PatternKind.Glob, PatternKind.Regex).Should().BeFalse();
     }
 
     /// <summary>

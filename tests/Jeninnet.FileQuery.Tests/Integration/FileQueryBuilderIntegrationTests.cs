@@ -19,8 +19,8 @@ public sealed class Phase2CoverageDeepDiveTests {
     public void Should_MatchCorrectly_When_PosixClassesUsed() {
         static void AssertPosix(string className, char match, char noMatch) {
             var tokens = new List<IPatternToken> { new CharacterClassToken(new CharacterClass(false, [new PosixClass(className)])) };
-            (SegmentInstructionMatcher.MatchSegment(match.ToString().AsSpan(), tokens, StringComparison.Ordinal)).Should().BeTrue(because: $"Expected {match} to match {className}");
-            (SegmentInstructionMatcher.MatchSegment(noMatch.ToString().AsSpan(), tokens, StringComparison.Ordinal)).Should().BeFalse(because: $"Expected {noMatch} NOT to match {className}");
+            SegmentInstructionMatcher.MatchSegment(match.ToString().AsSpan(), tokens, StringComparison.Ordinal).Should().BeTrue(because: $"Expected {match} to match {className}");
+            SegmentInstructionMatcher.MatchSegment(noMatch.ToString().AsSpan(), tokens, StringComparison.Ordinal).Should().BeFalse(because: $"Expected {noMatch} NOT to match {className}");
         }
 
         AssertPosix("digit", '5', 'a');
@@ -38,7 +38,7 @@ public sealed class Phase2CoverageDeepDiveTests {
 
         // Unknown class should never match anything
         var unknownTokens = new List<IPatternToken> { new CharacterClassToken(new CharacterClass(false, [new PosixClass("unknown")])) };
-        (SegmentInstructionMatcher.MatchSegment("a".AsSpan(), unknownTokens, StringComparison.Ordinal)).Should().BeFalse();
+        SegmentInstructionMatcher.MatchSegment("a".AsSpan(), unknownTokens, StringComparison.Ordinal).Should().BeFalse();
     }
 
     /// <summary>
@@ -47,10 +47,10 @@ public sealed class Phase2CoverageDeepDiveTests {
     [TestMethod]
     public void Should_MatchCorrectly_When_CharRangeUsed() {
         var tokens = new List<IPatternToken> { new CharacterClassToken(new CharacterClass(false, [new CharRange('a', 'c')])) };
-        (SegmentInstructionMatcher.MatchSegment("a".AsSpan(), tokens, StringComparison.Ordinal)).Should().BeTrue();
-        (SegmentInstructionMatcher.MatchSegment("b".AsSpan(), tokens, StringComparison.Ordinal)).Should().BeTrue();
-        (SegmentInstructionMatcher.MatchSegment("c".AsSpan(), tokens, StringComparison.Ordinal)).Should().BeTrue();
-        (SegmentInstructionMatcher.MatchSegment("d".AsSpan(), tokens, StringComparison.Ordinal)).Should().BeFalse();
+        SegmentInstructionMatcher.MatchSegment("a".AsSpan(), tokens, StringComparison.Ordinal).Should().BeTrue();
+        SegmentInstructionMatcher.MatchSegment("b".AsSpan(), tokens, StringComparison.Ordinal).Should().BeTrue();
+        SegmentInstructionMatcher.MatchSegment("c".AsSpan(), tokens, StringComparison.Ordinal).Should().BeTrue();
+        SegmentInstructionMatcher.MatchSegment("d".AsSpan(), tokens, StringComparison.Ordinal).Should().BeFalse();
     }
 
     /// <summary>
@@ -151,6 +151,7 @@ public sealed class Phase2CoverageDeepDiveTests {
     /// <summary>
     /// Verifies that delegate-based match evaluation on match results behaves as expected.
     /// </summary>
+    /// <exception cref="AssertionFailedException">Thrown when the test assertion fails.</exception>
     [TestMethod]
     public void Should_WorkCorrectly_When_DelegateMatch() {
         TestMatch(true);

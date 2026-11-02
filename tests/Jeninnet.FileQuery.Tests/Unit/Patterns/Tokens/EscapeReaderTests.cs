@@ -21,7 +21,7 @@ public sealed class EscapeReaderTests {
     public void Should_ReturnFalse_When_NotEscape() {
         var pattern = "abc".AsSpan();
         var i = 0;
-        (_reader.TryRead(pattern, ref i, out _)).Should().BeFalse();
+        _reader.TryRead(pattern, ref i, out _).Should().BeFalse();
         i.Should().Be(0);
     }
 
@@ -32,7 +32,7 @@ public sealed class EscapeReaderTests {
     public void Should_ReturnFalse_When_BackslashAtEnd() {
         var pattern = "\\".AsSpan();
         var i = 0;
-        (_reader.TryRead(pattern, ref i, out _)).Should().BeFalse();
+        _reader.TryRead(pattern, ref i, out _).Should().BeFalse();
         i.Should().Be(0);
     }
 
@@ -43,7 +43,7 @@ public sealed class EscapeReaderTests {
     public void Should_ReturnFalse_When_InvalidEscape() {
         var pattern = "\\a".AsSpan();
         var i = 0;
-        (_reader.TryRead(pattern, ref i, out _)).Should().BeFalse();
+        _reader.TryRead(pattern, ref i, out _).Should().BeFalse();
         i.Should().Be(0);
     }
 
@@ -54,7 +54,7 @@ public sealed class EscapeReaderTests {
     public void Should_ReturnTrueAndToken_When_ValidEscape() {
         var pattern = "\\*".AsSpan();
         var i = 0;
-        (_reader.TryRead(pattern, ref i, out var token)).Should().BeTrue();
+        _reader.TryRead(pattern, ref i, out var token).Should().BeTrue();
         i.Should().Be(2);
         token.Should().BeAssignableTo<EscapeToken>();
         ((EscapeToken)token).Escaped.Should().Be('*');
@@ -67,7 +67,7 @@ public sealed class EscapeReaderTests {
     public void Should_ReturnTrueAndToken_When_ValidEscapeBackslash() {
         var pattern = "\\\\".AsSpan();
         var i = 0;
-        (_reader.TryRead(pattern, ref i, out var token)).Should().BeTrue();
+        _reader.TryRead(pattern, ref i, out var token).Should().BeTrue();
         i.Should().Be(2);
         token.Should().BeAssignableTo<EscapeToken>();
         ((EscapeToken)token).Escaped.Should().Be('\\');

@@ -33,9 +33,9 @@ public sealed class BraceExpansionTests {
     public void Compile_ExpandsNestedAlternation() {
         var patterns = CompileGlobSet("{src,test}/**/*.{cs,vb}");
 
-        (patterns.IsMatch("src/Program.cs")).Should().BeTrue();
-        (patterns.IsMatch("test/Program.vb")).Should().BeTrue();
-        (patterns.IsMatch("test/Program.txt")).Should().BeFalse();
+        patterns.IsMatch("src/Program.cs").Should().BeTrue();
+        patterns.IsMatch("test/Program.vb").Should().BeTrue();
+        patterns.IsMatch("test/Program.txt").Should().BeFalse();
     }
 
     /// <summary>
@@ -63,7 +63,7 @@ public sealed class BraceExpansionTests {
             PatternMatchingMode.Regex);
 
         patterns.IsMatch("a").Should().BeTrue();
-        (patterns.IsMatch(" a")).Should().BeFalse();
+        patterns.IsMatch(" a").Should().BeFalse();
     }
 
     /// <summary>
@@ -81,7 +81,7 @@ public sealed class BraceExpansionTests {
     /// Brace alternation is classified as a Glob feature.
     /// </summary>
     [TestMethod]
-    public void Classification_RecognizesBraceAlternation() => (PatternClassifier.Classify("*.{cs,vb}")).Should().Be(PatternKind.Glob);
+    public void Classification_RecognizesBraceAlternation() => PatternClassifier.Classify("*.{cs,vb}").Should().Be(PatternKind.Glob);
 
     /// <summary>
     /// An unterminated group reports a validation error with a position.

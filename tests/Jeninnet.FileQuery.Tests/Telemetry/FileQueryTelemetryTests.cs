@@ -121,7 +121,7 @@ public sealed class FileQueryTelemetryTests {
         var counters = new ConcurrentDictionary<string, long>(StringComparer.Ordinal);
         using var listener = CreateLongCounterListener(counters);
 
-        FluentActions.Invoking(() => { _ = results.ToList(); }).Should().ThrowExactly<IOException>();
+        FluentActions.Invoking(() => _ = results.ToList()).Should().ThrowExactly<IOException>();
         counters[FileQueryTelemetry.QueriesErrorsMetric].Should().BeGreaterThanOrEqualTo(1);
     }
 

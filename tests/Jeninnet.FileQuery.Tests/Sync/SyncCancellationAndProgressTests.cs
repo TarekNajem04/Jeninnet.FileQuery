@@ -24,7 +24,7 @@ public sealed class SyncCancellationAndProgressTests {
 
         var query = FileQuery.From(environment.Root);
 
-        FluentActions.Invoking(() => { _ = query.Execute(cancellation.Token).ToList(); }).Should().ThrowExactly<OperationCanceledException>();
+        FluentActions.Invoking(() => _ = query.Execute(cancellation.Token).ToList()).Should().ThrowExactly<OperationCanceledException>();
     }
 
     /// <summary>
@@ -93,7 +93,7 @@ public sealed class SyncCancellationAndProgressTests {
         using var cancellation = new CancellationTokenSource();
         cancellation.Cancel();
 
-        FluentActions.Invoking(() => { _ = query.ExecuteEntries(cancellation.Token).ToList(); }).Should().ThrowExactly<OperationCanceledException>();
+        FluentActions.Invoking(() => _ = query.ExecuteEntries(cancellation.Token).ToList()).Should().ThrowExactly<OperationCanceledException>();
     }
 
     /// <summary>
