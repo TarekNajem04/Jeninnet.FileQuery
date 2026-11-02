@@ -49,7 +49,7 @@ public sealed class FileQueryEntryTests {
             .ToArray();
 
         Assert.AreSequenceEqual(
-            _nestedEntries, entries.Select(static entry => entry.RelativePath).ToArray(), Microsoft.VisualStudio.TestTools.UnitTesting.SequenceOrder.InAnyOrder);
+            _nestedEntries, entries.Select(static entry => entry.RelativePath), Microsoft.VisualStudio.TestTools.UnitTesting.SequenceOrder.InAnyOrder);
     }
 
     /// <summary>
@@ -69,7 +69,7 @@ public sealed class FileQueryEntryTests {
             asyncEntries.Add(entry.RelativePath);
         }
 
-        Assert.AreSequenceEqual(sync, asyncEntries.OrderBy(static path => path, StringComparer.Ordinal).ToArray());
+        Assert.AreSequenceEqual(sync, asyncEntries.OrderBy(static path => path, StringComparer.Ordinal));
     }
 
     /// <summary>

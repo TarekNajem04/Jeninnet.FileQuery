@@ -761,7 +761,7 @@ try {
         "/d:sonar.token=$Token",
         "/d:sonar.cs.vstest.reportsPaths=TestResults/**/*.trx",
         "/d:sonar.cs.opencover.reportsPaths=**/coverage.opencover.xml",
-        "/d:sonar.coverage.exclusions=**/*.ps1,docs/**,scripts/**,.github/**,artifacts/**",
+        "/d:sonar.coverage.exclusions=**/*.ps1,docs/**,scripts/**,.github/**,artifacts/**,src/Jeninnet.FileQuery.Soak/**,src/Jeninnet.FileQuery.AotSmoke/**",
         "/d:sonar.scm.provider=git",
         "/d:sonar.scm.forceReloadAll=true",
         "/d:sonar.exclusions=samples/**,src/**[Bb]enchmarks/**,docs/**,scripts/**,.github/**,artifacts/**,**/*.ps1,**/*.md,**/bin/**,**/obj/**,**/TestResults/**",

@@ -208,23 +208,23 @@ internal static class SoakRunner {
             .AppendLine("## Soak summary")
             .AppendLine()
             .AppendLine("| Metric | Value |")
-            .AppendLine("|---|---|");
-        builder.AppendLine(CultureInfo.InvariantCulture, $"| Verdict | **{(analysis.Passed ? "PASS" : "FAIL")}** |");
-        builder.AppendLine(CultureInfo.InvariantCulture, $"| Operating system | {report.OperatingSystem} |");
-        builder.AppendLine(CultureInfo.InvariantCulture, $"| Runtime | {report.Runtime} |");
-        builder.AppendLine(CultureInfo.InvariantCulture, $"| Processors | {report.ProcessorCount} |");
-        builder.AppendLine(CultureInfo.InvariantCulture, $"| Dataset | {report.DatasetFiles:N0} files |");
-        builder.AppendLine(CultureInfo.InvariantCulture, $"| Query | `{report.Options.Query}` |");
-        builder.AppendLine(CultureInfo.InvariantCulture, $"| Iterations | {analysis.Iterations:N0} |");
-        builder.AppendLine(CultureInfo.InvariantCulture, $"| Matches per iteration | {analysis.MatchesPerIteration:N0} |");
-        builder.AppendLine(CultureInfo.InvariantCulture, $"| Throughput | {analysis.ThroughputPerSecond:F1} iterations/s |");
-        builder.AppendLine(CultureInfo.InvariantCulture, $"| Iteration time (mean / p50 / p95) | {analysis.MeanMs:F2} / {analysis.P50Ms:F2} / {analysis.P95Ms:F2} ms |");
-        builder.AppendLine(CultureInfo.InvariantCulture, $"| First half / second half mean | {analysis.FirstHalfMeanMs:F2} / {analysis.SecondHalfMeanMs:F2} ms |");
-        builder.AppendLine(CultureInfo.InvariantCulture, $"| Managed heap first / last | {ToMegabytes(analysis.HeapFirstBytes):F2} / {ToMegabytes(analysis.HeapLastBytes):F2} MB |");
-        builder.AppendLine(CultureInfo.InvariantCulture, $"| Managed heap growth | {analysis.HeapGrowthMegabytes:F2} MB (threshold {report.Options.MaxGrowthMegabytes:F2} MB) |");
-        builder.AppendLine(CultureInfo.InvariantCulture, $"| Heap slope | {analysis.HeapSlopeBytesPerIteration:F1} B/iteration |");
-        builder.AppendLine(CultureInfo.InvariantCulture, $"| Allocated during run | {ToMegabytes(analysis.AllocatedBytes):F2} MB |");
-        builder.AppendLine();
+            .AppendLine("|---|---|")
+            .AppendLine(CultureInfo.InvariantCulture, $"| Verdict | **{(analysis.Passed ? "PASS" : "FAIL")}** |")
+            .AppendLine(CultureInfo.InvariantCulture, $"| Operating system | {report.OperatingSystem} |")
+            .AppendLine(CultureInfo.InvariantCulture, $"| Runtime | {report.Runtime} |")
+            .AppendLine(CultureInfo.InvariantCulture, $"| Processors | {report.ProcessorCount} |")
+            .AppendLine(CultureInfo.InvariantCulture, $"| Dataset | {report.DatasetFiles:N0} files |")
+            .AppendLine(CultureInfo.InvariantCulture, $"| Query | `{report.Options.Query}` |")
+            .AppendLine(CultureInfo.InvariantCulture, $"| Iterations | {analysis.Iterations:N0} |")
+            .AppendLine(CultureInfo.InvariantCulture, $"| Matches per iteration | {analysis.MatchesPerIteration:N0} |")
+            .AppendLine(CultureInfo.InvariantCulture, $"| Throughput | {analysis.ThroughputPerSecond:F1} iterations/s |")
+            .AppendLine(CultureInfo.InvariantCulture, $"| Iteration time (mean / p50 / p95) | {analysis.MeanMs:F2} / {analysis.P50Ms:F2} / {analysis.P95Ms:F2} ms |")
+            .AppendLine(CultureInfo.InvariantCulture, $"| First half / second half mean | {analysis.FirstHalfMeanMs:F2} / {analysis.SecondHalfMeanMs:F2} ms |")
+            .AppendLine(CultureInfo.InvariantCulture, $"| Managed heap first / last | {ToMegabytes(analysis.HeapFirstBytes):F2} / {ToMegabytes(analysis.HeapLastBytes):F2} MB |")
+            .AppendLine(CultureInfo.InvariantCulture, $"| Managed heap growth | {analysis.HeapGrowthMegabytes:F2} MB (threshold {report.Options.MaxGrowthMegabytes:F2} MB) |")
+            .AppendLine(CultureInfo.InvariantCulture, $"| Heap slope | {analysis.HeapSlopeBytesPerIteration:F1} B/iteration |")
+            .AppendLine(CultureInfo.InvariantCulture, $"| Allocated during run | {ToMegabytes(analysis.AllocatedBytes):F2} MB |")
+            .AppendLine();
 
         if(analysis.Failures.Count > 0) {
             builder

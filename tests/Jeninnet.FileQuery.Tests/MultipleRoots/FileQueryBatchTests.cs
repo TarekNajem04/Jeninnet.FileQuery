@@ -31,8 +31,8 @@ public sealed class FileQueryBatchTests {
         Assert.IsNotEmpty(firstPaths);
         Assert.IsNotEmpty(secondPaths);
         Assert.IsTrue(secondPaths.All(path => path.StartsWith(second.Root, StringComparison.Ordinal)));
-        Assert.AreSequenceEqual(FileQueryRuntime.Create().Execute(batchQuery(first), TestContext.CancellationToken).ToArray(), firstPaths);
-        Assert.AreSequenceEqual(FileQueryRuntime.Create().Execute(batchQuery(second), TestContext.CancellationToken).ToArray(), secondPaths);
+        Assert.AreSequenceEqual(FileQueryRuntime.Create().Execute(batchQuery(first), TestContext.CancellationToken), firstPaths);
+        Assert.AreSequenceEqual(FileQueryRuntime.Create().Execute(batchQuery(second), TestContext.CancellationToken), secondPaths);
 
         static FileQuery batchQuery(TestEnvironment environment) =>
             FileQuery.From(environment.Root)
@@ -56,7 +56,7 @@ public sealed class FileQueryBatchTests {
 
         Assert.HasCount(2, entries);
         Assert.AreSequenceEqual(
-            [first.Root, second.Root], entries.Select(static entry => entry.RootPath).ToArray(), Microsoft.VisualStudio.TestTools.UnitTesting.SequenceOrder.InAnyOrder);
+            [first.Root, second.Root], entries.Select(static entry => entry.RootPath), Microsoft.VisualStudio.TestTools.UnitTesting.SequenceOrder.InAnyOrder);
         Assert.AreEqual(Path.Combine(first.Root, "a.txt"), entries.Single(entry => entry.RootPath == first.Root).FullPath);
         Assert.AreEqual(Path.Combine(second.Root, "a.txt"), entries.Single(entry => entry.RootPath == second.Root).FullPath);
     }
@@ -81,7 +81,7 @@ public sealed class FileQueryBatchTests {
             asyncResults.Add($"{entry.RootPath}|{entry.RelativePath}");
         }
 
-        Assert.AreSequenceEqual(sync, asyncResults.ToArray());
+        Assert.AreSequenceEqual(sync, asyncResults);
     }
 
     /// <summary>

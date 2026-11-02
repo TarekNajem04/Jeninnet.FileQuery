@@ -89,6 +89,8 @@ $env:SONAR_TOKEN_LOCAL = "<local token>"
   `artifacts/sonar-issues.txt`.
 - Coverage requires `coverlet.collector` (referenced by the test projects) and the
   `tests/coverage.opencover.runsettings` file; the script passes both to `dotnet test`.
+- The Soak and AotSmoke harness projects are excluded from the coverage metric because they are
+  executable harnesses, not shipped libraries; they remain part of the issue analysis.
 - The scanner honors `.editorconfig` severities, so rules pinned there stay silent both
   locally and in CI.
 - The main-branch warning applies to SonarCloud only. A local SonarQube server analyzes the
@@ -103,8 +105,9 @@ The 2026-11-02 local run used SonarQube Community Build 26.10 with `-Local -With
 |---|---|
 | Open issues | **0** |
 | Quality Gate | **OK** |
-| Sonar coverage | **84.6%** (85.4% lines, 83.1% branches) |
+| Sonar coverage | **86.9%** (88.9% lines, 83.1% branches) |
 | Maintained lines (ncloc) | 8,613 |
+| Covered / uncovered lines | 4,737 / 593 |
 | Duplicated lines | **0.0%** (0 lines, 0 blocks) |
 | Bugs / vulnerabilities / code smells | 0 / 0 / 0 |
 

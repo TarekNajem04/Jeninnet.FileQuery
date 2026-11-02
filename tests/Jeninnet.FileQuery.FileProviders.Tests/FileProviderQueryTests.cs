@@ -59,7 +59,7 @@ public sealed class FileProviderQueryTests {
             .OrderBy(static entry => entry.RelativePath, StringComparer.Ordinal)
             .ToArray();
 
-        Assert.AreSequenceEqual(_physicalMatches, entries.Select(static entry => entry.RelativePath).ToArray());
+        Assert.AreSequenceEqual(_physicalMatches, entries.Select(static entry => entry.RelativePath));
         Assert.IsTrue(entries.All(static entry => entry.Length > 0));
         Assert.IsTrue(entries.All(static entry => entry.LastWriteTimeUtc > DateTime.MinValue));
         Assert.IsTrue(entries.All(static entry => entry.RootPath == "/"));
@@ -83,7 +83,7 @@ public sealed class FileProviderQueryTests {
             .ToArray();
 
         Assert.AreSequenceEqual(
-            _memoryMatches, entries.Select(static entry => entry.RelativePath).ToArray());
+            _memoryMatches, entries.Select(static entry => entry.RelativePath));
         Assert.AreEqual("class B {}".Length, entries[0].Length);
     }
 

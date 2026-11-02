@@ -142,7 +142,7 @@ public sealed class DirectoryResultTests {
             asyncResults.Add($"{entry.RelativePath}|{entry.IsDirectory}");
         }
 
-        Assert.AreSequenceEqual(sync, asyncResults.OrderBy(static value => value, StringComparer.Ordinal).ToArray());
+        Assert.AreSequenceEqual(sync, asyncResults.OrderBy(static value => value, StringComparer.Ordinal));
     }
 
     /// <summary>
