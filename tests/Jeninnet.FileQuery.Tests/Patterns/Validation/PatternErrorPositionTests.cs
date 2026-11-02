@@ -21,7 +21,7 @@ public sealed class PatternErrorPositionTests {
 
         Assert.IsTrue(isMalformed);
         Assert.IsNotNull(error);
-        StringAssert.Contains(error, "Missing closing bracket");
+        Assert.Contains("Missing closing bracket", error);
         Assert.AreEqual(4, position);
         Assert.AreEqual(1, segment);
     }
@@ -77,7 +77,7 @@ public sealed class PatternErrorPositionTests {
     public void PatternException_ReportsReason_ForMalformedUntypedPattern() {
         var exception = Assert.ThrowsExactly<PatternException>(() => CompileHybrid("src/[abc"));
 
-        StringAssert.Contains(exception.Message, "Missing closing bracket");
+        Assert.Contains("Missing closing bracket", exception.Message);
         Assert.AreEqual(4, exception.Position);
         Assert.AreEqual(1, exception.Segment);
     }

@@ -97,7 +97,7 @@ public sealed class ExplainTests {
         included.GetProperty("patternKind").GetString().Should().Be("GitIgnore");
         included.GetProperty("patternIndex").GetInt32().Should().Be(1);
         included.GetProperty("reason").GetString().Should().Contain("Include");
-        Assert.IsTrue(included.GetProperty("length").GetInt64() >= 0);
+        Assert.IsGreaterThanOrEqualTo(0, included.GetProperty("length").GetInt64());
 
         var excluded = byPath["a.txt"];
         excluded.GetProperty("outcome").GetString().Should().Be("exclude");

@@ -51,7 +51,7 @@ public sealed class PatternLiteralAnalyzer : DiagnosticAnalyzer {
         helpLinkUri: "https://github.com/TarekNajem04/Jeninnet.FileQuery/blob/main/docs/guides/roslyn-analyzers.md");
 
     /// <inheritdoc/>
-    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => ImmutableArray.Create(_rule);
+    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [_rule];
 
     /// <inheritdoc/>
     public override void Initialize(AnalysisContext context) {
@@ -70,16 +70,16 @@ public sealed class PatternLiteralAnalyzer : DiagnosticAnalyzer {
     /// <param name="context">The syntax node analysis context.</param>
     private static void AnalyzeInvocation(SyntaxNodeAnalysisContext context) {
         var invocation = (Microsoft.CodeAnalysis.CSharp.Syntax.InvocationExpressionSyntax)context.Node;
-        var symbol = context.SemanticModel.GetSymbolInfo(invocation, context.CancellationToken).Symbol as IMethodSymbol;
+        var symbol = context.SemanticModel.GetSymbolInfo(invocation, context.CancellationToken).Symbol;
 
-        if(symbol is null || !IsWhereMethod(symbol)) {
+        if(symbol is not IMethodSymbol method || !IsWhereMethod(method)) {
             return;
         }
 
         var arguments = invocation.ArgumentList.Arguments;
 
         for(var index = 0; index < arguments.Count; index++) {
-            var parameter = ResolveParameter(symbol, index);
+            var parameter = ResolveParameter(method, index);
             var patterns = PatternLiteralReader.Read(
                 invocation,
                 index,

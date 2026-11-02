@@ -51,8 +51,8 @@ public sealed class BfsTraversalTests {
             )
         );
 
-        var bfsResults = engine.Execute(new(env.Root, bfsOptions)).ToList();
-        var dfsResults = engine.Execute(new(env.Root, dfsOptions)).ToList();
+        var bfsResults = engine.Execute(new(env.Root, bfsOptions), TestContext.CancellationToken).ToList();
+        var dfsResults = engine.Execute(new(env.Root, dfsOptions), TestContext.CancellationToken).ToList();
 
         Assert.AreSequenceEqual(dfsResults, bfsResults, SequenceOrder.InAnyOrder, "BFS and DFS must return the same set of files.");
 
@@ -79,7 +79,7 @@ public sealed class BfsTraversalTests {
             )
         );
 
-        var results = engine.Execute(new(env.Root, options)).ToList();
+        var results = engine.Execute(new(env.Root, options), TestContext.CancellationToken).ToList();
 
         Assert.HasCount(2, results);
 
@@ -113,7 +113,7 @@ public sealed class BfsTraversalTests {
             )
         );
 
-        var results = engine.Execute(new(env.Root, options)).ToList();
+        var results = engine.Execute(new(env.Root, options), TestContext.CancellationToken).ToList();
 
         Assert.HasCount(2, results,
             "MaxRecursionDepth = 1 must include depth 0 and 1 only.");
@@ -141,7 +141,7 @@ public sealed class BfsTraversalTests {
             )
         );
 
-        var syncResults = engine.Execute(new(env.Root, options)).Order().ToList();
+        var syncResults = engine.Execute(new(env.Root, options), TestContext.CancellationToken).Order().ToList();
         var asyncResults = await engine
             .ExecuteAsync(new(env.Root, options), TestContext.CancellationToken)
             .ToListAsync(TestContext.CancellationToken);

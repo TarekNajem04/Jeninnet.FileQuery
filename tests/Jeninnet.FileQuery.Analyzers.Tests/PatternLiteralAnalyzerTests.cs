@@ -33,59 +33,59 @@ public sealed class PatternLiteralAnalyzerTests {
     /// A missing closing bracket is reported.
     /// </summary>
     [TestMethod]
-    public async Task Analyzer_Reports_MissingClosingBracket() {
+    public async Task Analyzer_Reports_MissingClosingBracketAsync() {
         var source = Compose("""builder.Where(PatternKind.GitIgnore, ["a[b"]);""");
 
         var diagnostics = await AnalyzerTestHost.GetDiagnosticsAsync(source);
 
-        Assert.AreEqual(1, diagnostics.Length);
+        Assert.HasCount(1, diagnostics);
         Assert.AreEqual(PatternLiteralAnalyzer.DiagnosticId, diagnostics[0].Id);
-        StringAssert.Contains(diagnostics[0].GetMessage(CultureInfo.InvariantCulture), "missing closing bracket");
+        Assert.Contains("missing closing bracket", diagnostics[0].GetMessage(CultureInfo.InvariantCulture));
     }
 
     /// <summary>
     /// A trailing backslash is reported.
     /// </summary>
     [TestMethod]
-    public async Task Analyzer_Reports_TrailingBackslash() {
+    public async Task Analyzer_Reports_TrailingBackslashAsync() {
         var source = Compose("""builder.Where(PatternKind.GitIgnore, ["a\\"]);""");
 
         var diagnostics = await AnalyzerTestHost.GetDiagnosticsAsync(source);
 
-        Assert.AreEqual(1, diagnostics.Length);
-        StringAssert.Contains(diagnostics[0].GetMessage(CultureInfo.InvariantCulture), "unescaped backslash");
+        Assert.HasCount(1, diagnostics);
+        Assert.Contains("unescaped backslash", diagnostics[0].GetMessage(CultureInfo.InvariantCulture));
     }
 
     /// <summary>
     /// Delimited string overloads are split before validation.
     /// </summary>
     [TestMethod]
-    public async Task Analyzer_Reports_MalformedPartOfDelimitedString() {
+    public async Task Analyzer_Reports_MalformedPartOfDelimitedStringAsync() {
         var source = Compose("""builder.Where("*.cs;[a-]");""");
 
         var diagnostics = await AnalyzerTestHost.GetDiagnosticsAsync(source);
 
-        Assert.AreEqual(1, diagnostics.Length);
-        StringAssert.Contains(diagnostics[0].GetMessage(CultureInfo.InvariantCulture), "invalid range");
+        Assert.HasCount(1, diagnostics);
+        Assert.Contains("invalid range", diagnostics[0].GetMessage(CultureInfo.InvariantCulture));
     }
 
     /// <summary>
     /// Valid patterns, including POSIX classes and escaped brackets, do not produce diagnostics.
     /// </summary>
     [TestMethod]
-    public async Task Analyzer_DoesNotReport_ValidPatterns() {
+    public async Task Analyzer_DoesNotReport_ValidPatternsAsync() {
         var source = Compose("""builder.Where(PatternKind.GitIgnore, ["**/*.cs", "!bin/", "[[:digit:]]", "a[0-9]", "\\[literal\\]"]);""");
 
         var diagnostics = await AnalyzerTestHost.GetDiagnosticsAsync(source);
 
-        Assert.AreEqual(0, diagnostics.Length);
+        Assert.IsEmpty(diagnostics);
     }
 
     /// <summary>
     /// Non-constant values are ignored to avoid false positives.
     /// </summary>
     [TestMethod]
-    public async Task Analyzer_DoesNotReport_NonConstantPatterns() {
+    public async Task Analyzer_DoesNotReport_NonConstantPatternsAsync() {
         var source = Compose(
             """
             var pattern = LoadPattern();
@@ -96,14 +96,14 @@ public sealed class PatternLiteralAnalyzerTests {
 
         var diagnostics = await AnalyzerTestHost.GetDiagnosticsAsync(source);
 
-        Assert.AreEqual(0, diagnostics.Length);
+        Assert.IsEmpty(diagnostics);
     }
 
     /// <summary>
     /// Other <c>Where</c> methods are not analyzed.
     /// </summary>
     [TestMethod]
-    public async Task Analyzer_DoesNotReport_UnrelatedWhereMethod() {
+    public async Task Analyzer_DoesNotReport_UnrelatedWhereMethodAsync() {
         var source = Compose(
             """
             Unrelated.Where("a[b");
@@ -116,24 +116,24 @@ public sealed class PatternLiteralAnalyzerTests {
 
         var diagnostics = await AnalyzerTestHost.GetDiagnosticsAsync(source);
 
-        Assert.AreEqual(0, diagnostics.Length);
+        Assert.IsEmpty(diagnostics);
     }
 
     /// <summary>
     /// The code fix closes a character class when the rewrite is safe.
     /// </summary>
     [TestMethod]
-    public async Task CodeFix_ClosesCharacterClass() {
+    public async Task CodeFix_ClosesCharacterClassAsync() {
         var source = Compose("""builder.Where(PatternKind.GitIgnore, ["a[b"]);""");
 
         var fixedSource = await AnalyzerTestHost.ApplyFirstFixAsync(source);
 
-        StringAssert.Contains(fixedSource, """["a[b]"]""");
+        Assert.Contains("""["a[b]"]""", fixedSource);
     }
 
     /// <summary>
     /// Builds a compilable source file around a method body statement.
     /// </summary>
     /// <param name="body">The statement to insert.</param>
-    private static string Compose(string body) => $"{HEADER}{body}{FOOTER}";
+    private static string Compose(string body) => HEADER + body + FOOTER;
 }

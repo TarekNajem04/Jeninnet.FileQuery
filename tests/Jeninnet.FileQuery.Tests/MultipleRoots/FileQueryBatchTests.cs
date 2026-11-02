@@ -23,7 +23,7 @@ public sealed class FileQueryBatchTests {
             FileQuery.From(first.Root).UsingGitIgnore().Where(PatternKind.GitIgnore, ["**", "!**/*.txt"]),
             FileQuery.From(second.Root).UsingGitIgnore().Where(PatternKind.GitIgnore, ["**", "!**/*.txt"]));
 
-        var paths = batch.Execute().ToArray();
+        var paths = batch.Execute(cancellationToken: TestContext.CancellationToken).ToArray();
 
         var firstPaths = paths.TakeWhile(path => path.StartsWith(first.Root, StringComparison.Ordinal)).ToArray();
         var secondPaths = paths.Skip(firstPaths.Length).ToArray();
@@ -31,8 +31,8 @@ public sealed class FileQueryBatchTests {
         Assert.IsNotEmpty(firstPaths);
         Assert.IsNotEmpty(secondPaths);
         Assert.IsTrue(secondPaths.All(path => path.StartsWith(second.Root, StringComparison.Ordinal)));
-        CollectionAssert.AreEqual(FileQueryRuntime.Create().Execute(batchQuery(first)).ToArray(), firstPaths);
-        CollectionAssert.AreEqual(FileQueryRuntime.Create().Execute(batchQuery(second)).ToArray(), secondPaths);
+        Assert.AreSequenceEqual(FileQueryRuntime.Create().Execute(batchQuery(first), TestContext.CancellationToken).ToArray(), firstPaths);
+        Assert.AreSequenceEqual(FileQueryRuntime.Create().Execute(batchQuery(second), TestContext.CancellationToken).ToArray(), secondPaths);
 
         static FileQuery batchQuery(TestEnvironment environment) =>
             FileQuery.From(environment.Root)
@@ -52,12 +52,11 @@ public sealed class FileQueryBatchTests {
             FileQuery.From(first.Root).UsingGitIgnore().Where(PatternKind.GitIgnore, ["**", "!**/*.txt"]),
             FileQuery.From(second.Root).UsingGitIgnore().Where(PatternKind.GitIgnore, ["**", "!**/*.txt"]));
 
-        var entries = batch.ExecuteEntries().Where(static entry => entry.RelativePath == "a.txt").ToArray();
+        var entries = batch.ExecuteEntries(cancellationToken: TestContext.CancellationToken).Where(static entry => entry.RelativePath == "a.txt").ToArray();
 
-        Assert.AreEqual(2, entries.Length);
-        CollectionAssert.AreEquivalent(
-            new[] { first.Root, second.Root },
-            entries.Select(static entry => entry.RootPath).ToArray());
+        Assert.HasCount(2, entries);
+        Assert.AreSequenceEqual(
+            [first.Root, second.Root], entries.Select(static entry => entry.RootPath).ToArray(), Microsoft.VisualStudio.TestTools.UnitTesting.SequenceOrder.InAnyOrder);
         Assert.AreEqual(Path.Combine(first.Root, "a.txt"), entries.Single(entry => entry.RootPath == first.Root).FullPath);
         Assert.AreEqual(Path.Combine(second.Root, "a.txt"), entries.Single(entry => entry.RootPath == second.Root).FullPath);
     }
@@ -66,23 +65,23 @@ public sealed class FileQueryBatchTests {
     /// The asynchronous batch returns the same entries as the synchronous batch.
     /// </summary>
     [TestMethod]
-    public async Task ExecuteEntriesAsync_MatchesSyncResults() {
+    public async Task ExecuteEntriesAsync_MatchesSyncResultsAsync() {
         using var first = CreateFirstRoot();
         using var second = CreateSecondRoot();
         var batch = FileQueryBatch.From(
             FileQuery.From(first.Root).UsingGitIgnore().Where(PatternKind.GitIgnore, ["**", "!**/*.txt"]),
             FileQuery.From(second.Root).UsingGitIgnore().Where(PatternKind.GitIgnore, ["**", "!**/*.txt"]));
 
-        var sync = batch.ExecuteEntries()
+        var sync = batch.ExecuteEntries(cancellationToken: TestContext.CancellationToken)
             .Select(static entry => $"{entry.RootPath}|{entry.RelativePath}")
             .ToArray();
         var asyncResults = new List<string>();
 
-        await foreach(var entry in batch.ExecuteEntriesAsync()) {
+        await foreach(var entry in batch.ExecuteEntriesAsync(TestContext.CancellationToken)) {
             asyncResults.Add($"{entry.RootPath}|{entry.RelativePath}");
         }
 
-        CollectionAssert.AreEqual(sync, asyncResults.ToArray());
+        Assert.AreSequenceEqual(sync, asyncResults.ToArray());
     }
 
     /// <summary>
@@ -96,11 +95,11 @@ public sealed class FileQueryBatchTests {
             FileQuery.From(first.Root).UsingGitIgnore().Where(PatternKind.GitIgnore, ["**", "!**/*.txt"]),
             FileQuery.From(second.Root).UsingGitIgnore().Where(PatternKind.GitIgnore, ["**", "!**/*.log"]));
 
-        var paths = batch.Execute().ToArray();
+        var paths = batch.Execute(cancellationToken: TestContext.CancellationToken).ToArray();
 
-        Assert.IsTrue(paths.Any(path => path.StartsWith(first.Root, StringComparison.Ordinal) && path.EndsWith(".txt", StringComparison.Ordinal)));
-        Assert.IsFalse(paths.Any(path => path.StartsWith(first.Root, StringComparison.Ordinal) && path.EndsWith(".log", StringComparison.Ordinal)));
-        Assert.IsTrue(paths.Any(path => path.StartsWith(second.Root, StringComparison.Ordinal) && path.EndsWith(".log", StringComparison.Ordinal)));
+        Assert.Contains(path => path.StartsWith(first.Root, StringComparison.Ordinal) && path.EndsWith(".txt", StringComparison.Ordinal), paths);
+        Assert.DoesNotContain(path => path.StartsWith(first.Root, StringComparison.Ordinal) && path.EndsWith(".log", StringComparison.Ordinal), paths);
+        Assert.Contains(path => path.StartsWith(second.Root, StringComparison.Ordinal) && path.EndsWith(".log", StringComparison.Ordinal), paths);
     }
 
     /// <summary>
@@ -125,9 +124,9 @@ public sealed class FileQueryBatchTests {
     public void Execute_EmptyBatch_ReturnsEmpty() {
         var batch = FileQueryBatch.Create([]);
 
-        Assert.AreEqual(0, batch.Roots.Count);
-        Assert.AreEqual(0, batch.Execute().Count());
-        Assert.AreEqual(0, batch.ExecuteEntries().Count());
+        Assert.IsEmpty(batch.Roots);
+        Assert.IsEmpty(batch.Execute(cancellationToken: TestContext.CancellationToken));
+        Assert.IsEmpty(batch.ExecuteEntries(cancellationToken: TestContext.CancellationToken));
     }
 
     private static TestEnvironment CreateFirstRoot() {
@@ -141,4 +140,10 @@ public sealed class FileQueryBatchTests {
         environment.CreateFiles("a.txt", "c.log", "nested/d.txt");
         return environment;
     }
+
+    /// <summary>
+    /// Gets or sets the test context, which provides information about the current test run.
+    /// Used here primarily for accessing the <see cref="CancellationToken"/>.
+    /// </summary>
+    public TestContext TestContext { get; set; } = null!;
 }

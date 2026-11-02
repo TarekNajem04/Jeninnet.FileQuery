@@ -36,7 +36,7 @@ public class RecursiveWildcardTests {
             )
         );
 
-        var result = fileQueryEngine.Execute(new(env.Root, options))
+        var result = fileQueryEngine.Execute(new(env.Root, options), TestContext.CancellationToken)
                                     .Order()
                                     .ToList();
 
@@ -67,7 +67,7 @@ public class RecursiveWildcardTests {
             )
         );
 
-        var result = fileQueryEngine.Execute(new(env.Root, options))
+        var result = fileQueryEngine.Execute(new(env.Root, options), TestContext.CancellationToken)
                                     .Order()
                                     .ToList();
 
@@ -96,11 +96,17 @@ public class RecursiveWildcardTests {
             )
         );
 
-        var result = fileQueryEngine.Execute(new(env.Root, options))
+        var result = fileQueryEngine.Execute(new(env.Root, options), TestContext.CancellationToken)
                                     .ToList();
 
         result.Should().Contain(static x => x.EndsWith("a.txt", StringComparison.Ordinal));
         result.Should().Contain(static x => x.EndsWith("c.txt", StringComparison.Ordinal));
         result.Should().NotContain(static x => x.EndsWith("b.log", StringComparison.Ordinal));
     }
+
+    /// <summary>
+    /// Gets or sets the test context, which provides information about the current test run.
+    /// Used here primarily for accessing the <see cref="CancellationToken"/>.
+    /// </summary>
+    public TestContext TestContext { get; set; } = null!;
 }

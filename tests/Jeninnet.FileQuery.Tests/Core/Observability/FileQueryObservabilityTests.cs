@@ -62,7 +62,7 @@ public sealed class FileQueryObservabilityTests {
             )
         );
 
-        var results = FileQueryRuntime.Create().Execute(query).ToList();
+        var results = FileQueryRuntime.Create().Execute(query, TestContext.CancellationToken).ToList();
 
         TestAssertEx.HasCount(results, 1);
         var included = diagnostics.Values.Single(static d => d.RelativePath == "keep.txt");
@@ -112,7 +112,7 @@ public sealed class FileQueryObservabilityTests {
         var engine = CreateEngine(fileSystem);
         var query = CreateRecoveryQuery(fileSystem, FileQueryErrorRecoveryOptions.Skip);
 
-        var results = engine.Execute(query).ToList();
+        var results = engine.Execute(query, TestContext.CancellationToken).ToList();
 
         Assert.Contains(fileSystem.KeepFile, results);
         Assert.DoesNotContain(fileSystem.RetryFile, results);
@@ -128,7 +128,7 @@ public sealed class FileQueryObservabilityTests {
         var query = CreateRecoveryQuery(fileSystem, FileQueryErrorRecoveryOptions.Abort);
 
         TestAssertEx.Throws<IOException>(() => {
-            var _ = engine.Execute(query).ToList();
+            var _ = engine.Execute(query, TestContext.CancellationToken).ToList();
         });
     }
 
@@ -141,7 +141,7 @@ public sealed class FileQueryObservabilityTests {
         var engine = CreateEngine(fileSystem);
         var query = CreateRecoveryQuery(fileSystem, FileQueryErrorRecoveryOptions.Retry(maxRetryAttempts: 1));
 
-        var results = engine.Execute(query).ToList();
+        var results = engine.Execute(query, TestContext.CancellationToken).ToList();
 
         Assert.Contains(fileSystem.KeepFile, results);
         Assert.Contains(fileSystem.RetryFile, results);

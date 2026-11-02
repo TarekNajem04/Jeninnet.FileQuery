@@ -19,14 +19,9 @@ namespace Jeninnet.FileQuery.FileProviders;
 /// directories as <see cref="FileAttributes.Directory"/>. The last-modified timestamp is mapped to
 /// both timestamp fields because providers expose only one timestamp.
 /// </remarks>
-internal sealed class FileProviderFileSystem : IFileSystem {
-    private readonly IFileProvider _provider;
-
-    /// <summary>
-    /// Initializes the adapter.
-    /// </summary>
-    /// <param name="provider">The provider to adapt.</param>
-    public FileProviderFileSystem(IFileProvider provider) => _provider = provider;
+/// <param name="provider">The provider to adapt.</param>
+internal sealed class FileProviderFileSystem(IFileProvider provider) : IFileSystem {
+    private readonly IFileProvider _provider = provider;
 
     /// <inheritdoc/>
     public IEnumerable<FileSystemEntry> Enumerate(

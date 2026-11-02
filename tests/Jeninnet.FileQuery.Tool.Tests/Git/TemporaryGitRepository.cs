@@ -70,6 +70,9 @@ internal sealed class TemporaryGitRepository : IDisposable {
     /// <param name="date">The commit date applied through the Git environment variables.</param>
     /// <param name="arguments">The Git arguments.</param>
     /// <returns>The captured standard output.</returns>
+    /// <exception cref="InvalidOperationException">
+    /// Thrown when Git cannot be started or exits with a non-zero code.
+    /// </exception>
     private string RunWithDate(DateTimeOffset? date, params string[] arguments) {
 #pragma warning disable S4036 // Tests run the user-installed Git from PATH by design.
         var startInfo = new ProcessStartInfo("git") {

@@ -357,7 +357,7 @@ public sealed class CharacterClassParserTests {
             )
         );
 
-        var results = engine.Execute(new(env.Root, options)).ToList();
+        var results = engine.Execute(new(env.Root, options), TestContext.CancellationToken).ToList();
 
         Assert.HasCount(3, results);
         Assert.Contains(static p => p.EndsWith("a.txt", StringComparison.Ordinal), results);
@@ -381,7 +381,7 @@ public sealed class CharacterClassParserTests {
             )
         );
 
-        var results = engine.Execute(new(env.Root, options)).ToList();
+        var results = engine.Execute(new(env.Root, options), TestContext.CancellationToken).ToList();
 
         Assert.HasCount(3, results);
         Assert.DoesNotContain(static p => p.EndsWith("fileX.txt", StringComparison.Ordinal), results);
@@ -403,7 +403,7 @@ public sealed class CharacterClassParserTests {
             )
         );
 
-        var results = engine.Execute(new(env.Root, options)).ToList();
+        var results = engine.Execute(new(env.Root, options), TestContext.CancellationToken).ToList();
 
         Assert.HasCount(2, results);
         Assert.Contains(static p => p.EndsWith("d.txt", StringComparison.Ordinal), results);
@@ -426,7 +426,7 @@ public sealed class CharacterClassParserTests {
             )
         );
 
-        var results = engine.Execute(new(env.Root, options)).ToList();
+        var results = engine.Execute(new(env.Root, options), TestContext.CancellationToken).ToList();
 
         Assert.HasCount(2, results);
         Assert.Contains(static p => p.EndsWith("file1.txt", StringComparison.Ordinal), results);
@@ -443,4 +443,10 @@ public sealed class CharacterClassParserTests {
             return (true, ex.Message);
         }
     }
+
+    /// <summary>
+    /// Gets or sets the test context, which provides information about the current test run.
+    /// Used here primarily for accessing the <see cref="CancellationToken"/>.
+    /// </summary>
+    public TestContext TestContext { get; set; } = null!;
 }

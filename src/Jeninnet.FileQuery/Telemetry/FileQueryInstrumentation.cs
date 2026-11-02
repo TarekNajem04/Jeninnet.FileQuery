@@ -86,14 +86,15 @@ internal static class FileQueryInstrumentation {
             return null;
         }
 
-        activity.SetTag("filequery.interpretation", options.PatternInput.InterpretationMode.ToString());
-        activity.SetTag("filequery.matching_mode", options.PatternMatchingMode.ToString());
-        activity.SetTag("filequery.case_sensitivity", options.CaseSensitivity.ToString());
-        activity.SetTag("filequery.recurse", options.RecurseSubdirectories);
-        activity.SetTag("filequery.include_directories", options.IncludeDirectories);
-        activity.SetTag("filequery.strategy", options.Traversal.Strategy.ToString());
-        activity.SetTag("filequery.symlink_policy", options.Traversal.SymlinkPolicy.ToString());
-        activity.SetTag("filequery.pattern_count", CountPatterns(options.PatternInput));
+        activity
+            .SetTag("filequery.interpretation", options.PatternInput.InterpretationMode.ToString())
+            .SetTag("filequery.matching_mode", options.PatternMatchingMode.ToString())
+            .SetTag("filequery.case_sensitivity", options.CaseSensitivity.ToString())
+            .SetTag("filequery.recurse", options.RecurseSubdirectories)
+            .SetTag("filequery.include_directories", options.IncludeDirectories)
+            .SetTag("filequery.strategy", options.Traversal.Strategy.ToString())
+            .SetTag("filequery.symlink_policy", options.Traversal.SymlinkPolicy.ToString())
+            .SetTag("filequery.pattern_count", CountPatterns(options.PatternInput));
 
         return activity;
     }

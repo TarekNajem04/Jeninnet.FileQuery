@@ -36,7 +36,7 @@ public sealed class DefaultEngineBuilderTests {
             )
         );
 
-        var expected = fileQueryEngine.Execute(new(env.Root, options)).ToList();
+        var expected = fileQueryEngine.Execute(new(env.Root, options), TestContext.CancellationToken).ToList();
 
         // Fluent API usage
         var query = FileQuery.From(env.Root)
@@ -44,10 +44,16 @@ public sealed class DefaultEngineBuilderTests {
                              .Build()
                              ;
 
-        var actual = engine.Execute(query).ToList();
+        var actual = engine.Execute(query, TestContext.CancellationToken).ToList();
 
         Assert.IsNotNull(expected);
         Assert.IsNotNull(actual);
         Assert.AreSequenceEqual(expected, actual);
     }
+
+    /// <summary>
+    /// Gets or sets the test context, which provides information about the current test run.
+    /// Used here primarily for accessing the <see cref="CancellationToken"/>.
+    /// </summary>
+    public TestContext TestContext { get; set; } = null!;
 }

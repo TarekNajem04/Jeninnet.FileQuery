@@ -39,7 +39,7 @@ public sealed class DatasetGeneratorBoundaryTests {
         try {
             // Act: must not throw an IndexOutOfRangeException or any other
             // exception when the final file exhausts the last extension capacity.
-            var result = await new DatasetGenerator().GenerateAsync(options, cancellationToken: TestContext?.CancellationToken ?? CancellationToken.None);
+            var result = await new DatasetGenerator().GenerateAsync(options, cancellationToken: TestContext.CancellationToken);
 
             // Assert: exactly the target number of files must exist.
             Assert.AreEqual(
@@ -88,7 +88,7 @@ public sealed class DatasetGeneratorBoundaryTests {
 
         try {
             // Act
-            var result = await new DatasetGenerator().GenerateAsync(options, cancellationToken: TestContext?.CancellationToken ?? CancellationToken.None);
+            var result = await new DatasetGenerator().GenerateAsync(options, cancellationToken: TestContext.CancellationToken);
 
             // Assert
             Assert.AreEqual(
@@ -147,5 +147,5 @@ public sealed class DatasetGeneratorBoundaryTests {
                 StringComparison.OrdinalIgnoreCase));
 
     /// <inheritdoc/>
-    public TestContext? TestContext { get; set; }
+    public TestContext TestContext { get; set; } = null!;
 }

@@ -172,7 +172,7 @@ public class RegexPathMatcherTests {
         var exception = Assert.ThrowsExactly<PatternException>(
             () => RegexInstructionMatcher.MatchWithTimeout(regex, path.AsSpan(), "(a+)+$"));
 
-        StringAssert.Contains(exception.Message, "match timeout");
+        Assert.Contains("match timeout", exception.Message);
         Assert.IsInstanceOfType<RegexMatchTimeoutException>(exception.InnerException);
     }
 }

@@ -41,7 +41,7 @@ public class SymlinkCycleTests {
             )
         );
 
-        var results = fileQueryEngine.Execute(new(env.Root, options)).ToList();
+        var results = fileQueryEngine.Execute(new(env.Root, options), TestContext.CancellationToken).ToList();
 
         // Should find only one 'file1.txt' (at 'a/file1.txt')
         // If cycle detection fails, this will hang or throw StackOverflow (if recursive)

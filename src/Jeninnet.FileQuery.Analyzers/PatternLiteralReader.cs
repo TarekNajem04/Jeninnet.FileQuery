@@ -62,7 +62,7 @@ internal static class PatternLiteralReader {
 
         var separator = ResolveSeparator(invocation, semanticModel, cancellationToken);
 
-        foreach(var part in delimited.Split(new[] { separator }, StringSplitOptions.RemoveEmptyEntries)) {
+        foreach(var part in delimited.Split([separator], StringSplitOptions.RemoveEmptyEntries)) {
             var pattern = part.Trim();
 
             if(pattern.Length > 0) {
@@ -156,24 +156,17 @@ internal static class PatternLiteralReader {
 /// <summary>
 /// A constant pattern literal and its source location.
 /// </summary>
-internal sealed class PatternLiteral {
-    /// <summary>
-    /// Initializes a pattern literal.
-    /// </summary>
-    /// <param name="value">The pattern value.</param>
-    /// <param name="location">The source location.</param>
-    public PatternLiteral(string value, Location location) {
-        Value = value;
-        Location = location;
-    }
+/// <param name="value">The pattern value.</param>
+/// <param name="location">The source location.</param>
+internal sealed class PatternLiteral(string value, Location location) {
 
     /// <summary>
     /// Gets the pattern value.
     /// </summary>
-    public string Value { get; }
+    public string Value { get; } = value;
 
     /// <summary>
     /// Gets the source location.
     /// </summary>
-    public Location Location { get; }
+    public Location Location { get; } = location;
 }

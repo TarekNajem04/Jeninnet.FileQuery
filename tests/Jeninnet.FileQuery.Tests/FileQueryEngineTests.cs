@@ -32,8 +32,14 @@ public class FileQueryEngineTests {
         public void Engine_Rejects_Null_Query() {
             var engine = DefaultEngineBuilder.Create();
 
-            Assert.ThrowsExactly<ArgumentNullException>(() => engine.Execute(null!));
+            Assert.ThrowsExactly<ArgumentNullException>(() => engine.Execute(null!, TestContext.CancellationToken));
         }
+
+        /// <summary>
+        /// Gets or sets the test context, which provides information about the current test run.
+        /// Used here primarily for accessing the <see cref="CancellationToken"/>.
+        /// </summary>
+        public TestContext TestContext { get; set; } = null!;
     }
 
     /// <summary>

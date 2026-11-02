@@ -39,7 +39,7 @@ public class InaccessibleDirectoryTests {
 
         TestAssertEx.Throws<Exception>(() => {
             try {
-                _ = fileQueryEngine.Execute(new(env.Root, options)).ToList();
+                _ = fileQueryEngine.Execute(new(env.Root, options), TestContext.CancellationToken).ToList();
 
                 // If we reach this point, no exception was thrown ? fail explicitly
                 throw new AssertFailedException("Expected an exception due to inaccessible directory, but none was thrown.");
@@ -84,9 +84,15 @@ public class InaccessibleDirectoryTests {
             )
         );
 
-        var result = fileQueryEngine.Execute(new(env.Root, options)).ToList();
+        var result = fileQueryEngine.Execute(new(env.Root, options), TestContext.CancellationToken).ToList();
 
         TestAssertEx.HasCount(result, 1);
         Assert.EndsWith("keep.txt", result.Single());
     }
+
+    /// <summary>
+    /// Gets or sets the test context, which provides information about the current test run.
+    /// Used here primarily for accessing the <see cref="CancellationToken"/>.
+    /// </summary>
+    public TestContext TestContext { get; set; } = null!;
 }

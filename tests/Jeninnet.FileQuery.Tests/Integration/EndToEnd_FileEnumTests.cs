@@ -33,7 +33,7 @@ public class EndToEnd_FileEnumTests {
             )
         );
 
-        var result = fileQueryEngine.Execute(new(env.Root, options)).ToList();
+        var result = fileQueryEngine.Execute(new(env.Root, options), TestContext.CancellationToken).ToList();
 
         TestAssertEx.AreEquivalent(result, [
             env.Abs("b.cs"),
@@ -72,7 +72,7 @@ public class EndToEnd_FileEnumTests {
                         )
                     )
                 )
-            )
+, TestContext.CancellationToken)
             .Select(PathUtilities.Normalize)
             .ToList();
 
@@ -111,7 +111,7 @@ public class EndToEnd_FileEnumTests {
                         )
                     )
                 )
-            )
+, TestContext.CancellationToken)
             .ToList();
 
         TestAssertEx.Contains(result, env.Abs("b.cs"));
@@ -147,7 +147,7 @@ public class EndToEnd_FileEnumTests {
                         )
                     )
                 )
-            )
+, TestContext.CancellationToken)
             .Select(PathUtilities.Normalize)
             .ToList();
 
@@ -178,7 +178,7 @@ public class EndToEnd_FileEnumTests {
                         )
                     )
                 )
-            )
+, TestContext.CancellationToken)
             .Select(PathUtilities.Normalize)
             .ToList();
 
@@ -205,7 +205,7 @@ public class EndToEnd_FileEnumTests {
             )
         );
 
-        var result = FileQueryRuntime.Create().Execute(new(env.Root, options)).ToList();
+        var result = FileQueryRuntime.Create().Execute(new(env.Root, options), TestContext.CancellationToken).ToList();
 
         TestAssertEx.DoesNotContain(result, static x => x.Contains($"{Path.DirectorySeparatorChar}src{Path.DirectorySeparatorChar}util{Path.DirectorySeparatorChar}", StringComparison.Ordinal));
         TestAssertEx.Contains(result, env.Abs("src", "main.cs"));
@@ -240,11 +240,17 @@ public class EndToEnd_FileEnumTests {
             )
         );
 
-        var insensitiveResult = fileQueryEngine.Execute(new(env.Root, insensitiveOptions)).ToList();
-        var sensitiveResult = fileQueryEngine.Execute(new(env.Root, sensitiveOptions)).ToList();
+        var insensitiveResult = fileQueryEngine.Execute(new(env.Root, insensitiveOptions), TestContext.CancellationToken).ToList();
+        var sensitiveResult = fileQueryEngine.Execute(new(env.Root, sensitiveOptions), TestContext.CancellationToken).ToList();
 
         TestAssertEx.HasCount(insensitiveResult, 2);
         TestAssertEx.HasCount(sensitiveResult, 1);
         TestAssertEx.Contains(sensitiveResult, env.Abs("a.txt"));
     }
+
+    /// <summary>
+    /// Gets or sets the test context, which provides information about the current test run.
+    /// Used here primarily for accessing the <see cref="CancellationToken"/>.
+    /// </summary>
+    public TestContext TestContext { get; set; } = null!;
 }

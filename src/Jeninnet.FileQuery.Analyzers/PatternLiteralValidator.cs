@@ -123,24 +123,17 @@ internal static class PatternLiteralValidator {
 /// <summary>
 /// Describes a structural pattern issue.
 /// </summary>
-internal sealed class PatternIssue {
-    /// <summary>
-    /// Initializes a pattern issue.
-    /// </summary>
-    /// <param name="kind">The machine-readable malformation kind.</param>
-    /// <param name="message">The human-readable explanation.</param>
-    public PatternIssue(string kind, string message) {
-        Kind = kind;
-        Message = message;
-    }
+/// <param name="kind">The machine-readable malformation kind.</param>
+/// <param name="message">The human-readable explanation.</param>
+internal sealed class PatternIssue(string kind, string message) {
 
     /// <summary>
     /// Gets the machine-readable malformation kind.
     /// </summary>
-    public string Kind { get; }
+    public string Kind { get; } = kind;
 
     /// <summary>
     /// Gets the human-readable explanation.
     /// </summary>
-    public string Message { get; }
+    public string Message { get; } = message;
 }

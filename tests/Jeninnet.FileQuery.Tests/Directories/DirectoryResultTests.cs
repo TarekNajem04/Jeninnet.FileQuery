@@ -12,7 +12,7 @@ namespace Jeninnet.FileQuery.Tests.Directories;
 /// </summary>
 [TestClass]
 public sealed class DirectoryResultTests {
-    private static readonly string[] ALL_RESULTS =
+    private static readonly string[] _allResults =
     [
         "bin",
         "bin/tool.exe",
@@ -25,7 +25,7 @@ public sealed class DirectoryResultTests {
         "src/nested/b.cs"
     ];
 
-    private static readonly string[] REINCLUDED_KEEP =
+    private static readonly string[] _reincludedKeep =
     [
         "keep",
         "keep/keep.txt"
@@ -39,7 +39,7 @@ public sealed class DirectoryResultTests {
         using var environment = CreateEnvironment();
 
         var paths = FileQuery.From(environment.Root)
-            .Execute()
+            .Execute(TestContext.CancellationToken)
             .Select(path => Relative(environment.Root, path))
             .ToArray();
 
@@ -57,12 +57,12 @@ public sealed class DirectoryResultTests {
 
         var paths = FileQuery.From(environment.Root)
             .IncludeDirectories()
-            .Execute()
+            .Execute(TestContext.CancellationToken)
             .Select(path => Relative(environment.Root, path))
             .OrderBy(static path => path, StringComparer.Ordinal)
             .ToArray();
 
-        CollectionAssert.AreEquivalent(ALL_RESULTS, paths);
+        Assert.AreSequenceEqual(_allResults, paths, Microsoft.VisualStudio.TestTools.UnitTesting.SequenceOrder.InAnyOrder);
     }
 
     /// <summary>
@@ -74,7 +74,7 @@ public sealed class DirectoryResultTests {
 
         var entries = FileQuery.From(environment.Root)
             .IncludeDirectories()
-            .ExecuteEntries()
+            .ExecuteEntries(TestContext.CancellationToken)
             .ToArray();
 
         var directory = entries.Single(entry => entry.RelativePath == "src/nested");
@@ -96,12 +96,12 @@ public sealed class DirectoryResultTests {
             .UsingGitIgnore()
             .Where(PatternKind.GitIgnore, ["**", "!keep/"])
             .IncludeDirectories()
-            .ExecuteEntries()
+            .ExecuteEntries(TestContext.CancellationToken)
             .Select(entry => entry.RelativePath)
             .OrderBy(static path => path, StringComparer.Ordinal)
             .ToArray();
 
-        CollectionAssert.AreEqual(REINCLUDED_KEEP, entries);
+        Assert.AreSequenceEqual(_reincludedKeep, entries);
     }
 
     /// <summary>
@@ -115,7 +115,7 @@ public sealed class DirectoryResultTests {
             .UsingGitIgnore()
             .Where(PatternKind.GitIgnore, ["bin/"])
             .IncludeDirectories()
-            .ExecuteEntries()
+            .ExecuteEntries(TestContext.CancellationToken)
             .Select(entry => entry.RelativePath)
             .ToArray();
 
@@ -128,21 +128,21 @@ public sealed class DirectoryResultTests {
     /// Async entry enumeration returns the same directory results.
     /// </summary>
     [TestMethod]
-    public async Task ExecuteEntriesAsync_IncludeDirectories_MatchesSyncResults() {
+    public async Task ExecuteEntriesAsync_IncludeDirectories_MatchesSyncResultsAsync() {
         using var environment = CreateEnvironment();
         var builder = FileQuery.From(environment.Root).IncludeDirectories();
 
-        var sync = builder.ExecuteEntries()
+        var sync = builder.ExecuteEntries(TestContext.CancellationToken)
             .Select(static entry => $"{entry.RelativePath}|{entry.IsDirectory}")
             .OrderBy(static value => value, StringComparer.Ordinal)
             .ToArray();
         var asyncResults = new List<string>();
 
-        await foreach(var entry in builder.ExecuteEntriesAsync()) {
+        await foreach(var entry in builder.ExecuteEntriesAsync(TestContext.CancellationToken)) {
             asyncResults.Add($"{entry.RelativePath}|{entry.IsDirectory}");
         }
 
-        CollectionAssert.AreEqual(sync, asyncResults.OrderBy(static value => value, StringComparer.Ordinal).ToArray());
+        Assert.AreSequenceEqual(sync, asyncResults.OrderBy(static value => value, StringComparer.Ordinal).ToArray());
     }
 
     /// <summary>
@@ -154,7 +154,7 @@ public sealed class DirectoryResultTests {
 
         var paths = FileQuery.From(environment.Root)
             .IncludeDirectories(false)
-            .Execute()
+            .Execute(TestContext.CancellationToken)
             .Select(path => Relative(environment.Root, path))
             .ToArray();
 
@@ -179,4 +179,10 @@ public sealed class DirectoryResultTests {
 
     private static string Relative(string root, string path) =>
         Path.GetRelativePath(root, path).Replace('\\', '/');
+
+    /// <summary>
+    /// Gets or sets the test context, which provides information about the current test run.
+    /// Used here primarily for accessing the <see cref="CancellationToken"/>.
+    /// </summary>
+    public TestContext TestContext { get; set; } = null!;
 }

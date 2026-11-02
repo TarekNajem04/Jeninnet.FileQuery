@@ -58,7 +58,7 @@ public sealed class ValidateFileQueryPatternsTaskTests {
         };
 
         Assert.IsFalse(task.Execute());
-        Assert.AreEqual(1, engine.Errors.Count);
+        Assert.HasCount(1, engine.Errors);
         Assert.AreEqual("JNQ2001", engine.Errors[0].Code);
         Assert.AreEqual("build/patterns.props", engine.Errors[0].File);
         Assert.AreEqual(12, engine.Errors[0].LineNumber);
@@ -95,10 +95,10 @@ public sealed class ValidateFileQueryPatternsTaskTests {
     /// </summary>
     [TestMethod]
     public void Target_ValidatesPropertyPatterns() {
-        var result = RunProject("**/*.cs;[abc", expectSuccess: false);
+        var (output, sarif) = RunProject("**/*.cs;[abc", expectSuccess: false);
 
-        StringAssert.Contains(result.Output, "JNQ2001");
-        Assert.IsNotNull(result.Sarif);
+        Assert.Contains("JNQ2001", output);
+        Assert.IsNotNull(sarif);
     }
 
     /// <summary>
@@ -106,9 +106,9 @@ public sealed class ValidateFileQueryPatternsTaskTests {
     /// </summary>
     [TestMethod]
     public void Target_AcceptsValidPropertyPatterns() {
-        var result = RunProject("**/*.cs;!bin/", expectSuccess: true);
+        var (_, sarif) = RunProject("**/*.cs;!bin/", expectSuccess: true);
 
-        Assert.IsNotNull(result.Sarif);
+        Assert.IsNotNull(sarif);
     }
 
     private static (string Output, string? Sarif) RunProject(string patterns, bool expectSuccess) {

@@ -204,10 +204,11 @@ internal static class SoakRunner {
         var analysis = report.Analysis;
         var builder = new StringBuilder();
 
-        builder.AppendLine("## Soak summary");
-        builder.AppendLine();
-        builder.AppendLine("| Metric | Value |");
-        builder.AppendLine("|---|---|");
+        builder
+            .AppendLine("## Soak summary")
+            .AppendLine()
+            .AppendLine("| Metric | Value |")
+            .AppendLine("|---|---|");
         builder.AppendLine(CultureInfo.InvariantCulture, $"| Verdict | **{(analysis.Passed ? "PASS" : "FAIL")}** |");
         builder.AppendLine(CultureInfo.InvariantCulture, $"| Operating system | {report.OperatingSystem} |");
         builder.AppendLine(CultureInfo.InvariantCulture, $"| Runtime | {report.Runtime} |");
@@ -226,8 +227,9 @@ internal static class SoakRunner {
         builder.AppendLine();
 
         if(analysis.Failures.Count > 0) {
-            builder.AppendLine("### Failures");
-            builder.AppendLine();
+            builder
+                .AppendLine("### Failures")
+                .AppendLine();
 
             foreach(var failure in analysis.Failures) {
                 builder.AppendLine(CultureInfo.InvariantCulture, $"- {failure}");
@@ -237,10 +239,11 @@ internal static class SoakRunner {
         }
 
         if(report.Samples.Count > 0) {
-            builder.AppendLine("### Heap samples");
-            builder.AppendLine();
-            builder.AppendLine("| Iteration | Managed heap (MB) |");
-            builder.AppendLine("|---|---|");
+            builder
+                .AppendLine("### Heap samples")
+                .AppendLine()
+                .AppendLine("| Iteration | Managed heap (MB) |")
+                .AppendLine("|---|---|");
 
             foreach(var sample in report.Samples) {
                 builder.AppendLine(CultureInfo.InvariantCulture, $"| {sample.Iteration:N0} | {ToMegabytes(sample.ManagedHeapBytes):F2} |");

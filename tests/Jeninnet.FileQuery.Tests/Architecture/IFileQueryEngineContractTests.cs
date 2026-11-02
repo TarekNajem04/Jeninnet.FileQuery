@@ -19,7 +19,7 @@ public class IFileQueryEngineContractTests {
     /// Verifies that Should Throw When NullQueryExecuted.
     /// </summary>
     [TestMethod]
-    public void Should_Throw_When_NullQueryExecuted() => ((Action)(() => _engine.Execute(null!))).Should().Throw<ArgumentNullException>();
+    public void Should_Throw_When_NullQueryExecuted() => ((Action)(() => _engine.Execute(null!, TestContext.CancellationToken))).Should().Throw<ArgumentNullException>();
 
     /// <summary>
     /// Verifies that ExecuteAsync NullQuery ShouldThrowAsync.
@@ -46,7 +46,7 @@ public class IFileQueryEngineContractTests {
             new FileQueryOptions(new FileQueryOptionsConfig(new([])))
         );
 
-        Action act = () => _ = _engine.Execute(query).ToList();
+        Action act = () => _ = _engine.Execute(query, TestContext.CancellationToken).ToList();
 
         act.Should().Throw<DirectoryNotFoundException>();
     }
@@ -110,7 +110,7 @@ public class IFileQueryEngineContractTests {
         var options = new FileQueryOptions(new FileQueryOptionsConfig(PatternInput: new(Patterns: ["**"])));
         var query = new FileQuery(env.Root, options);
 
-        var results = _engine.Execute(query).ToList();
+        var results = _engine.Execute(query, TestContext.CancellationToken).ToList();
 
         Assert.IsEmpty(results);
     }

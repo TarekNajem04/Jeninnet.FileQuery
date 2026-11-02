@@ -14,6 +14,11 @@ public sealed class GitException : Exception {
     /// <summary>
     /// Initializes a new instance of the <see cref="GitException"/> class.
     /// </summary>
+    public GitException() { }
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="GitException"/> class.
+    /// </summary>
     /// <param name="message">The error message.</param>
     public GitException(string message) : base(message) { }
 

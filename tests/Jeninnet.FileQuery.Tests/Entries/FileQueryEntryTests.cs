@@ -12,8 +12,8 @@ namespace Jeninnet.FileQuery.Tests.Entries;
 /// </summary>
 [TestClass]
 public sealed class FileQueryEntryTests {
-    private static readonly string[] NESTED_ENTRIES = ["large.txt", "small.txt", "sub/medium.txt"];
-    private static readonly string[] SIZE_FILTERED_ENTRIES = ["large.txt", "sub/medium.txt"];
+    private static readonly string[] _nestedEntries = ["large.txt", "small.txt", "sub/medium.txt"];
+    private static readonly string[] _sizeFilteredEntries = ["large.txt", "sub/medium.txt"];
 
     /// <summary>
     /// Entries expose paths and metadata captured by the enumeration.
@@ -26,7 +26,7 @@ public sealed class FileQueryEntryTests {
         var entry = FileQuery.From(environment.Root)
             .UsingGitIgnore()
             .Where(PatternKind.GitIgnore, ["**", "!**/*.txt"])
-            .ExecuteEntries()
+            .ExecuteEntries(TestContext.CancellationToken)
             .Single(candidate => candidate.RelativePath == "small.txt");
 
         Assert.AreEqual(smallPath, entry.FullPath);
@@ -45,32 +45,31 @@ public sealed class FileQueryEntryTests {
         var entries = FileQuery.From(environment.Root)
             .UsingGitIgnore()
             .Where(PatternKind.GitIgnore, ["**", "!**/*.txt"])
-            .ExecuteEntries()
+            .ExecuteEntries(TestContext.CancellationToken)
             .ToArray();
 
-        CollectionAssert.AreEquivalent(
-            NESTED_ENTRIES,
-            entries.Select(static entry => entry.RelativePath).ToArray());
+        Assert.AreSequenceEqual(
+            _nestedEntries, entries.Select(static entry => entry.RelativePath).ToArray(), Microsoft.VisualStudio.TestTools.UnitTesting.SequenceOrder.InAnyOrder);
     }
 
     /// <summary>
     /// The asynchronous API returns the same entries as the synchronous API.
     /// </summary>
     [TestMethod]
-    public async Task ExecuteEntriesAsync_ReturnsSameEntries() {
+    public async Task ExecuteEntriesAsync_ReturnsSameEntriesAsync() {
         using var environment = CreateEnvironment();
         var query = FileQuery.From(environment.Root)
             .UsingGitIgnore()
             .Where(PatternKind.GitIgnore, ["**", "!**/*.txt"]);
 
-        var sync = query.ExecuteEntries().Select(static entry => entry.RelativePath).OrderBy(static path => path, StringComparer.Ordinal).ToArray();
+        var sync = query.ExecuteEntries(TestContext.CancellationToken).Select(static entry => entry.RelativePath).OrderBy(static path => path, StringComparer.Ordinal).ToArray();
         var asyncEntries = new List<string>();
 
-        await foreach(var entry in query.ExecuteEntriesAsync()) {
+        await foreach(var entry in query.ExecuteEntriesAsync(TestContext.CancellationToken)) {
             asyncEntries.Add(entry.RelativePath);
         }
 
-        CollectionAssert.AreEqual(sync, asyncEntries.OrderBy(static path => path, StringComparer.Ordinal).ToArray());
+        Assert.AreSequenceEqual(sync, asyncEntries.OrderBy(static path => path, StringComparer.Ordinal).ToArray());
     }
 
     /// <summary>
@@ -83,13 +82,13 @@ public sealed class FileQueryEntryTests {
             .UsingGitIgnore()
             .Where(PatternKind.GitIgnore, ["**", "!**/*.txt"]);
 
-        var paths = builder.Execute().OrderBy(static path => path, StringComparer.Ordinal).ToArray();
-        var entryPaths = builder.ExecuteEntries()
+        var paths = builder.Execute(TestContext.CancellationToken).OrderBy(static path => path, StringComparer.Ordinal).ToArray();
+        var entryPaths = builder.ExecuteEntries(TestContext.CancellationToken)
             .Select(static entry => entry.FullPath)
             .OrderBy(static path => path, StringComparer.Ordinal)
             .ToArray();
 
-        CollectionAssert.AreEqual(paths, entryPaths);
+        Assert.AreSequenceEqual(paths, entryPaths);
     }
 
     /// <summary>
@@ -104,12 +103,12 @@ public sealed class FileQueryEntryTests {
             .Where(PatternKind.GitIgnore, ["**", "!**/*.txt"])
             .MinSize(5)
             .MaxSize(10)
-            .ExecuteEntries()
+            .ExecuteEntries(TestContext.CancellationToken)
             .Select(static entry => entry.RelativePath)
             .OrderBy(static path => path, StringComparer.Ordinal)
             .ToArray();
 
-        CollectionAssert.AreEqual(SIZE_FILTERED_ENTRIES, entries);
+        Assert.AreSequenceEqual(_sizeFilteredEntries, entries);
     }
 
     /// <summary>
@@ -122,14 +121,14 @@ public sealed class FileQueryEntryTests {
         var entries = FileQuery.From(environment.Root)
             .UsingGitIgnore()
             .Where(PatternKind.GitIgnore, ["**", "!**/*.txt"])
-            .ModifiedAfter(OldTimestamp)
-            .ModifiedBefore(RecentTimestamp.AddDays(1))
-            .ExecuteEntries()
+            .ModifiedAfter(_oldTimestamp)
+            .ModifiedBefore(_recentTimestamp.AddDays(1))
+            .ExecuteEntries(TestContext.CancellationToken)
             .Select(static entry => entry.RelativePath)
             .OrderBy(static path => path, StringComparer.Ordinal)
             .ToArray();
 
-        CollectionAssert.AreEqual(SIZE_FILTERED_ENTRIES, entries);
+        Assert.AreSequenceEqual(_sizeFilteredEntries, entries);
     }
 
     /// <summary>
@@ -160,15 +159,15 @@ public sealed class FileQueryEntryTests {
             MaxSize: 1));
         var timeOptions = new FileQueryOptions(new FileQueryOptionsConfig(
             new PatternInput(),
-            ModifiedAfter: RecentTimestamp,
-            ModifiedBefore: OldTimestamp));
+            ModifiedAfter: _recentTimestamp,
+            ModifiedBefore: _oldTimestamp));
 
         Assert.ThrowsExactly<ArgumentException>(sizeOptions.Validate);
         Assert.ThrowsExactly<ArgumentException>(timeOptions.Validate);
     }
 
-    private static readonly DateTimeOffset OldTimestamp = new(2020, 1, 1, 0, 0, 0, TimeSpan.Zero);
-    private static readonly DateTimeOffset RecentTimestamp = new(2024, 1, 1, 0, 0, 0, TimeSpan.Zero);
+    private static readonly DateTimeOffset _oldTimestamp = new(2020, 1, 1, 0, 0, 0, TimeSpan.Zero);
+    private static readonly DateTimeOffset _recentTimestamp = new(2024, 1, 1, 0, 0, 0, TimeSpan.Zero);
 
     /// <summary>
     /// Creates a tree with known sizes and timestamps.
@@ -180,10 +179,16 @@ public sealed class FileQueryEntryTests {
         environment.CreateFile("sub/medium.txt", "12345");
         environment.CreateFile("ignored.log", "log");
 
-        File.SetLastWriteTimeUtc(environment.Abs("small.txt"), OldTimestamp.UtcDateTime);
-        File.SetLastWriteTimeUtc(environment.Abs("large.txt"), RecentTimestamp.UtcDateTime);
-        File.SetLastWriteTimeUtc(environment.Abs("sub/medium.txt"), RecentTimestamp.UtcDateTime);
+        File.SetLastWriteTimeUtc(environment.Abs("small.txt"), _oldTimestamp.UtcDateTime);
+        File.SetLastWriteTimeUtc(environment.Abs("large.txt"), _recentTimestamp.UtcDateTime);
+        File.SetLastWriteTimeUtc(environment.Abs("sub/medium.txt"), _recentTimestamp.UtcDateTime);
 
         return environment;
     }
+
+    /// <summary>
+    /// Gets or sets the test context, which provides information about the current test run.
+    /// Used here primarily for accessing the <see cref="CancellationToken"/>.
+    /// </summary>
+    public TestContext TestContext { get; set; } = null!;
 }

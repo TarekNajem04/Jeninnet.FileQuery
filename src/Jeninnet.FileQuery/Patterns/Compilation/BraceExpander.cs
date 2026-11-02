@@ -66,13 +66,13 @@ internal static class BraceExpander {
         StringBuilder builder,
         List<string> results
     ) {
-        var group = FindGroup(pattern, start);
+        var (open, close, groupError) = FindGroup(pattern, start);
 
-        if(group.Error is not null) {
-            return group.Error;
+        if(groupError is not null) {
+            return groupError;
         }
 
-        if(group.Open < 0) {
+        if(open < 0) {
             builder.Append(pattern, start, pattern.Length - start);
             results.Add(builder.ToString());
 
@@ -81,18 +81,18 @@ internal static class BraceExpander {
                 : null;
         }
 
-        builder.Append(pattern, start, group.Open - start);
+        builder.Append(pattern, start, open - start);
 
-        var suffix = pattern[(group.Close + 1)..];
-        var alternatives = SplitAlternatives(pattern, group.Open + 1, group.Close);
+        var suffix = pattern[(close + 1)..];
+        var alternatives = SplitAlternatives(pattern, open + 1, close);
 
         if(alternatives.Count == 0) {
-            return new BraceError("Brace alternation must contain at least one alternative.", group.Open);
+            return new BraceError("Brace alternation must contain at least one alternative.", open);
         }
 
         foreach(var alternative in alternatives) {
             if(alternative.Length == 0) {
-                return new BraceError("Brace alternatives cannot be empty.", group.Open);
+                return new BraceError("Brace alternatives cannot be empty.", open);
             }
 
             var length = builder.Length;

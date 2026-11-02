@@ -106,7 +106,7 @@ internal static class GitIgnoreFileLoader {
                 // Git does not read nested ignore files (and does not descend) inside an
                 // ignored directory. Evaluating the directory before loading its own rules
                 // reproduces that behavior.
-                if(matcher is not null && !matcher.IsMatch($"{childRelativePath}/")) {
+                if(matcher?.IsMatch($"{childRelativePath}/") == false) {
                     continue;
                 }
 
@@ -398,15 +398,13 @@ internal static class GitIgnoreFileLoader {
         var contentWithoutTrailingSlash = isDirectoryOnly ? content[..^1] : content;
         var containsSlash = contentWithoutTrailingSlash.Contains('/', StringComparison.Ordinal);
 
-        string scoped;
+        var unanchoredSuffix = string.Equals(content, "**", StringComparison.Ordinal)
+            ? "**"
+            : $"**/{content}";
 
-        if(wasRootAnchored || containsSlash) {
-            scoped = $"/{baseRelativePath}/{content}";
-        } else if(string.Equals(content, "**", StringComparison.Ordinal)) {
-            scoped = $"/{baseRelativePath}/**";
-        } else {
-            scoped = $"/{baseRelativePath}/**/{content}";
-        }
+        var scoped = wasRootAnchored || containsSlash
+            ? $"/{baseRelativePath}/{content}"
+            : $"/{baseRelativePath}/{unanchoredSuffix}";
 
         return negated ? $"!{scoped}" : scoped;
     }

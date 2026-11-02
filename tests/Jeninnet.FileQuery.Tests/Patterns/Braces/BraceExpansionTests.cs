@@ -12,7 +12,7 @@ namespace Jeninnet.FileQuery.Tests.Patterns.Braces;
 /// </summary>
 [TestClass]
 public sealed class BraceExpansionTests {
-    private static readonly string[] EXPECTED_FILES = ["a.cs", "b.vb"];
+    private static readonly string[] _expectedFiles = ["a.cs", "b.vb"];
 
     /// <summary>
     /// A brace group expands to individual alternatives.
@@ -53,9 +53,7 @@ public sealed class BraceExpansionTests {
     /// Brace alternation is classified as a Glob feature.
     /// </summary>
     [TestMethod]
-    public void Classification_RecognizesBraceAlternation() {
-        Assert.AreEqual(PatternKind.Glob, PatternClassifier.Classify("*.{cs,vb}"));
-    }
+    public void Classification_RecognizesBraceAlternation() => Assert.AreEqual(PatternKind.Glob, PatternClassifier.Classify("*.{cs,vb}"));
 
     /// <summary>
     /// An unterminated group reports a validation error with a position.
@@ -66,7 +64,7 @@ public sealed class BraceExpansionTests {
 
         Assert.AreEqual(4, exception.Position);
         Assert.AreEqual(1, exception.Segment);
-        StringAssert.Contains(exception.Message, "matching closing brace");
+        Assert.Contains("matching closing brace", exception.Message);
     }
     /// <summary>
     /// A stray closing brace is rejected.
@@ -76,7 +74,7 @@ public sealed class BraceExpansionTests {
         var exception = Assert.ThrowsExactly<PatternException>(() => CompileGlob("src/a}b"));
 
         Assert.AreEqual(5, exception.Position);
-        StringAssert.Contains(exception.Message, "no matching opening brace");
+        Assert.Contains("no matching opening brace", exception.Message);
     }
 
     /// <summary>
@@ -86,7 +84,7 @@ public sealed class BraceExpansionTests {
     public void Compile_RejectsEmptyAlternative() {
         var exception = Assert.ThrowsExactly<PatternException>(() => CompileGlob("src/{a,}"));
 
-        StringAssert.Contains(exception.Message, "cannot be empty");
+        Assert.Contains("cannot be empty", exception.Message);
     }
 
     /// <summary>
@@ -98,7 +96,7 @@ public sealed class BraceExpansionTests {
 
         var exception = Assert.ThrowsExactly<PatternException>(() => CompileGlob(pattern));
 
-        StringAssert.Contains(exception.Message, "exceeds");
+        Assert.Contains("exceeds", exception.Message);
     }
 
     /// <summary>
@@ -109,7 +107,7 @@ public sealed class BraceExpansionTests {
         var patterns = FileQueryPatternSet.Compile(
             new PatternInput(
                 TypedPatterns: new Dictionary<PatternKind, IEnumerable<string>> {
-                    [PatternKind.Regex] = [@"r:^a{2,3}$"]
+                    [PatternKind.Regex] = ["r:^a{2,3}$"]
                 },
                 InterpretationMode: PatternInterpretationMode.Specific),
             PatternMatchingMode.Regex);
@@ -129,12 +127,12 @@ public sealed class BraceExpansionTests {
 
         var paths = FileQuery.From(environment.Root)
             .Where("*.{cs,vb}")
-            .Execute()
+            .Execute(TestContext.CancellationToken)
             .Select(path => Path.GetRelativePath(environment.Root, path))
             .OrderBy(static path => path, StringComparer.Ordinal)
             .ToArray();
 
-        CollectionAssert.AreEqual(EXPECTED_FILES, paths);
+        Assert.AreSequenceEqual(_expectedFiles, paths);
     }
 
     private static void CompileGlob(string pattern) =>
@@ -154,4 +152,10 @@ public sealed class BraceExpansionTests {
                 },
                 InterpretationMode: PatternInterpretationMode.Specific),
             PatternMatchingMode.Glob);
+
+    /// <summary>
+    /// Gets or sets the test context, which provides information about the current test run.
+    /// Used here primarily for accessing the <see cref="CancellationToken"/>.
+    /// </summary>
+    public TestContext TestContext { get; set; } = null!;
 }

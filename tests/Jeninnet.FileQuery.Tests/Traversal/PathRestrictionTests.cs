@@ -21,7 +21,7 @@ public sealed class PathRestrictionTests {
 
         var results = FileQuery.From(environment.Root)
             .RestrictToPaths(["b.log", "src/nested/d.cs"])
-            .Execute()
+            .Execute(TestContext.CancellationToken)
             .ToList();
 
         AssertPaths(results, environment, "b.log", "src/nested/d.cs");
@@ -34,7 +34,7 @@ public sealed class PathRestrictionTests {
     [TestMethod]
     public async Task RestrictToPaths_ShouldReturnOnlyListedFilesAsync() {
         using var environment = CreateEnvironment();
-        var cancellationToken = TestContext?.CancellationToken ?? CancellationToken.None;
+        var cancellationToken = TestContext.CancellationToken;
 
         var results = new List<string>();
 
@@ -57,7 +57,7 @@ public sealed class PathRestrictionTests {
         var results = FileQuery.From(environment.Root)
             .RestrictToPaths(["a.txt", "b.log"])
             .Where("**;!*.txt")
-            .Execute()
+            .Execute(TestContext.CancellationToken)
             .ToList();
 
         AssertPaths(results, environment, "a.txt");
@@ -72,7 +72,7 @@ public sealed class PathRestrictionTests {
 
         var results = FileQuery.From(environment.Root)
             .RestrictToPaths([@".\src\c.cs", "src/./nested/d.cs"])
-            .Execute()
+            .Execute(TestContext.CancellationToken)
             .ToList();
 
         AssertPaths(results, environment, "src/c.cs", "src/nested/d.cs");
@@ -87,7 +87,7 @@ public sealed class PathRestrictionTests {
 
         var results = FileQuery.From(environment.Root)
             .RestrictToPaths([])
-            .Execute()
+            .Execute(TestContext.CancellationToken)
             .ToList();
 
         results.Should().BeEmpty();
@@ -130,7 +130,7 @@ public sealed class PathRestrictionTests {
         var results = FileQuery.From(environment.Root)
             .IgnoreCase(false)
             .RestrictToPaths(["SRC/C.CS"])
-            .Execute()
+            .Execute(TestContext.CancellationToken)
             .ToList();
 
         results.Should().BeEmpty();
@@ -146,7 +146,7 @@ public sealed class PathRestrictionTests {
         var results = FileQuery.From(environment.Root)
             .IgnoreCase()
             .RestrictToPaths(["SRC/C.CS"])
-            .Execute()
+            .Execute(TestContext.CancellationToken)
             .ToList();
 
         AssertPaths(results, environment, "src/c.cs");
@@ -165,7 +165,7 @@ public sealed class PathRestrictionTests {
         });
 
         var results = FileQueryRuntime.Create()
-            .Execute(new FileQuery(environment.Root, options))
+            .Execute(new FileQuery(environment.Root, options), TestContext.CancellationToken)
             .ToList();
 
         AssertPaths(results, environment, "src/c.cs");
@@ -203,5 +203,5 @@ public sealed class PathRestrictionTests {
     }
 
     /// <inheritdoc/>
-    public TestContext? TestContext { get; set; }
+    public TestContext TestContext { get; set; } = null!;
 }

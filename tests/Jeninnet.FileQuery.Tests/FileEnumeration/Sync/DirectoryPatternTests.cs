@@ -57,7 +57,7 @@ public class DirectoryPatternTests {
                     )
                 )
             )
-        )
+, TestContext.CancellationToken)
         .Select(Path.GetFullPath)
         .ToList();
 
@@ -100,7 +100,7 @@ public class DirectoryPatternTests {
                         )
                     )
                 )
-            )
+, TestContext.CancellationToken)
             .ToList();
 
         // ASSERT
@@ -143,7 +143,7 @@ public class DirectoryPatternTests {
                         )
                     )
                 )
-            )
+, TestContext.CancellationToken)
             .ToList();
 
         // ASSERT
@@ -153,4 +153,10 @@ public class DirectoryPatternTests {
         result.Should().NotContain(static x => x.Contains(Path.Combine("src", "util")));
         result.Should().NotContain(static x => x.Contains(Path.Combine("src", "other")));
     }
+
+    /// <summary>
+    /// Gets or sets the test context, which provides information about the current test run.
+    /// Used here primarily for accessing the <see cref="CancellationToken"/>.
+    /// </summary>
+    public TestContext TestContext { get; set; } = null!;
 }

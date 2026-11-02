@@ -13,18 +13,12 @@ namespace Jeninnet.FileQuery.FileProviders.Tests;
 /// <summary>
 /// A minimal in-memory <see cref="IFileProvider"/> used to prove provider portability.
 /// </summary>
-internal sealed class InMemoryFileProvider : IFileProvider {
+/// <param name="throwOnEnumeration">
+/// When <see langword="true"/>, directory enumeration throws <see cref="UnauthorizedAccessException"/>.
+/// </param>
+internal sealed class InMemoryFileProvider(bool throwOnEnumeration = false) : IFileProvider {
     private readonly Dictionary<string, InMemoryFileInfo> _files = new(StringComparer.Ordinal);
-    private readonly bool _throwOnEnumeration;
-
-    /// <summary>
-    /// Initializes an empty provider.
-    /// </summary>
-    /// <param name="throwOnEnumeration">
-    /// When <see langword="true"/>, directory enumeration throws <see cref="UnauthorizedAccessException"/>.
-    /// </param>
-    public InMemoryFileProvider(bool throwOnEnumeration = false) =>
-        _throwOnEnumeration = throwOnEnumeration;
+    private readonly bool _throwOnEnumeration = throwOnEnumeration;
 
     /// <summary>
     /// Adds a file with the supplied contents.

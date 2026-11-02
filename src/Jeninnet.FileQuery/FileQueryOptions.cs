@@ -255,6 +255,12 @@ public sealed record FileQueryOptions {
     /// </summary>
     /// <param name="minSize">The inclusive minimum size.</param>
     /// <param name="maxSize">The inclusive maximum size.</param>
+    /// <exception cref="ArgumentOutOfRangeException">
+    /// Thrown when <paramref name="minSize"/> or <paramref name="maxSize"/> is negative.
+    /// </exception>
+    /// <exception cref="ArgumentException">
+    /// Thrown when <paramref name="minSize"/> exceeds <paramref name="maxSize"/>.
+    /// </exception>
     private static void ValidateSizeRange(long? minSize, long? maxSize) {
         if(minSize is < 0) {
             throw new ArgumentOutOfRangeException(nameof(minSize), minSize, "The minimum size cannot be negative.");
@@ -274,6 +280,9 @@ public sealed record FileQueryOptions {
     /// </summary>
     /// <param name="after">The exclusive lower boundary.</param>
     /// <param name="before">The exclusive upper boundary.</param>
+    /// <exception cref="ArgumentException">
+    /// Thrown when <paramref name="after"/> is not earlier than <paramref name="before"/>.
+    /// </exception>
     private static void ValidateModifiedRange(DateTimeOffset? after, DateTimeOffset? before) {
         if(after is { } afterValue && before is { } beforeValue && afterValue >= beforeValue) {
             throw new ArgumentException(

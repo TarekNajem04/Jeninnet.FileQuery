@@ -67,7 +67,7 @@ public class EnumerateFilesAsync_BasicTests {
         );
 
         // sync results
-        var syncResults = fileQueryEngine.Execute(new(env.Root, options)).Order().ToList();
+        var syncResults = fileQueryEngine.Execute(new(env.Root, options), TestContext.CancellationToken).Order().ToList();
 
         // async results
         var asyncResults = await fileQueryEngine.ExecuteAsync(new(env.Root, options), TestContext.CancellationToken)

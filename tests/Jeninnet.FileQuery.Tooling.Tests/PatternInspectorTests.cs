@@ -139,7 +139,7 @@ public sealed class PatternInspectorTests {
     /// </summary>
     [TestMethod]
     public void Inspect_ShouldRenderRegexTokens() {
-        var inspection = PatternInspector.Inspect(@"r:^a.*$");
+        var inspection = PatternInspector.Inspect("r:^a.*$");
 
         inspection.Kind.Should().Be(PatternKind.Regex);
         inspection.IsRegex.Should().BeTrue();

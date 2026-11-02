@@ -33,9 +33,9 @@ public sealed class FileQueryTelemetryTests {
             .Where(PatternKind.Glob, ["**/*.txt"])
             .Build();
 
-        _ = engine.Execute(query).ToArray();
+        _ = engine.Execute(query, TestContext.CancellationToken).ToArray();
 
-        Assert.AreEqual(1, activities.Count);
+        Assert.HasCount(1, activities);
 
         var activity = activities[0];
         Assert.AreEqual(FileQueryTelemetry.ExecuteActivityName, activity.OperationName);
@@ -48,7 +48,7 @@ public sealed class FileQueryTelemetryTests {
     /// Asynchronous execution emits the asynchronous span name.
     /// </summary>
     [TestMethod]
-    public async Task ExecuteAsync_EmitsAsyncActivity() {
+    public async Task ExecuteAsync_EmitsAsyncActivityAsync() {
         using var environment = CreateEnvironment();
         var activities = new List<Activity>();
         using var listener = CreateActivityListener(activities);
@@ -61,12 +61,12 @@ public sealed class FileQueryTelemetryTests {
 
         var results = new List<string>();
 
-        await foreach(var path in engine.ExecuteAsync(query)) {
+        await foreach(var path in engine.ExecuteAsync(query, TestContext.CancellationToken)) {
             results.Add(path);
         }
 
-        Assert.AreEqual(3, results.Count);
-        Assert.AreEqual(1, activities.Count);
+        Assert.HasCount(3, results);
+        Assert.HasCount(1, activities);
         Assert.AreEqual(FileQueryTelemetry.ExecuteAsyncActivityName, activities[0].OperationName);
     }
 
@@ -99,13 +99,13 @@ public sealed class FileQueryTelemetryTests {
             .Where(PatternKind.Glob, ["**/*.txt"])
             .Build();
 
-        _ = engine.Execute(query).ToArray();
+        _ = engine.Execute(query, TestContext.CancellationToken).ToArray();
 
-        Assert.IsTrue(counters[FileQueryTelemetry.QueriesStartedMetric] >= 1);
-        Assert.IsTrue(counters[FileQueryTelemetry.QueriesCompletedMetric] >= 1);
-        Assert.IsTrue(counters[FileQueryTelemetry.EntriesScannedMetric] >= 1);
+        Assert.IsGreaterThanOrEqualTo(1, counters[FileQueryTelemetry.QueriesStartedMetric]);
+        Assert.IsGreaterThanOrEqualTo(1, counters[FileQueryTelemetry.QueriesCompletedMetric]);
+        Assert.IsGreaterThanOrEqualTo(1, counters[FileQueryTelemetry.EntriesScannedMetric]);
         Assert.AreEqual(3, counters[FileQueryTelemetry.FilesMatchedMetric]);
-        Assert.IsTrue(histograms[FileQueryTelemetry.QueryDurationMetric] > 0);
+        Assert.IsGreaterThan(0, histograms[FileQueryTelemetry.QueryDurationMetric]);
     }
 
     /// <summary>
@@ -116,13 +116,13 @@ public sealed class FileQueryTelemetryTests {
         using var environment = CreateEnvironment();
         var engine = new Engine.FileQueryEngine(new ThrowingTraversalExecutor(), new NullPlanBuilder());
         var query = FileQuery.From(environment.Root).Build();
-        var results = engine.Execute(query);
+        var results = engine.Execute(query, TestContext.CancellationToken);
 
         var counters = new ConcurrentDictionary<string, long>(StringComparer.Ordinal);
         using var listener = CreateLongCounterListener(counters);
 
         Assert.ThrowsExactly<IOException>(() => results.ToList());
-        Assert.IsTrue(counters[FileQueryTelemetry.QueriesErrorsMetric] >= 1);
+        Assert.IsGreaterThanOrEqualTo(1, counters[FileQueryTelemetry.QueriesErrorsMetric]);
     }
 
     /// <summary>
@@ -193,8 +193,8 @@ public sealed class FileQueryTelemetryTests {
                 source.Name,
                 FileQueryTelemetry.ActivitySourceName,
                 StringComparison.Ordinal),
-            Sample = static (ref ActivityCreationOptions<ActivityContext> _) => ActivitySamplingResult.AllDataAndRecorded,
-            SampleUsingParentId = static (ref ActivityCreationOptions<string> _) => ActivitySamplingResult.AllDataAndRecorded,
+            Sample = static (ref _) => ActivitySamplingResult.AllDataAndRecorded,
+            SampleUsingParentId = static (ref _) => ActivitySamplingResult.AllDataAndRecorded,
             ActivityStopped = activity => {
                 lock(activities) {
                     activities.Add(activity);
@@ -225,4 +225,10 @@ public sealed class FileQueryTelemetryTests {
     private sealed class NullPlanBuilder : ITraversalPlanBuilder {
         public TraversalPlan Build(FileQuery query, IProgress<FileQueryProgress>? progress = null) => null!;
     }
+
+    /// <summary>
+    /// Gets or sets the test context, which provides information about the current test run.
+    /// Used here primarily for accessing the <see cref="CancellationToken"/>.
+    /// </summary>
+    public TestContext TestContext { get; set; } = null!;
 }

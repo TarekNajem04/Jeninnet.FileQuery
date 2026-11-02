@@ -12,23 +12,23 @@ namespace Jeninnet.FileQuery.Tool.Git;
 /// </summary>
 internal enum GitChangeKind {
     /// <summary>The file is new.</summary>
-    Added,
+    Added = 0,
 
     /// <summary>The file content or metadata changed.</summary>
-    Modified,
+    Modified = 1,
 
     /// <summary>The file was removed.</summary>
-    Deleted,
+    Deleted = 2,
 
     /// <summary>The file was renamed; the previous path is recorded separately.</summary>
-    Renamed,
+    Renamed = 3,
 
     /// <summary>The file was copied from another path.</summary>
-    Copied,
+    Copied = 4,
 
     /// <summary>The file type changed (for example, a regular file became a symbolic link).</summary>
-    TypeChanged,
+    TypeChanged = 5,
 
     /// <summary>The status reported by Git is not recognized.</summary>
-    Unknown
+    Unknown = 6
 }

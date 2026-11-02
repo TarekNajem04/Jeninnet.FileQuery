@@ -30,7 +30,7 @@ public class RelativePathBufferEngineTests {
         var engine = FileQueryRuntime.Create();
         var query = engine.From(env.Root).Where("*.log", "*.tmp", "!**/*.txt", "!**/*.md").Build();
 
-        var results = engine.Execute(query).ToList();
+        var results = engine.Execute(query, TestContext.CancellationToken).ToList();
 
         TestAssertEx.HasCount(results, 2);
         Assert.Contains(static x => x.EndsWith("a.txt", StringComparison.Ordinal), results);
@@ -64,7 +64,7 @@ public class RelativePathBufferEngineTests {
         var engine = FileQueryRuntime.Create();
         var query = engine.From(env.Root).Where("*.log", "*.tmp", "!**/*.txt", "!**/*.md").Build();
 
-        var results = engine.Execute(query).ToList();
+        var results = engine.Execute(query, TestContext.CancellationToken).ToList();
 
         TestAssertEx.HasCount(results, 2);
         Assert.Contains(
@@ -97,7 +97,7 @@ public class RelativePathBufferEngineTests {
             .Where("*.log", "*.tmp", "!**/*.txt", "!**/*.md")
             .Build();
 
-        var results = engine.Execute(query).ToList();
+        var results = engine.Execute(query, TestContext.CancellationToken).ToList();
 
         TestAssertEx.HasCount(results, 3);
         Assert.Contains(static x => x.EndsWith("keep.txt", StringComparison.Ordinal), results);
@@ -123,7 +123,7 @@ public class RelativePathBufferEngineTests {
         var engine = FileQueryRuntime.Create();
         var query = engine.From(env.Root).Where("*.log", "*.tmp", "!**/*.txt", "!**/*.md").Build();
 
-        var results = engine.Execute(query).ToList();
+        var results = engine.Execute(query, TestContext.CancellationToken).ToList();
 
         TestAssertEx.HasCount(results, 3);
 
@@ -173,7 +173,7 @@ public class RelativePathBufferEngineTests {
         var engine = FileQueryRuntime.Create();
         var query = engine.From(env.Root).Where("*.log", "*.tmp", "!**/*.txt", "!**/*.md").Build();
 
-        var syncResults = engine.Execute(query).Order().ToList();
+        var syncResults = engine.Execute(query, TestContext.CancellationToken).Order().ToList();
         var asyncResults = await engine.ExecuteAsync(query, TestContext.CancellationToken)
                                        .ToListAsync(TestContext.CancellationToken);
 

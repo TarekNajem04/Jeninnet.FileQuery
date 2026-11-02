@@ -56,14 +56,14 @@ public sealed class SyncCancellationAndProgressTests {
         var syncProgress = new RecordingProgress<FileQueryProgress>();
         var asyncProgress = new RecordingProgress<FileQueryProgress>();
 
-        var syncResults = query.Execute(syncProgress).ToList();
+        var syncResults = query.Execute(syncProgress, TestContext.CancellationToken).ToList();
         var asyncResults = new List<string>();
 
-        await foreach(var path in query.ExecuteAsync(asyncProgress)) {
+        await foreach(var path in query.ExecuteAsync(asyncProgress, TestContext.CancellationToken)) {
             asyncResults.Add(path);
         }
 
-        Assert.AreEqual(syncResults.Count, asyncResults.Count);
+        Assert.HasCount(syncResults.Count, asyncResults);
         Assert.IsNotEmpty(syncProgress.Values);
         Assert.IsNotEmpty(asyncProgress.Values);
 
@@ -84,7 +84,7 @@ public sealed class SyncCancellationAndProgressTests {
         var query = FileQuery.From(environment.Root);
         var progress = new RecordingProgress<FileQueryProgress>();
 
-        var entries = query.ExecuteEntries(progress).ToList();
+        var entries = query.ExecuteEntries(progress, TestContext.CancellationToken).ToList();
 
         Assert.IsNotEmpty(entries);
         Assert.IsNotEmpty(progress.Values);
@@ -104,8 +104,8 @@ public sealed class SyncCancellationAndProgressTests {
         using var environment = CreateEnvironment();
         var query = FileQuery.From(environment.Root);
 
-        Assert.ThrowsExactly<ArgumentNullException>(() => query.Execute(progress: null!));
-        Assert.ThrowsExactly<ArgumentNullException>(() => query.ExecuteEntries(progress: null!));
+        Assert.ThrowsExactly<ArgumentNullException>(() => query.Execute(progress: null!, TestContext.CancellationToken));
+        Assert.ThrowsExactly<ArgumentNullException>(() => query.ExecuteEntries(progress: null!, TestContext.CancellationToken));
     }
 
     /// <summary>
@@ -135,4 +135,10 @@ public sealed class SyncCancellationAndProgressTests {
 
         public void Report(T value) => Values.Add(value);
     }
+
+    /// <summary>
+    /// Gets or sets the test context, which provides information about the current test run.
+    /// Used here primarily for accessing the <see cref="CancellationToken"/>.
+    /// </summary>
+    public TestContext TestContext { get; set; } = null!;
 }

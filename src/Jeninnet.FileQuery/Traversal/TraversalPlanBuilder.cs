@@ -114,7 +114,7 @@ internal sealed class TraversalPlanBuilder(IFileSystem fileSystem) : ITraversalP
 
         var existing = typedPatterns.TryGetValue(PatternKind.GitIgnore, out var current)
             ? current
-            : ImmutableArray<string>.Empty;
+            : [];
 
         typedPatterns[PatternKind.GitIgnore] = [.. loaded, .. existing];
     }

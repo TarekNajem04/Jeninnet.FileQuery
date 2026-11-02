@@ -28,7 +28,7 @@ internal static class AnalyzerTestHost {
 
         var analyzer = new PatternLiteralAnalyzer();
         return await compilation
-            .WithAnalyzers(ImmutableArray.Create<DiagnosticAnalyzer>(analyzer))
+            .WithAnalyzers([analyzer])
             .GetAnalyzerDiagnosticsAsync()
             .ConfigureAwait(false);
     }
@@ -44,10 +44,10 @@ internal static class AnalyzerTestHost {
         Assert.IsNotNull(compilation);
 
         var diagnostics = await compilation
-            .WithAnalyzers(ImmutableArray.Create<DiagnosticAnalyzer>(new PatternLiteralAnalyzer()))
+            .WithAnalyzers([new PatternLiteralAnalyzer()])
             .GetAnalyzerDiagnosticsAsync()
             .ConfigureAwait(false);
-        Assert.AreNotEqual(0, diagnostics.Length);
+        Assert.IsNotEmpty(diagnostics);
         var diagnostic = diagnostics[0];
 
         var actions = new List<CodeAction>();
@@ -59,7 +59,7 @@ internal static class AnalyzerTestHost {
         var provider = new PatternLiteralCodeFixProvider();
         await provider.RegisterCodeFixesAsync(context).ConfigureAwait(false);
 
-        Assert.AreNotEqual(0, actions.Count);
+        Assert.IsNotEmpty(actions);
 
         var operations = await actions[0].GetOperationsAsync(CancellationToken.None).ConfigureAwait(false);
         var apply = operations.OfType<ApplyChangesOperation>().Single();

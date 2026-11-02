@@ -33,7 +33,7 @@ public class NegationAndOrderTests {
             )
         );
 
-        var result = fileQueryEngine.Execute(new(env.Root, options))
+        var result = fileQueryEngine.Execute(new(env.Root, options), TestContext.CancellationToken)
                                     .Order()
                                     .ToList();
 
@@ -63,7 +63,7 @@ public class NegationAndOrderTests {
             )
         );
 
-        var result = fileQueryEngine.Execute(new(env.Root, options))
+        var result = fileQueryEngine.Execute(new(env.Root, options), TestContext.CancellationToken)
                                     .ToList();
 
         result.Should().ContainSingle(static x => x.EndsWith("data.log", StringComparison.Ordinal));
@@ -93,10 +93,16 @@ public class NegationAndOrderTests {
             )
         );
 
-        var result = fileQueryEngine.Execute(new(env.Root, options))
+        var result = fileQueryEngine.Execute(new(env.Root, options), TestContext.CancellationToken)
                                     .ToList();
 
         result.Should().Contain(static x => x.EndsWith(Path.Combine("sub", "file.txt"), StringComparison.Ordinal));
         result.Should().Contain(static x => x.EndsWith("file.txt", StringComparison.Ordinal));
     }
+
+    /// <summary>
+    /// Gets or sets the test context, which provides information about the current test run.
+    /// Used here primarily for accessing the <see cref="CancellationToken"/>.
+    /// </summary>
+    public TestContext TestContext { get; set; } = null!;
 }

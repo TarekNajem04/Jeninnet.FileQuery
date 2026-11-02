@@ -1481,6 +1481,12 @@
             </summary>
             <param name="minSize">The inclusive minimum size.</param>
             <param name="maxSize">The inclusive maximum size.</param>
+            <exception cref="T:System.ArgumentOutOfRangeException">
+            Thrown when <paramref name="minSize"/> or <paramref name="maxSize"/> is negative.
+            </exception>
+            <exception cref="T:System.ArgumentException">
+            Thrown when <paramref name="minSize"/> exceeds <paramref name="maxSize"/>.
+            </exception>
         </member>
         <member name="M:Jeninnet.FileQuery.FileQueryOptions.ValidateModifiedRange(System.Nullable{System.DateTimeOffset},System.Nullable{System.DateTimeOffset})">
             <summary>
@@ -1488,6 +1494,9 @@
             </summary>
             <param name="after">The exclusive lower boundary.</param>
             <param name="before">The exclusive upper boundary.</param>
+            <exception cref="T:System.ArgumentException">
+            Thrown when <paramref name="after"/> is not earlier than <paramref name="before"/>.
+            </exception>
         </member>
         <member name="T:Jeninnet.FileQuery.FileQueryPatternExplanation">
             <summary>

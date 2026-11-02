@@ -244,16 +244,16 @@ public sealed class Phase2CoverageDeepDiveTests {
         var builder = FileQueryBuilder.From(env.Root).UsingGlob().Where("a.txt");
 
         // Sync
-        var resultsSync = builder.Execute().ToList();
+        var resultsSync = builder.Execute(TestContext.CancellationToken).ToList();
         Assert.HasCount(1, resultsSync);
 
         // Async
-        var resultsAsync = await builder.ExecuteAsync(TestContext?.CancellationToken ?? CancellationToken.None).ToListAsync(TestContext?.CancellationToken ?? CancellationToken.None);
+        var resultsAsync = await builder.ExecuteAsync(TestContext.CancellationToken).ToListAsync(TestContext.CancellationToken);
         Assert.HasCount(1, resultsAsync);
 
         // Async with progress
         var progress = new MockProgress<FileQueryProgress>();
-        var resultsProgress = await builder.ExecuteAsync(progress, TestContext?.CancellationToken ?? CancellationToken.None).ToListAsync(TestContext?.CancellationToken ?? CancellationToken.None);
+        var resultsProgress = await builder.ExecuteAsync(progress, TestContext.CancellationToken).ToListAsync(TestContext.CancellationToken);
         Assert.HasCount(1, resultsProgress);
     }
 
@@ -293,5 +293,5 @@ public sealed class Phase2CoverageDeepDiveTests {
     /// <summary>
     /// Gets or sets the test context for the current test.
     /// </summary>
-    public TestContext? TestContext { get; set; }
+    public TestContext TestContext { get; set; } = null!;
 }

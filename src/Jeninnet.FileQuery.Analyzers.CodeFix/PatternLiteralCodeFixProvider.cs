@@ -34,7 +34,7 @@ public sealed class PatternLiteralCodeFixProvider : CodeFixProvider {
     private const string MISSING_CLOSING_BRACKET = "MissingClosingBracket";
 
     /// <inheritdoc/>
-    public override ImmutableArray<string> FixableDiagnosticIds => ImmutableArray.Create(DIAGNOSTIC_ID);
+    public override ImmutableArray<string> FixableDiagnosticIds => [DIAGNOSTIC_ID];
 
     /// <inheritdoc/>
     public override FixAllProvider GetFixAllProvider() => WellKnownFixAllProviders.BatchFixer;
@@ -55,7 +55,7 @@ public sealed class PatternLiteralCodeFixProvider : CodeFixProvider {
             var node = root.FindNode(diagnostic.Location.SourceSpan, getInnermostNodeForTie: true);
             var literal = node.FirstAncestorOrSelf<LiteralExpressionSyntax>();
 
-            if(literal is null || literal.IsKind(SyntaxKind.InterpolatedStringExpression) || IsRawString(literal)) {
+            if(literal?.IsKind(SyntaxKind.InterpolatedStringExpression) != false || IsRawString(literal)) {
                 continue;
             }
 

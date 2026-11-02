@@ -31,8 +31,8 @@ public sealed class DependencyInjectionParityTests {
         var defaultEngine = FileQueryRuntime.Create();
         var query = CreateParityQuery(env.Root);
 
-        var expected = defaultEngine.Execute(query).Order().ToArray();
-        var actual = diEngine.Execute(query).Order().ToArray();
+        var expected = defaultEngine.Execute(query, TestContext.CancellationToken).Order().ToArray();
+        var actual = diEngine.Execute(query, TestContext.CancellationToken).Order().ToArray();
 
         Assert.AreSame(diEngine, secondResolvedEngine);
         Assert.AreSequenceEqual(expected, actual);

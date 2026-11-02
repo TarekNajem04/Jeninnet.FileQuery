@@ -35,7 +35,7 @@ public class ComplexWildcardTests {
             )
         );
 
-        var results = fileQueryEngine.Execute(new(env.Root, options)).ToList();
+        var results = fileQueryEngine.Execute(new(env.Root, options), TestContext.CancellationToken).ToList();
 
         results.Should().HaveCount(3);
         results.Should().Contain(x => x.EndsWith(Path.Combine(env.Root, "a.txt"), StringComparison.Ordinal));
@@ -66,7 +66,7 @@ public class ComplexWildcardTests {
             )
         );
 
-        var results = fileQueryEngine.Execute(new(env.Root, options)).ToList();
+        var results = fileQueryEngine.Execute(new(env.Root, options), TestContext.CancellationToken).ToList();
 
         results.Should().HaveCount(3);
     }
@@ -94,9 +94,15 @@ public class ComplexWildcardTests {
             )
         );
 
-        var results = fileQueryEngine.Execute(new(env.Root, options)).ToList();
+        var results = fileQueryEngine.Execute(new(env.Root, options), TestContext.CancellationToken).ToList();
 
         results.Should().HaveCount(2);
         Assert.IsTrue(results.All(static x => x.Contains('a')));
     }
+
+    /// <summary>
+    /// Gets or sets the test context, which provides information about the current test run.
+    /// Used here primarily for accessing the <see cref="CancellationToken"/>.
+    /// </summary>
+    public TestContext TestContext { get; set; } = null!;
 }

@@ -12,10 +12,10 @@ namespace Jeninnet.FileQuery.FileProviders.Tests;
 /// </summary>
 [TestClass]
 public sealed class FileProviderQueryTests {
-    private static readonly string[] PHYSICAL_MATCHES = ["a.cs", "src/c.cs"];
-    private static readonly string[] MEMORY_MATCHES = ["src/b.cs", "src/nested/c.cs"];
-    private static readonly string[] SCOPED_MATCHES = ["/src/keep.cs"];
-    private static readonly string[] GITIGNORE_MATCHES = ["/.gitignore", "/a.txt"];
+    private static readonly string[] _physicalMatches = ["a.cs", "src/c.cs"];
+    private static readonly string[] _memoryMatches = ["src/b.cs", "src/nested/c.cs"];
+    private static readonly string[] _scopedMatches = ["/src/keep.cs"];
+    private static readonly string[] _gitignoreMatches = ["/.gitignore", "/a.txt"];
 
     /// <summary>
     /// Provider enumeration failures honor the configured skip/abort policy.
@@ -23,13 +23,13 @@ public sealed class FileProviderQueryTests {
     [TestMethod]
     public void Provider_EnumerationFailure_HonorsErrorRecovery() {
         var provider = new InMemoryFileProvider(throwOnEnumeration: true);
-        var skipped = FileProviderQuery.From(provider).Execute().ToArray();
+        var skipped = FileProviderQuery.From(provider).Execute(TestContext.CancellationToken).ToArray();
         Assert.IsEmpty(skipped);
 
         var aborting = FileProviderQuery.From(provider)
             .WithErrorRecovery(FileQueryErrorRecoveryOptions.Abort);
 
-        Assert.ThrowsExactly<UnauthorizedAccessException>(() => aborting.Execute().ToArray());
+        Assert.ThrowsExactly<UnauthorizedAccessException>(() => aborting.Execute(TestContext.CancellationToken).ToArray());
     }
 
     /// <summary>
@@ -55,11 +55,11 @@ public sealed class FileProviderQueryTests {
         var entries = FileProviderQuery.From(provider)
             .UsingGlob()
             .Where(PatternKind.Glob, ["**/*.cs"])
-            .ExecuteEntries()
+            .ExecuteEntries(TestContext.CancellationToken)
             .OrderBy(static entry => entry.RelativePath, StringComparer.Ordinal)
             .ToArray();
 
-        CollectionAssert.AreEqual(PHYSICAL_MATCHES, entries.Select(static entry => entry.RelativePath).ToArray());
+        Assert.AreSequenceEqual(_physicalMatches, entries.Select(static entry => entry.RelativePath).ToArray());
         Assert.IsTrue(entries.All(static entry => entry.Length > 0));
         Assert.IsTrue(entries.All(static entry => entry.LastWriteTimeUtc > DateTime.MinValue));
         Assert.IsTrue(entries.All(static entry => entry.RootPath == "/"));
@@ -78,13 +78,12 @@ public sealed class FileProviderQueryTests {
         var entries = FileProviderQuery.From(provider)
             .UsingGlob()
             .Where(PatternKind.Glob, ["**/*.cs"])
-            .ExecuteEntries()
+            .ExecuteEntries(TestContext.CancellationToken)
             .OrderBy(static entry => entry.RelativePath, StringComparer.Ordinal)
             .ToArray();
 
-        CollectionAssert.AreEqual(
-            MEMORY_MATCHES,
-            entries.Select(static entry => entry.RelativePath).ToArray());
+        Assert.AreSequenceEqual(
+            _memoryMatches, entries.Select(static entry => entry.RelativePath).ToArray());
         Assert.AreEqual("class B {}".Length, entries[0].Length);
     }
 
@@ -100,11 +99,11 @@ public sealed class FileProviderQueryTests {
 
         var paths = FileProviderQuery.From(provider)
             .UseGitIgnoreFiles()
-            .Execute()
+            .Execute(TestContext.CancellationToken)
             .OrderBy(static path => path, StringComparer.Ordinal)
             .ToArray();
 
-        CollectionAssert.AreEqual(GITIGNORE_MATCHES, paths);
+        Assert.AreSequenceEqual(_gitignoreMatches, paths);
     }
 
     /// <summary>
@@ -121,18 +120,18 @@ public sealed class FileProviderQueryTests {
             .UsingGlob()
             .Where(PatternKind.Glob, ["**/*.cs"])
             .MinSize(1)
-            .Execute()
+            .Execute(TestContext.CancellationToken)
             .OrderBy(static path => path, StringComparer.Ordinal)
             .ToArray();
 
-        CollectionAssert.AreEqual(SCOPED_MATCHES, paths);
+        Assert.AreSequenceEqual(_scopedMatches, paths);
     }
 
     /// <summary>
     /// Directory results and async execution work through the adapter.
     /// </summary>
     [TestMethod]
-    public async Task Provider_DirectoryResultsAndAsync_Work() {
+    public async Task Provider_DirectoryResultsAndAsync_WorkAsync() {
         var provider = new InMemoryFileProvider();
         provider.AddFile("src/a.cs", "a");
         provider.AddFile("src/nested/b.cs", "b");
@@ -140,12 +139,18 @@ public sealed class FileProviderQueryTests {
         var builder = FileProviderQuery.From(provider).IncludeDirectories();
         var entries = new List<FileQueryEntry>();
 
-        await foreach(var entry in builder.ExecuteEntriesAsync()) {
+        await foreach(var entry in builder.ExecuteEntriesAsync(TestContext.CancellationToken)) {
             entries.Add(entry);
         }
 
-        Assert.IsTrue(entries.Any(static entry => entry.RelativePath == "src" && entry.IsDirectory));
-        Assert.IsTrue(entries.Any(static entry => entry.RelativePath == "src/nested" && entry.IsDirectory));
-        Assert.IsTrue(entries.Any(static entry => entry.RelativePath == "src/nested/b.cs" && !entry.IsDirectory));
+        Assert.Contains(static entry => entry.RelativePath == "src" && entry.IsDirectory, entries);
+        Assert.Contains(static entry => entry.RelativePath == "src/nested" && entry.IsDirectory, entries);
+        Assert.Contains(static entry => entry.RelativePath == "src/nested/b.cs" && !entry.IsDirectory, entries);
     }
+
+    /// <summary>
+    /// Gets or sets the test context, which provides information about the current test run.
+    /// Used here primarily for accessing the <see cref="CancellationToken"/>.
+    /// </summary>
+    public TestContext TestContext { get; set; } = null!;
 }
