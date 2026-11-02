@@ -22,6 +22,10 @@
         <File Path=".github/workflows/nuget-publish.yml" />
         <File Path=".github/workflows/sonarcloud.yml" />
     </Folder>
+    <Folder Name="/.github/actions/filequery/">
+        <File Path=".github/actions/filequery/action.yml" />
+        <File Path=".github/actions/filequery/README.md" />
+    </Folder>
 
     <Folder Name="/scripts/">
         <File Path="scripts/README.md" />
@@ -121,6 +125,7 @@
     </Folder>
     <Folder Name="/doc/articles/">
         <File Path="docs/articles/introducing-jeninnet-filequery.md" />
+        <File Path="docs/articles/library-capability-review.md" />
         <File Path="docs/articles/toc.yml" />
     </Folder>
     <Folder Name="/doc/contributing/">
@@ -129,19 +134,42 @@
         <File Path="docs/contributing/release-checklist.md" />
         <File Path="docs/contributing/testing-and-release-plan.md" />
         <File Path="docs/contributing/testing.md" />
+        <File Path="docs/contributing/toc.yml" />
     </Folder>
     <Folder Name="/doc/getting-started/">
         <File Path="docs/getting-started/basic-patterns.md" />
+        <File Path="docs/getting-started/common-recipes.md" />
         <File Path="docs/getting-started/installation.md" />
         <File Path="docs/getting-started/quick-start.md" />
         <File Path="docs/getting-started/toc.yml" />
     </Folder>
     <Folder Name="/doc/guides/">
+        <File Path="docs/guides/brace-expansion.md" />
         <File Path="docs/guides/cli-usage.md" />
         <File Path="docs/guides/command-line-integration.md" />
         <File Path="docs/guides/dependency-injection.md" />
+        <File Path="docs/guides/diff-aware-queries.md" />
+        <File Path="docs/guides/directory-results.md" />
+        <File Path="docs/guides/entry-metadata-and-filters.md" />
+        <File Path="docs/guides/error-handling-and-validation.md" />
+        <File Path="docs/guides/file-provider-adapter.md" />
+        <File Path="docs/guides/gitignore-files.md" />
+        <File Path="docs/guides/global-tool.md" />
+        <File Path="docs/guides/ide-extension.md" />
+        <File Path="docs/guides/in-memory-matching.md" />
+        <File Path="docs/guides/integrations.md" />
+        <File Path="docs/guides/json-output.md" />
+        <File Path="docs/guides/msbuild-validation.md" />
+        <File Path="docs/guides/multiple-roots.md" />
+        <File Path="docs/guides/native-aot.md" />
         <File Path="docs/guides/observability-and-diagnostics.md" />
+        <File Path="docs/guides/roslyn-analyzers.md" />
         <File Path="docs/guides/toc.yml" />
+        <File Path="docs/guides/tooling-sdk.md" />
+    </Folder>
+    <Folder Name="/doc/images/">
+        <File Path="docs/images/favicon.png" />
+        <File Path="docs/images/icon.png" />
     </Folder>
     <Folder Name="/doc/introduction/">
         <File Path="docs/introduction/design-goals.md" />
@@ -151,12 +179,18 @@
     <Folder Name="/doc/performance/">
         <File Path="docs/performance/allocation-strategy.md" />
         <File Path="docs/performance/benchmarking.md" />
+        <File Path="docs/performance/cross-platform-baseline.json" />
+        <File Path="docs/performance/cross-platform-baseline.md" />
         <File Path="docs/performance/design-for-performance.md" />
+        <File Path="docs/performance/long-running-stability.md" />
         <File Path="docs/performance/matcher-performance.md" />
+        <File Path="docs/performance/native-enumeration-research.md" />
         <File Path="docs/performance/phase5-perf-investigation.md" />
         <File Path="docs/performance/phase6-perf-optimization.md" />
         <File Path="docs/performance/phase7-perf-investigation.md" />
         <File Path="docs/performance/release-benchmark-baseline.md" />
+        <File Path="docs/performance/runtime-evolution.json" />
+        <File Path="docs/performance/runtime-evolution.md" />
         <File Path="docs/performance/toc.yml" />
         <File Path="docs/performance/traversal-model.md" />
     </Folder>
@@ -173,6 +207,7 @@
         <File Path="docs/runtime/case-sensitivity.md" />
         <File Path="docs/runtime/filequery-runtime.md" />
         <File Path="docs/runtime/recursion-depth.md" />
+        <File Path="docs/runtime/toc.yml" />
         <File Path="docs/runtime/traversal-model.md" />
     </Folder>
     <Folder Name="/doc/specification/">
@@ -183,6 +218,11 @@
         <File Path="docs/whitepaper/Jeninnet.FileQuery-Whitepaper.md" />
         <File Path="docs/whitepaper/Jeninnet.FileQuery.Web.md" />
         <File Path="docs/whitepaper/Whitepaper Cover.png" />
+    </Folder>
+
+    <Folder Name="/assets/">
+        <File Path="assets/icon.png" />
+        <File Path="assets/icon.svg" />
     </Folder>
 
     <Folder Name="/src/">
@@ -197,6 +237,19 @@
         <Project Path="src/Jeninnet.FileQuery.Analyzers.CodeFix/Jeninnet.FileQuery.Analyzers.CodeFix.csproj" />
         <Project Path="src/Jeninnet.FileQuery.Build/Jeninnet.FileQuery.Build.csproj" />
         <Project Path="src/Jeninnet.FileQuery.FileProviders/Jeninnet.FileQuery.FileProviders.csproj" />
+        <File Path="src/Jeninnet.FileQuery/README.md" />
+        <File Path="src/Jeninnet.FileQuery/Patterns/README.md" />
+        <File Path="src/Jeninnet.FileQuery.Analyzers/README.md" />
+        <File Path="src/Jeninnet.FileQuery.Analyzers.CodeFix/README.md" />
+        <File Path="src/Jeninnet.FileQuery.AotSmoke/README.md" />
+        <File Path="src/Jeninnet.FileQuery.Benchmarks/README.md" />
+        <File Path="src/Jeninnet.FileQuery.Build/README.md" />
+        <File Path="src/Jeninnet.FileQuery.CommandLine/README.md" />
+        <File Path="src/Jeninnet.FileQuery.DependencyInjection/README.md" />
+        <File Path="src/Jeninnet.FileQuery.FileProviders/README.md" />
+        <File Path="src/Jeninnet.FileQuery.Soak/README.md" />
+        <File Path="src/Jeninnet.FileQuery.Tool/README.md" />
+        <File Path="src/Jeninnet.FileQuery.Tooling/README.md" />
     </Folder>
 
     <Folder Name="/tests/">
@@ -207,6 +260,14 @@
         <Project Path="tests/Jeninnet.FileQuery.Analyzers.Tests/Jeninnet.FileQuery.Analyzers.Tests.csproj" />
         <Project Path="tests/Jeninnet.FileQuery.Build.Tests/Jeninnet.FileQuery.Build.Tests.csproj" />
         <Project Path="tests/Jeninnet.FileQuery.FileProviders.Tests/Jeninnet.FileQuery.FileProviders.Tests.csproj" />
+        <File Path="tests/README.md" />
+        <File Path="tests/Jeninnet.AdvancedUsage.Tests/README.md" />
+        <File Path="tests/Jeninnet.FileQuery.Tests/README.md" />
+        <File Path="tests/Jeninnet.FileQuery.Tool.Tests/README.md" />
+        <File Path="tests/Jeninnet.FileQuery.Tooling.Tests/README.md" />
+        <File Path="tests/Jeninnet.FileQuery.Analyzers.Tests/README.md" />
+        <File Path="tests/Jeninnet.FileQuery.Build.Tests/README.md" />
+        <File Path="tests/Jeninnet.FileQuery.FileProviders.Tests/README.md" />
     </Folder>
 
     <Folder Name="/samples/">
@@ -224,6 +285,21 @@
         <Project Path="samples/RegexAnchoredMatching/RegexAnchoredMatching.csproj" />
         <Project Path="samples/RegexMatching/RegexMatching.csproj" />
         <Project Path="samples/SamplesUtilities/SamplesUtilities.csproj" />
+        <File Path="samples/README.md" />
+        <File Path="samples/AdvancedUsage/README.md" />
+        <File Path="samples/BasicMatching/README.md" />
+        <File Path="samples/DirectoryOnlyMatching/README.md" />
+        <File Path="samples/EntryMetadata/README.md" />
+        <File Path="samples/HybridMatcher/README.md" />
+        <File Path="samples/LogFiltering/README.md" />
+        <File Path="samples/NegationAndRecursive/README.md" />
+        <File Path="samples/NestedGlobMatching/README.md" />
+        <File Path="samples/PatternLanguage/README.md" />
+        <File Path="samples/POSIXClassMatching/README.md" />
+        <File Path="samples/RecursiveTraversal/README.md" />
+        <File Path="samples/RegexAnchoredMatching/README.md" />
+        <File Path="samples/RegexMatching/README.md" />
+        <File Path="samples/SamplesUtilities/README.md" />
     </Folder>
 
     <Folder Name="/benchmarks/">
