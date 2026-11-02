@@ -34,11 +34,11 @@ public class BasicMatchingTests {
             )
         );
 
-        var result = fileQueryEngine.Execute(new(env.Root, options))
+        var result = fileQueryEngine.Execute(new(env.Root, options), TestContext.CancellationToken)
                                     .ToList();
 
         TestAssertEx.ContainsSingle(result);
-        Assert.IsTrue(PathHelper.Equivalent(result[0], env.Abs("file1.txt")));
+        PathHelper.Equivalent(result[0], env.Abs("file1.txt")).Should().BeTrue();
     }
 
     /// <summary>
@@ -61,7 +61,7 @@ public class BasicMatchingTests {
             )
         );
 
-        var result = fileQueryEngine.Execute(new(env.Root, options))
+        var result = fileQueryEngine.Execute(new(env.Root, options), TestContext.CancellationToken)
                                     .Order()
                                     .ToList();
 
@@ -88,11 +88,17 @@ public class BasicMatchingTests {
             )
         );
 
-        var result = fileQueryEngine.Execute(new(env.Root, options))
+        var result = fileQueryEngine.Execute(new(env.Root, options), TestContext.CancellationToken)
                                     .ToList();
 
         TestAssertEx.HasCount(result, 2);
-        Assert.Contains(static x => x.EndsWith("fileA.txt", StringComparison.Ordinal), result);
-        Assert.Contains(static x => x.EndsWith("fileB.txt", StringComparison.Ordinal), result);
+        result.Should().Contain(static x => x.EndsWith("fileA.txt", StringComparison.Ordinal));
+        result.Should().Contain(static x => x.EndsWith("fileB.txt", StringComparison.Ordinal));
     }
+
+    /// <summary>
+    /// Gets or sets the test context, which provides information about the current test run.
+    /// Used here primarily for accessing the <see cref="CancellationToken"/>.
+    /// </summary>
+    public TestContext TestContext { get; set; } = null!;
 }

@@ -44,10 +44,9 @@ public class CommandLinePatternOptions {
             Required = false,
             Description =
             """
-            File patterns to include in the search.
-            Supports literal paths and wildcards (* and ?).
+            Patterns applied in order. Prefix regular expressions with 'r:'.
+            Separate multiple patterns with ';' (e.g. *.txt;!temp.txt).
             Patterns cannot end with ".." or contain consecutive "..".
-            Multiple patterns must be separated by ';' (e.g. *.txt;*.log).
             """,
             DefaultValueFactory = static _ => default,
             Arity = ArgumentArity.ZeroOrOne
@@ -55,21 +54,21 @@ public class CommandLinePatternOptions {
 
         Gitignore = new Option<string?>(OPTION_NAME_GITIGNORE_PATTERNS) {
             Required = false,
-            Description = "Exclude patterns written in GitIgnore syntax.",
+            Description = "GitIgnore-style patterns applied in order ('!' re-includes a path).",
             DefaultValueFactory = static _ => default,
             Arity = ArgumentArity.ZeroOrOne
         };
 
         Glob = new Option<string?>(OPTION_NAME_GLOB_PATTERNS) {
             Required = false,
-            Description = "Exclude patterns written in glob syntax.",
+            Description = "Glob-style patterns applied in order.",
             DefaultValueFactory = static _ => default,
             Arity = ArgumentArity.ZeroOrOne
         };
 
         RegularExpression = new Option<string?>(OPTION_NAME_FLAT_PATTERNS) {
             Required = false,
-            Description = "Exclude patterns written as regular expressions.",
+            Description = "Regular-expression patterns applied in order; the 'r:' prefix is optional.",
             DefaultValueFactory = static _ => default,
             Arity = ArgumentArity.ZeroOrOne
         };

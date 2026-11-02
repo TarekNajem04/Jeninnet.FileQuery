@@ -142,7 +142,7 @@ internal static class PathUtilities {
         var root = rootDir.AsSpan();
         var span = full[root.Length..];
 
-        if(span.Length > 0 && span[0] == Path.DirectorySeparatorChar) {
+        if(span.Length > 0 && span[0] is '/' or '\\') {
             span = span[1..];
         }
 
@@ -154,7 +154,7 @@ internal static class PathUtilities {
         var written = 0;
 
         foreach(var ch in span) {
-            buffer[written++] = ch == Path.DirectorySeparatorChar ? '/' : ch;
+            buffer[written++] = ch is '/' or '\\' ? '/' : ch;
         }
 
         if(entry.IsDirectory) {

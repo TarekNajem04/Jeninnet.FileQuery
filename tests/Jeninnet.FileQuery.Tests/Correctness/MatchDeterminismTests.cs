@@ -25,7 +25,7 @@ public sealed class MatchDeterminismTests {
         var second = matcher.Match(pattern, context);
 
         // Assert
-        Assert.AreEqual(first, second);
+        second.Should().Be(first);
     }
 
     /// <summary>Tests NoMatchingPattern_YieldsNoMatch.</summary>
@@ -37,6 +37,6 @@ public sealed class MatchDeterminismTests {
 
         var result = matcher.Match(pattern, context);
 
-        Assert.AreEqual(MatchOutcome.NoMatch, result);
+        result.Should().Be(MatchOutcome.NoMatch);
     }
 }

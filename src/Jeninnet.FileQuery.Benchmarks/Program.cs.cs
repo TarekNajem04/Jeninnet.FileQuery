@@ -20,6 +20,8 @@ internal static class Program {
                 typeof(RegexMatcherBenchmark),
                 typeof(HybridMatcherBenchmark),
                 typeof(TraversalBenchmark),
+                typeof(CrossPlatformTraversalBenchmark),
+                typeof(EnumerationCeilingBenchmark),
 
                 typeof(FileQueryBenchmark),
                 typeof(TraversalStrategyBenchmark),

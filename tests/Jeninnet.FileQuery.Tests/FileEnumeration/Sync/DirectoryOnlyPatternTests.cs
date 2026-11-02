@@ -39,7 +39,7 @@ public class DirectoryOnlyPatternTests {
             )
         );
 
-        var results = fileQueryEngine.Execute(new(env.Root, options)).ToList();
+        var results = fileQueryEngine.Execute(new(env.Root, options), TestContext.CancellationToken).ToList();
 
         // Directory rule matches only the folder, not the files
         results.Should().BeEmpty();
@@ -68,10 +68,10 @@ public class DirectoryOnlyPatternTests {
             )
         );
 
-        var results = fileQueryEngine.Execute(new(env.Root, options)).ToList();
+        var results = fileQueryEngine.Execute(new(env.Root, options), TestContext.CancellationToken).ToList();
 
         results.Should().Contain(static x => x.EndsWith("inside.txt", StringComparison.Ordinal));   // Included by negation "!sub/*.txt" rule
-        results.Should().Contain(static x => x.EndsWith("other.log", StringComparison.Ordinal));    // Excluded by default
+        results.Should().NotContain(static x => x.EndsWith("other.log", StringComparison.Ordinal)); // Excluded by the directory-only rule
         results.Should().ContainSingle(static x => x.EndsWith("x.txt", StringComparison.Ordinal));       // Included by default (not in 'sub/')
     }
 
@@ -97,7 +97,7 @@ public class DirectoryOnlyPatternTests {
             )
         );
 
-        var results = fileQueryEngine.Execute(new(env.Root, options)).ToList();
+        var results = fileQueryEngine.Execute(new(env.Root, options), TestContext.CancellationToken).ToList();
 
         results.Should().ContainSingle(static x => x.EndsWith("a.txt", StringComparison.Ordinal));
     }
@@ -133,7 +133,7 @@ public class DirectoryOnlyPatternTests {
             )
         );
 
-        var results = fileQueryEngine.Execute(new(env.Root, options)).ToList();
+        var results = fileQueryEngine.Execute(new(env.Root, options), TestContext.CancellationToken).ToList();
 
         results.Should().NotContain(static x => x.StartsWith("temp", StringComparison.Ordinal));
         results.Should().Contain(static x => x.EndsWith("file.log", StringComparison.Ordinal));
@@ -176,7 +176,7 @@ public class DirectoryOnlyPatternTests {
             )
         );
 
-        var results = fileQueryEngine.Execute(new(env.Root, options)).ToList();
+        var results = fileQueryEngine.Execute(new(env.Root, options), TestContext.CancellationToken).ToList();
 
         results.Should().Contain(env.Abs("temp", "file.log"), "File inside root 'temp' must be excluded.");
         results.Should().Contain(env.Abs("src", "temp", "file.log"), "File inside nested 'src/temp' must be included.");
@@ -219,11 +219,17 @@ public class DirectoryOnlyPatternTests {
             )
         );
 
-        var results = fileQueryEngine.Execute(new(env.Root, options)).ToList();
+        var results = fileQueryEngine.Execute(new(env.Root, options), TestContext.CancellationToken).ToList();
 
         results.Should().NotContain(env.Abs("sub", "inside.txt"), "File 'inside.txt' inside root 'sub' must be excluded.");
         results.Should().NotContain(env.Abs("sub", "other.log"), "File 'other.log' inside 'sub' must be excluded.");
         results.Should().Contain(env.Abs("sub", "x.txt"), "File 'x.txt' inside 'sub' must be included.");
         results.Should().NotContain(env.Abs("tmp", "sub", "x.txt"), "File 'b.txt' inside nested 'tmp/sub' must be excluded by '*/sub/*'.");
     }
+
+    /// <summary>
+    /// Gets or sets the test context, which provides information about the current test run.
+    /// Used here primarily for accessing the <see cref="CancellationToken"/>.
+    /// </summary>
+    public TestContext TestContext { get; set; } = null!;
 }

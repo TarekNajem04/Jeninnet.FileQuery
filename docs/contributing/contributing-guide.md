@@ -22,7 +22,7 @@ dotnet build -c Release
 dotnet test -c Release
 ```
 
-All 235+ tests must pass before submitting a pull request.
+All 1,167 tests must pass before submitting a pull request.
 
 ---
 
@@ -31,14 +31,13 @@ All 235+ tests must pass before submitting a pull request.
 Benchmarks must be run in Release configuration. Do not run them inside the IDE:
 
 ```bash
-cd benchmarks
-dotnet run -c Release -- --job Short
+dotnet run --project src/Jeninnet.FileQuery.Benchmarks/Jeninnet.FileQuery.Benchmarks.csproj -c Release -- --job Short
 ```
 
 For a full run (takes 5–15 minutes):
 
 ```bash
-dotnet run -c Release
+dotnet run --project src/Jeninnet.FileQuery.Benchmarks/Jeninnet.FileQuery.Benchmarks.csproj -c Release
 ```
 
 For a quick sanity check (one iteration, fast):
@@ -114,7 +113,7 @@ All public members require XML documentation comments. The project is configured
 
 ## Adding a New Benchmark
 
-Add a class to `benchmarks/Jeninnet.FileQuery.Benchmarks/` following the pattern of existing benchmarks:
+Add a class to `src/Jeninnet.FileQuery.Benchmarks/` following the pattern of existing benchmarks:
 
 ```csharp
 [MemoryDiagnoser]

@@ -20,6 +20,6 @@ public sealed class FileSystemGuardsTests {
         using var env = new TestEnvironment();
         FileSystemGuards.EnsureAccessible(env.Root, false);
         // Assert: If we reached here, no exception was thrown, which is correct.
-        Assert.IsTrue(Directory.Exists(env.Root));
+        Directory.Exists(env.Root).Should().BeTrue();
     }
 }

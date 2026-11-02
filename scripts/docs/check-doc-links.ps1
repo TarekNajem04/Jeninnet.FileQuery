@@ -2,9 +2,9 @@
 <#
 .SYNOPSIS
   Verifies that every relative Markdown link and image in the repository's project
-  documentation (root *.md, docs/**, src/**, samples/**, tests/**) resolves to
-  an existing file or folder, and that no project document links into unpublished
-  internal files.
+  documentation (root *.md, docs/**, src/**, samples/**, tests/**, .github/**,
+  extensions/**) resolves to an existing file or folder, and that no project
+  document links into unpublished internal files.
 
 .DESCRIPTION
   Absolute URLs (http/https/mailto), pure anchors (#...) and code-fenced content are
@@ -49,7 +49,7 @@ foreach ($rootDocument in Get-ChildItem $RepositoryRoot -Filter '*.md' -File) {
     [void]$files.Add($rootDocument.FullName)
 }
 
-foreach ($area in @('docs', 'src', 'samples', 'tests')) {
+foreach ($area in @('docs', 'src', 'samples', 'tests', '.github', 'extensions')) {
     $path = Join-Path $RepositoryRoot $area
     if (-not (Test-Path -LiteralPath $path)) { continue }
     foreach ($file in Get-ChildItem $path -Recurse -Filter '*.md' -File) {

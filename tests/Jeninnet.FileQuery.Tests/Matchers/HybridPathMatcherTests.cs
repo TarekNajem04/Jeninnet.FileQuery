@@ -33,8 +33,8 @@ public class HybridPathMatcherTests {
         var matcher = CreateMatcher();
         var patterns = Compile(patterns: ["**", "!foo.txt"]);
 
-        Assert.IsTrue(matcher.Match(patterns, CreateFileContext(path: "foo.txt")).IsSuccess());
-        Assert.IsFalse(matcher.Match(patterns, CreateFileContext(path: "bar.txt")).IsSuccess());
+        matcher.Match(patterns, CreateFileContext(path: "foo.txt")).IsSuccess().Should().BeTrue();
+        matcher.Match(patterns, CreateFileContext(path: "bar.txt")).IsSuccess().Should().BeFalse();
     }
 
     /// <summary>Tests ShouldSupportNegation.</summary>
@@ -43,8 +43,8 @@ public class HybridPathMatcherTests {
         var matcher = CreateMatcher();
         var patterns = Compile(patterns: ["!*.cs", "Program.cs"]);
 
-        Assert.IsTrue(matcher.Match(patterns, CreateFileContext(path: "Test.cs")).IsSuccess());
-        Assert.IsFalse(matcher.Match(patterns, CreateFileContext(path: "Program.cs")).IsSuccess());
+        matcher.Match(patterns, CreateFileContext(path: "Test.cs")).IsSuccess().Should().BeTrue();
+        matcher.Match(patterns, CreateFileContext(path: "Program.cs")).IsSuccess().Should().BeFalse();
     }
 
     /// <summary>Tests ShouldSupportDirectoryOnlyRules.</summary>
@@ -53,8 +53,8 @@ public class HybridPathMatcherTests {
         var matcher = CreateMatcher();
         var patterns = Compile(patterns: ["**", "!obj/"]);
 
-        Assert.IsTrue(matcher.Match(patterns, CreateDirectoryContext(path: "obj")).IsSuccess(), "the directory 'obj' should be matched"); // directory
-        Assert.IsFalse(matcher.Match(patterns, CreateFileContext(path: "obj")).IsSuccess(), "the file 'obj' should not be matched excluded by pattern '**'"); // file
+        matcher.Match(patterns, CreateDirectoryContext(path: "obj")).IsSuccess().Should().BeTrue(because: "the directory 'obj' should be matched"); // directory
+        matcher.Match(patterns, CreateFileContext(path: "obj")).IsSuccess().Should().BeFalse(because: "the file 'obj' should not be matched excluded by pattern '**'"); // file
     }
 
     /// <summary>Tests ShouldMatchWildcardPatterns.</summary>
@@ -63,8 +63,8 @@ public class HybridPathMatcherTests {
         var matcher = CreateMatcher();
         var patterns = Compile(patterns: ["*.txt", "!*.cs"]);
 
-        Assert.IsTrue(matcher.Match(patterns, CreateFileContext(path: "Program.cs")).IsSuccess());
-        Assert.IsFalse(matcher.Match(patterns, CreateFileContext(path: "Program.txt")).IsSuccess());
+        matcher.Match(patterns, CreateFileContext(path: "Program.cs")).IsSuccess().Should().BeTrue();
+        matcher.Match(patterns, CreateFileContext(path: "Program.txt")).IsSuccess().Should().BeFalse();
     }
 
     /// <summary>Tests ShouldMatchRecursiveWildcardPatterns.</summary>
@@ -73,9 +73,9 @@ public class HybridPathMatcherTests {
         var matcher = CreateMatcher();
         var patterns = Compile(patterns: ["*.txt", "!src/**/*.cs"]);
 
-        Assert.IsTrue(matcher.Match(patterns, CreateFileContext(path: "src/Program.cs")).IsSuccess());
-        Assert.IsTrue(matcher.Match(patterns, CreateFileContext(path: "src/utils/Helper.cs")).IsSuccess());
-        Assert.IsFalse(matcher.Match(patterns, CreateFileContext(path: "src/utils/Helper.txt")).IsSuccess());
+        matcher.Match(patterns, CreateFileContext(path: "src/Program.cs")).IsSuccess().Should().BeTrue();
+        matcher.Match(patterns, CreateFileContext(path: "src/utils/Helper.cs")).IsSuccess().Should().BeTrue();
+        matcher.Match(patterns, CreateFileContext(path: "src/utils/Helper.txt")).IsSuccess().Should().BeFalse();
     }
 
     /// <summary>Tests ShouldHandleMultiPatternCliInput.</summary>
@@ -91,10 +91,10 @@ public class HybridPathMatcherTests {
             ]
         );
 
-        Assert.IsTrue(matcher.Match(patterns, CreateFileContext(path: "Test.cs")).IsSuccess());
-        Assert.IsFalse(matcher.Match(patterns, CreateFileContext(path: "bin/Ignore.cs")).IsSuccess());
-        Assert.IsTrue(matcher.Match(patterns, CreateFileContext(path: "src/data/file.txt")).IsSuccess());
-        Assert.IsFalse(matcher.Match(patterns, CreateFileContext(path: "src/data/file.md")).IsSuccess());
+        matcher.Match(patterns, CreateFileContext(path: "Test.cs")).IsSuccess().Should().BeTrue();
+        matcher.Match(patterns, CreateFileContext(path: "bin/Ignore.cs")).IsSuccess().Should().BeFalse();
+        matcher.Match(patterns, CreateFileContext(path: "src/data/file.txt")).IsSuccess().Should().BeTrue();
+        matcher.Match(patterns, CreateFileContext(path: "src/data/file.md")).IsSuccess().Should().BeFalse();
     }
 
     /// <summary>Tests ShouldSupportIgnoreCase.</summary>
@@ -103,9 +103,9 @@ public class HybridPathMatcherTests {
         var matcher = CreateMatcher();
         var patterns = Compile(patterns: ["*.txt", "!Foo.TXT"]);
 
-        Assert.IsTrue(matcher.Match(patterns, CreateFileContext(path: "foo.txt", caseSensitivity: CaseSensitivity.Insensitive)).IsSuccess());
-        Assert.IsTrue(matcher.Match(patterns, CreateFileContext(path: "FOO.TXT", caseSensitivity: CaseSensitivity.Insensitive)).IsSuccess());
-        Assert.IsFalse(matcher.Match(patterns, CreateFileContext(path: "bar.txt", caseSensitivity: CaseSensitivity.Insensitive)).IsSuccess());
+        matcher.Match(patterns, CreateFileContext(path: "foo.txt", caseSensitivity: CaseSensitivity.Insensitive)).IsSuccess().Should().BeTrue();
+        matcher.Match(patterns, CreateFileContext(path: "FOO.TXT", caseSensitivity: CaseSensitivity.Insensitive)).IsSuccess().Should().BeTrue();
+        matcher.Match(patterns, CreateFileContext(path: "bar.txt", caseSensitivity: CaseSensitivity.Insensitive)).IsSuccess().Should().BeFalse();
     }
 
     /// <summary>Tests ShouldReturnFalseForEmptyOrNullPath.</summary>
@@ -114,8 +114,8 @@ public class HybridPathMatcherTests {
         var matcher = CreateMatcher();
         var patterns = Compile(patterns: ["!**"]);
 
-        Assert.IsFalse(matcher.Match(patterns, CreateFileContext(path: null!)).IsSuccess());
-        Assert.IsFalse(matcher.Match(patterns, CreateFileContext(path: "")).IsSuccess());
+        matcher.Match(patterns, CreateFileContext(path: null!)).IsSuccess().Should().BeFalse();
+        matcher.Match(patterns, CreateFileContext(path: "")).IsSuccess().Should().BeFalse();
     }
 
     /// <summary>
@@ -148,23 +148,23 @@ public class HybridPathMatcherTests {
         const string binDir = "ignore_me/bin"; // Correct path for the directory, removed trailing '**'
 
         // 1. EXPECTED INCLUSION: The file the test failed to find previously (matched by !ignore_me/recover/file.txt)
-        Assert.IsTrue(matcher.Match(patterns, CreateFileContext(path: fileToRestore)).IsSuccess(), "File inside re-included subdirectory must be included by the explicit negation rule.");
+        matcher.Match(patterns, CreateFileContext(path: fileToRestore)).IsSuccess().Should().BeTrue(because: "File inside re-included subdirectory must be included by the explicit negation rule.");
         // 2. EXPECTED INCLUSION: The subdirectory itself (matched by !ignore_me/recover/**)
         // The pattern "!ignore_me/recover/**" matches the directory path "ignore_me/recover"
         // and allows traversal.
-        Assert.IsTrue(matcher.Match(patterns, CreateDirectoryContext(path: dirToRestore)).IsSuccess(), "Re-included subdirectory path must be included by '!ignore_me/recover/**'.");
+        matcher.Match(patterns, CreateDirectoryContext(path: dirToRestore)).IsSuccess().Should().BeTrue(because: "Re-included subdirectory path must be included by '!ignore_me/recover/**'.");
         // ------------------------------------
 
         // 3. EXPECTED EXCLUSION: A file outside the excluded tree
         // Should be false because it matched the exclusion rule "**" and did not match any inclusion rule.
-        Assert.IsFalse(matcher.Match(patterns, CreateFileContext(path: outsideFile)).IsSuccess(), "File outside the ignored tree must be excluded by '**'.");
+        matcher.Match(patterns, CreateFileContext(path: outsideFile)).IsSuccess().Should().BeFalse(because: "File outside the ignored tree must be excluded by '**'.");
         // 4. EXPECTED EXCLUSION: File in the excluded parent directory (matched by ignore_me/**)
-        Assert.IsFalse(matcher.Match(patterns, CreateFileContext(path: rootFile)).IsSuccess(), "File in the excluded parent directory must be excluded.");
+        matcher.Match(patterns, CreateFileContext(path: rootFile)).IsSuccess().Should().BeFalse(because: "File in the excluded parent directory must be excluded.");
         // 5. EXPECTED EXCLUSION: File in another excluded subdirectory (matched by ignore_me/**)
-        Assert.IsFalse(matcher.Match(patterns, CreateFileContext(path: binFile)).IsSuccess(), "File in another excluded subdirectory must be excluded.");
+        matcher.Match(patterns, CreateFileContext(path: binFile)).IsSuccess().Should().BeFalse(because: "File in another excluded subdirectory must be excluded.");
         // 6. EXPECTED EXCLUSION: Another excluded subdirectory (matched by ignore_me/**)
         // This is the failing assertion. It must be False because "ignore_me/**" is a non-negated pruning rule.
-        Assert.IsFalse(matcher.Match(patterns, CreateDirectoryContext(path: binDir)).IsSuccess(), $"Another excluded subdirectory '{binDir}' path must be excluded by pattern [\"ignore_me/**\"].");
+        matcher.Match(patterns, CreateDirectoryContext(path: binDir)).IsSuccess().Should().BeFalse(because: $"Another excluded subdirectory '{binDir}' path must be excluded by pattern [\"ignore_me/**\"].");
     }
 
     /// <summary>Tests HybridPathMatcher_SimpleNegated.</summary>
@@ -199,13 +199,13 @@ public class HybridPathMatcherTests {
         var matcher = CreateMatcher();
         var patterns = Compile(patterns: ["**", "!*/"]);
 
-        Assert.IsTrue(matcher.Match(patterns, CreateDirectoryContext(path: "temp")).IsSuccess(), "Root directory 'temp' must be excluded (IsNegated=false).");
-        Assert.IsTrue(matcher.Match(patterns, CreateFileContext(path: "temp/file.log")).IsSuccess(), "File inside root 'temp' must be excluded.");
+        matcher.Match(patterns, CreateDirectoryContext(path: "temp")).IsSuccess().Should().BeTrue(because: "Root directory 'temp' must be excluded (IsNegated=false).");
+        matcher.Match(patterns, CreateFileContext(path: "temp/file.log")).IsSuccess().Should().BeTrue(because: "File inside root 'temp' must be excluded.");
         // ==========================================
         // Nested Must Match
         // ==========================================
-        Assert.IsTrue(matcher.Match(patterns, CreateDirectoryContext(path: "src/temp/")).IsSuccess(), "Nested directory 'src/temp' must be included.");
-        Assert.IsTrue(matcher.Match(patterns, CreateFileContext(path: "src/temp/file.log")).IsSuccess(), "File inside nested 'src/temp' must be included.");
+        matcher.Match(patterns, CreateDirectoryContext(path: "src/temp/")).IsSuccess().Should().BeTrue(because: "Nested directory 'src/temp' must be included.");
+        matcher.Match(patterns, CreateFileContext(path: "src/temp/file.log")).IsSuccess().Should().BeTrue(because: "File inside nested 'src/temp' must be included.");
     }
 
     /// <summary>
@@ -219,15 +219,15 @@ public class HybridPathMatcherTests {
         var patterns = Compile(patterns: ["/temp/"]);
 
         // Root Match: Should be successfully matched and EXCLUDED.
-        Assert.IsFalse(matcher.Match(patterns, CreateDirectoryContext(path: "temp")).IsSuccess(), "Root directory 'temp' must be excluded.");
-        Assert.IsFalse(matcher.Match(patterns, CreateFileContext(path: "temp/file.log")).IsSuccess(), "File inside root 'temp' must be excluded.");
+        matcher.Match(patterns, CreateDirectoryContext(path: "temp")).IsSuccess().Should().BeFalse(because: "Root directory 'temp' must be excluded.");
+        matcher.Match(patterns, CreateFileContext(path: "temp/file.log")).IsSuccess().Should().BeFalse(because: "File inside root 'temp' must be excluded.");
         // Nested Must NOT Match:
         // It should NOT match the exclusion rule, therefore it remains INCLUDED (the default state).
         var nestedDirResult = matcher.Match(patterns, CreateDirectoryContext(path: "src/temp"));
 
         // Assertion 2: Since it didn't match the only exclusion rule, the final result must be INCLUDED (True).
-        Assert.IsTrue(nestedDirResult.IsSuccess(), "Since it did not match the exclusion rule, the nested directory should be Included/Traversed by default.");
+        nestedDirResult.IsSuccess().Should().BeTrue(because: "Since it did not match the exclusion rule, the nested directory should be Included/Traversed by default.");
         var nestedFileResult = matcher.Match(patterns, CreateFileContext(path: "src/temp/file.log"));
-        Assert.IsTrue(nestedFileResult.IsSuccess(), "File inside non-matching nested 'src/temp' should be Included by default.");
+        nestedFileResult.IsSuccess().Should().BeTrue(because: "File inside non-matching nested 'src/temp' should be Included by default.");
     }
 }

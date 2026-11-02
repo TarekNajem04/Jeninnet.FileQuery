@@ -23,9 +23,9 @@ public sealed class RecursiveWildcardReaderTests {
 
         var result = reader.TryRead(pattern, ref i, out var token);
 
-        Assert.IsTrue(result);
-        Assert.IsInstanceOfType<RecursiveWildcardToken>(token);
-        Assert.AreEqual(2, i);
+        result.Should().BeTrue();
+        token.Should().BeAssignableTo<RecursiveWildcardToken>();
+        i.Should().Be(2);
     }
 
     /// <summary>
@@ -39,7 +39,7 @@ public sealed class RecursiveWildcardReaderTests {
 
         var result = reader.TryRead(pattern, ref i, out _);
 
-        Assert.IsFalse(result);
-        Assert.AreEqual(0, i);
+        result.Should().BeFalse();
+        i.Should().Be(0);
     }
 }

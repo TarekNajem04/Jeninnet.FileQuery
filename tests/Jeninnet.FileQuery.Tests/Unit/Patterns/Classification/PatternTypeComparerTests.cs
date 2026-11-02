@@ -18,7 +18,7 @@ public sealed class PatternTypeComparerTests {
     [TestMethod]
     public void Should_ReturnTrue_When_SameKindCompared() {
         var comparer = new PatternTypeComparer();
-        Assert.IsTrue(comparer.Equals(PatternKind.Glob, PatternKind.Glob));
+        comparer.Equals(PatternKind.Glob, PatternKind.Glob).Should().BeTrue();
     }
 
     /// <summary>
@@ -27,7 +27,7 @@ public sealed class PatternTypeComparerTests {
     [TestMethod]
     public void Should_ReturnFalse_When_DifferentKindCompared() {
         var comparer = new PatternTypeComparer();
-        Assert.IsFalse(comparer.Equals(PatternKind.Glob, PatternKind.Regex));
+        comparer.Equals(PatternKind.Glob, PatternKind.Regex).Should().BeFalse();
     }
 
     /// <summary>
@@ -36,6 +36,6 @@ public sealed class PatternTypeComparerTests {
     [TestMethod]
     public void Should_ReturnHashCode_When_ValidKindUsed() {
         var comparer = new PatternTypeComparer();
-        Assert.AreEqual(PatternKind.GitIgnore.GetHashCode(), comparer.GetHashCode(PatternKind.GitIgnore));
+        comparer.GetHashCode(PatternKind.GitIgnore).Should().Be(PatternKind.GitIgnore.GetHashCode());
     }
 }

@@ -18,20 +18,48 @@ For applications that use dependency injection, prefer `AddFileQuery()` over cal
 
 ## IFileQueryEngine
 
-The engine exposes two methods:
+The engine exposes path and metadata result families, each with sync/async and
+cancellation/progress overloads:
 
 ```csharp
 public interface IFileQueryEngine
 {
     IEnumerable<string> Execute(FileQuery query);
+    IEnumerable<string> Execute(FileQuery query, CancellationToken cancellationToken);
+    IEnumerable<string> Execute(
+        FileQuery query,
+        IProgress<FileQueryProgress>? progress,
+        CancellationToken cancellationToken = default);
 
     IAsyncEnumerable<string> ExecuteAsync(
         FileQuery query,
         CancellationToken cancellationToken = default);
+
+    IAsyncEnumerable<string> ExecuteAsync(
+        FileQuery query,
+        IProgress<FileQueryProgress>? progress,
+        CancellationToken cancellationToken = default);
+
+    IEnumerable<FileQueryEntry> ExecuteEntries(FileQuery query);
+    IEnumerable<FileQueryEntry> ExecuteEntries(FileQuery query, CancellationToken cancellationToken);
+    IEnumerable<FileQueryEntry> ExecuteEntries(
+        FileQuery query,
+        IProgress<FileQueryProgress>? progress,
+        CancellationToken cancellationToken = default);
+
+    IAsyncEnumerable<FileQueryEntry> ExecuteEntriesAsync(
+        FileQuery query,
+        CancellationToken cancellationToken = default);
+
+    IAsyncEnumerable<FileQueryEntry> ExecuteEntriesAsync(
+        FileQuery query,
+        IProgress<FileQueryProgress>? progress,
+        CancellationToken cancellationToken = default);
 }
 ```
 
-Both methods return absolute file-system paths as produced by the underlying `Directory` enumeration APIs. Paths use the native directory separator for the current platform.
+Path APIs return absolute filesystem paths using the native separator. Entry APIs return
+`FileQueryEntry` with root-relative paths and enumeration metadata.
 
 ---
 
@@ -48,24 +76,33 @@ var query = FileQuery.From(@"C:\repo")
 var results = engine.Execute(query).ToList();
 ```
 
-The builder validates the configuration and throws `InvalidOperationException` if the root path is null or whitespace. `DirectoryNotFoundException` is thrown if the root directory does not exist when the query is built.
+The builder validates the configuration and throws `ArgumentException` when the root path is null or
+empty. `DirectoryNotFoundException` is thrown if the root directory does not exist when the query
+is built.
 
 ---
 
-## Executing Without the Builder
+## Advanced Configuration
 
-Construct `FileQueryOptions` directly and pass it to the engine:
+Build the query through the fluent API; `FileQuery` itself is an immutable descriptor and its
+constructor is internal. For options that do not have a fluent method, use the corresponding builder
+method or the `FileQueryOptionsConfig` surface exposed by the library.
 
 ```csharp
-var options = new FileQueryOptions {
-    PatternInput = new(patterns: ["**", "!src/**/*.cs"]),
-    RecurseSubdirectories = true,
-    CaseSensitivity       = CaseSensitivity.Insensitive
-};
+var query = FileQuery.From(root)
+    .UsingGlob()
+    .Where(PatternKind.Glob, ["**/*.cs"])
+    .WithRecursion()
+    .IgnoreCase()
+    .IgnoreInaccessible()
+    .WithErrorRecovery(FileQueryErrorRecoveryOptions.Skip)
+    .Build();
 
-var query   = new FileQuery(rootPath, options);  // internal constructor via From()
 var results = engine.Execute(query);
 ```
+
+`FileQuery.Options` is intentionally internal. Inspect behavior through the public builder,
+`FileQueryPatternSet`, diagnostics, and the Tooling SDK instead of reading option state.
 
 ---
 

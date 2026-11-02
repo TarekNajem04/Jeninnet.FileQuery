@@ -6,7 +6,9 @@ This page introduces the Jeninnet.FileQuery pattern language through practical e
 
 ## The Golden Rule
 
-**Patterns are evaluated sequentially. The last matching rule wins.**
+**Within each dialect, patterns are evaluated sequentially and the last matching rule wins.**
+Across dialects, the subsets are evaluated GitIgnore → Glob → Regex and the first subset that
+returns Include wins. See [Pattern Precedence](../reference/pattern-precedence.md).
 
 ```
 **          ← Rule 1: exclude everything
@@ -14,9 +16,11 @@ This page introduces the Jeninnet.FileQuery pattern language through practical e
 data.log    ← Rule 3: exclude data.log specifically
 ```
 
-`data.log` is excluded because Rule 3 is the last rule that matches it.
-Every other `.log` file is included because Rule 2 matches them and no later rule overrides that.
-Every non-`.log` file is excluded because only Rule 1 matches them.
+This is a GitIgnore-only example. `data.log` is excluded because Rule 3 is the last GitIgnore rule
+that matches it. Every other `.log` file is included because Rule 2 matches them and no later
+GitIgnore rule overrides that. Every non-`.log` file is excluded because only Rule 1 matches them.
+A later Glob or Regex Include could override an Exclude, but a later dialect cannot exclude a
+path that GitIgnore already included.
 
 ---
 
@@ -137,6 +141,40 @@ Supported POSIX classes: `digit`, `alpha`, `alnum`, `space`, `blank`, `upper`, `
 
 ---
 
+## Brace Alternation
+
+Glob and GitIgnore patterns support `{a,b}` alternatives:
+
+```csharp
+FileQuery.From(root)
+    .UsingGlob()
+    .Where(PatternKind.Glob, ["**/*.{cs,vb,fs}"])
+    .Execute();
+```
+
+Alternatives can be nested, and braces used literally can be escaped. Regex patterns are excluded
+from expansion so quantifiers such as `{2,4}` keep their meaning.
+
+---
+
+## Case Sensitivity
+
+`IgnoreCase()` folds literal characters, character-class literals, and character-class ranges:
+
+```csharp
+FileQuery.From(root)
+    .UsingGlob()
+    .Where(PatternKind.Glob, ["**/*.[a-z][a-z]"])
+    .IgnoreCase() // also matches uppercase extensions
+    .Execute();
+```
+
+POSIX categories keep their category semantics: `[:upper:]` remains uppercase-only and
+`[:lower:]` remains lowercase-only. Without `IgnoreCase()`, matching follows
+`CaseSensitivity.PlatformDefault` (sensitive on Linux, insensitive on Windows/macOS).
+
+---
+
 ## Regular Expression Patterns
 
 Prefix a pattern with `r:` to use full .NET regular expression syntax:
@@ -190,8 +228,18 @@ r:.*_large\.txt exclude files ending in _large.txt
 ## What Patterns Cannot Do
 
 - Match file content — patterns operate on paths only
-- Match file metadata (size, date, attributes)
+- Match file metadata directly — use `MinSize`, `MaxSize`, `ModifiedAfter`, `ModifiedBefore`, and
+  `AttributesToSkip` on the builder
 - Perform arithmetic or conditional logic
 - Reference environment variables
 
-For content-based filtering, apply your own predicate to the results returned by the engine.
+For content-based filtering, apply your own predicate to the results.
+
+---
+
+## Next steps
+
+- [Quick start](quick-start.md)
+- [Common recipes](common-recipes.md)
+- [Pattern reference](../reference/pattern-overview.md)
+- [Entry metadata and filters](../guides/entry-metadata-and-filters.md)

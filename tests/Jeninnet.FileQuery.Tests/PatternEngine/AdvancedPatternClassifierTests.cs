@@ -13,7 +13,7 @@ namespace Jeninnet.FileQuery.Tests.PatternEngine;
 /// </summary>
 [TestClass]
 public class AdvancedPatternClassifierComprehensiveTests {
-    private static void AssertClassification(string pattern, PatternKind expected) => Assert.AreEqual(expected, PatternClassifier.Classify(pattern));
+    private static void AssertClassification(string pattern, PatternKind expected) => PatternClassifier.Classify(pattern).Should().Be(expected);
 
     /// <summary>Tests GitIgnore_ShouldDetectNegationPatterns.</summary>
     [TestMethod]

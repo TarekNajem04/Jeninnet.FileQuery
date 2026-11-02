@@ -9,11 +9,14 @@ The traversal layer is responsible for discovering filesystem paths. It is entir
 Two strategies are available, configured through `TraversalOptions`:
 
 ```csharp
-var options = new FileQueryOptions {
-    Traversal = new TraversalOptions(
-        Strategy: TraversalStrategy.DepthFirst   // default
+var options = new FileQueryOptions(
+    new FileQueryOptionsConfig(
+        PatternInput: new PatternInput(),
+        Traversal: new TraversalOptions(
+            Strategy: TraversalStrategy.DepthFirst   // default
+        )
     )
-};
+);
 ```
 
 ### DepthFirst (default)
@@ -82,19 +85,20 @@ public enum SymlinkPolicy
 }
 ```
 
-The default `Ignore` is the safe choice. `Follow` is appropriate for filesystems where symlinks are used as first-class directory structures. `FollowWithCycleDetection` adds a `HashSet<string>` to detect circular references at the cost of additional allocation per traversal.
+The default `Ignore` is the safe choice. `Follow` is appropriate for filesystems where symlinks are used as first-class directory structures. `Follow` performs no cycle detection, so a symlink cycle can make traversal run indefinitely; use `FollowWithCycleDetection` for any tree that may contain cycles. `FollowWithCycleDetection` adds a `HashSet<string>` to detect circular references at the cost of additional allocation per traversal.
 
 ---
 
 ## Inaccessible Directories
 
 ```csharp
-var options = new FileQueryOptions {
-    IgnoreInaccessible = true   // default — skip locked / denied directories
-};
+var query = FileQuery.From(root)
+    .IgnoreInaccessible(false)   // default: true — skip locked / denied directories
+    .WithErrorRecovery(FileQueryErrorRecoveryOptions.Abort)
+    .Build();
 ```
 
-When `true`, directories that throw `UnauthorizedAccessException`, `IOException`, or `DirectoryNotFoundException` are silently skipped and traversal continues. When `false`, the exception propagates to the caller.
+When `IgnoreInaccessible` is `true` (the default), directories and files that throw `UnauthorizedAccessException`, `IOException`, or `DirectoryNotFoundException` are silently skipped and traversal continues. When it is `false`, those failures become recoverable errors; the default error-recovery policy is then `Abort`, so they propagate to the caller. Pass `WithErrorRecovery(...)` to choose `Skip` or `Retry` explicitly.
 
 ---
 

@@ -108,7 +108,7 @@ Ambiguities lead to unpredictable results.
 
 **Jeninnet.FileQuery** adopts a simple and explicit rule model:
 
-Patterns are evaluated sequentially, and the last matching rule determines the final result.
+Within each dialect, patterns are evaluated sequentially and the last matching rule determines that dialect's result. Across dialects, GitIgnore → Glob → Regex are evaluated in order and the first Include wins.
 
 Example rule set:
 
@@ -424,7 +424,11 @@ public class FileScanner(IFileQueryEngine engine)
 ```csharp
 // Usage: myapp --patterns "**;!*.exe" --gitignore "bin/;obj/"
 
-var options = new CommandLinePatternOptions();
+public sealed class AppCliOptions : CommandLinePatternOptions
+{
+}
+
+var options = new AppCliOptions();
 var rootCmd = new RootCommand("File scanner");
 
 foreach (var opt in options.GetCommandOptions())
@@ -434,6 +438,7 @@ rootCmd.SetAction(result =>
 {
     var patterns = PatternBuilder.Build(result, options);
     var query = FileQuery.From(root).Where(patterns).Build();
+    var engine = FileQueryRuntime.Create();
 
     foreach (var file in engine.Execute(query))
         Console.WriteLine(file);
@@ -449,16 +454,22 @@ rootCmd.SetAction(result =>
 | Jeninnet.FileQuery | Core engine. GitIgnore, Glob, Regex. Zero-allocation matching. |
 | Jeninnet.FileQuery.CommandLine | Maps System.CommandLine results to pattern options. |
 | Jeninnet.FileQuery.DependencyInjection | Registers IFileQueryEngine for DI containers. |
+| Jeninnet.FileQuery.FileProviders | Queries `IFileProvider` sources. |
+| Jeninnet.FileQuery.Tool | `dotnet-filequery` global tool. |
+| Jeninnet.FileQuery.Tooling | Pattern inspection/validation SDK. |
+| Jeninnet.FileQuery.Build | MSBuild validation and SARIF export. |
+| Jeninnet.FileQuery.Analyzers | Roslyn `JNQ1001` diagnostic and code fix. |
 
 ### Supported Targets
 
-All packages target:
+Runtime/tool packages target:
 
 ```txt
 net10.0
 ```
 
-Symbol packages and Source Link are enabled.
+The Roslyn analyzer/code-fix package targets `netstandard2.0` for Roslyn host compatibility.
+Symbol packages and Source Link are enabled for the six library/tool packages.
 
 <div style="page-break-after: always;"></div>
 
@@ -477,9 +488,9 @@ Symbol packages and Source Link are enabled.
 ### Non-Goals
 
 - File content inspection
-- Parallel traversal (planned for v1.1)
+- Parallel traversal (not scheduled)
 - Mutable filesystem operations
-- Pattern caching across queries (planned for v1.1)
+- Pattern caching across queries (future consideration)
 
 <div style="page-break-after: always;"></div>
 

@@ -35,10 +35,10 @@ public class NegationRuleTests {
             )
         );
 
-        var result = fileQueryEngine.Execute(new(env.Root, options)).Order().ToList();
+        var result = fileQueryEngine.Execute(new(env.Root, options), TestContext.CancellationToken).Order().ToList();
 
         TestAssertEx.HasCount(result, 2);
-        Assert.DoesNotContain(static x => x.EndsWith("b.txt", StringComparison.Ordinal), result);
+        result.Should().NotContain(static x => x.EndsWith("b.txt", StringComparison.Ordinal));
     }
 
     /// <summary>
@@ -63,7 +63,7 @@ public class NegationRuleTests {
             )
         );
 
-        var result = fileQueryEngine.Execute(new(env.Root, options)).ToList();
+        var result = fileQueryEngine.Execute(new(env.Root, options), TestContext.CancellationToken).ToList();
 
         TestAssertEx.ContainsSingle(result, static x => x.EndsWith("keep.txt", StringComparison.Ordinal));
     }
@@ -92,8 +92,14 @@ public class NegationRuleTests {
             )
         );
 
-        var result = fileQueryEngine.Execute(new(env.Root, options)).ToList();
+        var result = fileQueryEngine.Execute(new(env.Root, options), TestContext.CancellationToken).ToList();
 
         TestAssertEx.ContainsSingle(result, static x => x.EndsWith("revive.txt", StringComparison.Ordinal));
     }
+
+    /// <summary>
+    /// Gets or sets the test context, which provides information about the current test run.
+    /// Used here primarily for accessing the <see cref="CancellationToken"/>.
+    /// </summary>
+    public TestContext TestContext { get; set; } = null!;
 }

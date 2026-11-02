@@ -68,7 +68,7 @@ public void Matching_Must_Not_Allocate()
     var before = GC.GetAllocatedBytesForCurrentThread();
     matcher.Match(compiledPatternSets, context);
     var after = GC.GetAllocatedBytesForCurrentThread();
-    Assert.AreEqual(before, after);
+    after.Should().Be(before);
 }
 ```
 

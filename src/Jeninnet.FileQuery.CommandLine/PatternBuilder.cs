@@ -11,10 +11,14 @@ namespace Jeninnet.FileQuery.CommandLine;
 /// Builds a classified dictionary of file patterns from command-line options.
 /// </summary>
 /// <remarks>
-/// Consolidates --patterns, and --gitignore into a single GitIgnore list
-/// following the "last rule wins" principle.
+/// Classifies patterns supplied through <c>--patterns</c>, keeps the explicitly typed
+/// <c>--gitignore</c>, <c>--glob</c>, and <c>--regex</c> buckets separate, and prefixes regex
+/// patterns with the <c>r:</c> dialect marker when it is missing.
 /// </remarks>
 public static class PatternBuilder {
+    private const string FALLBACK_PATTERN = "!**";
+    private const string REGEX_PREFIX = "r:";
+
     /// <summary>
     /// Builds pattern dictionary from a parsed command-line result.
     /// </summary>
@@ -47,7 +51,6 @@ public static class PatternBuilder {
         string? glob = default,
         string? regex = default
     ) {
-        const string FALLBACK_PATTERN = "!**";
         var typedPatterns = new Dictionary<PatternKind, List<string>>();
 
         foreach(var rawPattern in GetSplitPatterns(patterns)) {
@@ -57,7 +60,7 @@ public static class PatternBuilder {
 
         AddToBucket(typedPatterns, PatternKind.GitIgnore, GetSplitPatterns(gitignore));
         AddToBucket(typedPatterns, PatternKind.Glob, GetSplitPatterns(glob));
-        AddToBucket(typedPatterns, PatternKind.Regex, GetSplitPatterns(regex));
+        AddToBucket(typedPatterns, PatternKind.Regex, GetSplitPatterns(regex).Select(EnsureRegexPrefix));
 
         // 4. Default: Include everything if nothing was defined
         if(typedPatterns.Count == 0) {
@@ -90,4 +93,15 @@ public static class PatternBuilder {
         string.IsNullOrWhiteSpace(value)
             ? []
             : PatternSplitter.Split(value);
+
+    /// <summary>
+    /// Ensures a pattern supplied through the regex option carries the <c>r:</c> dialect prefix
+    /// required by the pattern tokenizer.
+    /// </summary>
+    /// <param name="pattern">The raw regex pattern.</param>
+    /// <returns>The pattern with an <c>r:</c> prefix.</returns>
+    private static string EnsureRegexPrefix(string pattern) =>
+        pattern.StartsWith(REGEX_PREFIX, StringComparison.Ordinal)
+            ? pattern
+            : REGEX_PREFIX + pattern;
 }

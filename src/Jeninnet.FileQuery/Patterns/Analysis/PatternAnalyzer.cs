@@ -5,6 +5,8 @@
 // Solution Repository: https://github.com/TarekNajem04/Jeninnet.FileQuery [LIVE]
 // Licensed under the MIT License.
 //
+using Jeninnet.FileQuery.Patterns.Compilation;
+
 namespace Jeninnet.FileQuery.Patterns.Analysis;
 
 /// <inheritdoc/>
@@ -82,6 +84,10 @@ internal sealed class PatternAnalyzer : IPatternAnalyzer {
             }
 
             if(HandleWildcard(pattern, state, i, out skipNext)) {
+                continue;
+            }
+
+            if(HandleBrace(pattern, state, i)) {
                 continue;
             }
 
@@ -176,6 +182,50 @@ internal sealed class PatternAnalyzer : IPatternAnalyzer {
     }
 
     /// <summary>
+    /// Handles brace alternation groups.
+    /// </summary>
+    /// <param name="pattern">The pattern being analyzed.</param>
+    /// <param name="state">Mutable analysis state.</param>
+    /// <param name="index">The current index.</param>
+    private static bool HandleBrace(ReadOnlySpan<char> pattern, AnalysisState state, int index) {
+        if(pattern[index] != '{') {
+            return false;
+        }
+
+        if(HasTopLevelComma(pattern, index + 1)) {
+            state.HasBraceAlternation = true;
+        }
+
+        return true;
+    }
+
+    /// <summary>
+    /// Detects whether a brace group contains a top-level comma.
+    /// </summary>
+    /// <param name="pattern">The pattern being analyzed.</param>
+    /// <param name="start">The position after the opening brace.</param>
+    private static bool HasTopLevelComma(ReadOnlySpan<char> pattern, int start) {
+        var depth = 1;
+        var scanner = new BraceScanner(pattern, start, pattern.Length);
+
+        while(scanner.MoveNext()) {
+            var c = scanner.Current;
+
+            if(c == '{') {
+                depth++;
+            } else if(c == '}' && --depth == 0) {
+                return false;
+            } else if(c == ',' && depth == 1) {
+                return true;
+            }
+
+            scanner.Advance();
+        }
+
+        return false;
+    }
+
+    /// <summary>
     /// Handles bracket characters (<c>[</c> and <c>]</c>).
     /// </summary>
     /// <param name="c">The character to check.</param>
@@ -244,6 +294,9 @@ internal sealed class PatternAnalyzer : IPatternAnalyzer {
         /// <summary>True if any GitIgnore‑specific syntax was detected.</summary>
         public bool HasGitIgnoreSyntax;
 
+        /// <summary>True if a brace alternation group was detected.</summary>
+        public bool HasBraceAlternation;
+
         /// <summary>Number of path segments (counted via <c>/</c>).</summary>
         public int SegmentCount = 1;
 
@@ -263,7 +316,8 @@ internal sealed class PatternAnalyzer : IPatternAnalyzer {
                 HasRecursiveWildcard: HasRecursiveWildcard,
                 HasEscapedCharacters: HasEscapedCharacters,
                 HasGitIgnoreSyntax: HasGitIgnoreSyntax,
-                SegmentCount: SegmentCount
+                SegmentCount: SegmentCount,
+                HasBraceAlternation: HasBraceAlternation
             );
     }
 }

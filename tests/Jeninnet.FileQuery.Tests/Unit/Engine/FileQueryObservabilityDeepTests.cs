@@ -54,11 +54,11 @@ public sealed class FileQueryObservabilityDeepTests {
     public void Should_SetSensibleDefaults_When_ErrorRecoveryConstructed() {
         // When ignoreInaccessible is true (default)
         var optionsWithIgnore = new FileQueryOptions(new FileQueryOptionsConfig(PatternInput: new PatternInput(["*"]), IgnoreInaccessible: true));
-        Assert.AreEqual(FileQueryErrorAction.Skip, optionsWithIgnore.ErrorRecovery.Action);
+        optionsWithIgnore.ErrorRecovery.Action.Should().Be(FileQueryErrorAction.Skip);
 
         // When ignoreInaccessible is false
         var optionsWithoutIgnore = new FileQueryOptions(new FileQueryOptionsConfig(PatternInput: new PatternInput(["*"]), IgnoreInaccessible: false));
-        Assert.AreEqual(FileQueryErrorAction.Abort, optionsWithoutIgnore.ErrorRecovery.Action);
+        optionsWithoutIgnore.ErrorRecovery.Action.Should().Be(FileQueryErrorAction.Abort);
     }
 
     /// <summary>
@@ -77,14 +77,14 @@ public sealed class FileQueryObservabilityDeepTests {
             PatternIndex: 5
         );
 
-        Assert.AreEqual("/root/a.txt", diagnostic.Path);
-        Assert.AreEqual("a.txt", diagnostic.RelativePath);
-        Assert.AreEqual("File", diagnostic.EntryKind);
-        Assert.AreEqual("Include", diagnostic.Outcome);
-        Assert.AreEqual("Matched pattern", diagnostic.Reason);
-        Assert.AreEqual(PatternKind.GitIgnore, diagnostic.PatternKind);
-        Assert.AreEqual("**/*.txt", diagnostic.Pattern);
-        Assert.AreEqual(5, diagnostic.PatternIndex);
+        diagnostic.Path.Should().Be("/root/a.txt");
+        diagnostic.RelativePath.Should().Be("a.txt");
+        diagnostic.EntryKind.Should().Be("File");
+        diagnostic.Outcome.Should().Be("Include");
+        diagnostic.Reason.Should().Be("Matched pattern");
+        diagnostic.PatternKind.Should().Be(PatternKind.GitIgnore);
+        diagnostic.Pattern.Should().Be("**/*.txt");
+        diagnostic.PatternIndex.Should().Be(5);
     }
 
     /// <summary>
@@ -94,9 +94,9 @@ public sealed class FileQueryObservabilityDeepTests {
     public void Should_StorePropertiesCorrectly_When_ProgressCreated() {
         var progress = new FileQueryProgress(1, 2, 3, "/root/a.txt");
 
-        Assert.AreEqual(1, progress.DirectoriesVisited);
-        Assert.AreEqual(2, progress.EntriesScanned);
-        Assert.AreEqual(3, progress.FilesMatched);
-        Assert.AreEqual("/root/a.txt", progress.CurrentPath);
+        progress.DirectoriesVisited.Should().Be(1);
+        progress.EntriesScanned.Should().Be(2);
+        progress.FilesMatched.Should().Be(3);
+        progress.CurrentPath.Should().Be("/root/a.txt");
     }
 }

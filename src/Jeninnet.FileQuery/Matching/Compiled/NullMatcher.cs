@@ -37,12 +37,13 @@ internal sealed class NullMatcher : PathMatcher {
     /// <param name="patterns">Ignored.</param>
     /// <param name="context">Ignored.</param>
     /// <returns>
-    /// Always returns a successful result, effectively treating all paths as included.
+    /// Returns an inclusive result for non-empty paths and a matched exclusion for the empty path,
+    /// matching the engine's default root-exclusion contract.
     /// </returns>
     /// <remarks>
-    /// This behavior is intentional: when no patterns are configured, the engine
-    /// should not filter out any paths. Centralizing this logic here keeps the
-    /// traversal code simple and free of special cases.
+    /// Non-empty paths are never filtered when no patterns are configured. Centralizing this
+    /// logic here keeps the traversal code simple and free of special cases.
     /// </remarks>
-    protected override MatchResult MatchCore(ICompiledPatternSet patterns, PathMatchContext context) => MatchResult.Success();
+    protected override MatchResult MatchCore(ICompiledPatternSet patterns, PathMatchContext context) =>
+        context.Path.IsEmpty ? MatchResult.Matched() : MatchResult.Success();
 }

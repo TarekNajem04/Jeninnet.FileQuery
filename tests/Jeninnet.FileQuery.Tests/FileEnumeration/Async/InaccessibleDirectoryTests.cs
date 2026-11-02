@@ -51,7 +51,7 @@ public class EnumerateFilesAsync_InaccessibleDirectoryTests {
                 }
 
                 // If we reach this point, no exception was thrown - fail explicitly
-                throw new AssertFailedException("Expected an exception due to inaccessible directory, but none was thrown.");
+                throw new AssertionFailedException("Expected an exception due to inaccessible directory, but none was thrown.");
             }
             catch(Exception ex) when(
                 ex is DirectoryNotFoundException or IOException or UnauthorizedAccessException
@@ -133,3 +133,4 @@ public class EnumerateFilesAsync_InaccessibleDirectoryTests {
     /// </summary>
     public TestContext TestContext { get; set; } = null!;
 }
+

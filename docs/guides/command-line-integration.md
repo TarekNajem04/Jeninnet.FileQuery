@@ -183,7 +183,7 @@ This becomes:
 Splitting is handled by:
 
 ```
-PatternSpliter.Split(...)
+PatternSplitter.Split(...)
 ```
 
 ---
@@ -210,38 +210,40 @@ This ensures the engine always has a valid rule set.
 
 Minimal example of a console application using the library.
 
+`CommandLinePatternOptions` has a `protected` constructor, so subclass it to add options or
+reuse the parser.
+
 ```csharp
 using System.CommandLine;
+using Jeninnet.FileQuery;
 using Jeninnet.FileQuery.CommandLine;
 
-var patternOptions = new CommandLinePatternOptions();
+public sealed class AppCliOptions : CommandLinePatternOptions
+{
+}
 
+var patternOptions = new AppCliOptions();
 var rootCommand = new RootCommand("File query example");
 
 foreach (var option in patternOptions.GetCommandOptions())
 {
-    rootCommand.AddOption(option);
+    rootCommand.Add(option);
 }
 
-rootCommand.SetHandler((ParseResult result) =>
+rootCommand.SetAction((ParseResult result) =>
 {
     var patterns = PatternBuilder.Build(result, patternOptions);
 
     var engine = FileQueryRuntime.Create();
+    var query = FileQuery.From(".")
+        .Where(patterns)
+        .Build();
 
-    var options = new FileQueryOptions
-    {
-        PatternInput = new(patterns)
-    };
-
-    var files = engine.Execute(new(".", options));
-
-    foreach (var file in files)
+    foreach (var file in engine.Execute(query))
         Console.WriteLine(file);
-
 });
 
-return rootCommand.InvokeAsync(args);
+return await rootCommand.InvokeAsync(args);
 ```
 
 ---

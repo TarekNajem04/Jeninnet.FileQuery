@@ -286,6 +286,12 @@ csharp_preserve_single_line_statements = true
 
 #### Naming styles ####
 
+# Tests intentionally exercise both token-free and cancellable sync query overloads.
+# S8949 would force every legacy call site to thread a test cancellation token through
+# public APIs whose token-free form is part of the contract.
+[tests/**/*.cs]
+dotnet_diagnostic.S8949.severity = none
+
 # Naming rules
 dotnet_naming_rule.async_method_should_be_async_method.severity = suggestion
 dotnet_naming_rule.async_method_should_be_async_method.symbols = async_method

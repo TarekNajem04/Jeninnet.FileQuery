@@ -52,6 +52,13 @@ internal sealed class RegexInstructionMatcher : PathMatcher {
     private readonly ConcurrentDictionary<RegexCacheKey, Regex> _regexCache = new();
 
     /// <summary>
+    /// Upper bound on cached <see cref="Regex"/> instances. The cache is process-wide
+    /// through the shared matcher, so an unbounded cache would retain a compiled
+    /// expression for every distinct pattern text a long-running host ever supplies.
+    /// </summary>
+    private const int MAX_CACHED_REGEXES = 512;
+
+    /// <summary>
     /// Initializes a new instance of the <see cref="RegexInstructionMatcher"/>.
     /// </summary>
     /// <remarks>
@@ -93,12 +100,34 @@ internal sealed class RegexInstructionMatcher : PathMatcher {
             var regex = GetOrCreateRegex(regexText, context.CaseSensitivity);
 
             // Full-path match: the entire normalized path must satisfy the expression.
-            if(regex.IsMatch(context.Path)) {
+            if(MatchWithTimeout(regex, context.Path, regexText)) {
                 return MatchResult.Success();
             }
         }
 
         return MatchResult.Fail();
+    }
+
+    /// <summary>
+    /// Executes a regex match and converts a match timeout into a domain-level
+    /// <see cref="PatternException"/>.
+    /// </summary>
+    /// <param name="regex">The compiled regular expression.</param>
+    /// <param name="path">The normalized path to match.</param>
+    /// <param name="patternText">The source pattern, used in the error message.</param>
+    /// <returns><see langword="true"/> when the expression matches the path.</returns>
+    /// <exception cref="PatternException">
+    /// Thrown when the expression exceeds its configured match timeout.
+    /// </exception>
+    internal static bool MatchWithTimeout(Regex regex, ReadOnlySpan<char> path, string patternText) {
+        try {
+            return regex.IsMatch(path);
+        }
+        catch(RegexMatchTimeoutException ex) {
+            throw new PatternException(
+                $"Regex pattern '{patternText}' exceeded the configured match timeout.",
+                ex);
+        }
     }
 
     /// <summary>
@@ -113,6 +142,13 @@ internal sealed class RegexInstructionMatcher : PathMatcher {
     /// </param>
     private Regex GetOrCreateRegex(string patternText, CaseSensitivity caseSensitivity) {
         var key = new RegexCacheKey(patternText, caseSensitivity);
+
+        // Bounded cache: when the cap is reached, drop the whole cache instead of
+        // growing without limit. Cached Regex instances are immutable, so concurrent
+        // readers that already hold one continue to use it safely.
+        if(_regexCache.Count >= MAX_CACHED_REGEXES) {
+            _regexCache.Clear();
+        }
 
         return _regexCache.GetOrAdd(key, static k => {
             var options = RegexOptions.Compiled | RegexOptions.CultureInvariant;

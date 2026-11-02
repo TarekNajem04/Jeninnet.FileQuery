@@ -1,6 +1,40 @@
+- name: Global Tool
+  href: global-tool.md
+- name: Diff-Aware Queries
+  href: diff-aware-queries.md
+- name: Jeninnet FileQuery for VS Code
+  href: ide-extension.md
+- name: Build Tooling SDK
+  href: tooling-sdk.md
+- name: Ecosystem Integrations
+  href: integrations.md
 - name: CLI Usage
   href: cli-usage.md
+- name: JSON Output
+  href: json-output.md
 - name: Dependency Injection
   href: dependency-injection.md
 - name: Observability and Diagnostics
   href: observability-and-diagnostics.md
+- name: Error Handling and Validation
+  href: error-handling-and-validation.md
+- name: Entry Metadata and Filters
+  href: entry-metadata-and-filters.md
+- name: Directory Results
+  href: directory-results.md
+- name: Multiple Roots
+  href: multiple-roots.md
+- name: Brace Expansion
+  href: brace-expansion.md
+- name: IFileProvider Adapter
+  href: file-provider-adapter.md
+- name: In-Memory Matching
+  href: in-memory-matching.md
+- name: Git Ignore Files
+  href: gitignore-files.md
+- name: Roslyn Analyzer
+  href: roslyn-analyzers.md
+- name: MSBuild Validation and SARIF
+  href: msbuild-validation.md
+- name: Native AOT
+  href: native-aot.md

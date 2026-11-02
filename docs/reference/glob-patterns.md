@@ -56,24 +56,34 @@ var query = FileQuery.From(root)
 Or supply patterns with explicit `PatternKind.Glob`:
 
 ```csharp
-var options = new FileQueryOptions {
-    PatternInput = new(
-        typedPatterns: new Dictionary<PatternKind, IEnumerable<string>> {
-            [PatternKind.Glob] = ["**/*.cs", "src/**/*.md"]
-        }
+var options = new FileQueryOptions(
+    new FileQueryOptionsConfig(
+        PatternInput: new(
+            typedPatterns: new Dictionary<PatternKind, IEnumerable<string>> {
+                [PatternKind.Glob] = ["**/*.cs", "src/**/*.md"]
+            }
+        )
     )
-};
+);
 ```
 
 ---
 
 ## Mixed Usage
 
-In `Hybrid` mode (the default), Glob patterns are auto-classified when they contain a backslash (Windows-style path) and no GitIgnore-specific syntax:
+In `Hybrid` mode (the default), a pattern containing a backslash and no GitIgnore-specific syntax is
+classified as Glob. The Glob grammar uses `/` as the path separator and `\` only as an escape for a
+glob metacharacter (`*`, `?`, `!`, `#`, `[`, `]`, `\`, `{`, `}`). Windows-style separators are **not**
+accepted as path separators: compilation fails with an actionable `PatternException` instead of
+silently producing a pattern that can never match a normalized path. Use forward slashes in queries:
 
 ```csharp
-// Auto-classified as Glob because of the backslash separator
 var query = FileQuery.From(root)
-                     .Where(@"src\**\*.cs")
+                     .Where("src/**/*.cs")
                      .Build();
 ```
+
+For example, `src\file.cs` is rejected because `\f` is not a Glob escape; write `src/file.cs`.
+A backslash before a Glob metacharacter such as `*` is an escape for that literal character, so
+`src\*.cs` matches a literal file name containing `*` rather than a `src` directory; use
+`src/*.cs` for the directory form.

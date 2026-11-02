@@ -22,7 +22,7 @@ public class NullMatcherTests {
         var patterns = new CompiledPatternSet([]);
         var outcome = matcher.Match(patterns, context);
 
-        Assert.IsTrue(outcome.IsSuccess());
+        outcome.IsSuccess().Should().BeTrue();
     }
 
     /// <summary>
@@ -31,9 +31,9 @@ public class NullMatcherTests {
     [TestMethod]
     public void Should_SupportAllKinds_When_NullMatcherUsed() {
         var matcher = NullMatcher.Instance;
-        Assert.IsTrue(matcher.Supports(PatternKind.GitIgnore));
-        Assert.IsTrue(matcher.Supports(PatternKind.Glob));
-        Assert.IsTrue(matcher.Supports(PatternKind.Regex));
-        Assert.IsTrue(matcher.Supports(PatternKind.Unknown));
+        matcher.Supports(PatternKind.GitIgnore).Should().BeTrue();
+        matcher.Supports(PatternKind.Glob).Should().BeTrue();
+        matcher.Supports(PatternKind.Regex).Should().BeTrue();
+        matcher.Supports(PatternKind.Unknown).Should().BeTrue();
     }
 }

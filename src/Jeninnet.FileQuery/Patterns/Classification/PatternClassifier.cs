@@ -61,7 +61,7 @@ internal static partial class PatternClassifier {
 
         var span = pattern.AsSpan();
 
-        var (isMalformed, _) = PatternValidator.Validate(span);
+        var (isMalformed, _, _, _) = PatternValidator.Validate(span);
         if(isMalformed) {
             // Store the specific error reason in a way the compiler can access.
             // For now, we mark as Unknown and the compiler can throw based on this.
@@ -86,25 +86,25 @@ internal static partial class PatternClassifier {
         }
 
         // ---------------------------------------------------------
-        // 3. Stray bracket → Glob
+        // 3. Escaped → GitIgnore
+        // ---------------------------------------------------------
+        if(analysis.HasEscapedCharacters) {
+            return PatternKind.GitIgnore;
+        }
+
+        // ---------------------------------------------------------
+        // 4. Stray bracket → Glob
         // ---------------------------------------------------------
         if(PatternValidator.HasStrayClosingBracket(span)) {
             return PatternKind.Glob;
         }
 
         // ---------------------------------------------------------
-        // 4. WINDOWS PATH RULE (HIGHEST PRIORITY)
+        // 5. WINDOWS PATH RULE (HIGHEST PRIORITY)
         // ---------------------------------------------------------
         // escaped-only case must NOT be treated as path
         if(analysis.HasBackslash && !analysis.HasEscapedCharacters && !analysis.IsNegated) {
             return PatternKind.Glob;
-        }
-
-        // ---------------------------------------------------------
-        // 5. Escaped → GitIgnore
-        // ---------------------------------------------------------
-        if(analysis.HasEscapedCharacters) {
-            return PatternKind.GitIgnore;
         }
 
         // ---------------------------------------------------------
@@ -115,14 +115,21 @@ internal static partial class PatternClassifier {
         }
 
         // ---------------------------------------------------------
-        // 7. Wildcards default to GitIgnore
+        // 7. Brace alternation is a glob feature
+        // ---------------------------------------------------------
+        if(analysis.HasBraceAlternation) {
+            return PatternKind.Glob;
+        }
+
+        // ---------------------------------------------------------
+        // 8. Wildcards default to GitIgnore
         // ---------------------------------------------------------
         if(analysis.HasWildcard || analysis.HasBracket) {
             return PatternKind.GitIgnore;
         }
 
         // ---------------------------------------------------------
-        // 8. Fallback
+        // 9. Fallback
         // ---------------------------------------------------------
         return PatternKind.GitIgnore;
     }

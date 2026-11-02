@@ -366,6 +366,9 @@ FodyWeavers.xsd
 
 **/TestResults/
 
+# Legacy test-run XML artifacts
+tests/**/Jeninnet.*.Tests.xml
+
 # Generated coverage HTML reports
 artifacts/coverage/
 
@@ -387,6 +390,7 @@ docs/api/
 
 # Build-generated project XML documentation files
 src/**/*.xml
+tests/**/*.xml
 archive/**/*.xml
 # AdvancedUsage evaluation output
 samples/AdvancedUsage/EvaluationResults/

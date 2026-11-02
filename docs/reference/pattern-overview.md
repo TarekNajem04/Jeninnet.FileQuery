@@ -23,27 +23,26 @@ Patterns are provided to the engine through the `PatternInput` component of `Fil
 Example:
 
 ```csharp
-var options = new FileQueryOptions
-{
-    PatternInput = new(
-        patterns:
-        [
-            "**",
-            "!*.txt"
-        ]
+var options = new FileQueryOptions(
+    new FileQueryOptionsConfig(
+        PatternInput: new(
+            patterns:
+            [
+                "**",
+                "!*.txt"
+            ]
+        )
     )
-};
+);
 ```
 
-Patterns are evaluated sequentially.
+Evaluation has two levels:
 
-The evaluation model follows the rule:
+- **Within a dialect**, rules are evaluated in declaration order and the last matching rule wins.
+- **Across dialects**, the order is GitIgnore → Glob → Regex; the first subset that returns
+  Include wins. A later dialect can override an earlier Exclude, but not an earlier Include.
 
-```
-last rule wins
-```
-
-This rule is fundamental to the behavior of the engine.
+See [Pattern Precedence](pattern-precedence.md) for the full model and examples.
 
 Typed patterns can be supplied when the caller already knows the dialect and
 wants to bypass automatic classification:
@@ -118,7 +117,8 @@ Responsibilities include:
 ```
 normalizing path separators
 removing redundant segments
-trimming whitespace
+rejecting empty or whitespace-only entries
+trimming surrounding whitespace during scanning
 standardizing pattern representation
 ```
 
@@ -302,7 +302,7 @@ These patterns are separated using the `;` character.
 Splitting is performed by:
 
 ```
-PatternSpliter.Split(...)
+PatternSplitter.Split(...)
 ```
 
 This produces a sequence of individual patterns which are then classified and tokenized.

@@ -37,10 +37,10 @@ public class RecursionDepthTests {
             )
         );
 
-        var result = fileQueryEngine.Execute(new(env.Root, options)).ToList();
+        var result = fileQueryEngine.Execute(new(env.Root, options), TestContext.CancellationToken).ToList();
 
         TestAssertEx.HasCount(result, 1);
-        Assert.EndsWith("root.txt", result.Single());
+        result.Single().Should().EndWith("root.txt");
     }
 
     /// <summary>
@@ -68,12 +68,12 @@ public class RecursionDepthTests {
             )
         );
 
-        var result = fileQueryEngine.Execute(new(env.Root, options)).Order().ToList();
+        var result = fileQueryEngine.Execute(new(env.Root, options), TestContext.CancellationToken).Order().ToList();
 
         TestAssertEx.HasCount(result, 2);
-        Assert.Contains(static x => x.EndsWith("root.txt", StringComparison.Ordinal), result);
-        Assert.Contains(static x => x.EndsWith("fileA.txt", StringComparison.Ordinal), result);
-        Assert.DoesNotContain(static x => x.EndsWith("fileB.txt", StringComparison.Ordinal), result);
+        result.Should().Contain(static x => x.EndsWith("root.txt", StringComparison.Ordinal));
+        result.Should().Contain(static x => x.EndsWith("fileA.txt", StringComparison.Ordinal));
+        result.Should().NotContain(static x => x.EndsWith("fileB.txt", StringComparison.Ordinal));
     }
 
     /// <summary>
@@ -101,8 +101,14 @@ public class RecursionDepthTests {
             )
         );
 
-        var result = fileQueryEngine.Execute(new(env.Root, options)).Order().ToList();
+        var result = fileQueryEngine.Execute(new(env.Root, options), TestContext.CancellationToken).Order().ToList();
 
         TestAssertEx.HasCount(result, 3);
     }
+
+    /// <summary>
+    /// Gets or sets the test context, which provides information about the current test run.
+    /// Used here primarily for accessing the <see cref="CancellationToken"/>.
+    /// </summary>
+    public TestContext TestContext { get; set; } = null!;
 }

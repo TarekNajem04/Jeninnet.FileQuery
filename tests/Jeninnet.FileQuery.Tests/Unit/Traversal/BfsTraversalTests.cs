@@ -47,12 +47,12 @@ public sealed class BfsTraversalTests {
             )
         );
 
-        var bfsResults = engine.Execute(new(env.Root, bfsOptions)).ToList();
-        var dfsResults = engine.Execute(new(env.Root, dfsOptions)).ToList();
+        var bfsResults = engine.Execute(new(env.Root, bfsOptions), TestContext.CancellationToken).ToList();
+        var dfsResults = engine.Execute(new(env.Root, dfsOptions), TestContext.CancellationToken).ToList();
 
-        Assert.AreSequenceEqual(dfsResults, bfsResults, SequenceOrder.InAnyOrder, "BFS and DFS must return the same set of files.");
+        bfsResults.Should().BeEquivalentTo(dfsResults, because: "BFS and DFS must return the same set of files.");
 
-        Assert.HasCount(4, bfsResults);
+        bfsResults.Should().HaveCount(4);
     }
 
     /// <summary>
@@ -74,16 +74,14 @@ public sealed class BfsTraversalTests {
             )
         );
 
-        var results = engine.Execute(new(env.Root, options)).ToList();
+        var results = engine.Execute(new(env.Root, options), TestContext.CancellationToken).ToList();
 
-        Assert.HasCount(2, results);
+        results.Should().HaveCount(2);
 
         var rootIndex = results.FindIndex(static p => p.EndsWith("root.txt", StringComparison.Ordinal));
         var deepIndex = results.FindIndex(static p => p.EndsWith("deep.txt", StringComparison.Ordinal));
 
-        Assert.IsLessThan(
-            deepIndex, rootIndex,
-            $"BFS must return 'root.txt' (index {rootIndex}) before 'deep.txt' (index {deepIndex}).");
+        rootIndex.Should().BeLessThan(deepIndex, because: $"BFS must return 'root.txt' (index {rootIndex}) before 'deep.txt' (index {deepIndex}).");
     }
 
     /// <summary>
@@ -107,10 +105,9 @@ public sealed class BfsTraversalTests {
             )
         );
 
-        var results = engine.Execute(new(env.Root, options)).ToList();
+        var results = engine.Execute(new(env.Root, options), TestContext.CancellationToken).ToList();
 
-        Assert.HasCount(2, results,
-            "MaxRecursionDepth = 1 must include depth 0 and 1 only.");
+        results.Should().HaveCount(2, because: "MaxRecursionDepth = 1 must include depth 0 and 1 only.");
 
         results.Should().Contain(static p => p.EndsWith("root.txt", StringComparison.Ordinal), "root.txt at depth 0 must be included.");
         results.Should().Contain(static p => p.EndsWith("a.txt", StringComparison.Ordinal), "a.txt at depth 1 must be included.");
@@ -135,13 +132,13 @@ public sealed class BfsTraversalTests {
             )
         );
 
-        var syncResults = engine.Execute(new(env.Root, options)).Order().ToList();
+        var syncResults = engine.Execute(new(env.Root, options), TestContext.CancellationToken).Order().ToList();
         var asyncResults = await engine
             .ExecuteAsync(new(env.Root, options), TestContext.CancellationToken)
             .ToListAsync(TestContext.CancellationToken);
         asyncResults.Sort();
 
-        Assert.AreSequenceEqual(syncResults, asyncResults, "BFS async must match BFS sync when both results are sorted.");
+        asyncResults.Should().Equal(syncResults, because: "BFS async must match BFS sync when both results are sorted.");
     }
 
     /// <summary>

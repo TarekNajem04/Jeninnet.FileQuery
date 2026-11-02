@@ -60,6 +60,16 @@ jobs:
       - name: Restore
         run: dotnet restore Jeninnet.FileQuery.slnx
 
+      - name: Check runtime drift
+        shell: pwsh
+        run: pwsh scripts/performance/check-runtime.ps1
+
+      - name: Record runtime information
+        shell: bash
+        run: |
+          mkdir -p BenchmarkDotNet.Artifacts/results
+          dotnet --info | tee BenchmarkDotNet.Artifacts/results/runtime-info.txt
+
       - name: Run Benchmarks
         run: >
           dotnet run

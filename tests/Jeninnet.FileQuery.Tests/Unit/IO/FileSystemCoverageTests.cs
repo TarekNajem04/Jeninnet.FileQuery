@@ -21,8 +21,8 @@ public class FileSystemCoverageTests {
         const FileAttributes attributes = FileAttributes.Normal;
         var entry = new FileSystemEntry(path, attributes);
 
-        Assert.AreEqual(path, entry.FullPath);
-        Assert.AreEqual(attributes, entry.Attributes);
+        entry.FullPath.Should().Be(path);
+        entry.Attributes.Should().Be(attributes);
     }
 
     /// <summary>
@@ -31,8 +31,8 @@ public class FileSystemCoverageTests {
     [TestMethod]
     public void Should_CallStandardIO_When_DirectoryExistsChecked() {
         using var env = new TestEnvironment();
-        Assert.IsTrue(FileSystem.Instance.DirectoryExists(env.Root));
-        Assert.IsFalse(FileSystem.Instance.DirectoryExists(System.IO.Path.Combine(env.Root, "non-existent")));
+        FileSystem.Instance.DirectoryExists(env.Root).Should().BeTrue();
+        FileSystem.Instance.DirectoryExists(System.IO.Path.Combine(env.Root, "non-existent")).Should().BeFalse();
     }
 
     /// <summary>
@@ -43,7 +43,7 @@ public class FileSystemCoverageTests {
         using var env = new TestEnvironment();
         var file = env.CreateFile("test.txt");
         var attr = FileSystem.Instance.GetAttributes(file);
-        Assert.IsTrue(attr.HasFlag(FileAttributes.Archive) || attr.HasFlag(FileAttributes.Normal));
+        (attr.HasFlag(FileAttributes.Archive) || attr.HasFlag(FileAttributes.Normal)).Should().BeTrue();
     }
 
     /// <summary>
@@ -54,7 +54,7 @@ public class FileSystemCoverageTests {
         using var env = new TestEnvironment();
         var file = env.CreateFile("test.txt");
         var resolved = FileSystem.Instance.ResolveRealPath(file);
-        Assert.AreEqual(file, resolved);
+        resolved.Should().Be(file);
     }
 
     /// <summary>
@@ -71,7 +71,7 @@ public class FileSystemCoverageTests {
         );
 
         var results = FileSystem.Instance.Enumerate(env.Root, false, errorRecovery).ToList();
-        Assert.HasCount(1, results);
+        results.Should().HaveCount(1);
     }
 
     /// <summary>
@@ -92,7 +92,7 @@ public class FileSystemCoverageTests {
             results.Add(entry);
         }
 
-        Assert.HasCount(1, results);
+        results.Should().HaveCount(1);
     }
 
     /// <summary>
@@ -113,7 +113,7 @@ public class FileSystemCoverageTests {
 
         // Assert that we at least got the 'locked' directory itself (depending on OS behavior)
         // or simply that the operation completed.
-        Assert.IsNotNull(results);
+        results.Should().NotBeNull();
     }
 
     /// <summary>
@@ -123,16 +123,16 @@ public class FileSystemCoverageTests {
     public void Should_ReturnFullPath_When_GetFullPathCalled() {
         const string path = "test.txt";
         var full = FileSystem.Instance.GetFullPath(path);
-        Assert.IsTrue(System.IO.Path.IsPathRooted(full));
+        System.IO.Path.IsPathRooted(full).Should().BeTrue();
 
         var baseDir = System.IO.Path.GetTempPath();
         var full2 = FileSystem.Instance.GetFullPath(path, baseDir);
-        Assert.AreEqual(System.IO.Path.GetFullPath(System.IO.Path.Combine(baseDir, path)), full2);
+        full2.Should().Be(System.IO.Path.GetFullPath(System.IO.Path.Combine(baseDir, path)));
     }
 
     /// <summary>
     /// Verifies that FileSystem.DirectorySeparator returns the platform directory separator character.
     /// </summary>
     [TestMethod]
-    public void Should_BeChar_When_DirectorySeparatorAccessed() => Assert.AreEqual(System.IO.Path.DirectorySeparatorChar, FileSystem.Instance.DirectorySeparator);
+    public void Should_BeChar_When_DirectorySeparatorAccessed() => FileSystem.Instance.DirectorySeparator.Should().Be(System.IO.Path.DirectorySeparatorChar);
 }

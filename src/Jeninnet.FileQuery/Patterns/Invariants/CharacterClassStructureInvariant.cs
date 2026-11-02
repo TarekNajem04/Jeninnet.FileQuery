@@ -49,7 +49,11 @@ internal sealed class CharacterClassStructureInvariant : IPatternInvariant {
             foreach(var token in segment.OfType<CharacterClassToken>()) {
                 // Guard against an unexpectedly empty element list.
                 if(token.Value.Elements.Count == 0) {
-                    return PatternInvariantResult.Fail("Empty character class is not allowed.");
+                    var position = PatternTextPosition.Find(context.Pattern.Text.AsSpan(), "[");
+                    return PatternInvariantResult.Fail(
+                        "Empty character class is not allowed.",
+                        position,
+                        position is { } value ? PatternTextPosition.SegmentAt(context.Pattern.Text.AsSpan(), value) : null);
                 }
 
                 // Surface any parse error recorded by CharacterClassParser.
@@ -59,7 +63,11 @@ internal sealed class CharacterClassStructureInvariant : IPatternInvariant {
                                       .FirstOrDefault();
 
                 if(parseError is not null) {
-                    return PatternInvariantResult.Fail(parseError.Message);
+                    var position = PatternTextPosition.Find(context.Pattern.Text.AsSpan(), "[");
+                    return PatternInvariantResult.Fail(
+                        parseError.Message,
+                        position,
+                        position is { } value ? PatternTextPosition.SegmentAt(context.Pattern.Text.AsSpan(), value) : null);
                 }
             }
 #pragma warning restore S3267

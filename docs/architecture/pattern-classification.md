@@ -16,10 +16,10 @@ When the caller uses `PatternInput.TypedPatterns` or passes an explicit `Pattern
 
 Rules are evaluated in priority order:
 
-1. **Empty after trimming** → `GitIgnore` (a whitespace-only pattern is treated as a no-op GitIgnore entry)
+1. **Empty or whitespace-only** → rejected at the public boundary (`PatternInput`, `FileQueryBuilder.Where`) with an `ArgumentException`; such entries never reach classification
 2. **Starts with `r:`** → `Regex` (terminal — no further analysis)
 3. **Contains `]` without `[`** (stray closing bracket) → `Glob`
-4. **Contains `\` without leading `!` and without an escaped character** (Windows path separator) → `Glob`
+4. **Contains `\` without leading `!` and without an escaped character** (Windows path separator) → `Glob`; Glob compilation then rejects it with an actionable error — use `/` as the separator
 5. **Contains a leading `\` followed by an escapable character** → `GitIgnore` (escaped metacharacter)
 6. **Contains GitIgnore-specific syntax** (`!`, `#`, `**`, trailing `/`, leading `/`) → `GitIgnore`
 7. **Contains wildcards or brackets** (`*`, `?`, `[`) → `GitIgnore`
@@ -31,7 +31,7 @@ The `PatternAnalyzer` performs a single-pass scan of the pattern to detect these
 
 ## Malformed Patterns
 
-Before classification, `PatternValidator.IsMalformed` is called. Patterns that fail validation are classified as `PatternKind.Unknown`. The compilation pipeline has no compiler registered for `Unknown`, so a `PatternException` is raised immediately.
+Before classification, `PatternValidator` is called. Patterns that fail validation are classified as `PatternKind.Unknown`; the compilation pipeline then surfaces a `PatternException` containing the validator's concrete reason plus `Position` and `Segment` when known. The classifier never throws for malformed input.
 
 Conditions that produce `Unknown`:
 - Trailing unescaped backslash (`\`)

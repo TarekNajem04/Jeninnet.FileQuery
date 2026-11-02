@@ -25,6 +25,9 @@ An explicit `-Token` always wins. Create a User Token at
 - Java 17 or newer (required by SonarScanner); the script resolves a JDK automatically from
   `SONAR_JAVA_PATH` (path to `java.exe`), `JAVA_HOME`, and the common install locations.
 - Local mode: SonarQube Community Build running at <http://localhost:9000> (default).
+  Current Community Build releases require Java 21 for the server itself; `StartSonar.bat` reads
+  `SONAR_JAVA_PATH` (or the first `java.exe` on `PATH`), so set it explicitly when an older JDK
+  is first on `PATH`.
 
 ## Local SonarQube (Community Build)
 
@@ -86,7 +89,36 @@ $env:SONAR_TOKEN_LOCAL = "<local token>"
   `artifacts/sonar-issues.txt`.
 - Coverage requires `coverlet.collector` (referenced by the test projects) and the
   `tests/coverage.opencover.runsettings` file; the script passes both to `dotnet test`.
+- The Soak and AotSmoke harness projects are excluded from the coverage metric because they are
+  executable harnesses, not shipped libraries; they remain part of the issue analysis.
 - The scanner honors `.editorconfig` severities, so rules pinned there stay silent both
   locally and in CI.
 - The main-branch warning applies to SonarCloud only. A local SonarQube server analyzes the
   working copy and has no branch concept, so branch parameters are omitted in local mode.
+
+## Local baseline
+
+The 2026-11-02 local run used SonarQube Community Build 26.10 with `-Local -WithCoverage
+-FailOnQualityGate -ExportIssues`:
+
+| Metric | Value |
+|---|---|
+| Open issues | **0** |
+| Quality Gate | **OK** |
+| Sonar coverage | **86.0%** (88.0% lines, 82.0% branches) |
+| Maintained lines (ncloc) | 9,063 |
+| Covered / uncovered lines | 4,507 / 617 |
+| Duplicated lines | **0.0%** (0 lines, 0 blocks) |
+| Bugs / vulnerabilities / code smells | 0 / 0 / 0 |
+
+The Sonar server reuses the `SonarAnalyzer.CSharp` rules that already run during `dotnet build`;
+a clean zero-warning build therefore normally produces zero Sonar issues. Use `-FetchIssues
+-ExportIssues` after changing code to re-read the server without rerunning the analysis.
+
+## Troubleshooting
+
+| Symptom | Cause | Fix |
+|---|---|---|
+| `UnsupportedClassVersionError` when starting SonarQube | `StartSonar.bat` picked an older `java.exe` from `PATH` | Set `SONAR_JAVA_PATH` to the Java 21 `java.exe` used by the server |
+| `MissingObjectException: Missing blob` at the SCM publisher step | The local Git object store is incomplete after history rewriting | Run `git repack -adf`, then rerun the preview |
+| Quality Gate `NONE` on the first query | The compute engine has not finished the first analysis | Wait for the scanner task, then rerun with `-FetchIssues` |

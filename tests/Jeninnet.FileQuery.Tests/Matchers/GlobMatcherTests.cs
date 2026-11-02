@@ -26,9 +26,9 @@ public class GlobMatcherTests {
         var patterns = Compile(patterns: ["src/*.cs"]);
 
         // Matches from root
-        Assert.IsTrue(matcher.Match(patterns, CreateFileContext(path: "src/File.cs", caseSensitivity: CaseSensitivity.Insensitive)).IsSuccess());
+        matcher.Match(patterns, CreateFileContext(path: "src/File.cs", caseSensitivity: CaseSensitivity.Insensitive)).IsSuccess().Should().BeTrue();
         // Does NOT match if nested (no implicit unanchored check)
-        Assert.IsFalse(matcher.Match(patterns, CreateFileContext(path: "other/src/File.cs", caseSensitivity: CaseSensitivity.Insensitive)).IsSuccess());
+        matcher.Match(patterns, CreateFileContext(path: "other/src/File.cs", caseSensitivity: CaseSensitivity.Insensitive)).IsSuccess().Should().BeFalse();
     }
 
     /// <summary>Tests RecursiveWildcard_ShouldMatchDeeply_WhenAnchoredToRoot.</summary>
@@ -38,9 +38,9 @@ public class GlobMatcherTests {
         var matcher = CreateMatcher();
         var patterns = Compile(patterns: ["**/config.json"]);
 
-        Assert.IsTrue(matcher.Match(patterns, CreateFileContext(path: "config.json", caseSensitivity: CaseSensitivity.Insensitive)).IsSuccess());
-        Assert.IsTrue(matcher.Match(patterns, CreateFileContext(path: "src/config.json", caseSensitivity: CaseSensitivity.Insensitive)).IsSuccess());
-        Assert.IsTrue(matcher.Match(patterns, CreateFileContext(path: "src/main/config.json", caseSensitivity: CaseSensitivity.Insensitive)).IsSuccess());
+        matcher.Match(patterns, CreateFileContext(path: "config.json", caseSensitivity: CaseSensitivity.Insensitive)).IsSuccess().Should().BeTrue();
+        matcher.Match(patterns, CreateFileContext(path: "src/config.json", caseSensitivity: CaseSensitivity.Insensitive)).IsSuccess().Should().BeTrue();
+        matcher.Match(patterns, CreateFileContext(path: "src/main/config.json", caseSensitivity: CaseSensitivity.Insensitive)).IsSuccess().Should().BeTrue();
     }
 
     /// <summary>Tests ComplexGlobbing.</summary>
@@ -49,9 +49,9 @@ public class GlobMatcherTests {
         var matcher = CreateMatcher();
         var patterns = Compile(patterns: ["data/??.log"]);
 
-        Assert.IsTrue(matcher.Match(patterns, CreateFileContext(path: "data/01.log", caseSensitivity: CaseSensitivity.Insensitive)).IsSuccess());
-        Assert.IsFalse(matcher.Match(patterns, CreateFileContext(path: "data/abc.log", caseSensitivity: CaseSensitivity.Insensitive)).IsSuccess(), "?? only matches two characters.");
-        Assert.IsFalse(matcher.Match(patterns, CreateFileContext(path: "other/data/01.log", caseSensitivity: CaseSensitivity.Insensitive)).IsSuccess(), "Not anchored.");
+        matcher.Match(patterns, CreateFileContext(path: "data/01.log", caseSensitivity: CaseSensitivity.Insensitive)).IsSuccess().Should().BeTrue();
+        matcher.Match(patterns, CreateFileContext(path: "data/abc.log", caseSensitivity: CaseSensitivity.Insensitive)).IsSuccess().Should().BeFalse(because: "?? only matches two characters.");
+        matcher.Match(patterns, CreateFileContext(path: "other/data/01.log", caseSensitivity: CaseSensitivity.Insensitive)).IsSuccess().Should().BeFalse(because: "Not anchored.");
     }
 
     /// <summary>Tests Wildcard_CharacterSet_Digits.</summary>
@@ -60,9 +60,9 @@ public class GlobMatcherTests {
         var matcher = CreateMatcher();
         var patterns = Compile(patterns: ["example.[0-9]"]);
 
-        Assert.IsTrue(matcher.Match(patterns, CreateFileContext(path: "example.0", caseSensitivity: CaseSensitivity.Insensitive)).IsSuccess());
-        Assert.IsTrue(matcher.Match(patterns, CreateFileContext(path: "example.5", caseSensitivity: CaseSensitivity.Insensitive)).IsSuccess());
-        Assert.IsFalse(matcher.Match(patterns, CreateFileContext(path: "example.b", caseSensitivity: CaseSensitivity.Insensitive)).IsSuccess(), "The category includes only digits, therefore it does not include the letter b.");
+        matcher.Match(patterns, CreateFileContext(path: "example.0", caseSensitivity: CaseSensitivity.Insensitive)).IsSuccess().Should().BeTrue();
+        matcher.Match(patterns, CreateFileContext(path: "example.5", caseSensitivity: CaseSensitivity.Insensitive)).IsSuccess().Should().BeTrue();
+        matcher.Match(patterns, CreateFileContext(path: "example.b", caseSensitivity: CaseSensitivity.Insensitive)).IsSuccess().Should().BeFalse(because: "The category includes only digits, therefore it does not include the letter b.");
     }
 
     /// <summary>Tests Wildcard_CharacterSet_Characters.</summary>
@@ -71,10 +71,10 @@ public class GlobMatcherTests {
         var matcher = CreateMatcher();
         var patterns = Compile(patterns: ["example.[abc]"]);
 
-        Assert.IsTrue(matcher.Match(patterns, CreateFileContext(path: "example.a", caseSensitivity: CaseSensitivity.Insensitive)).IsSuccess());
-        Assert.IsTrue(matcher.Match(patterns, CreateFileContext(path: "example.b", caseSensitivity: CaseSensitivity.Insensitive)).IsSuccess());
-        Assert.IsTrue(matcher.Match(patterns, CreateFileContext(path: "example.c", caseSensitivity: CaseSensitivity.Insensitive)).IsSuccess());
-        Assert.IsFalse(matcher.Match(patterns, CreateFileContext(path: "example.h", caseSensitivity: CaseSensitivity.Insensitive)).IsSuccess(), "The category includes only letters a, b, and c.");
+        matcher.Match(patterns, CreateFileContext(path: "example.a", caseSensitivity: CaseSensitivity.Insensitive)).IsSuccess().Should().BeTrue();
+        matcher.Match(patterns, CreateFileContext(path: "example.b", caseSensitivity: CaseSensitivity.Insensitive)).IsSuccess().Should().BeTrue();
+        matcher.Match(patterns, CreateFileContext(path: "example.c", caseSensitivity: CaseSensitivity.Insensitive)).IsSuccess().Should().BeTrue();
+        matcher.Match(patterns, CreateFileContext(path: "example.h", caseSensitivity: CaseSensitivity.Insensitive)).IsSuccess().Should().BeFalse(because: "The category includes only letters a, b, and c.");
     }
 
     /// <summary>Tests Wildcard_CharacterSet_Complex_2.</summary>
@@ -83,10 +83,10 @@ public class GlobMatcherTests {
         var matcher = CreateMatcher();
         var patterns = Compile(patterns: ["example.[CB]at"]);
 
-        Assert.IsTrue(matcher.Match(patterns, CreateFileContext(path: "example.Cat")).IsSuccess());
-        Assert.IsTrue(matcher.Match(patterns, CreateFileContext(path: "example.Bat")).IsSuccess());
-        Assert.IsFalse(matcher.Match(patterns, CreateFileContext(path: "example.BAT")).IsSuccess(), "The category includes only letters C and B, followed by 'at'.");
-        Assert.IsFalse(matcher.Match(patterns, CreateFileContext(path: "example.rat")).IsSuccess(), "The category includes only letters C and B, followed by 'at'.");
+        matcher.Match(patterns, CreateFileContext(path: "example.Cat")).IsSuccess().Should().BeTrue();
+        matcher.Match(patterns, CreateFileContext(path: "example.Bat")).IsSuccess().Should().BeTrue();
+        matcher.Match(patterns, CreateFileContext(path: "example.BAT")).IsSuccess().Should().BeFalse(because: "The category includes only letters C and B, followed by 'at'.");
+        matcher.Match(patterns, CreateFileContext(path: "example.rat")).IsSuccess().Should().BeFalse(because: "The category includes only letters C and B, followed by 'at'.");
     }
 
     /// <summary>Tests Wildcard_CharacterSet_Negate.</summary>
@@ -95,9 +95,9 @@ public class GlobMatcherTests {
         var matcher = CreateMatcher();
         var patterns = Compile(patterns: ["example.[!0-9]"]);
 
-        Assert.IsTrue(matcher.Match(patterns, CreateFileContext(path: "example.a")).IsSuccess());
-        Assert.IsTrue(matcher.Match(patterns, CreateFileContext(path: "example.t")).IsSuccess());
-        Assert.IsFalse(matcher.Match(patterns, CreateFileContext(path: "example.9")).IsSuccess(), "The category excludes digits.");
+        matcher.Match(patterns, CreateFileContext(path: "example.a")).IsSuccess().Should().BeTrue();
+        matcher.Match(patterns, CreateFileContext(path: "example.t")).IsSuccess().Should().BeTrue();
+        matcher.Match(patterns, CreateFileContext(path: "example.9")).IsSuccess().Should().BeFalse(because: "The category excludes digits.");
     }
 
     /// <summary>Tests Wildcard_CharacterSet_Asterix.</summary>
@@ -106,17 +106,17 @@ public class GlobMatcherTests {
         var matcher = CreateMatcher();
         var patterns = Compile(patterns: ["example.Law*"]);
 
-        Assert.IsTrue(matcher.Match(patterns, CreateFileContext(path: "example.Law")).IsSuccess());
-        Assert.IsTrue(matcher.Match(patterns, CreateFileContext(path: "example.Lawyer")).IsSuccess());
-        Assert.IsFalse(matcher.Match(patterns, CreateFileContext(path: "example.GrokLaw")).IsSuccess(), "Asterix only matches suffixes after 'Law'.");
+        matcher.Match(patterns, CreateFileContext(path: "example.Law")).IsSuccess().Should().BeTrue();
+        matcher.Match(patterns, CreateFileContext(path: "example.Lawyer")).IsSuccess().Should().BeTrue();
+        matcher.Match(patterns, CreateFileContext(path: "example.GrokLaw")).IsSuccess().Should().BeFalse(because: "Asterix only matches suffixes after 'Law'.");
         var matcher1 = CreateMatcher();
         var patterns1 = Compile(patterns: ["example.*Law*"]);
 
-        Assert.IsTrue(matcher1.Match(patterns1, CreateFileContext(path: "example.Law")).IsSuccess());
-        Assert.IsTrue(matcher1.Match(patterns1, CreateFileContext(path: "example.Lawyer")).IsSuccess());
-        Assert.IsTrue(matcher1.Match(patterns1, CreateFileContext(path: "example.GrokLaw5")).IsSuccess());
-        Assert.IsFalse(matcher1.Match(patterns1, CreateFileContext(path: "example.law")).IsSuccess(), "Asterix only matches letters after 'Law' with exact casing.");
-        Assert.IsFalse(matcher1.Match(patterns1, CreateFileContext(path: "example.aw")).IsSuccess(), "Asterix only matches letters before 'Law' and after 'Law'.");
+        matcher1.Match(patterns1, CreateFileContext(path: "example.Law")).IsSuccess().Should().BeTrue();
+        matcher1.Match(patterns1, CreateFileContext(path: "example.Lawyer")).IsSuccess().Should().BeTrue();
+        matcher1.Match(patterns1, CreateFileContext(path: "example.GrokLaw5")).IsSuccess().Should().BeTrue();
+        matcher1.Match(patterns1, CreateFileContext(path: "example.law")).IsSuccess().Should().BeFalse(because: "Asterix only matches letters after 'Law' with exact casing.");
+        matcher1.Match(patterns1, CreateFileContext(path: "example.aw")).IsSuccess().Should().BeFalse(because: "Asterix only matches letters before 'Law' and after 'Law'.");
     }
 
     /// <summary>Tests MultiPattern_SecondPatternShouldMatch.</summary>
@@ -126,6 +126,6 @@ public class GlobMatcherTests {
         var patterns = Compile(["src/*.cs", "test/*.cs"]);
         var ctx = CreateFileContext(path: "test/helpers.cs");
 
-        Assert.AreEqual(MatchOutcome.Include, matcher.Match(patterns, ctx));
+        matcher.Match(patterns, ctx).Should().Be(MatchOutcome.Include);
     }
 }

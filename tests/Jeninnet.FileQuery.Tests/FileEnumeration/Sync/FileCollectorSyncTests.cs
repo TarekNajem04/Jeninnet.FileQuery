@@ -39,7 +39,7 @@ public class FileCollectorSyncTests {
         );
 
         var fc = FileQueryRuntime.Create();
-        var result = fc.Execute(new(env.Root, opts)).ToList();
+        var result = fc.Execute(new(env.Root, opts), TestContext.CancellationToken).ToList();
 
         // only logs directory included ? includes file inside it
         var onlyResult = result.Should().ContainSingle();
@@ -70,7 +70,7 @@ public class FileCollectorSyncTests {
         );
 
         var fc = FileQueryRuntime.Create();
-        var result = fc.Execute(new(env.Root, opts)).ToList();
+        var result = fc.Execute(new(env.Root, opts), TestContext.CancellationToken).ToList();
 
         var onlyResult = result.Should().ContainSingle();
         onlyResult.Which.Should().EndsWith(PathHelper.Join("logs", "b.txt"));
@@ -100,7 +100,7 @@ public class FileCollectorSyncTests {
         );
 
         var fc = FileQueryRuntime.Create();
-        var result = fc.Execute(new(env.Root, opts)).ToList();
+        var result = fc.Execute(new(env.Root, opts), TestContext.CancellationToken).ToList();
 
         var onlyResult = result.Should().ContainSingle();
         onlyResult.Which.Should().EndsWith("a.txt");
@@ -130,7 +130,7 @@ public class FileCollectorSyncTests {
         );
 
         var fc = FileQueryRuntime.Create();
-        var result = fc.Execute(new(env.Root, opts)).ToList();
+        var result = fc.Execute(new(env.Root, opts), TestContext.CancellationToken).ToList();
 
         result.Should().HaveCount(2);
     }
@@ -158,7 +158,7 @@ public class FileCollectorSyncTests {
             )
         );
 
-        var result = FileQueryRuntime.Create().Execute(new(env.Root, opts)).ToList();
+        var result = FileQueryRuntime.Create().Execute(new(env.Root, opts), TestContext.CancellationToken).ToList();
 
         var onlyResult = result.Should().ContainSingle();
         onlyResult.Which.Should().EndsWith("other.log");
@@ -187,7 +187,7 @@ public class FileCollectorSyncTests {
             )
         );
 
-        var result = FileQueryRuntime.Create().Execute(new(env.Root, opts)).ToList();
+        var result = FileQueryRuntime.Create().Execute(new(env.Root, opts), TestContext.CancellationToken).ToList();
 
         var onlyResult = result.Should().ContainSingle();
         onlyResult.Which.Should().EndsWith(PathHelper.Join("logs", "hidden", "keep.txt"));
@@ -216,7 +216,7 @@ public class FileCollectorSyncTests {
             )
         );
 
-        var result = FileQueryRuntime.Create().Execute(new(env.Root, opts)).ToList();
+        var result = FileQueryRuntime.Create().Execute(new(env.Root, opts), TestContext.CancellationToken).ToList();
         result.Should().HaveCount(2);
     }
 
@@ -242,7 +242,7 @@ public class FileCollectorSyncTests {
             )
         );
 
-        var result = FileQueryRuntime.Create().Execute(new(env.Root, opts)).ToList();
+        var result = FileQueryRuntime.Create().Execute(new(env.Root, opts), TestContext.CancellationToken).ToList();
         var onlyResult = result.Should().ContainSingle();
         onlyResult.Which.Should().EndsWith("file1.txt");
     }
@@ -271,7 +271,7 @@ public class FileCollectorSyncTests {
             )
         );
 
-        var result = FileQueryRuntime.Create().Execute(new(env.Root, opts)).ToList();
+        var result = FileQueryRuntime.Create().Execute(new(env.Root, opts), TestContext.CancellationToken).ToList();
         result.Should().HaveCount(3);
     }
 
@@ -295,7 +295,7 @@ public class FileCollectorSyncTests {
             )
         );
 
-        var result = FileQueryRuntime.Create().Execute(new(env.Root, opts)).ToList();
+        var result = FileQueryRuntime.Create().Execute(new(env.Root, opts), TestContext.CancellationToken).ToList();
         result.Should().NotBeEmpty();
     }
 
@@ -320,7 +320,7 @@ public class FileCollectorSyncTests {
             )
         );
 
-        var result = FileQueryRuntime.Create().Execute(new(env.Root, opts)).ToList();
+        var result = FileQueryRuntime.Create().Execute(new(env.Root, opts), TestContext.CancellationToken).ToList();
         result.Should().ContainSingle();
     }
 
@@ -347,7 +347,7 @@ public class FileCollectorSyncTests {
             )
         );
 
-        var result = FileQueryRuntime.Create().Execute(new(env.Root, opts)).ToList();
+        var result = FileQueryRuntime.Create().Execute(new(env.Root, opts), TestContext.CancellationToken).ToList();
         result.Should().BeEmpty();
     }
 
@@ -377,10 +377,16 @@ public class FileCollectorSyncTests {
                                                    )
                                                )
                                            )
-                                       )
+, TestContext.CancellationToken)
                                        .ToList();
 
         // The returned path MUST use native separators
         result.Single().Should().Contain(Path.DirectorySeparatorChar.ToString());
     }
+
+    /// <summary>
+    /// Gets or sets the test context, which provides information about the current test run.
+    /// Used here primarily for accessing the <see cref="CancellationToken"/>.
+    /// </summary>
+    public TestContext TestContext { get; set; } = null!;
 }

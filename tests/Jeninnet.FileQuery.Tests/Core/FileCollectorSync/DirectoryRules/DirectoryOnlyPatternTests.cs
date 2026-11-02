@@ -39,7 +39,7 @@ public class DirectoryOnlyPatternTests {
             )
         );
 
-        var results = fileQueryEngine.Execute(new(env.Root, options)).ToList();
+        var results = fileQueryEngine.Execute(new(env.Root, options), TestContext.CancellationToken).ToList();
 
         // Directory rule matches only the folder, not the files
         TestAssertEx.IsEmpty(results);
@@ -68,10 +68,10 @@ public class DirectoryOnlyPatternTests {
             )
         );
 
-        var results = fileQueryEngine.Execute(new(env.Root, options)).ToList();
+        var results = fileQueryEngine.Execute(new(env.Root, options), TestContext.CancellationToken).ToList();
 
-        Assert.Contains(static x => x.EndsWith("inside.txt", StringComparison.Ordinal), results);   // Included by negation "!sub/*.txt" rule
-        Assert.Contains(static x => x.EndsWith("other.log", StringComparison.Ordinal), results);    // Excluded by default
+        results.Should().Contain(static x => x.EndsWith("inside.txt", StringComparison.Ordinal));   // Included by negation "!sub/*.txt" rule
+        results.Should().NotContain(static x => x.EndsWith("other.log", StringComparison.Ordinal)); // Excluded by the directory-only rule
         TestAssertEx.ContainsSingle(results, static x => x.EndsWith("x.txt", StringComparison.Ordinal));       // Included by default (not in 'sub/')
     }
 
@@ -97,7 +97,7 @@ public class DirectoryOnlyPatternTests {
             )
         );
 
-        var results = fileQueryEngine.Execute(new(env.Root, options)).ToList();
+        var results = fileQueryEngine.Execute(new(env.Root, options), TestContext.CancellationToken).ToList();
 
         TestAssertEx.ContainsSingle(results, static x => x.EndsWith("a.txt", StringComparison.Ordinal));
     }
@@ -130,10 +130,10 @@ public class DirectoryOnlyPatternTests {
             )
         );
 
-        var results = fileQueryEngine.Execute(new(env.Root, options)).ToList();
+        var results = fileQueryEngine.Execute(new(env.Root, options), TestContext.CancellationToken).ToList();
 
-        Assert.DoesNotContain(static x => x.StartsWith("temp", StringComparison.Ordinal), results);
-        Assert.Contains(static x => x.EndsWith("file.log", StringComparison.Ordinal), results);
+        results.Should().NotContain(static x => x.StartsWith("temp", StringComparison.Ordinal));
+        results.Should().Contain(static x => x.EndsWith("file.log", StringComparison.Ordinal));
         TestAssertEx.HasCount(results, 1);
     }
 
@@ -170,7 +170,7 @@ public class DirectoryOnlyPatternTests {
             )
         );
 
-        var results = fileQueryEngine.Execute(new(env.Root, options)).ToList();
+        var results = fileQueryEngine.Execute(new(env.Root, options), TestContext.CancellationToken).ToList();
 
         TestAssertEx.Contains(results, env.Abs("temp", "file.log"), "File inside root 'temp' must be excluded.");
         TestAssertEx.Contains(results, env.Abs("src", "temp", "file.log"), "File inside nested 'src/temp' must be included.");
@@ -210,11 +210,17 @@ public class DirectoryOnlyPatternTests {
             )
         );
 
-        var results = fileQueryEngine.Execute(new(env.Root, options)).ToList();
+        var results = fileQueryEngine.Execute(new(env.Root, options), TestContext.CancellationToken).ToList();
 
         TestAssertEx.DoesNotContain(results, env.Abs("sub", "inside.txt"), "File 'inside.txt' inside root 'sub' must be excluded.");
         TestAssertEx.DoesNotContain(results, env.Abs("sub", "other.log"), "File 'other.log' inside 'sub' must be excluded.");
         TestAssertEx.Contains(results, env.Abs("sub", "x.txt"), "File 'x.txt' inside 'sub' must be included.");
         TestAssertEx.DoesNotContain(results, env.Abs("tmp", "sub", "x.txt"), "File 'b.txt' inside nested 'tmp/sub' must be excluded by '*/sub/*'.");
     }
+
+    /// <summary>
+    /// Gets or sets the test context, which provides information about the current test run.
+    /// Used here primarily for accessing the <see cref="CancellationToken"/>.
+    /// </summary>
+    public TestContext TestContext { get; set; } = null!;
 }

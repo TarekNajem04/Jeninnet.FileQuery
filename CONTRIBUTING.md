@@ -46,12 +46,26 @@ src/
     Jeninnet.FileQuery
     Jeninnet.FileQuery.CommandLine
     Jeninnet.FileQuery.DependencyInjection
+    Jeninnet.FileQuery.FileProviders
+    Jeninnet.FileQuery.Tool
+    Jeninnet.FileQuery.Tooling
+    Jeninnet.FileQuery.Build
+    Jeninnet.FileQuery.Analyzers
+    Jeninnet.FileQuery.Analyzers.CodeFix
+    Jeninnet.FileQuery.AotSmoke
+    Jeninnet.FileQuery.Benchmarks
+    Jeninnet.FileQuery.Soak
 
 tests/
     Jeninnet.FileQuery.Tests
+    Jeninnet.AdvancedUsage.Tests
+    Jeninnet.FileQuery.Tool.Tests
+    Jeninnet.FileQuery.Tooling.Tests
+    Jeninnet.FileQuery.Analyzers.Tests
+    Jeninnet.FileQuery.Build.Tests
+    Jeninnet.FileQuery.FileProviders.Tests
 
 samples/
-
 docs/
 ```
 

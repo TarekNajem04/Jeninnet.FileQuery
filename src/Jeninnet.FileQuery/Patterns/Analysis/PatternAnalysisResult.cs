@@ -22,6 +22,7 @@ namespace Jeninnet.FileQuery.Patterns.Analysis;
 /// <param name="HasEscapedCharacters">Whether the pattern contains escaped characters.</param>
 /// <param name="HasGitIgnoreSyntax">Whether the pattern contains gitignore syntax.</param>
 /// <param name="SegmentCount">The number of segments.</param>
+/// <param name="HasBraceAlternation">Whether the pattern contains expandable brace alternation.</param>
 internal readonly record struct PatternAnalysisResult(
     bool IsEmpty,
     bool IsRegex,
@@ -34,10 +35,11 @@ internal readonly record struct PatternAnalysisResult(
     bool HasRecursiveWildcard,
     bool HasEscapedCharacters,
     bool HasGitIgnoreSyntax,
-    int SegmentCount
+    int SegmentCount,
+    bool HasBraceAlternation = false
 ) {
     public static PatternAnalysisResult Empty() => new(
-        IsEmpty: false,
+        IsEmpty: true,
         IsRegex: false,
         IsNegated: false,
         HasBackslash: false,
@@ -48,7 +50,8 @@ internal readonly record struct PatternAnalysisResult(
         HasRecursiveWildcard: false,
         HasEscapedCharacters: false,
         HasGitIgnoreSyntax: false,
-        SegmentCount: 0
+        SegmentCount: 0,
+        HasBraceAlternation: false
     );
 
     public static PatternAnalysisResult Regex() => new(
@@ -63,6 +66,7 @@ internal readonly record struct PatternAnalysisResult(
         HasRecursiveWildcard: false,
         HasEscapedCharacters: false,
         HasGitIgnoreSyntax: false,
-        SegmentCount: 0
+        SegmentCount: 0,
+        HasBraceAlternation: false
     );
 }

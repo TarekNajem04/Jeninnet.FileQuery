@@ -75,19 +75,57 @@ internal static class PathMatcherFactory {
     /// </exception>
     public static IPathMatcher Create(FileQueryOptions options) {
         ArgumentNullException.ThrowIfNull(options);
+        return Create(
+            options.PatternMatchingMode,
+            options.PatternInput.InterpretationMode,
+            options.PatternInput.Patterns.Count > 0 || options.PatternInput.TypedPatterns.Count > 0);
+    }
+
+    /// <summary>
+    /// Creates an appropriate <see cref="IPathMatcher"/> for a pattern input and matching mode.
+    /// </summary>
+    /// <param name="patternInput">The pattern configuration.</param>
+    /// <param name="matchingMode">The dialect used when the interpretation mode is Specific.</param>
+    /// <returns>The selected matcher.</returns>
+    /// <exception cref="ArgumentNullException">Thrown when <paramref name="patternInput"/> is <see langword="null"/>.</exception>
+    public static IPathMatcher Create(PatternInput patternInput, PatternMatchingMode matchingMode) {
+        ArgumentNullException.ThrowIfNull(patternInput);
+        return Create(
+            matchingMode,
+            patternInput.InterpretationMode,
+            patternInput.Patterns.Count > 0 || patternInput.TypedPatterns.Count > 0);
+    }
+
+    /// <summary>
+    /// Creates an appropriate <see cref="IPathMatcher"/> from the resolved matching settings.
+    /// </summary>
+    /// <param name="matchingMode">The dialect used when the interpretation mode is Specific.</param>
+    /// <param name="interpretationMode">The pattern interpretation mode.</param>
+    /// <param name="hasPatterns">Whether at least one pattern will be evaluated.</param>
+    /// <returns>The selected matcher.</returns>
+    /// <exception cref="ArgumentOutOfRangeException">
+    /// Thrown when <paramref name="matchingMode"/> is not a defined value of <see cref="PatternMatchingMode"/>.
+    /// </exception>
+    public static IPathMatcher Create(
+        PatternMatchingMode matchingMode,
+        PatternInterpretationMode interpretationMode,
+        bool hasPatterns
+    ) {
+        if(!Enum.IsDefined(matchingMode)) {
+            throw new ArgumentOutOfRangeException(
+                nameof(matchingMode),
+                matchingMode,
+                "Unknown pattern matching mode.");
+        }
 
         // When no patterns are configured, use the null-object matcher.
         // This avoids a conditional in the hot traversal loop.
-        // Note: PatternInput.TypedPatterns is never null (guaranteed by the PatternInput constructor).
-        if(
-            options.PatternInput.Patterns.Count == 0 &&
-            options.PatternInput.TypedPatterns.Count == 0
-        ) {
+        if(!hasPatterns) {
             return NullMatcher.Instance;
         }
 
-        return options.PatternInput.InterpretationMode is PatternInterpretationMode.Hybrid
+        return interpretationMode is PatternInterpretationMode.Hybrid
             ? _hybridPathMatcher
-            : _matchers[options.PatternMatchingMode];
+            : _matchers[matchingMode];
     }
 }

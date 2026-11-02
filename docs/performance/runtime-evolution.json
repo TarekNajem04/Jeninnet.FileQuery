@@ -1,0 +1,24 @@
+{
+    "schemaVersion": 1,
+    "runtime": "10.0.14",
+    "recordedAt": "2026-11-01",
+    "pinnedSdk": "10.0.203",
+    "rollForward": "latestFeature",
+    "latestSdk": "10.0.204",
+    "cadence": [
+        "weekly scheduled benchmarks",
+        "on global.json, SDK, or runtime changes",
+        "before every release tag",
+        "when scripts/performance/check-runtime.ps1 reports drift"
+    ],
+    "history": [
+        {
+            "runtime": "10.0.14",
+            "sdk": "10.0.203 (pinned) / 10.0.204 (resolved)",
+            "recordedAt": "2026-11-01",
+            "source": "local Windows MediumRun + scheduled run 40290984641",
+            "baseline": "docs/performance/cross-platform-baseline.json",
+            "notes": "Initial tracked runtime for the v2.0.0 cycle."
+        }
+    ]
+}

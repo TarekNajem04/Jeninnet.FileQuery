@@ -114,9 +114,8 @@ public sealed class PatternInvariantTests {
         PatternScanner.Scan(context, syntax);
 
         // Semantic validation / invariants should throw
-        Assert.ThrowsExactly<PatternException>(() =>
-            _invariants.ValidateSemantic(context)
-        );
+        FluentActions.Invoking(() =>
+            _invariants.ValidateSemantic(context)).Should().ThrowExactly<PatternException>();
     }
 
     /// <summary>

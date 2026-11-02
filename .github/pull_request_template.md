@@ -16,8 +16,9 @@ Why is this change necessary? What problem does it solve?
 
 ## Tests
 
-- [ ] `dotnet build Jeninnet.FileQuery.slnx`
-- [ ] `dotnet test tests/Jeninnet.FileQuery.Tests/Jeninnet.FileQuery.Tests.csproj`
+- [ ] `dotnet build Jeninnet.FileQuery.slnx -c Release`
+- [ ] `dotnet test Jeninnet.FileQuery.slnx -c Release --no-build`
+- [ ] `dotnet format Jeninnet.FileQuery.slnx --verify-no-changes`
 - [ ] New test cases added (if applicable)
 - [ ] All existing tests passed
 - [ ] Other: 

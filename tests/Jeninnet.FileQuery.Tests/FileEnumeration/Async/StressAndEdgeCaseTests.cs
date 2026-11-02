@@ -110,9 +110,9 @@ public class EnumerateFilesAsync_StressAndEdgeCaseTests {
                                                 .ToListAsync(TestContext.CancellationToken);
 
         // sync
-        var syncResults = fileQueryEngine.Execute(new(env.Root, options)).ToList();
+        var syncResults = fileQueryEngine.Execute(new(env.Root, options), TestContext.CancellationToken).ToList();
 
-        Assert.AreSequenceEqual(syncResults, asyncResults, SequenceOrder.InAnyOrder);
+        asyncResults.Should().BeEquivalentTo(syncResults);
     }
 
     /// <summary>

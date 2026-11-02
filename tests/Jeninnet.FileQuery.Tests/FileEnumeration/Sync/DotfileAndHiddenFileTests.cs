@@ -35,7 +35,7 @@ public class DotfileAndHiddenFileTests {
             )
         );
 
-        var result = fileQueryEngine.Execute(new(env.Root, options)).ToList();
+        var result = fileQueryEngine.Execute(new(env.Root, options), TestContext.CancellationToken).ToList();
 
         result.Should().ContainSingle(static x => x.EndsWith(".hidden", StringComparison.Ordinal));
     }
@@ -63,10 +63,10 @@ public class DotfileAndHiddenFileTests {
             )
         );
 
-        var result = fileQueryEngine.Execute(new(env.Root, options)).ToList();
+        var result = fileQueryEngine.Execute(new(env.Root, options), TestContext.CancellationToken).ToList();
 
         result.Should().HaveCount(1);
-        Assert.EndsWith("file.txt", result.Single());
+        result.Single().Should().EndWith("file.txt");
     }
 
     /// <summary>
@@ -91,7 +91,7 @@ public class DotfileAndHiddenFileTests {
             )
         );
 
-        var result = fileQueryEngine.Execute(new(env.Root, options)).ToList();
+        var result = fileQueryEngine.Execute(new(env.Root, options), TestContext.CancellationToken).ToList();
 
         result.Should().HaveCount(3);
         result.Should().Contain(static x => x.EndsWith("envfile.txt", StringComparison.Ordinal));
@@ -120,7 +120,7 @@ public class DotfileAndHiddenFileTests {
             )
         );
 
-        var result = fileQueryEngine.Execute(new(env.Root, options)).ToList();
+        var result = fileQueryEngine.Execute(new(env.Root, options), TestContext.CancellationToken).ToList();
 
         result.Should().HaveCount(1);
         result.Should().NotContain(static x => x.StartsWith(".env", StringComparison.Ordinal));
@@ -152,11 +152,17 @@ public class DotfileAndHiddenFileTests {
             )
         );
 
-        var result = fileQueryEngine.Execute(new(env.Root, options)).ToList();
+        var result = fileQueryEngine.Execute(new(env.Root, options), TestContext.CancellationToken).ToList();
 
         result.Should().HaveCount(2);
         result.Should().NotContain(static x => x.EndsWith(".env", StringComparison.Ordinal));
         result.Should().Contain(static x => x.EndsWith(".secret", StringComparison.Ordinal));
         result.Should().Contain(static x => x.EndsWith("file.txt", StringComparison.Ordinal));
     }
+
+    /// <summary>
+    /// Gets or sets the test context, which provides information about the current test run.
+    /// Used here primarily for accessing the <see cref="CancellationToken"/>.
+    /// </summary>
+    public TestContext TestContext { get; set; } = null!;
 }

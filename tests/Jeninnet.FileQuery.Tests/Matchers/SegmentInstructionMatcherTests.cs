@@ -21,8 +21,8 @@ public class SegmentInstructionMatcherTests {
         {
             new CharacterClassToken(new CharacterClass(false, [new PosixClass("digit")]))
         };
-        Assert.IsTrue(SegmentInstructionMatcher.MatchSegment("1", tokens, StringComparison.Ordinal));
-        Assert.IsFalse(SegmentInstructionMatcher.MatchSegment("a", tokens, StringComparison.Ordinal));
+        SegmentInstructionMatcher.MatchSegment("1", tokens, StringComparison.Ordinal).Should().BeTrue();
+        SegmentInstructionMatcher.MatchSegment("a", tokens, StringComparison.Ordinal).Should().BeFalse();
     }
 
     /// <summary>
@@ -34,7 +34,7 @@ public class SegmentInstructionMatcherTests {
         {
             new CharacterClassToken(new CharacterClass(false, [new PosixClass("unknown")]))
         };
-        Assert.IsFalse(SegmentInstructionMatcher.MatchSegment("a", tokens, StringComparison.Ordinal));
+        SegmentInstructionMatcher.MatchSegment("a", tokens, StringComparison.Ordinal).Should().BeFalse();
     }
 
     /// <summary>
@@ -46,7 +46,69 @@ public class SegmentInstructionMatcherTests {
         {
             new CharacterClassToken(new CharacterClass(true, [new CharLiteral('a')]))
         };
-        Assert.IsTrue(SegmentInstructionMatcher.MatchSegment("b", tokens, StringComparison.Ordinal));
-        Assert.IsFalse(SegmentInstructionMatcher.MatchSegment("a", tokens, StringComparison.Ordinal));
+        SegmentInstructionMatcher.MatchSegment("b", tokens, StringComparison.Ordinal).Should().BeTrue();
+        SegmentInstructionMatcher.MatchSegment("a", tokens, StringComparison.Ordinal).Should().BeFalse();
+    }
+
+    /// <summary>
+    /// Verifies that a range is folded when the comparison ignores case.
+    /// </summary>
+    [TestMethod]
+    public void MatchSegment_CharacterRange_IgnoreCase_MatchesOppositeCase() {
+        var lowerRange = new List<IPatternToken>
+        {
+            new CharacterClassToken(new CharacterClass(false, [new CharRange('a', 'z')]))
+        };
+        var upperRange = new List<IPatternToken>
+        {
+            new CharacterClassToken(new CharacterClass(false, [new CharRange('A', 'Z')]))
+        };
+
+        SegmentInstructionMatcher.MatchSegment("A", lowerRange, StringComparison.OrdinalIgnoreCase).Should().BeTrue();
+        SegmentInstructionMatcher.MatchSegment("a", upperRange, StringComparison.OrdinalIgnoreCase).Should().BeTrue();
+        SegmentInstructionMatcher.MatchSegment("A", lowerRange, StringComparison.Ordinal).Should().BeFalse();
+        SegmentInstructionMatcher.MatchSegment("a", upperRange, StringComparison.Ordinal).Should().BeFalse();
+    }
+
+    /// <summary>
+    /// Verifies that a literal inside a character class is folded when the comparison ignores case.
+    /// </summary>
+    [TestMethod]
+    public void MatchSegment_CharacterClassLiteral_IgnoreCase_MatchesOppositeCase() {
+        var tokens = new List<IPatternToken>
+        {
+            new CharacterClassToken(new CharacterClass(false, [new CharLiteral('a')]))
+        };
+
+        SegmentInstructionMatcher.MatchSegment("A", tokens, StringComparison.OrdinalIgnoreCase).Should().BeTrue();
+        SegmentInstructionMatcher.MatchSegment("A", tokens, StringComparison.Ordinal).Should().BeFalse();
+    }
+
+    /// <summary>
+    /// Verifies that negation is applied after case folding.
+    /// </summary>
+    [TestMethod]
+    public void MatchSegment_CharacterClass_Negated_IgnoreCase_FoldsBeforeNegation() {
+        var tokens = new List<IPatternToken>
+        {
+            new CharacterClassToken(new CharacterClass(true, [new CharRange('a', 'z')]))
+        };
+
+        SegmentInstructionMatcher.MatchSegment("A", tokens, StringComparison.OrdinalIgnoreCase).Should().BeFalse();
+        SegmentInstructionMatcher.MatchSegment("1", tokens, StringComparison.OrdinalIgnoreCase).Should().BeTrue();
+    }
+
+    /// <summary>
+    /// Verifies that POSIX categories keep their category semantics under ignore-case comparisons.
+    /// </summary>
+    [TestMethod]
+    public void MatchSegment_PosixUpper_IgnoreCase_RemainsCategoryBased() {
+        var tokens = new List<IPatternToken>
+        {
+            new CharacterClassToken(new CharacterClass(false, [new PosixClass("upper")]))
+        };
+
+        SegmentInstructionMatcher.MatchSegment("A", tokens, StringComparison.OrdinalIgnoreCase).Should().BeTrue();
+        SegmentInstructionMatcher.MatchSegment("a", tokens, StringComparison.OrdinalIgnoreCase).Should().BeFalse();
     }
 }

@@ -20,10 +20,10 @@ public sealed class PatternSplitterTests {
         const string input = "a.txt;b.txt;c.txt";
         var result = PatternSplitter.Split(input).ToList();
 
-        Assert.HasCount(3, result);
-        Assert.AreEqual("a.txt", result[0]);
-        Assert.AreEqual("b.txt", result[1]);
-        Assert.AreEqual("c.txt", result[2]);
+        result.Should().HaveCount(3);
+        result[0].Should().Be("a.txt");
+        result[1].Should().Be("b.txt");
+        result[2].Should().Be("c.txt");
     }
 
     /// <summary>
@@ -35,10 +35,10 @@ public sealed class PatternSplitterTests {
         var separators = new[] { ',', ';' };
         var result = PatternSplitter.Split(input, separators).ToList();
 
-        Assert.HasCount(3, result);
-        Assert.AreEqual("a.txt", result[0]);
-        Assert.AreEqual("b.txt", result[1]);
-        Assert.AreEqual("c.txt", result[2]);
+        result.Should().HaveCount(3);
+        result[0].Should().Be("a.txt");
+        result[1].Should().Be("b.txt");
+        result[2].Should().Be("c.txt");
     }
 
     /// <summary>
@@ -49,8 +49,8 @@ public sealed class PatternSplitterTests {
         const string input = "a.txt";
         var result = PatternSplitter.Split(input).ToList();
 
-        Assert.HasCount(1, result);
-        Assert.AreEqual("a.txt", result[0]);
+        result.Should().HaveCount(1);
+        result[0].Should().Be("a.txt");
     }
 
     /// <summary>
@@ -60,6 +60,6 @@ public sealed class PatternSplitterTests {
     public void Split_ShouldHandleEmptyAndWhitespaceInput() {
         const string input = " ; ; ";
         var result = PatternSplitter.Split(input).ToList();
-        Assert.IsEmpty(result);
+        result.Should().BeEmpty();
     }
 }

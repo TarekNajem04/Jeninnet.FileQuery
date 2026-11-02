@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="assets/icon.png" alt="Jeninnet.FileQuery icon" width="128" />
+</p>
+
 # Jeninnet.FileQuery
 
 ![GitHub Actions CI Workflow Status](https://img.shields.io/github/actions/workflow/status/TarekNajem04/Jeninnet.FileQuery/ci.yml)
@@ -7,13 +11,29 @@
 [![GitHub license](https://img.shields.io/github/license/TarekNajem04/Jeninnet.FileQuery)](https://github.com/TarekNajem04/Jeninnet.FileQuery/blob/main/LICENSE)
 
 ![NuGet Version](https://img.shields.io/nuget/v/Jeninnet.FileQuery)
-[![NuGet downloads](https://img.shields.io/nuget/dt/Jeninnet.FileQuery)](https://www.nuget.org/packages/Jeninnet.FileQuery.CommandLine/)
+[![NuGet downloads](https://img.shields.io/nuget/dt/Jeninnet.FileQuery)](https://www.nuget.org/packages/Jeninnet.FileQuery/)
+[![Documentation](https://img.shields.io/badge/docs-online-1f6feb)](https://tareknajem04.github.io/Jeninnet.FileQuery/)
 
-![architecture: invariants ok](badges/architecture.svg) ![target framework: net10.0](badges/frameworks.svg) ![documented packages: 3](badges/packages.svg)
+![architecture: invariants ok](badges/architecture.svg) ![target framework: net10.0](badges/frameworks.svg) ![API-documented projects: 5](badges/packages.svg) ![line coverage: 89.5%](badges/coverage.svg)
 
 **A high-performance, deterministic file discovery and filtering engine for .NET.**
 
 Jeninnet.FileQuery combines three pattern dialects — **GitIgnore**, **Glob**, and **Regular Expressions** — into a single, deterministic query pipeline. Patterns are tokenized, validated against structural invariants, and compiled into immutable instruction sets before any filesystem work begins. The compiled matchers then evaluate every entry through one unified pipeline where GitIgnore, Glob, and Regex rules coexist with well-defined precedence. The result is predictable, scalable file discovery across Windows, Linux, and macOS — decoupled from `System.IO` through the [`IFileSystem`](./src/Jeninnet.FileQuery/IO/IFileSystem.cs) abstraction.
+
+---
+
+## 📚 Documentation
+
+**Full documentation:** [tareknajem04.github.io/Jeninnet.FileQuery](https://tareknajem04.github.io/Jeninnet.FileQuery/)
+
+| Start with | Link |
+|---|---|
+| Install and run your first query | [Installation](https://tareknajem04.github.io/Jeninnet.FileQuery/getting-started/installation.html) · [Quick start](https://tareknajem04.github.io/Jeninnet.FileQuery/getting-started/quick-start.html) |
+| Learn the pattern language | [Basic patterns](https://tareknajem04.github.io/Jeninnet.FileQuery/getting-started/basic-patterns.html) · [Pattern reference](https://tareknajem04.github.io/Jeninnet.FileQuery/reference/pattern-overview.html) |
+| Copy a ready-made query | [Common recipes](https://tareknajem04.github.io/Jeninnet.FileQuery/getting-started/common-recipes.html) |
+| Query metadata, directories, or `.gitignore` | [Metadata](https://tareknajem04.github.io/Jeninnet.FileQuery/guides/entry-metadata-and-filters.html) · [Directories](https://tareknajem04.github.io/Jeninnet.FileQuery/guides/directory-results.html) · [Git ignore](https://tareknajem04.github.io/Jeninnet.FileQuery/guides/gitignore-files.html) |
+| Use the CLI or ASP.NET Core | [Global tool](https://tareknajem04.github.io/Jeninnet.FileQuery/guides/global-tool.html) · [IFileProvider](https://tareknajem04.github.io/Jeninnet.FileQuery/guides/file-provider-adapter.html) |
+| Understand an error | [Error handling](https://tareknajem04.github.io/Jeninnet.FileQuery/guides/error-handling-and-validation.html) |
 
 ---
 
@@ -53,6 +73,19 @@ foreach (var file in files)
 }
 ```
 
+### Global Tool
+
+The same engine is available as a terminal tool:
+
+```bash
+dotnet tool install --global Jeninnet.FileQuery.Tool
+
+dotnet-filequery "**;!*.cs"           # every C# file
+dotnet-filequery --count --root src  # count files under src
+```
+
+See the [Global Tool guide](./docs/guides/global-tool.md) for the full option set and pipeline examples.
+
 ---
 
 ## ✨ Features
@@ -63,28 +96,40 @@ foreach (var file in files)
 *   **Deterministic precedence.** GitIgnore inclusions take final precedence over Glob and Regex sub-sets. A GitIgnore inclusion is final; Glob and Regex matchers can re-include paths excluded by GitIgnore but cannot exclude paths that GitIgnore has included.
 *   **POSIX character classes.** Bracket expressions support named classes (`[:digit:]`, `[:alpha:]`, `[:alnum:]`, `[:space:]`, `[:blank:]`, `[:upper:]`, `[:lower:]`, `[:print:]`, `[:graph:]`, `[:punct:]`, `[:cntrl:]`, `[:xdigit:]`).
 *   **Compile-time validation.** Patterns are tokenized and checked against semantic and structural invariants (e.g., `**` isolation, valid character ranges) before execution. Malformed patterns produce rich diagnostics without throwing during tokenization.
+*   **Diff-aware scans.** Restrict any query to an explicit path allow-list with `RestrictToPaths`, so incremental tooling processes only the files that changed. The `dotnet-filequery` tool fills that list from a Git commit or timestamp.
+*   **Build-tool SDK.** `Jeninnet.FileQuery.Tooling` exposes classification, structural validation, and tokenization without executing a query, so MSBuild tasks, linters, and IDE plugins can reuse the engine's pattern semantics.
+*   **`IFileProvider` sources.** Query physical, embedded, and in-memory providers through `FileProviderQuery.From(provider)`, with the same matching, filters, directory results, and GitIgnore ingestion as disk queries.
+*   **CI integration.** A composite GitHub Action runs the global tool and exposes `files` and `count` outputs for downstream jobs, including diff-aware scans.
 
 ### Traversal
 
-*   **Depth-first or breadth-first.** Choose between stack-based (`DepthFirst`) or queue-based (`BreadthFirst`) traversal strategies through `TraversalOptions`.
-*   **Symlink policies.** Control symbolic link behavior with `Ignore`, `Follow`, or `FollowWithCycleDetection`.
+*   **Depth-first or breadth-first.** Choose between stack-based (`DepthFirst`) or queue-based (`BreadthFirst`) traversal strategies through `WithTraversal(...)`, and cap depth with `WithMaxDepth(...)`.
+*   **Symlink policies.** Control symbolic link behavior with `Ignore`, `Follow`, or `FollowWithCycleDetection` through `TraversalOptions`.
 *   **Decoupled filesystem.** The [`IFileSystem`](./src/Jeninnet.FileQuery/IO/IFileSystem.cs) interface decouples all IO, enabling virtual or mock filesystems for cloud workloads and test isolation.
 *   **Configurable error recovery.** Handle IO errors with `Skip`, `Retry(n)`, or `Abort` strategies through `FileQueryErrorRecoveryOptions`.
+*   **Inaccessible-entry policy.** `IgnoreInaccessible(false)` surfaces recoverable access failures instead of silently skipping them; the default stays skip-and-continue.
 
 ### Observability
 
-*   **Async progress snapshots.** Report live traversal statistics (entries scanned, files matched, directories visited) through `IProgress<FileQueryProgress>`.
+*   **Progress snapshots (sync and async).** Report live traversal statistics (entries scanned, files matched, directories visited) through `IProgress<FileQueryProgress>` on either execution path.
 *   **Match audit diagnostics.** Opt-in per-entry explanations of match outcomes, including the responsible pattern and its source metadata, through `IProgress<FileQueryDiagnostic>`.
-*   **Deep cancellation.** `CancellationToken` propagation is verified across all hot paths.
-*   **OpenTelemetry integration.** Export metrics and spans for structured observability.
-*   **Roslyn analyzers.** Design-time warnings and code fixes for malformed GitIgnore, Glob, or Regex patterns.
+*   **Deep cancellation (sync and async).** `CancellationToken` propagation is verified across both traversal paths, with cancellation observed per frame and per entry.
+*   **OpenTelemetry-ready.** Built-in `ActivitySource`/`Meter` instrumentation exposes query spans and metrics; attach any OpenTelemetry exporter. See `docs/guides/observability-and-diagnostics.md`.
+*   **Roslyn analyzers.** `Jeninnet.FileQuery.Analyzers` validates pattern literals at design time and offers safe code fixes. See `docs/guides/roslyn-analyzers.md`.
+*   **Entry metadata.** `ExecuteEntries()` returns full/relative paths, size, timestamps, attributes, and directory state without extra file-system calls, with size/time/attribute filters.
+*   **Directory results.** `IncludeDirectories()` opts into yielding matching directories from the same traversal, with directory-only and negation semantics preserved.
+*   **Multiple roots.** `FileQueryBatch` runs several roots as one deterministic stream; entry results expose `RootPath`.
+*   **Brace expansion.** Write `src/**/*.{cs,vb}` instead of repeating alternatives; nesting and escaping follow documented rules.
+*   **MSBuild validation and SARIF.** Validate `FileQueryPatterns` during `dotnet build` and upload SARIF 2.1.0 diagnostics to GitHub code scanning.
+*   **Script-friendly CLI.** `dotnet-filequery --json` streams newline-delimited objects with paths, size, timestamps, attributes, and explain outcomes.
+*   **Actionable pattern errors.** `PatternException` and the Tooling SDK expose the offending character position and segment when available.
 
 ### Performance
 
 *   **Zero-allocation matching hot path.** The matching evaluation loop is designed to avoid per-entry heap allocations, using `ReadOnlySpan<char>`, stack-allocated `ref struct` types (`PathView`, `PathSegmentEnumerator`), and index-based loops. Allocation-free matching is enforced by architecture tests.
 *   **Pooled relative-path buffering.** Relative paths are composed in a reusable `ArrayPool<char>`-backed buffer (`RelativePathBuffer`) rather than allocating a new string for every traversed entry. A `string` is materialized only for matched results.
 *   **GitIgnore literal-suffix fast path.** Eligible wildcard patterns resolve their literal suffix at compile time, allowing zero-allocation `EndsWith` rejection before recursive matching.
-*   **AOT-ready.** Reflection is completely avoided to ensure compatibility with .NET Native AOT compilation.
+*   **AOT-ready.** Reflection is completely avoided, and a Native AOT smoke host publishes and runs in CI with trimming/AOT warnings treated as errors. See `docs/guides/native-aot.md`.
 
 ---
 
@@ -109,6 +154,16 @@ Key findings from the investigation:
 
 Further native filesystem enumeration was not introduced because the measured benefit did not justify the additional platform-specific complexity and maintenance risk. The detailed investigation methodology and per-phase measurements are documented under [`docs/performance/`](./docs/performance/).
 
+### Cross-Platform Baseline
+
+Traversal behaviour is compared on Windows x64, Ubuntu x64, and macOS Arm64 using a deterministic 10,000-file tree (`CrossPlatformTraversalBenchmark`) plus the scheduled three-OS benchmark artifacts. The recorded baseline, analysis, and the 25% regression policy live in the [cross-platform baseline](./docs/performance/cross-platform-baseline.md).
+
+Long-running stability is validated by a dedicated soak harness that repeats queries, samples the managed heap after full collections, and fails on heap growth or throughput degradation. The recorded run and verdict rules are in the [stability report](./docs/performance/long-running-stability.md).
+
+Runtime updates are tracked against the benchmark baseline: `scripts/performance/check-runtime.ps1` detects drift, and the [runtime evolution](./docs/performance/runtime-evolution.md) page defines when benchmarks are re-run and how the baseline is refreshed.
+
+Platform-specific enumeration was measured against the managed path and **rejected** for v2.0.0: .NET's BCL already wraps the native APIs, so the addressable gain does not justify three OS-specific implementations. The ceiling benchmark, cost/risk analysis, and revisit criteria are in the [native enumeration research](./docs/performance/native-enumeration-research.md).
+
 ---
 
 ## 📊 Repo Stats
@@ -119,7 +174,12 @@ Further native filesystem enumeration was not introduced because the measured be
 
 ## Upgrading
 
-If you are upgrading from v1.0.0 or v1.1.0 to v1.2.0, please see the [Migration Guide](Migration.md) for important breaking changes regarding `FileQueryOptions`.
+Upgrading from v1.x to **v2.0.0**? The [`IFileQueryEngine` contract expanded](Migration.md#upgrading-to-v200)
+and regex timeout/case-folding behavior changed. See the [Migration Guide](Migration.md) for the full
+checklist.
+
+If you are upgrading from v1.0.0 or v1.1.0 to v1.2.0, the `FileQueryOptions` constructor change is
+also documented there.
 
 ---
 
@@ -130,9 +190,17 @@ This repository contains the core library and its companion packages:
 *   **[Core Engine (Jeninnet.FileQuery)](./src/Jeninnet.FileQuery/README.md)**: The main matching runtime, builders, and parser pipeline.
 *   **[CommandLine Integration (Jeninnet.FileQuery.CommandLine)](./src/Jeninnet.FileQuery.CommandLine/README.md)**: Bridges command-line arguments (using `System.CommandLine`) to file query patterns.
 *   **[DependencyInjection Integration (Jeninnet.FileQuery.DependencyInjection)](./src/Jeninnet.FileQuery.DependencyInjection/README.md)**: Configures and registers the engine and its components in standard .NET host applications.
+*   **[Global Tool (Jeninnet.FileQuery.Tool)](./src/Jeninnet.FileQuery.Tool/README.md)**: The `dotnet-filequery` terminal tool for scripting and pipelines.
+*   **[VS Code Extension](./docs/guides/ide-extension.md)**: Pattern tester and explainer that drives the global tool from the editor.
+*   **[File Provider Adapter (Jeninnet.FileQuery.FileProviders)](./src/Jeninnet.FileQuery.FileProviders/README.md)**: Query physical, embedded, and in-memory `IFileProvider` sources with the same pipeline.
+*   **[Build Tooling SDK (Jeninnet.FileQuery.Tooling)](./src/Jeninnet.FileQuery.Tooling/README.md)**: Classify, validate, and tokenize patterns without executing a query.
+*   **[MSBuild Validation (Jeninnet.FileQuery.Build)](./src/Jeninnet.FileQuery.Build/README.md)**: Validate `FileQueryPatterns` during `dotnet build` and export SARIF for code scanning.
+*   **[Roslyn Analyzer (Jeninnet.FileQuery.Analyzers)](./src/Jeninnet.FileQuery.Analyzers/README.md)**: Design-time `JNQ1001` diagnostics and a safe code fix for pattern literals.
+*   **[GitHub Action](./.github/actions/filequery/README.md)**: Runs the global tool in workflows and exposes matched files and counts as step outputs.
 *   **[Documentation Suite (docs/)](./docs/README.md)**: Deep technical specifications, guides, and architectural whitepapers.
 *   **[Benchmark Suite](./src/Jeninnet.FileQuery.Benchmarks/README.md)**: Performance measurements and allocation verification.
-*   **[Samples (samples/)](./samples/AdvancedUsage/README.md)**: Practical examples showing basic to advanced usage.
+*   **[Samples](./samples/README.md)**: Thirteen runnable examples from hello-world to DI + evaluation.
+*   **[Test Suite](./tests/README.md)**: 1,167 tests across seven projects, with per-project guides. Every assertion uses the `Jeninnet.Assertions` fluent API (`Should()` / `FluentActions`); MSTest supplies only attributes and runner integration.
 
 ---
 
@@ -228,9 +296,9 @@ By using the [`IFileSystem`](./src/Jeninnet.FileQuery/IO/IFileSystem.cs) interfa
 
 ## 📋 Project Status
 
-**Current release: v1.5.0** — This release completes a focused performance engineering cycle for large-scale filesystem traversal and pattern matching.
+**Current release: v2.0.0** — This major release adds entry metadata and filters, directory results, `.gitignore` ingestion, the `IFileProvider` adapter, multiple roots, synchronous cancellation/progress, brace expansion, the global tool, the VS Code extension, the Tooling/Build/Analyzers packages, and OpenTelemetry instrumentation. The `IFileQueryEngine` contract, regex-timeout exception, and character-class case folding are breaking changes; see the [Migration Guide](./Migration.md#upgrading-to-v200).
 
-The optimization cycle was validated against a reproducible **1,000,000-file / 4,096-directory** dataset and included:
+The v1.5.0 performance cycle was validated against a reproducible **1,000,000-file / 4,096-directory** dataset and included:
 
 - Elimination of redundant per-entry filesystem attribute lookups.
 - Removal of per-entry relative-path string allocations through pooled path buffering.
@@ -259,9 +327,9 @@ The project adheres to the **Jeninnet.FileQuery Constitution**:
 
 ## 🏛️ Compatibility & Tech Stack
 
-*   **TFM**: `.NET 10`
+*   **TFM**: Runtime/tool packages target `.NET 10`; the Roslyn analyzer targets `netstandard2.0` for host compatibility.
 *   **Language**: `C# 14`
-*   **Test Suite**: MSTest + Moq + Coverlet
+*   **Test Suite**: MSTest + `Jeninnet.Assertions` + Moq + Coverlet
 *   **Enforcement**: Central Package Management (CPM), strict `.editorconfig` rules, and architecture tests enforcing zero allocations.
 
 ---
@@ -276,3 +344,4 @@ The project adheres to the **Jeninnet.FileQuery Constitution**:
 ## 📜 License
 
 This project is licensed under the MIT License. See **[LICENSE](./LICENSE)** for details.
+

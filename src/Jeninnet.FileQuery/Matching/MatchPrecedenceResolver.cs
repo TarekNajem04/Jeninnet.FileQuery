@@ -16,7 +16,8 @@ namespace Jeninnet.FileQuery.Matching;
 /// <list type="bullet">
 /// <item><description>Instructions are evaluated in order: GitIgnore → Glob → Regex.</description></item>
 /// <item><description>The first sub-set that returns <see cref="MatchOutcome.Include"/> wins.</description></item>
-/// <item><description>If nothing matches, the outcome defaults to <see cref="MatchOutcome.Include"/>.</description></item>
+/// <item><description>A non-matching later sub-set does not erase an earlier <see cref="MatchOutcome.Exclude"/>.</description></item>
+/// <item><description>When no pattern set exists, the outcome defaults to <see cref="MatchOutcome.Include"/>.</description></item>
 /// </list>
 /// </remarks>
 internal sealed class MatchPrecedenceResolver {
@@ -66,14 +67,28 @@ internal sealed class MatchPrecedenceResolver {
         }
 
         if(instructions.GlobSubSet is not null) {
-            result = GlobMatcher.Match(instructions.GlobSubSet, context);
-            if(result is MatchOutcome.Include) {
-                return result;
+            var globResult = GlobMatcher.Match(instructions.GlobSubSet, context);
+
+            if(globResult is MatchOutcome.Include) {
+                return globResult;
+            }
+
+            // A non-matching Glob/Regex subset must not erase an earlier Exclude.
+            if(result is not MatchOutcome.Exclude) {
+                result = globResult;
             }
         }
 
         if(instructions.RegexSubSet is not null) {
-            result = RegexMatcher.Match(instructions.RegexSubSet, context);
+            var regexResult = RegexMatcher.Match(instructions.RegexSubSet, context);
+
+            if(regexResult is MatchOutcome.Include) {
+                return regexResult;
+            }
+
+            if(result is not MatchOutcome.Exclude) {
+                result = regexResult;
+            }
         }
 
         return result;

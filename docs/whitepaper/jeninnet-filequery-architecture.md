@@ -42,7 +42,7 @@ The goal behind Jeninnet.FileQuery was therefore not simply to support another p
 
 One of the first design decisions in the engine was the adoption of a simple and powerful rule model:
 
-**Patterns are evaluated sequentially, and the last matching rule determines the final result.**
+**Within each dialect, patterns are evaluated sequentially and the last matching rule determines that dialect's result.** Across dialects, the engine evaluates GitIgnore → Glob → Regex and the first subset that returns Include wins.
 
 This rule is inspired by GitIgnore semantics and provides a surprisingly intuitive way to reason about complex rule sets.
 

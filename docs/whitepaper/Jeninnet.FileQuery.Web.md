@@ -108,7 +108,8 @@ The real challenge is not syntax—it is deterministic evaluation.
 
 Jeninnet.FileQuery adopts a simple rule model:
 
-> The last matching rule determines the final outcome.
+> Within each dialect, the last matching rule determines that dialect's outcome; across dialects,
+> GitIgnore → Glob → Regex are evaluated in order and the first Include wins.
 
 Example:
 

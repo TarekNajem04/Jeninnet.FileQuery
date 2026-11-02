@@ -120,7 +120,7 @@ public class EnumerateFilesAsync_CancellationTests {
         }
 
         await TestAssertEx.ThrowsAsync<OperationCanceledException>(ActAsync);
-        Assert.AreEqual(1, count);
+        count.Should().Be(1);
     }
 
     /// <summary>

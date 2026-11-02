@@ -25,15 +25,15 @@ To be the fastest, most predictable, and most flexible file discovery engine for
 
 *Goal: Provide deep insights into the enumeration and matching process.*
 
-- [x] **Progress Reporting**: Support `IProgress<T>` in `EnumerateFilesAsync` for real-time scan statistics.
+- [x] **Progress Reporting**: Support `IProgress<T>` in `EnumerateFilesAsync` for real-time scan statistics. *(sync progress added by H-11)*
 - [x] **Match Diagnostics**: Introduce an optional audit mode to explain why a file was included or excluded.
-- [x] **Deep Cancellation**: Ensure `CancellationToken` propagation is verified across all hot paths.
+- [x] **Deep Cancellation**: Ensure `CancellationToken` propagation is verified across all hot paths. *(sync and async; sync overloads added by H-11)*
 - [x] **Enhanced Error Recovery**: Provide configurable strategies for handling IO errors (`Skip`, `Retry`, `Abort`).
 - [x] **Pattern Validation Framework**: Implement early detection and reporting for malformed patterns.
 - [x] **Improved Path Validation**: Enhance `FileQueryValidator` for eager path structure validation.
-- [x] **OpenTelemetry Integration**: Export metrics and spans for structured observability.
-- [x] **AOT Compilation Validation Pipeline**: Establish strict Native AOT compatibility checks in CI to ensure zero-reflection guarantees remain unbroken.
-- [x] **Roslyn Analyzers for Pattern Validation**: Provide design-time warnings and code fixes for malformed GitIgnore, Glob, or Regex patterns.
+- [x] **OpenTelemetry Integration**: Export metrics and spans for structured observability. *(not implemented in v1.x; delivered for v2.0.0 by H-02)*
+- [x] **AOT Compilation Validation Pipeline**: Establish strict Native AOT compatibility checks in CI to ensure zero-reflection guarantees remain unbroken. *(not implemented in v1.x; delivered for v2.0.0 by H-04)*
+- [x] **Roslyn Analyzers for Pattern Validation**: Provide design-time warnings and code fixes for malformed GitIgnore, Glob, or Regex patterns. *(not implemented in v1.x; delivered for v2.0.0 by H-03)*
 
 ---
 
@@ -41,7 +41,7 @@ To be the fastest, most predictable, and most flexible file discovery engine for
 
 *Goal: Elevate code quality, documentation coverage, and test infrastructure.*
 
-- [x] **Assertion Library Extraction**: Extract shared test infrastructure into `Jeninnet.Testing.Assertions` v1.0.0, a reusable, well-documented assertion library with fluent `.Should()` syntax.
+- [x] **Assertion Library Extraction**: Extract shared test infrastructure into `Jeninnet.Testing.Assertions` v1.0.0, a reusable, well-documented assertion library with fluent `.Should()` syntax. *(superseded in v2.0.0 by the standalone `Jeninnet.Assertions` package; the local project was removed)*
 - [x] **XML Documentation Completion**: Add missing XML doc elements (`<param>`, `<exception>`, `<returns>`) across all source files; eliminate all CS1591 and RCS1141 warnings.
 - [x] **Enum Hygiene**: Add explicit underlying values to all enum members to maintain binary compatibility.
 - [x] **Test Migration**: Replace `TestAssertEx.*` with fluent `.Should()` assertions across 90+ test files.
@@ -86,11 +86,96 @@ The resulting performance measurements and engineering decisions are documented 
 
 *Goal: Broaden adoption through tooling, integrations, and specialized developer workflows.*
 
-- [ ] **Dotnet Global Tool**: Release `dotnet-filequery` CLI for terminal-based file discovery and piping.
-- [ ] **IDE Extensions**: Create Visual Studio and VS Code extensions for real-time pattern testing and visualization.
-- [ ] **Diff-Aware Queries**: Support incremental scans that only process files changed since a specific Git commit or timestamp.
-- [ ] **Developer Tooling SDK**: Expose selected tokenizers and classifiers for use by other build-tool authors.
-- [ ] **Ecosystem Integrations**: Explore integrations with build systems, development tooling, CI/CD workflows, and repository analysis tools.
+- [x] **Dotnet Global Tool**: Release `dotnet-filequery` CLI for terminal-based file discovery and piping. *(v2.0.0)*
+- [x] **IDE Extensions**: Create Visual Studio and VS Code extensions for real-time pattern testing and visualization. *(VS Code shipped; Visual Studio deferred as a follow-up)*
+- [x] **Diff-Aware Queries**: Support incremental scans that only process files changed since a specific Git commit or timestamp. *(v2.0.0)*
+- [x] **Developer Tooling SDK**: Expose selected tokenizers and classifiers for use by other build-tool authors. *(v2.0.0)*
+- [x] **Ecosystem Integrations**: Explore integrations with build systems, development tooling, CI/CD workflows, and repository analysis tools. *(inventory + GitHub Action prototype)*
+
+---
+
+## Phase 5.5: Pre-v2.0.0 Hardening (credibility & capability)
+
+*Goal: Make the published claims true, close the highest-value capability gaps, and raise the
+adoption ceiling before v2.0.0. Every item is free of paid services and new runtime dependencies
+unless stated. Detailed tasks for H-01…H-33 live in `private/Tasks/pre-v2-hardening/`; watch mode
+(H-16) is tracked under `private/Tasks/post-v2.0.0/`.*
+
+### Credibility (P0 — required before v2.0.0)
+
+- [x] **H-01 Claims audit**: reconcile the README and roadmap with the code, qualify the
+  performance/cancellation claims, and re-audit the three Phase 2 statuses below.
+- [x] **H-02 OpenTelemetry instrumentation**: `ActivitySource` for query spans and `Meter` for
+  entries/scanned/matched counters and duration, with tests and documentation. No external
+  OpenTelemetry package is required; consumers attach exporters.
+- [x] **H-03 Roslyn analyzers for pattern validation**: design-time diagnostics and code fixes for
+  malformed pattern literals; package, document, and test them.
+- [x] **H-04 AOT validation pipeline**: publish and run a Native AOT sample in CI on .NET 10, with
+  trimming/AOT warnings as errors.
+
+### One-pass results (P1 — highest user value)
+
+- [x] **H-05 Entry metadata and filters**: `FileQueryEntry` (`Length`, `CreationTimeUtc`,
+  `LastWriteTimeUtc`, `Attributes`, `IsDirectory`) with `ExecuteEntries()` and
+  `MinSize`/`MaxSize`/`ModifiedAfter`/`ModifiedBefore`/`AttributesToSkip`. The enumeration already
+  carries this data, so no extra syscalls.
+- [x] **H-06 Directory results**: opt-in directory matches, with documented interaction with
+  directory-only patterns and pruning.
+- [x] **H-07 Single-path matcher**: public `IsMatch(string)`/`IsMatch(ReadOnlySpan<char>)` and
+  `Explain(path)` over a compiled pattern set, for linters and IDE plugins.
+- [x] **H-08 CLI `--json` output**: path + metadata for scripts, mirroring `fd`/`ripgrep`.
+
+### Ecosystem and parity (P1/P2)
+
+- [x] **H-09 `.gitignore` file ingestion**: root, nested, `.git/info/exclude`, and optional global
+  excludes, with Git-accurate scoping and negation.
+- [x] **H-10 `IFileProvider` adapter package**: query an `IFileProvider` (ASP.NET Core, Razor,
+  static files, in-memory providers).
+- [x] **H-11 Sync cancellation and progress**: `Execute(query, CancellationToken)` and sync progress
+  parity with the async API.
+- [x] **H-12 Brace expansion** `{a,b}` for glob patterns, with escaping rules and tests.
+- [x] **H-13 Multiple roots**: query several directories in one pipeline with deterministic order.
+- [x] **H-14 Validation error positions**: surface the offending index/segment in
+  `PatternException`/Tooling diagnostics.
+- [x] **H-15 MSBuild task and SARIF exporter**: evaluation-time validation and code-scanning output.
+
+---
+
+## Platform Support Policy
+
+- **v2.0.0 targets .NET 10.0 only.** .NET 8 reaches end of support on 2026-11-10 and .NET 9 on 2026-05-12, so neither is added as a package target. A `net8.0` target is technically feasible (one `GetAlternateLookup` fallback) but would extend support beyond Microsoft's lifecycle and add a permanent verification matrix.
+- **The release after v2.0.0 adds .NET 11.** It multi-targets `net10.0;net11.0`, keeps .NET 10 LTS as the baseline, and still does not target .NET 8/9.
+- **No `netstandard2.0` or .NET Framework runtime targets.** The engine relies on spans, `IAsyncEnumerable`, `GeneratedRegex`, and modern file enumeration; supporting them would be a rewrite. The Roslyn analyzer/code-fix package is the documented exception: it targets `netstandard2.0` so it can load in the Roslyn host.
+
+---
+
+## Phase 6: The ".NET 11" Release (post-v2.0.0)
+
+*Goal: Adopt .NET 11 as it ships while keeping the .NET 10 LTS baseline and the current quality bar.*
+
+- [ ] **Multi-target libraries and tool**: `net10.0;net11.0` for the core, CommandLine,
+  DependencyInjection, FileProviders, Tooling, and the global tool. The Build package remains a
+  build-time `net10.0` task unless the .NET 11 SDK proves otherwise.
+- [ ] **CI matrix**: build and test both target frameworks on Windows, Linux, and macOS.
+- [ ] **AOT and trimming validation on .NET 11**: publish a sample with `PublishAot` and treat trimming warnings as errors.
+- [ ] **Performance re-baseline on .NET 11**: refresh `docs/performance/cross-platform-baseline.json`, `runtime-evolution.json`, and the soak reference.
+- [ ] **Package validation and documentation**: validate both targets, update the framework badges, README, and the supported-frameworks policy.
+
+> Capability opportunities beyond the roadmap (entry metadata, `.gitignore` ingestion, single-path matching, and others) are analysed in [`docs/articles/library-capability-review.md`](docs/articles/library-capability-review.md).
+
+---
+
+## Deferred Capability Work (post-v2.0.0)
+
+The following work was evaluated and deliberately left out of v2.0.0. It is tracked in its own
+group so it cannot be mistaken for release scope.
+
+- [ ] **H-16 Watch mode**: `FileSystemWatcher`-backed continuous queries. Prerequisites (entry
+  metadata, single-path matching, `.gitignore` ingestion) are complete and the capability is
+  implementable, but event loss, duplicate/reordered notifications, debounce policy, rename
+  pairing, disposal, and timing-sensitive tests create more risk than value without a concrete
+  IDE/dev-tool consumer. Physical filesystems only (`IFileProvider` has no watcher). Revisit after
+  Phase 6 or on demand.
 
 ---
 
@@ -100,9 +185,9 @@ Performance optimization remains an ongoing engineering concern, but future work
 
 Potential future investigations include:
 
-- [ ] **Cross-Platform Performance Validation**: Compare large-scale traversal behavior on Windows, Linux, and macOS.
-- [ ] **Long-Running Stability Validation**: Validate traversal behavior under repeated large-scale execution.
-- [ ] **Runtime Evolution Tracking**: Re-evaluate BCL filesystem enumeration performance as newer .NET runtimes become available.
-- [ ] **Native Enumeration Research**: Revisit native or platform-specific enumeration only if future measurements demonstrate a sufficiently large benefit to justify the complexity.
+- [x] **Cross-Platform Performance Validation**: Compare large-scale traversal behavior on Windows, Linux, and macOS. *(completed; see the cross-platform baseline)*
+- [x] **Long-Running Stability Validation**: Validate traversal behavior under repeated large-scale execution. *(completed; see the soak report)*
+- [x] **Runtime Evolution Tracking**: Re-evaluate BCL filesystem enumeration performance as newer .NET runtimes become available. *(completed; tracked by `check-runtime.ps1` and the runtime-evolution record)*
+- [x] **Native Enumeration Research**: Revisit native or platform-specific enumeration only if future measurements demonstrate a sufficiently large benefit to justify the complexity. *(rejected with measurements; see `docs/performance/native-enumeration-research.md`)*
 
 Future performance work is not part of the v1.5 release scope.

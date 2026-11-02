@@ -24,10 +24,10 @@ public sealed class CommandLinePatternOptionsTests {
     [TestMethod]
     public void Options_ShouldBeInitialized() {
         var options = new TestOptions();
-        Assert.IsNotNull(options.Patterns);
-        Assert.IsNotNull(options.Gitignore);
-        Assert.IsNotNull(options.Glob);
-        Assert.IsNotNull(options.RegularExpression);
+        options.Patterns.Should().NotBeNull();
+        options.Gitignore.Should().NotBeNull();
+        options.Glob.Should().NotBeNull();
+        options.RegularExpression.Should().NotBeNull();
     }
 
     /// <summary>Tests GetCommandOptions_ShouldReturnFourOptions.</summary>
@@ -35,6 +35,6 @@ public sealed class CommandLinePatternOptionsTests {
     public void GetCommandOptions_ShouldReturnFourOptions() {
         var options = new TestOptions();
         var commands = options.GetCommandOptions();
-        Assert.HasCount(4, commands);
+        commands.Should().HaveCount(4);
     }
 }

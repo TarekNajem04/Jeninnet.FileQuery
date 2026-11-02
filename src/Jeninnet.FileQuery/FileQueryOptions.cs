@@ -20,6 +20,13 @@ namespace Jeninnet.FileQuery;
 /// <param name="AuditMatches">Whether to audit matches.</param>
 /// <param name="Diagnostics">The diagnostics progress reporter.</param>
 /// <param name="ErrorRecovery">The error recovery options.</param>
+/// <param name="MinSize">The inclusive minimum entry size in bytes, or <see langword="null"/> for no lower bound.</param>
+/// <param name="MaxSize">The inclusive maximum entry size in bytes, or <see langword="null"/> for no upper bound.</param>
+/// <param name="ModifiedAfter">The exclusive lower last-write boundary, or <see langword="null"/> for no lower bound.</param>
+/// <param name="ModifiedBefore">The exclusive upper last-write boundary, or <see langword="null"/> for no upper bound.</param>
+/// <param name="AttributesToSkip">Attribute flags that exclude an entry (and prune a matching directory).</param>
+/// <param name="GitIgnoreFiles">The optional Git ignore-file loading settings.</param>
+/// <param name="IncludeDirectories">Whether included directories are yielded alongside files.</param>
 public record FileQueryOptionsConfig(
     PatternInput PatternInput,
     bool RecurseSubdirectories = true,
@@ -30,8 +37,33 @@ public record FileQueryOptionsConfig(
     TraversalOptions? Traversal = null,
     bool AuditMatches = false,
     IProgress<FileQueryDiagnostic>? Diagnostics = null,
-    FileQueryErrorRecoveryOptions? ErrorRecovery = null
-);
+    FileQueryErrorRecoveryOptions? ErrorRecovery = null,
+    long? MinSize = null,
+    long? MaxSize = null,
+    DateTimeOffset? ModifiedAfter = null,
+    DateTimeOffset? ModifiedBefore = null,
+    FileAttributes AttributesToSkip = FileAttributes.None,
+    GitIgnoreOptions? GitIgnoreFiles = null,
+    bool IncludeDirectories = false
+) {
+    /// <summary>
+    /// Gets the optional set of root-relative file paths that limits the query to an explicit
+    /// allow-list (for example, the files changed in a diff).
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// Paths use forward slashes and are relative to the query root. Absolute paths, parent
+    /// segments (<c>..</c>), empty entries, and directory entries are rejected when the query
+    /// is built.
+    /// </para>
+    /// <para>
+    /// When the collection is <see langword="null"/>, traversal is not restricted. An empty
+    /// collection matches no files. Directories that cannot contain an allowed path are pruned;
+    /// files that are not listed are not matched at all.
+    /// </para>
+    /// </remarks>
+    public IReadOnlyCollection<string>? IncludedPaths { get; init; }
+}
 
 /// <summary>
 /// Represents the complete, immutable configuration for a single file query execution.
@@ -68,6 +100,7 @@ public sealed record FileQueryOptions {
     /// <param name="config">The configuration object.</param>
     public FileQueryOptions(FileQueryOptionsConfig config) {
         ArgumentNullException.ThrowIfNull(config);
+        ArgumentNullException.ThrowIfNull(config.PatternInput);
 
         PatternInput = config.PatternInput;
         RecurseSubdirectories = config.RecurseSubdirectories;
@@ -81,6 +114,14 @@ public sealed record FileQueryOptions {
         ErrorRecovery = config.ErrorRecovery ?? (config.IgnoreInaccessible
             ? FileQueryErrorRecoveryOptions.Skip
             : FileQueryErrorRecoveryOptions.Abort);
+        IncludedPaths = config.IncludedPaths;
+        MinSize = config.MinSize;
+        MaxSize = config.MaxSize;
+        ModifiedAfter = config.ModifiedAfter;
+        ModifiedBefore = config.ModifiedBefore;
+        AttributesToSkip = config.AttributesToSkip;
+        GitIgnoreFiles = config.GitIgnoreFiles;
+        IncludeDirectories = config.IncludeDirectories;
     }
 
     /// <summary>
@@ -137,14 +178,138 @@ public sealed record FileQueryOptions {
     public FileQueryErrorRecoveryOptions ErrorRecovery { get; }
 
     /// <summary>
+    /// Gets the optional root-relative allow-list of files to query, or <see langword="null"/>
+    /// when traversal is unrestricted.
+    /// </summary>
+    /// <remarks>
+    /// This is the execution form of <see cref="FileQueryOptionsConfig.IncludedPaths"/>. When it
+    /// is set, matching is only attempted for the listed files, and directories that cannot
+    /// contain a listed file are pruned.
+    /// </remarks>
+    public IReadOnlyCollection<string>? IncludedPaths { get; }
+
+    /// <summary>
+    /// Gets the inclusive minimum entry size in bytes, or <see langword="null"/> when no lower bound is configured.
+    /// </summary>
+    /// <remarks>Size filters apply to files only; directories are never rejected based on size.</remarks>
+    public long? MinSize { get; }
+
+    /// <summary>
+    /// Gets the inclusive maximum entry size in bytes, or <see langword="null"/> when no upper bound is configured.
+    /// </summary>
+    /// <remarks>Size filters apply to files only; directories are never rejected based on size.</remarks>
+    public long? MaxSize { get; }
+
+    /// <summary>
+    /// Gets the exclusive lower last-write boundary, or <see langword="null"/> when no lower bound is configured.
+    /// </summary>
+    /// <remarks>Time filters apply to files only; directories are never rejected based on time.</remarks>
+    public DateTimeOffset? ModifiedAfter { get; }
+
+    /// <summary>
+    /// Gets the exclusive upper last-write boundary, or <see langword="null"/> when no upper bound is configured.
+    /// </summary>
+    /// <remarks>Time filters apply to files only; directories are never rejected based on time.</remarks>
+    public DateTimeOffset? ModifiedBefore { get; }
+
+    /// <summary>
+    /// Gets the attribute flags that exclude an entry, or <see cref="FileAttributes.None"/> when no
+    /// attribute filter is configured.
+    /// </summary>
+    /// <remarks>
+    /// An entry is skipped when any configured flag is set. Directories matching the filter are
+    /// pruned, so their contents are not traversed.
+    /// </remarks>
+    public FileAttributes AttributesToSkip { get; }
+
+    /// <summary>
+    /// Gets the Git ignore-file loading settings, or <see langword="null"/> when ignore files are not loaded.
+    /// </summary>
+    public GitIgnoreOptions? GitIgnoreFiles { get; }
+
+    /// <summary>
+    /// Gets a value indicating whether included directories are yielded as results.
+    /// </summary>
+    /// <remarks>
+    /// Disabled by default, so path-only queries keep returning files only. When enabled, a
+    /// directory is yielded when the matcher includes it; directory-only rules and negation
+    /// therefore decide directory results using the same last-match-wins semantics as files.
+    /// </remarks>
+    public bool IncludeDirectories { get; }
+
+    /// <summary>
     /// Validates this options instance for internal consistency.
     /// </summary>
     /// <exception cref="ArgumentOutOfRangeException">
     /// Thrown when <see cref="MaxRecursionDepth"/> is less than
-    /// <see cref="UNLIMITED_RECURSION_DEPTH"/>.
+    /// <see cref="UNLIMITED_RECURSION_DEPTH"/>, or when a numeric option or enum value is invalid.
     /// </exception>
     internal void Validate() {
         ArgumentOutOfRangeException.ThrowIfLessThan(MaxRecursionDepth, UNLIMITED_RECURSION_DEPTH);
+
+        if(!Enum.IsDefined(PatternMatchingMode)) {
+            throw new ArgumentOutOfRangeException($"Unknown pattern matching mode: {PatternMatchingMode}.");
+        }
+
+        if(!Enum.IsDefined(CaseSensitivity)) {
+            throw new ArgumentOutOfRangeException($"Unknown case sensitivity: {CaseSensitivity}.");
+        }
+
+        if(!Enum.IsDefined(Traversal.Strategy)) {
+            throw new ArgumentOutOfRangeException($"Unknown traversal strategy: {Traversal.Strategy}.");
+        }
+
+        if(!Enum.IsDefined(Traversal.SymlinkPolicy)) {
+            throw new ArgumentOutOfRangeException($"Unknown symlink policy: {Traversal.SymlinkPolicy}.");
+        }
+
+        if(!Enum.IsDefined(ErrorRecovery.Action)) {
+            throw new ArgumentOutOfRangeException($"Unknown error recovery action: {ErrorRecovery.Action}.");
+        }
+
         ErrorRecovery.Validate();
+        ValidateSizeRange(MinSize, MaxSize);
+        ValidateModifiedRange(ModifiedAfter, ModifiedBefore);
+    }
+
+    /// <summary>
+    /// Validates the optional size boundaries.
+    /// </summary>
+    /// <param name="minSize">The inclusive minimum size.</param>
+    /// <param name="maxSize">The inclusive maximum size.</param>
+    /// <exception cref="ArgumentOutOfRangeException">
+    /// Thrown when <paramref name="minSize"/> or <paramref name="maxSize"/> is negative.
+    /// </exception>
+    /// <exception cref="ArgumentException">
+    /// Thrown when <paramref name="minSize"/> exceeds <paramref name="maxSize"/>.
+    /// </exception>
+    private static void ValidateSizeRange(long? minSize, long? maxSize) {
+        if(minSize is < 0) {
+            throw new ArgumentOutOfRangeException(nameof(minSize), minSize, "The minimum size cannot be negative.");
+        }
+
+        if(maxSize is < 0) {
+            throw new ArgumentOutOfRangeException(nameof(maxSize), maxSize, "The maximum size cannot be negative.");
+        }
+
+        if(minSize is { } min && maxSize is { } max && min > max) {
+            throw new ArgumentException("The minimum size cannot exceed the maximum size.", nameof(minSize));
+        }
+    }
+
+    /// <summary>
+    /// Validates the optional last-write boundaries.
+    /// </summary>
+    /// <param name="after">The exclusive lower boundary.</param>
+    /// <param name="before">The exclusive upper boundary.</param>
+    /// <exception cref="ArgumentException">
+    /// Thrown when <paramref name="after"/> is not earlier than <paramref name="before"/>.
+    /// </exception>
+    private static void ValidateModifiedRange(DateTimeOffset? after, DateTimeOffset? before) {
+        if(after is { } afterValue && before is { } beforeValue && afterValue >= beforeValue) {
+            throw new ArgumentException(
+                "The 'ModifiedAfter' boundary must be earlier than the 'ModifiedBefore' boundary.",
+                nameof(after));
+        }
     }
 }

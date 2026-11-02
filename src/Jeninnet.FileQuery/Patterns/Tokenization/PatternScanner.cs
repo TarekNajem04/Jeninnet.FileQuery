@@ -114,11 +114,13 @@ internal static class PatternScanner {
         var end = span.Length;
 
         // Escaped leading '!' or '#' — consume the backslash.
-        if(span.Length > 1 && span[0] == '\\' && span[1] is '!' or '#') {
+        var escapedLeadingSpecial = span.Length > 1 && span[0] == '\\' && span[1] is '!' or '#';
+
+        if(escapedLeadingSpecial) {
             start++;
         }
 
-        var negated = syntax.SupportsNegation && start < end && span[start] == '!' && ++start > 0;
+        var negated = !escapedLeadingSpecial && syntax.SupportsNegation && start < end && span[start] == '!' && ++start > 0;
         var rooted = syntax.SupportsRootAnchoring && start < end && span[start] == '/' && ++start > 0;
         var dirOnly = syntax.SupportsDirectoryOnly && end > start && span[end - 1] == '/' && --end > 0;
 

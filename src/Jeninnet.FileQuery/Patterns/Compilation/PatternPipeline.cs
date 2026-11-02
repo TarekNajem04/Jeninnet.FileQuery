@@ -55,6 +55,28 @@ internal sealed class PatternPipeline {
     public ICompiledPattern Compile(ClassifiedPattern pattern) {
         ArgumentNullException.ThrowIfNull(pattern);
 
+        // Typed regex patterns do not need the "r:" prefix at the call site; normalize
+        // here so UsingRegex()/Where(PatternKind.Regex, ...) cannot silently produce a no-op.
+        // Trim first: the scanner trims raw pattern text, so prefixing untrimmed text
+        // would leave leading/trailing spaces inside the actual regex expression.
+        if(pattern.Type is PatternKind.Regex) {
+            var regexText = pattern.Text.Trim();
+            pattern = pattern with {
+                Text = regexText.StartsWith("r:", StringComparison.Ordinal)
+                    ? regexText
+                    : "r:" + regexText
+            };
+        }
+
+        if(pattern.Type is PatternKind.Unknown) {
+            var (_, error, position, segment) = PatternValidator.Validate(pattern.Text.AsSpan());
+            var message = error is not null
+                ? $"Invalid pattern '{pattern.Text}': {error}"
+                : $"Pattern '{pattern.Text}' could not be classified.";
+
+            throw new PatternException(message, position, segment);
+        }
+
         var context = new PatternCompilationContext(pattern);
         var syntax = PatternSyntaxProfile.GetProfileForPatternType(pattern.Type);
 
@@ -98,7 +120,21 @@ internal sealed class PatternPipeline {
         var compiled = new List<ICompiledPattern>(set.Patterns.Count);
 
         foreach(var pattern in set.Patterns) {
-            compiled.Add(Compile(pattern));
+            if(pattern.Type is PatternKind.Regex) {
+                compiled.Add(Compile(pattern));
+                continue;
+            }
+
+            var expansions = BraceExpander.Expand(pattern.Text);
+
+            if(expansions.Count == 1 && string.Equals(expansions[0], pattern.Text, StringComparison.Ordinal)) {
+                compiled.Add(Compile(pattern));
+                continue;
+            }
+
+            foreach(var expansion in expansions) {
+                compiled.Add(Compile(new ClassifiedPattern(expansion, pattern.Type, pattern.SourceIndex)));
+            }
         }
 
         return new CompiledPatternSet(compiled);
@@ -146,6 +182,7 @@ internal sealed class PatternPipeline {
             new LiteralNormalizationInvariant(),
             new RegexSyntaxInvariant(),             // fixed: strips r: prefix
             new EmptyPatternInvariant(),
+            new GlobPathSeparatorInvariant(),        // rejects Windows-style path separators
 
             // ---- Structural phase ----
             new CharacterClassRangeInvariant(),

@@ -59,6 +59,5 @@ internal static class FileSystemGuards {
         int attempts
     ) =>
         errorRecovery.Action is FileQueryErrorAction.Skip ||
-        (ignoreInaccessible && errorRecovery.Action is not FileQueryErrorAction.Abort) ||
         (errorRecovery.Action is FileQueryErrorAction.Retry && attempt >= attempts - 1 && ignoreInaccessible);
 }

@@ -19,9 +19,9 @@ public sealed class PatternBuilderTests {
     public void Build_ShouldReturnDefaultPattern_WhenInputIsEmpty() {
         var result = PatternBuilder.Build();
 
-        Assert.HasCount(1, result);
-        Assert.IsTrue(result.ContainsKey(PatternKind.GitIgnore));
-        Assert.AreEqual("!**", result[PatternKind.GitIgnore][0]);
+        result.Should().HaveCount(1);
+        result.ContainsKey(PatternKind.GitIgnore).Should().BeTrue();
+        result[PatternKind.GitIgnore][0].Should().Be("!**");
     }
 
     /// <summary>
@@ -32,8 +32,8 @@ public sealed class PatternBuilderTests {
         const string patterns = "r:.*\\.txt;*.log";
         var result = PatternBuilder.Build(patterns);
 
-        Assert.IsTrue(result.ContainsKey(PatternKind.Regex));
-        Assert.IsTrue(result.ContainsKey(PatternKind.GitIgnore), $"Result keys: {string.Join(", ", result.Keys)}");
+        result.ContainsKey(PatternKind.Regex).Should().BeTrue();
+        result.ContainsKey(PatternKind.GitIgnore).Should().BeTrue(because: $"Result keys: {string.Join(", ", result.Keys)}");
     }
 
     /// <summary>
@@ -43,8 +43,8 @@ public sealed class PatternBuilderTests {
     public void Build_ShouldMergeSameTypePatterns() {
         var result = PatternBuilder.Build("a.txt;b.txt");
 
-        Assert.IsTrue(result.ContainsKey(PatternKind.GitIgnore));
-        Assert.HasCount(2, result[PatternKind.GitIgnore]);
+        result.ContainsKey(PatternKind.GitIgnore).Should().BeTrue();
+        result[PatternKind.GitIgnore].Should().HaveCount(2);
     }
 
     /// <summary>
@@ -59,13 +59,35 @@ public sealed class PatternBuilderTests {
             regex: "r:d.txt"
         );
 
-        Assert.HasCount(3, result);
-        Assert.IsTrue(result.ContainsKey(PatternKind.GitIgnore));
-        Assert.IsTrue(result.ContainsKey(PatternKind.Glob));
-        Assert.IsTrue(result.ContainsKey(PatternKind.Regex));
-        Assert.HasCount(2, result[PatternKind.GitIgnore]);
-        Assert.HasCount(1, result[PatternKind.Glob]);
-        Assert.HasCount(1, result[PatternKind.Regex]);
+        result.Should().HaveCount(3);
+        result.ContainsKey(PatternKind.GitIgnore).Should().BeTrue();
+        result.ContainsKey(PatternKind.Glob).Should().BeTrue();
+        result.ContainsKey(PatternKind.Regex).Should().BeTrue();
+        result[PatternKind.GitIgnore].Should().HaveCount(2);
+        result[PatternKind.Glob].Should().HaveCount(1);
+        result[PatternKind.Regex].Should().HaveCount(1);
+    }
+
+    /// <summary>
+    /// Verifies that regex patterns without the dialect prefix are normalized.
+    /// </summary>
+    [TestMethod]
+    public void Build_ShouldAddRegexPrefix_WhenPrefixIsMissing() {
+        var result = PatternBuilder.Build(regex: @"d\.txt$");
+
+        result[PatternKind.Regex].Should().HaveCount(1);
+        result[PatternKind.Regex][0].Should().Be(@"r:d\.txt$");
+    }
+
+    /// <summary>
+    /// Verifies that an existing regex dialect prefix is preserved.
+    /// </summary>
+    [TestMethod]
+    public void Build_ShouldPreserveRegexPrefix_WhenPrefixIsPresent() {
+        var result = PatternBuilder.Build(regex: @"r:d\.txt$");
+
+        result[PatternKind.Regex].Should().HaveCount(1);
+        result[PatternKind.Regex][0].Should().Be(@"r:d\.txt$");
     }
 
     /// <summary>
@@ -81,8 +103,8 @@ public sealed class PatternBuilderTests {
 
         var parsed = PatternBuilder.Build(result, options);
 
-        Assert.IsTrue(parsed.ContainsKey(PatternKind.GitIgnore));
-        Assert.AreEqual("p1", parsed[PatternKind.GitIgnore][0]);
+        parsed.ContainsKey(PatternKind.GitIgnore).Should().BeTrue();
+        parsed[PatternKind.GitIgnore][0].Should().Be("p1");
     }
 
     private sealed class TestOptions : CommandLinePatternOptions {

@@ -46,9 +46,9 @@ public sealed class FileQueryBuilderTests : IDisposable {
         var query = builder.Build();
 
         // Assert
-        Assert.IsNotNull(query.Options.PatternInput.TypedPatterns);
-        Assert.IsTrue(query.Options.PatternInput.TypedPatterns.ContainsKey(PatternKind.Glob));
-        Assert.AreSequenceEqual(patterns, [.. query.Options.PatternInput.TypedPatterns[PatternKind.Glob]], SequenceOrder.InAnyOrder);
+        query.Options.PatternInput.TypedPatterns.Should().NotBeNull();
+        query.Options.PatternInput.TypedPatterns.ContainsKey(PatternKind.Glob).Should().BeTrue();
+        query.Options.PatternInput.TypedPatterns[PatternKind.Glob].Should().BeEquivalentTo(patterns);
     }
 
     /// <summary>
@@ -64,7 +64,7 @@ public sealed class FileQueryBuilderTests : IDisposable {
         var query = builder.Build();
 
         // Assert
-        Assert.AreEqual(PatternInterpretationMode.Hybrid, query.Options.PatternInput.InterpretationMode);
+        query.Options.PatternInput.InterpretationMode.Should().Be(PatternInterpretationMode.Hybrid);
     }
 
     /// <summary>
@@ -80,7 +80,7 @@ public sealed class FileQueryBuilderTests : IDisposable {
         var query = builder.Build();
 
         // Assert
-        Assert.AreEqual(PatternMatchingMode.GitIgnore, query.Options.PatternMatchingMode);
+        query.Options.PatternMatchingMode.Should().Be(PatternMatchingMode.GitIgnore);
     }
 
     /// <summary>
@@ -96,7 +96,7 @@ public sealed class FileQueryBuilderTests : IDisposable {
         var query = builder.Build();
 
         // Assert
-        Assert.AreEqual(PatternMatchingMode.Glob, query.Options.PatternMatchingMode);
+        query.Options.PatternMatchingMode.Should().Be(PatternMatchingMode.Glob);
     }
 
     /// <summary>
@@ -112,7 +112,7 @@ public sealed class FileQueryBuilderTests : IDisposable {
         var query = builder.Build();
 
         // Assert
-        Assert.AreEqual(PatternMatchingMode.Regex, query.Options.PatternMatchingMode);
+        query.Options.PatternMatchingMode.Should().Be(PatternMatchingMode.Regex);
     }
 
     /// <summary>
@@ -128,7 +128,7 @@ public sealed class FileQueryBuilderTests : IDisposable {
         var query = builder.Build();
 
         // Assert
-        Assert.IsFalse(query.Options.RecurseSubdirectories);
+        query.Options.RecurseSubdirectories.Should().BeFalse();
     }
 
     /// <summary>
@@ -144,7 +144,7 @@ public sealed class FileQueryBuilderTests : IDisposable {
         var query = builder.Build();
 
         // Assert
-        Assert.IsFalse(query.Options.RecurseSubdirectories);
+        query.Options.RecurseSubdirectories.Should().BeFalse();
     }
 
     /// <summary>
@@ -160,7 +160,7 @@ public sealed class FileQueryBuilderTests : IDisposable {
         var query = builder.Build();
 
         // Assert
-        Assert.AreEqual(CaseSensitivity.Insensitive, query.Options.CaseSensitivity);
+        query.Options.CaseSensitivity.Should().Be(CaseSensitivity.Insensitive);
     }
 
     /// <summary>
@@ -170,24 +170,24 @@ public sealed class FileQueryBuilderTests : IDisposable {
     public void Should_ThrowInvalidOperationException_When_ModeAndKindConflict() {
         // Test GitIgnore mode conflicts
         var builder1 = FileQuery.From(_tempRoot).UsingGitIgnore();
-        Assert.Throws<InvalidOperationException>(() => builder1.Where(PatternKind.Glob, ["*.txt"]));
+        FluentActions.Invoking(() => builder1.Where(PatternKind.Glob, ["*.txt"])).Should().Throw<InvalidOperationException>();
 
         var builder2 = FileQuery.From(_tempRoot).UsingGitIgnore();
-        Assert.Throws<InvalidOperationException>(() => builder2.Where(PatternKind.Regex, [".*"]));
+        FluentActions.Invoking(() => builder2.Where(PatternKind.Regex, [".*"])).Should().Throw<InvalidOperationException>();
 
         // Test Glob mode conflicts
         var builder3 = FileQuery.From(_tempRoot).UsingGlob();
-        Assert.Throws<InvalidOperationException>(() => builder3.Where(PatternKind.GitIgnore, ["*.txt"]));
+        FluentActions.Invoking(() => builder3.Where(PatternKind.GitIgnore, ["*.txt"])).Should().Throw<InvalidOperationException>();
 
         var builder4 = FileQuery.From(_tempRoot).UsingGlob();
-        Assert.Throws<InvalidOperationException>(() => builder4.Where(PatternKind.Regex, [".*"]));
+        FluentActions.Invoking(() => builder4.Where(PatternKind.Regex, [".*"])).Should().Throw<InvalidOperationException>();
 
         // Test Regex mode conflicts
         var builder5 = FileQuery.From(_tempRoot).UsingRegex();
-        Assert.Throws<InvalidOperationException>(() => builder5.Where(PatternKind.GitIgnore, ["*.txt"]));
+        FluentActions.Invoking(() => builder5.Where(PatternKind.GitIgnore, ["*.txt"])).Should().Throw<InvalidOperationException>();
 
         var builder6 = FileQuery.From(_tempRoot).UsingRegex();
-        Assert.Throws<InvalidOperationException>(() => builder6.Where(PatternKind.Glob, ["*.txt"]));
+        FluentActions.Invoking(() => builder6.Where(PatternKind.Glob, ["*.txt"])).Should().Throw<InvalidOperationException>();
     }
 
     /// <summary>
@@ -213,7 +213,7 @@ public sealed class FileQueryBuilderTests : IDisposable {
     [TestMethod]
     public void Should_Throw_When_RootPathIsNullOrEmpty() {
         var builder = new FileQueryBuilder("   ", FileSystem.Instance);
-        Assert.Throws<InvalidOperationException>(builder.Build);
+        FluentActions.Invoking(() => builder.Build()).Should().Throw<InvalidOperationException>();
     }
 
     /// <summary>
@@ -222,6 +222,6 @@ public sealed class FileQueryBuilderTests : IDisposable {
     [TestMethod]
     public void Should_Throw_When_RootPathDoesNotExist() {
         var builder = FileQuery.From(Path.Combine(_tempRoot, "does-not-exist"));
-        Assert.Throws<DirectoryNotFoundException>(builder.Build);
+        FluentActions.Invoking(() => builder.Build()).Should().Throw<DirectoryNotFoundException>();
     }
 }

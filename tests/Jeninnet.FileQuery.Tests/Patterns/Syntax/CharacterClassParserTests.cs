@@ -34,7 +34,7 @@ public sealed class CharacterClassParserTests {
             var index = 0;
             var result = CharacterClassParser.Parse(pattern, ref index);
 
-            Assert.IsNotNull(result);
+            result.Should().NotBeNull();
         }
     }
 
@@ -48,13 +48,13 @@ public sealed class CharacterClassParserTests {
 
         var result = CharacterClassParser.Parse(input, ref i);
 
-        Assert.IsFalse(result.IsNegated);
-        Assert.HasCount(3, result.Elements);
-        Assert.IsInstanceOfType<CharLiteral>(result.Elements[0]);
-        Assert.AreEqual('a', ((CharLiteral)result.Elements[0]).Value);
-        Assert.AreEqual('b', ((CharLiteral)result.Elements[1]).Value);
-        Assert.AreEqual('c', ((CharLiteral)result.Elements[2]).Value);
-        Assert.AreEqual(5, i, "Index must be positioned after the closing ']'.");
+        result.IsNegated.Should().BeFalse();
+        result.Elements.Should().HaveCount(3);
+        result.Elements[0].Should().BeAssignableTo<CharLiteral>();
+        ((CharLiteral)result.Elements[0]).Value.Should().Be('a');
+        ((CharLiteral)result.Elements[1]).Value.Should().Be('b');
+        ((CharLiteral)result.Elements[2]).Value.Should().Be('c');
+        i.Should().Be(5, because: "Index must be positioned after the closing ']'.");
     }
 
     /// <summary>
@@ -67,10 +67,10 @@ public sealed class CharacterClassParserTests {
 
         var result = CharacterClassParser.Parse(input, ref i);
 
-        Assert.HasCount(1, result.Elements);
-        var range = Assert.IsInstanceOfType<CharRange>(result.Elements[0]);
-        Assert.AreEqual('a', range.Start);
-        Assert.AreEqual('z', range.End);
+        result.Elements.Should().HaveCount(1);
+        var range = (CharRange)result.Elements[0];
+        range.Start.Should().Be('a');
+        range.End.Should().Be('z');
     }
 
     /// <summary>
@@ -83,9 +83,9 @@ public sealed class CharacterClassParserTests {
 
         var result = CharacterClassParser.Parse(input, ref i);
 
-        Assert.IsTrue(result.IsNegated);
-        Assert.HasCount(3, result.Elements);
-        Assert.IsTrue(result.Elements.All(static e => e is CharLiteral));
+        result.IsNegated.Should().BeTrue();
+        result.Elements.Should().HaveCount(3);
+        result.Elements.All(static e => e is CharLiteral).Should().BeTrue();
     }
 
     /// <summary>
@@ -98,8 +98,7 @@ public sealed class CharacterClassParserTests {
 
         var result = CharacterClassParser.Parse(input, ref i);
 
-        Assert.IsTrue(result.IsNegated,
-            "'^' must be treated as a negation prefix, identical to '!'.");
+        result.IsNegated.Should().BeTrue(because: "'^' must be treated as a negation prefix, identical to '!'.");
     }
 
     /// <summary>
@@ -113,9 +112,8 @@ public sealed class CharacterClassParserTests {
 
         var result = CharacterClassParser.Parse(input, ref i);
 
-        var first = Assert.IsInstanceOfType<CharLiteral>(result.Elements[0]);
-        Assert.AreEqual('-', first.Value,
-            "'-' at the start of a class must be treated as a literal.");
+        var first = (CharLiteral)result.Elements[0];
+        first.Value.Should().Be('-', because: "'-' at the start of a class must be treated as a literal.");
     }
 
     /// <summary>
@@ -130,11 +128,10 @@ public sealed class CharacterClassParserTests {
 
         var result = CharacterClassParser.Parse(input, ref i);
 
-        var first = Assert.IsInstanceOfType<CharLiteral>(result.Elements[0]);
-        Assert.AreEqual(']', first.Value,
-            "']' at the start of a class must be treated as a literal.");
+        var first = (CharLiteral)result.Elements[0];
+        first.Value.Should().Be(']', because: "']' at the start of a class must be treated as a literal.");
 
-        Assert.HasCount(4, result.Elements, "']', 'a', 'b', 'c'.");
+        result.Elements.Should().HaveCount(4, because: "']', 'a', 'b', 'c'.");
     }
 
     /// <summary>
@@ -148,11 +145,10 @@ public sealed class CharacterClassParserTests {
 
         var result = CharacterClassParser.Parse(input, ref i);
 
-        Assert.HasCount(2, result.Elements);
-        Assert.IsInstanceOfType<CharLiteral>(result.Elements[0]);
-        var dash = Assert.IsInstanceOfType<CharLiteral>(result.Elements[1]);
-        Assert.AreEqual('-', dash.Value,
-            "'-' immediately before ']' must be a literal, not a range delimiter.");
+        result.Elements.Should().HaveCount(2);
+        result.Elements[0].Should().BeAssignableTo<CharLiteral>();
+        var dash = (CharLiteral)result.Elements[1];
+        dash.Value.Should().Be('-', because: "'-' immediately before ']' must be a literal, not a range delimiter.");
     }
 
     /// <summary>
@@ -165,10 +161,10 @@ public sealed class CharacterClassParserTests {
 
         var result = CharacterClassParser.Parse(input, ref i);
 
-        Assert.HasCount(3, result.Elements);
-        Assert.IsInstanceOfType<CharRange>(result.Elements[0]); // a-z
-        Assert.IsInstanceOfType<CharRange>(result.Elements[1]); // 0-9
-        Assert.IsInstanceOfType<CharLiteral>(result.Elements[2]); // _
+        result.Elements.Should().HaveCount(3);
+        result.Elements[0].Should().BeAssignableTo<CharRange>(); // a-z
+        result.Elements[1].Should().BeAssignableTo<CharRange>(); // 0-9
+        result.Elements[2].Should().BeAssignableTo<CharLiteral>(); // _
     }
 
     /// <summary>
@@ -181,10 +177,10 @@ public sealed class CharacterClassParserTests {
 
         var result = CharacterClassParser.Parse(input, ref i);
 
-        Assert.HasCount(1, result.Elements);
-        var posix = Assert.IsInstanceOfType<PosixClass>(result.Elements[0]);
-        Assert.AreEqual("digit", posix.Name);
-        Assert.AreEqual(11, i);
+        result.Elements.Should().HaveCount(1);
+        var posix = (PosixClass)result.Elements[0];
+        posix.Name.Should().Be("digit");
+        i.Should().Be(11);
     }
 
     /// <summary>
@@ -197,8 +193,8 @@ public sealed class CharacterClassParserTests {
 
         var result = CharacterClassParser.Parse(input, ref i);
 
-        var posix = Assert.IsInstanceOfType<PosixClass>(result.Elements[0]);
-        Assert.AreEqual("alpha", posix.Name);
+        var posix = (PosixClass)result.Elements[0];
+        posix.Name.Should().Be("alpha");
     }
 
     /// <summary>
@@ -212,10 +208,10 @@ public sealed class CharacterClassParserTests {
 
         var result = CharacterClassParser.Parse(input, ref i);
 
-        Assert.HasCount(2, result.Elements);
-        Assert.IsInstanceOfType<PosixClass>(result.Elements[0]);
-        var lit = Assert.IsInstanceOfType<CharLiteral>(result.Elements[1]);
-        Assert.AreEqual('_', lit.Value);
+        result.Elements.Should().HaveCount(2);
+        result.Elements[0].Should().BeAssignableTo<PosixClass>();
+        var lit = (CharLiteral)result.Elements[1];
+        lit.Value.Should().Be('_');
     }
 
     /// <summary>
@@ -229,12 +225,9 @@ public sealed class CharacterClassParserTests {
 
         var result = CharacterClassParser.Parse(input, ref i);
 
-        Assert.Contains(
-            static e => e is CharacterClassParseError, result.Elements,
-            "An unterminated class must produce a CharacterClassParseError sentinel.");
+        result.Elements.Should().Contain(static e => e is CharacterClassParseError, because: "An unterminated class must produce a CharacterClassParseError sentinel.");
 
-        Assert.AreEqual(input.Length, i,
-            "Index must be at end-of-input after an unterminated class.");
+        i.Should().Be(input.Length, because: "Index must be at end-of-input after an unterminated class.");
     }
 
     /// <summary>
@@ -249,9 +242,7 @@ public sealed class CharacterClassParserTests {
         var result = CharacterClassParser.Parse(input, ref i);
 
         // ']' at the start is a CharLiteral, and then there's no closing bracket.
-        Assert.Contains(
-            static e => e is CharacterClassParseError, result.Elements,
-            "'[]' produces an unterminated sentinel because ']' is consumed as a literal.");
+        result.Elements.Should().Contain(static e => e is CharacterClassParseError, because: "'[]' produces an unterminated sentinel because ']' is consumed as a literal.");
     }
 
     /// <summary>
@@ -264,9 +255,7 @@ public sealed class CharacterClassParserTests {
 
         var result = CharacterClassParser.Parse(input, ref i);
 
-        Assert.Contains(
-            static e => e is CharacterClassParseError, result.Elements,
-            "An unterminated POSIX class must produce a CharacterClassParseError.");
+        result.Elements.Should().Contain(static e => e is CharacterClassParseError, because: "An unterminated POSIX class must produce a CharacterClassParseError.");
     }
 
     /// <summary>
@@ -279,9 +268,7 @@ public sealed class CharacterClassParserTests {
 
         var result = CharacterClassParser.Parse(input, ref i);
 
-        Assert.Contains(
-            static e => e is CharacterClassParseError, result.Elements,
-            "An incomplete escape at end of input must produce a CharacterClassParseError.");
+        result.Elements.Should().Contain(static e => e is CharacterClassParseError, because: "An incomplete escape at end of input must produce a CharacterClassParseError.");
     }
 
     /// <summary>
@@ -296,8 +283,8 @@ public sealed class CharacterClassParserTests {
 
         var result = CharacterClassParser.Parse(input, ref i);
 
-        Assert.DoesNotContain(static e => e is CharacterClassParseError, result.Elements);
-        Assert.AreEqual(8, i, "Index must point at 'b' (first char after ']').");
+        result.Elements.Should().NotContain(static e => e is CharacterClassParseError);
+        i.Should().Be(8, because: "Index must point at 'b' (first char after ']').");
     }
 
     /// <summary>
@@ -307,7 +294,7 @@ public sealed class CharacterClassParserTests {
     public void Invariant_UnterminatedClass_ReportsFailure() {
         var (HasException, _) = TryCompile("[abc");
 
-        Assert.IsTrue(HasException, "Unterminated class must fail invariant.");
+        HasException.Should().BeTrue(because: "Unterminated class must fail invariant.");
     }
 
     /// <summary>
@@ -317,7 +304,7 @@ public sealed class CharacterClassParserTests {
     public void Invariant_ValidClass_Passes() {
         var (HasException, ExceptionMessage) = TryCompile("[c-z]");
 
-        Assert.IsFalse(HasException, ExceptionMessage);
+        HasException.Should().BeFalse(because: ExceptionMessage);
     }
 
     /// <summary>
@@ -327,8 +314,7 @@ public sealed class CharacterClassParserTests {
     public void Invariant_InvertedRange_ReportsFailure() {
         var (HasException, _) = TryCompile("[z-a]");
 
-        Assert.IsTrue(HasException,
-            "An inverted range 'z-a' must fail the range invariant.");
+        HasException.Should().BeTrue(because: "An inverted range 'z-a' must fail the range invariant.");
     }
 
     /// <summary>
@@ -339,7 +325,7 @@ public sealed class CharacterClassParserTests {
         // "a-z" is a valid range, so it should pass the invariant.
         var (HasException, ExceptionMessage) = TryCompile("[a-z]");
 
-        Assert.IsFalse(HasException, ExceptionMessage);
+        HasException.Should().BeFalse(because: ExceptionMessage);
     }
 
     /// <summary>
@@ -357,13 +343,13 @@ public sealed class CharacterClassParserTests {
             )
         );
 
-        var results = engine.Execute(new(env.Root, options)).ToList();
+        var results = engine.Execute(new(env.Root, options), TestContext.CancellationToken).ToList();
 
-        Assert.HasCount(3, results);
-        Assert.Contains(static p => p.EndsWith("a.txt", StringComparison.Ordinal), results);
-        Assert.Contains(static p => p.EndsWith("b.txt", StringComparison.Ordinal), results);
-        Assert.Contains(static p => p.EndsWith("c.txt", StringComparison.Ordinal), results);
-        Assert.DoesNotContain(static p => p.EndsWith("d.txt", StringComparison.Ordinal), results);
+        results.Should().HaveCount(3);
+        results.Should().Contain(static p => p.EndsWith("a.txt", StringComparison.Ordinal));
+        results.Should().Contain(static p => p.EndsWith("b.txt", StringComparison.Ordinal));
+        results.Should().Contain(static p => p.EndsWith("c.txt", StringComparison.Ordinal));
+        results.Should().NotContain(static p => p.EndsWith("d.txt", StringComparison.Ordinal));
     }
 
     /// <summary>
@@ -381,10 +367,10 @@ public sealed class CharacterClassParserTests {
             )
         );
 
-        var results = engine.Execute(new(env.Root, options)).ToList();
+        var results = engine.Execute(new(env.Root, options), TestContext.CancellationToken).ToList();
 
-        Assert.HasCount(3, results);
-        Assert.DoesNotContain(static p => p.EndsWith("fileX.txt", StringComparison.Ordinal), results);
+        results.Should().HaveCount(3);
+        results.Should().NotContain(static p => p.EndsWith("fileX.txt", StringComparison.Ordinal));
     }
 
     /// <summary>
@@ -403,11 +389,11 @@ public sealed class CharacterClassParserTests {
             )
         );
 
-        var results = engine.Execute(new(env.Root, options)).ToList();
+        var results = engine.Execute(new(env.Root, options), TestContext.CancellationToken).ToList();
 
-        Assert.HasCount(2, results);
-        Assert.Contains(static p => p.EndsWith("d.txt", StringComparison.Ordinal), results);
-        Assert.Contains(static p => p.EndsWith("e.txt", StringComparison.Ordinal), results);
+        results.Should().HaveCount(2);
+        results.Should().Contain(static p => p.EndsWith("d.txt", StringComparison.Ordinal));
+        results.Should().Contain(static p => p.EndsWith("e.txt", StringComparison.Ordinal));
     }
 
     /// <summary>
@@ -426,12 +412,12 @@ public sealed class CharacterClassParserTests {
             )
         );
 
-        var results = engine.Execute(new(env.Root, options)).ToList();
+        var results = engine.Execute(new(env.Root, options), TestContext.CancellationToken).ToList();
 
-        Assert.HasCount(2, results);
-        Assert.Contains(static p => p.EndsWith("file1.txt", StringComparison.Ordinal), results);
-        Assert.Contains(static p => p.EndsWith("file2.txt", StringComparison.Ordinal), results);
-        Assert.DoesNotContain(static p => p.EndsWith("fileA.txt", StringComparison.Ordinal), results);
+        results.Should().HaveCount(2);
+        results.Should().Contain(static p => p.EndsWith("file1.txt", StringComparison.Ordinal));
+        results.Should().Contain(static p => p.EndsWith("file2.txt", StringComparison.Ordinal));
+        results.Should().NotContain(static p => p.EndsWith("fileA.txt", StringComparison.Ordinal));
     }
 
     private static (bool HasException, string ExceptionMessage) TryCompile(string pattern) {
@@ -443,4 +429,10 @@ public sealed class CharacterClassParserTests {
             return (true, ex.Message);
         }
     }
+
+    /// <summary>
+    /// Gets or sets the test context, which provides information about the current test run.
+    /// Used here primarily for accessing the <see cref="CancellationToken"/>.
+    /// </summary>
+    public TestContext TestContext { get; set; } = null!;
 }

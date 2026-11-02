@@ -83,7 +83,7 @@ public class EnumerateFilesAsync_RecursionDepthTests {
         TestAssertEx.HasCount(results, 2);
         TestAssertEx.Contains(results, static x => x.EndsWith("a.txt", StringComparison.Ordinal));
         TestAssertEx.Contains(results, static x => x.EndsWith(Path.Combine("sub", "b.txt"), StringComparison.Ordinal));
-        Assert.DoesNotContain(static x => x.EndsWith(Path.Combine("deeper", "c.txt"), StringComparison.Ordinal), results);
+        results.Should().NotContain(static x => x.EndsWith(Path.Combine("deeper", "c.txt"), StringComparison.Ordinal));
     }
 
     /// <summary>
@@ -120,8 +120,8 @@ public class EnumerateFilesAsync_RecursionDepthTests {
                                            .ToListAsync(TestContext.CancellationToken);
 
         TestAssertEx.HasCount(results, 4); // 2 root + 2 at depth 1
-        Assert.DoesNotContain(static x => x.Contains("A2", StringComparison.Ordinal), results);
-        Assert.DoesNotContain(static x => x.Contains("B2", StringComparison.Ordinal), results);
+        results.Should().NotContain(static x => x.Contains("A2", StringComparison.Ordinal));
+        results.Should().NotContain(static x => x.Contains("B2", StringComparison.Ordinal));
     }
 
     /// <summary>

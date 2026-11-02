@@ -1,0 +1,48 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <OutputPath>..\..\artifacts\</OutputPath>
+        <Version>2.0.0</Version>
+        <IsPackable>true</IsPackable>
+        <IncludeBuildOutput>false</IncludeBuildOutput>
+        <SuppressDependenciesWhenPacking>true</SuppressDependenciesWhenPacking>
+        <Description>
+            MSBuild integration for Jeninnet.FileQuery: validate FileQueryPatterns at evaluation time and export SARIF 2.1.0 diagnostics for code scanning.
+        </Description>
+        <PackageTags>filequery;msbuild;build;validation;sarif;code-scanning</PackageTags>
+        <!-- Task assemblies intentionally live under tasks/, not lib/; they are loaded by UsingTask. -->
+        <NoWarn>$(NoWarn);NU5100</NoWarn>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Microsoft.Build.Utilities.Core" PrivateAssets="all" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\Jeninnet.FileQuery.Tooling\Jeninnet.FileQuery.Tooling.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <None Include="$(OutputPath)$(AssemblyName).dll"
+              Pack="true"
+              PackagePath="tasks/net10.0"
+              Visible="false" />
+        <None Include="$(OutputPath)Jeninnet.FileQuery.Tooling.dll"
+              Pack="true"
+              PackagePath="tasks/net10.0"
+              Visible="false" />
+        <None Include="$(OutputPath)Jeninnet.FileQuery.dll"
+              Pack="true"
+              PackagePath="tasks/net10.0"
+              Visible="false" />
+        <None Include="build\Jeninnet.FileQuery.Build.props"
+              Pack="true"
+              PackagePath="build"
+              Visible="false" />
+        <None Include="build\Jeninnet.FileQuery.Build.targets"
+              Pack="true"
+              PackagePath="build"
+              Visible="false" />
+    </ItemGroup>
+
+</Project>

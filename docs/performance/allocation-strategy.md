@@ -148,8 +148,8 @@ public void Matching_Must_Not_Allocate()
 
     var after = GC.GetAllocatedBytesForCurrentThread();
 
-    Assert.AreEqual(before, after,
-        $"Matching allocated {after - before} bytes — must be 0.");
+    after.Should().Be(before,
+        because: $"Matching allocated {after - before} bytes — must be 0.");
 }
 ```
 

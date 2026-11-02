@@ -27,9 +27,9 @@ public sealed class MatchPrecedenceTests {
         var result_1 = matcher.Match(pattern_1, context);
         var result_2 = matcher.Match(pattern_2, context);
 
-        Assert.AreEqual(MatchOutcome.Include, result_1);
-        Assert.AreEqual(MatchOutcome.Include, result_2);
-        Assert.AreEqual(result_1, result_2);
+        result_1.Should().Be(MatchOutcome.Include);
+        result_2.Should().Be(MatchOutcome.Include);
+        result_2.Should().Be(result_1);
     }
 
     /// <summary>
@@ -46,7 +46,7 @@ public sealed class MatchPrecedenceTests {
         var resultInclude = matcher.Match(patternInclude, context);
         var resultExclude = matcher.Match(patternExclude, context);
 
-        Assert.AreEqual(MatchOutcome.Include, resultInclude);
-        Assert.AreEqual(MatchOutcome.Exclude, resultExclude);
+        resultInclude.Should().Be(MatchOutcome.Include);
+        resultExclude.Should().Be(MatchOutcome.Exclude);
     }
 }

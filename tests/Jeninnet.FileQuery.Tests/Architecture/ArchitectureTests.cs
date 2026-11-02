@@ -44,11 +44,7 @@ public sealed class ArchitectureTests {
 
         var after = GC.GetAllocatedBytesForCurrentThread();
 
-        Assert.AreEqual(
-            before,
-            after,
-            $"Additional memory has been reserved by '{after - before}' byte(s), matching must not allocate."
-        );
+        after.Should().Be(before, because: $"Additional memory has been reserved by '{after - before}' byte(s), matching must not allocate.");
     }
 
     /// <summary>Tests Scan_Does_Not_Allocate_Per_Invocation.</summary>
@@ -74,7 +70,7 @@ public sealed class ArchitectureTests {
 
         var after = GC.GetAllocatedBytesForCurrentThread();
 
-        Assert.IsLessThan(1024, after - before);
+        (after - before).Should().BeLessThan(1024);
     }
 
     /// <summary>Tests No_Public_Method_Performs_Blocking_IO.</summary>
@@ -85,7 +81,7 @@ public sealed class ArchitectureTests {
                 .GetMethods()
                 .Where(static m => m.Name == "ExecuteAsync");
 
-        Assert.IsNotEmpty(engineMethods);
+        engineMethods.Should().NotBeEmpty();
     }
 
     // ---------------------------------------------------------------------
@@ -115,9 +111,7 @@ public sealed class ArchitectureTests {
             .ToList();
 
         // Assert that no Engine types reference the Patterns namespace
-        Assert.IsEmpty(
-            forbiddenReferences,
-            $"""
+        forbiddenReferences.Should().BeEmpty(because: $"""
             Engine / Traversal layer must not reference Patterns namespace.
             Violating classes:
             {string.Join(Environment.NewLine, forbiddenReferences.Select(static x =>
@@ -125,8 +119,7 @@ public sealed class ArchitectureTests {
                         .Where(static rt => rt.Namespace?.StartsWith("Jeninnet.FileQuery.Patterns", StringComparison.Ordinal) == true) // Only show references to the Patterns namespace
                         .Select(static rt => rt.FullName))}")
             )}
-            """
-        );
+            """);
     }
 
     /// <summary>Tests CoreProject_Must_Not_Reference_Optional_Integration_Packages.</summary>
@@ -151,18 +144,12 @@ public sealed class ArchitectureTests {
             .Where(referencedNames.Contains)
             .ToArray();
 
-        Assert.IsEmpty(
-            forbiddenAssemblyReferences,
-            $"Core library must not reference optional integration packages: {string.Join(", ", forbiddenAssemblyReferences)}"
-        );
+        forbiddenAssemblyReferences.Should().BeEmpty(because: $"Core library must not reference optional integration packages: {string.Join(", ", forbiddenAssemblyReferences)}");
 
         var projectFile = Path.Combine(FindRepositoryRoot(), "src", "Jeninnet.FileQuery", "Jeninnet.FileQuery.csproj");
         var projectXml = File.ReadAllText(projectFile);
 
-        Assert.IsFalse(
-            projectXml.Contains("<ProjectReference", StringComparison.Ordinal),
-            "Core library project must not reference optional integration projects."
-        );
+        projectXml.Contains("<ProjectReference", StringComparison.Ordinal).Should().BeFalse(because: "Core library project must not reference optional integration projects.");
     }
 
     /// <summary>Tests OptionalPackages_Must_Not_Expose_Core_Internal_Types_Through_Public_Api.</summary>
@@ -183,14 +170,11 @@ public sealed class ArchitectureTests {
                 ))
             .ToArray();
 
-        Assert.IsEmpty(
-            violations,
-            $"""
+        violations.Should().BeEmpty(because: $"""
             Optional packages must not expose core internal types through public APIs.
             Violations:
             {string.Join(Environment.NewLine, violations)}
-            """
-        );
+            """);
     }
 
     /// <summary>Tests ProductionCode_Must_Not_Construct_FileInfo_Or_DirectoryInfo.</summary>
@@ -205,20 +189,17 @@ public sealed class ArchitectureTests {
 
         var violations = Directory
             .EnumerateFiles(sourceRoot, "*.cs", SearchOption.AllDirectories)
-            .Where(path => !path.Contains("Jeninnet.Testing.Assertions", StringComparison.Ordinal))
+            .Where(path => !path.Contains("Jeninnet.Assertions", StringComparison.Ordinal))
             .SelectMany(path => forbiddenPatterns
                 .Where(pattern => File.ReadAllText(path).Contains(pattern, StringComparison.Ordinal))
                 .Select(pattern => $"{Path.GetRelativePath(sourceRoot, path)} contains '{pattern}'"))
             .ToArray();
 
-        Assert.IsEmpty(
-            violations,
-            $"""
+        violations.Should().BeEmpty(because: $"""
             Production code must use static File/Directory APIs instead of constructing FileInfo or DirectoryInfo.
             Violations:
             {string.Join(Environment.NewLine, violations)}
-            """
-        );
+            """);
     }
 
     /// <summary>Tests ProductionCode_Must_Not_Use_Path_GetFullPath.</summary>
@@ -238,14 +219,11 @@ public sealed class ArchitectureTests {
             })
             .ToArray();
 
-        Assert.IsEmpty(
-            violations,
-            $"""
+        violations.Should().BeEmpty(because: $"""
             Production code must use IFileSystem.GetFullPath instead of System.IO.Path.GetFullPath.
             Violations:
             {string.Join(Environment.NewLine, violations)}
-            """
-        );
+            """);
     }
 
     /// <summary>Tests ProductionFileSystem_Must_Not_Use_PerEntry_TaskRun.</summary>
@@ -255,10 +233,7 @@ public sealed class ArchitectureTests {
         var fileSystemPath = Path.Combine(sourceRoot, "Jeninnet.FileQuery", "IO", "FileSystem.cs");
         var source = File.ReadAllText(fileSystemPath);
 
-        Assert.IsFalse(
-            source.Contains("Task.Run", StringComparison.Ordinal),
-            "FileSystem async enumeration must not offload per-entry synchronous filesystem calls with Task.Run."
-        );
+        source.Contains("Task.Run", StringComparison.Ordinal).Should().BeFalse(because: "FileSystem async enumeration must not offload per-entry synchronous filesystem calls with Task.Run.");
     }
 
     /// <summary>Tests CompiledPattern_Constructors_Must_Not_Be_Public.</summary>
@@ -267,10 +242,7 @@ public sealed class ArchitectureTests {
         var type = typeof(CompiledPattern);
         var publicCtors = type.GetConstructors(BindingFlags.Public | BindingFlags.Instance);
 
-        Assert.IsEmpty(
-            publicCtors,
-            "CompiledPattern must not be publicly constructible."
-        );
+        publicCtors.Should().BeEmpty(because: "CompiledPattern must not be publicly constructible.");
     }
 
     /// <summary>Tests Matchers_Must_Not_Have_Public_Constructors.</summary>
@@ -286,10 +258,7 @@ public sealed class ArchitectureTests {
         foreach(var type in matcherTypes) {
             var publicCtors = type.GetConstructors(BindingFlags.Public | BindingFlags.Instance);
 
-            Assert.IsEmpty(
-                publicCtors,
-                $"Matcher '{type.Name}' must not expose public constructors."
-            );
+            publicCtors.Should().BeEmpty(because: $"Matcher '{type.Name}' must not expose public constructors.");
         }
     }
 
@@ -309,11 +278,8 @@ public sealed class ArchitectureTests {
             var publicCtors =
                 impl.GetConstructors(BindingFlags.Public | BindingFlags.Instance);
 
-            Assert.IsEmpty(
-                publicCtors,
-                $"Matcher '{impl.FullName}' must not expose public constructors. " +
-                "Matchers must not own their construction."
-            );
+            publicCtors.Should().BeEmpty(because: $"Matcher '{impl.FullName}' must not expose public constructors. " +
+                "Matchers must not own their construction.");
         }
     }
 
@@ -326,10 +292,7 @@ public sealed class ArchitectureTests {
                 .GetTypes()
                 .Single(static t => t.Name == "PatternScanner");
 
-        Assert.IsFalse(
-            scannerType.IsPublic,
-            "PatternScanner must remain internal to prevent pattern-text leakage."
-        );
+        scannerType.IsPublic.Should().BeFalse(because: "PatternScanner must remain internal to prevent pattern-text leakage.");
     }
 
     private static IEnumerable<Type> GetAllReferencedTypes(Type type) =>

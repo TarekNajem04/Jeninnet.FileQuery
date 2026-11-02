@@ -19,7 +19,7 @@ public sealed class PatternValidatorTests {
     /// This was the root cause of the EndToEnd_PosixDigitClass_MatchesCorrectly failure:
     /// DetectNestedBrackets fired on <c>[[</c>, returned malformed=true,
     /// PatternClassifier returned Unknown, and the pipeline threw
-    /// "No compiler registered for pattern type Unknown".
+    /// a descriptive pattern exception.
     /// </summary>
     [TestMethod]
     public void IsMalformed_PosixDigitClass_IsNotMalformed() => AssertNotMalformed("[[:digit:]]");
@@ -111,28 +111,19 @@ public sealed class PatternValidatorTests {
     /// <summary>Tests IsMalformed_StrayClosingBracket_ReturnedByHasStrayClosingBracket.</summary>
     [TestMethod]
     public void IsMalformed_StrayClosingBracket_ReturnedByHasStrayClosingBracket() =>
-        Assert.IsTrue(
-            PatternValidator.HasStrayClosingBracket("file].txt".AsSpan()),
-            "A ']' without a preceding '[' must be detected by HasStrayClosingBracket."
-        );
+        PatternValidator.HasStrayClosingBracket("file].txt".AsSpan()).Should().BeTrue(because: "A ']' without a preceding '[' must be detected by HasStrayClosingBracket.");
 
     /// <summary>
     /// PatternClassifier must not return <see cref="PatternKind.Unknown"/>
     /// for a pattern containing a POSIX class.
-    /// Returning Unknown causes "No compiler registered for pattern type Unknown"
-    /// at runtime.
+    /// Returning Unknown causes a pattern exception at runtime.
     /// </summary>
     [TestMethod]
     public void Classifier_PatternWithPosixClass_DoesNotReturnUnknown() {
         var kind = PatternClassifier.Classify("!file[[:digit:]].txt");
 
-        Assert.AreNotEqual(
-            PatternKind.Unknown,
-            kind,
-            "A pattern containing a POSIX class must not be classified as Unknown. " +
-            "Unknown causes a PatternException at compile time because no compiler " +
-            "is registered for that kind."
-        );
+        kind.Should().NotBe(PatternKind.Unknown, because: "A pattern containing a POSIX class must not be classified as Unknown. " +
+            "Unknown causes a PatternException at compile time.");
     }
 
     /// <summary>Tests Classifier_PurePosixClass_DoesNotReturnUnknown.</summary>
@@ -140,18 +131,12 @@ public sealed class PatternValidatorTests {
     public void Classifier_PurePosixClass_DoesNotReturnUnknown() {
         var kind = PatternClassifier.Classify("[[:alpha:]]");
 
-        Assert.AreNotEqual(PatternKind.Unknown, kind);
+        kind.Should().NotBe(PatternKind.Unknown);
     }
 
     private static void AssertMalformed(string pattern) =>
-        Assert.IsTrue(
-            PatternValidator.IsMalformed(pattern.AsSpan()),
-            $"Pattern '{pattern}' must be reported as malformed."
-        );
+        PatternValidator.IsMalformed(pattern.AsSpan()).Should().BeTrue(because: $"Pattern '{pattern}' must be reported as malformed.");
 
     private static void AssertNotMalformed(string pattern) =>
-        Assert.IsFalse(
-            PatternValidator.IsMalformed(pattern.AsSpan()),
-            $"Pattern '{pattern}' must not be reported as malformed."
-        );
+        PatternValidator.IsMalformed(pattern.AsSpan()).Should().BeFalse(because: $"Pattern '{pattern}' must not be reported as malformed.");
 }

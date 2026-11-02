@@ -31,7 +31,7 @@ public sealed class HybridPatternCompilerTests {
 
         var selected = compiler.Select(pattern);
 
-        Assert.AreEqual(PatternKind.Glob, selected.PatternKind);
+        selected.PatternKind.Should().Be(PatternKind.Glob);
     }
 
     /// <summary>
@@ -44,7 +44,7 @@ public sealed class HybridPatternCompilerTests {
 
         var selected = compiler.Select(pattern);
 
-        Assert.AreEqual(PatternKind.Regex, selected.PatternKind);
+        selected.PatternKind.Should().Be(PatternKind.Regex);
     }
 
     /// <summary>
@@ -57,7 +57,7 @@ public sealed class HybridPatternCompilerTests {
 
         var selected = compiler.Select(pattern);
 
-        Assert.AreEqual(PatternKind.GitIgnore, selected.PatternKind);
+        selected.PatternKind.Should().Be(PatternKind.GitIgnore);
     }
 
     /// <summary>
@@ -70,6 +70,6 @@ public sealed class HybridPatternCompilerTests {
 
         var selected = compiler.Select(pattern);
 
-        Assert.AreEqual(PatternKind.GitIgnore, selected.PatternKind);
+        selected.PatternKind.Should().Be(PatternKind.GitIgnore);
     }
 }

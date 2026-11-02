@@ -1,0 +1,66 @@
+{
+    "name": "jeninnet-filequery",
+    "displayName": "Jeninnet FileQuery",
+    "description": "Test Jeninnet.FileQuery patterns against your workspace and see why each file matches or fails.",
+    "version": "0.1.0",
+    "publisher": "jeninnet",
+    "license": "MIT",
+    "engines": {
+        "vscode": "^1.85.0"
+    },
+    "categories": [
+        "Other"
+    ],
+    "keywords": [
+        "file",
+        "query",
+        "glob",
+        "gitignore",
+        "regex",
+        "pattern"
+    ],
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/TarekNajem04/Jeninnet.FileQuery"
+    },
+    "main": "./src/extension.js",
+    "activationEvents": [
+        "onCommand:jeninnet.testPattern",
+        "onCommand:jeninnet.explainPattern"
+    ],
+    "contributes": {
+        "commands": [
+            {
+                "command": "jeninnet.testPattern",
+                "title": "Jeninnet: Test File Pattern"
+            },
+            {
+                "command": "jeninnet.explainPattern",
+                "title": "Jeninnet: Explain File Pattern"
+            }
+        ],
+        "configuration": {
+            "title": "Jeninnet FileQuery",
+            "properties": {
+                "jeninnet.executable": {
+                    "type": "string",
+                    "default": "dotnet-filequery",
+                    "description": "Command used to run the tool. Install it with: dotnet tool install --global Jeninnet.FileQuery.Tool"
+                },
+                "jeninnet.defaultPattern": {
+                    "type": "string",
+                    "default": "!**",
+                    "description": "Pattern prefilled in the tester prompt. Use ';' to separate multiple patterns."
+                },
+                "jeninnet.ignoreCase": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "Match patterns without case sensitivity."
+                }
+            }
+        }
+    },
+    "scripts": {
+        "test": "node --test \"test/*.test.js\""
+    }
+}

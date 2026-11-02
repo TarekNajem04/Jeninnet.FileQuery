@@ -2,7 +2,15 @@
 
 The test suite for the **Jeninnet.FileQuery** library. This project contains unit, integration, architectural, and regression tests that verify the correctness and consistency of the production codebase.
 
+**1,059 tests** cover classification, compilation, matching, traversal, metadata, directory results, multiple roots, GitIgnore ingestion, cancellation, progress, diagnostics, and contract invariants.
+
 This README is written for contributors who want to understand the test structure, add new test scenarios, or maintain consistency across the project.
+
+```bash
+dotnet test tests/Jeninnet.FileQuery.Tests/Jeninnet.FileQuery.Tests.csproj -c Release
+```
+
+Part of the [test suite index](../README.md).
 
 ---
 
@@ -113,19 +121,18 @@ Targeted tests for specific bugs that have been fixed. Each test documents the e
 
 Reusable test infrastructure. This folder contains helpers, fixtures, and utilities used across all other test folders. Everything here is available via `global using Jeninnet.FileQuery.Tests.Shared;`.
 
+`TestEnvironment`, `InaccessibleDirectorySimulator`, `PathHelper`, `PathExtensions`, and the fluent
+`.Should()` assertions come from the external `Jeninnet.Assertions` 1.0.0 package. The files below
+are specific to this repository.
+
 | File | Purpose |
 |------|---------|
-| `TestEnvironment.cs` | Creates isolated temp directories, builds file structures, cleans up on dispose. |
-| `TestEnvironmentExtensions.cs` | Extension methods for building deep directory hierarchies with `TestEnvironment`. |
 | `TestAssertEx.cs` | Custom assertion helpers (`Throws<T>`, `DoesNotContain`, `ContainsSingle`, etc.). |
-| `TestPathUtils.cs` | Cross-platform path normalization and comparison utilities. |
 | `TestPath.cs` | Forward-slash path builder for cross-platform test assertions. |
 | `TestPattern.cs` | Factory for constructing compiled patterns from raw strings. |
 | `TestMatcher.cs` | Factory for creating `HybridPathMatcher` instances. |
 | `PatternHelpers.cs` | Creates pattern dictionaries (`PatternKind` → pattern strings). |
 | `FakeCompiledPattern.cs` | Stub `ICompiledPattern` for tests that need a default implementation. |
-| `InaccessibleDirectorySimulator.cs` | Simulates inaccessible directories without modifying ACLs. |
-| `PathExtensions.cs` | Path string assertion extensions (`EndsWith` with forward-slash normalization). |
 
 **Belongs here:** Shared utilities, base classes, factories, stubs.
 **Does NOT belong here:** Test methods, scenario-specific setup.
@@ -317,7 +324,7 @@ public void Should_ReturnEmptySet_When_InputIsEmpty() {
     var result = PatternCanonicalizer.Canonicalize(input);
 
     // Assert
-    Assert.IsEmpty(result);
+    result.Should().BeEmpty();
 }
 ```
 
@@ -354,15 +361,15 @@ Each `[TestMethod]` should verify exactly one behavior. Avoid testing multiple u
 
 ### Use descriptive assertions
 
-Prefer assertion messages and custom helpers over generic `Assert.IsTrue`:
+Prefer fluent assertions and custom helpers over generic boolean checks:
 
 ```csharp
 // Good
-Assert.Contains(result, x => x.EndsWith("expected.txt"));
+result.Should().Contain(x => x.EndsWith("expected.txt"));
 TestAssertEx.DoesNotContain(result, x => x.Contains("bin"));
 
 // Bad
-Assert.IsTrue(result.Count > 0);
+(result.Count > 0).Should().BeTrue();
 ```
 
 ### Keep tests deterministic
@@ -400,7 +407,7 @@ public void Should_EnumerateOnlyRoot_When_MaxDepthZero() {
 
     // Assert
     TestAssertEx.HasCount(results, 1);
-    Assert.Contains(results, x => x.EndsWith("root.txt"));
+    result.Should().Contain(x => x.EndsWith("root.txt"));
 }
 ```
 

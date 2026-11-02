@@ -35,12 +35,12 @@ public class ComplexWildcardTests {
             )
         );
 
-        var results = fileQueryEngine.Execute(new(env.Root, options)).ToList();
+        var results = fileQueryEngine.Execute(new(env.Root, options), TestContext.CancellationToken).ToList();
 
         TestAssertEx.HasCount(results, 3);
-        Assert.Contains(x => x.EndsWith(Path.Combine(env.Root, "a.txt"), StringComparison.Ordinal), results);
-        Assert.Contains(x => x.EndsWith(Path.Combine(env.Root, "b.txt"), StringComparison.Ordinal), results);
-        Assert.Contains(x => x.EndsWith(Path.Combine("sub", "c.txt"), StringComparison.Ordinal), results);
+        results.Should().Contain(x => x.EndsWith(Path.Combine(env.Root, "a.txt"), StringComparison.Ordinal));
+        results.Should().Contain(x => x.EndsWith(Path.Combine(env.Root, "b.txt"), StringComparison.Ordinal));
+        results.Should().Contain(x => x.EndsWith(Path.Combine("sub", "c.txt"), StringComparison.Ordinal));
     }
 
     /// <summary>
@@ -66,7 +66,7 @@ public class ComplexWildcardTests {
             )
         );
 
-        var results = fileQueryEngine.Execute(new(env.Root, options)).ToList();
+        var results = fileQueryEngine.Execute(new(env.Root, options), TestContext.CancellationToken).ToList();
 
         TestAssertEx.HasCount(results, 3);
     }
@@ -94,9 +94,15 @@ public class ComplexWildcardTests {
             )
         );
 
-        var results = fileQueryEngine.Execute(new(env.Root, options)).ToList();
+        var results = fileQueryEngine.Execute(new(env.Root, options), TestContext.CancellationToken).ToList();
 
         TestAssertEx.HasCount(results, 2);
-        Assert.IsTrue(results.All(static x => x.Contains('a')));
+        results.All(static x => x.Contains('a')).Should().BeTrue();
     }
+
+    /// <summary>
+    /// Gets or sets the test context, which provides information about the current test run.
+    /// Used here primarily for accessing the <see cref="CancellationToken"/>.
+    /// </summary>
+    public TestContext TestContext { get; set; } = null!;
 }

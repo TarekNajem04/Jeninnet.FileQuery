@@ -36,10 +36,10 @@ public sealed class FileQueryObservabilityTests {
                                   .ToListAsync(TestContext.CancellationToken);
 
         results.Should().HaveCount(2);
-        Assert.IsNotEmpty(progress.Values);
-        Assert.IsGreaterThanOrEqualTo(1, progress.Values[^1].DirectoriesVisited);
-        Assert.IsGreaterThanOrEqualTo(3, progress.Values[^1].EntriesScanned);
-        Assert.AreEqual(2, progress.Values[^1].FilesMatched);
+        progress.Values.Should().NotBeEmpty();
+        progress.Values[^1].DirectoriesVisited.Should().BeGreaterThanOrEqualTo(1);
+        progress.Values[^1].EntriesScanned.Should().BeGreaterThanOrEqualTo(3);
+        progress.Values[^1].FilesMatched.Should().Be(2);
     }
 
     /// <summary>
@@ -62,18 +62,18 @@ public sealed class FileQueryObservabilityTests {
             )
         );
 
-        var results = FileQueryRuntime.Create().Execute(query).ToList();
+        var results = FileQueryRuntime.Create().Execute(query, TestContext.CancellationToken).ToList();
 
         results.Should().HaveCount(1);
         var included = diagnostics.Values.Single(static d => d.RelativePath == "keep.txt");
         var excluded = diagnostics.Values.Single(static d => d.RelativePath == "drop.log");
 
-        Assert.AreEqual("Include", included.Outcome);
-        Assert.AreEqual("!**/*.txt", included.Pattern);
-        Assert.AreEqual(1, included.PatternIndex);
-        Assert.AreEqual("Exclude", excluded.Outcome);
-        Assert.AreEqual("**", excluded.Pattern);
-        Assert.AreEqual(0, excluded.PatternIndex);
+        included.Outcome.Should().Be("Include");
+        included.Pattern.Should().Be("!**/*.txt");
+        included.PatternIndex.Should().Be(1);
+        excluded.Outcome.Should().Be("Exclude");
+        excluded.Pattern.Should().Be("**");
+        excluded.PatternIndex.Should().Be(0);
     }
 
     /// <summary>
@@ -112,7 +112,7 @@ public sealed class FileQueryObservabilityTests {
         var engine = CreateEngine(fileSystem);
         var query = CreateRecoveryQuery(fileSystem, FileQueryErrorRecoveryOptions.Skip);
 
-        var results = engine.Execute(query).ToList();
+        var results = engine.Execute(query, TestContext.CancellationToken).ToList();
 
         results.Should().Contain(fileSystem.KeepFile);
         results.Should().NotContain(fileSystem.RetryFile);
@@ -128,7 +128,7 @@ public sealed class FileQueryObservabilityTests {
         var query = CreateRecoveryQuery(fileSystem, FileQueryErrorRecoveryOptions.Abort);
 
         ((Action)(() => {
-            var _ = engine.Execute(query).ToList();
+            var _ = engine.Execute(query, TestContext.CancellationToken).ToList();
         })).Should().Throw<IOException>();
     }
 
@@ -141,7 +141,7 @@ public sealed class FileQueryObservabilityTests {
         var engine = CreateEngine(fileSystem);
         var query = CreateRecoveryQuery(fileSystem, FileQueryErrorRecoveryOptions.Retry(maxRetryAttempts: 1));
 
-        var results = engine.Execute(query).ToList();
+        var results = engine.Execute(query, TestContext.CancellationToken).ToList();
 
         results.Should().Contain(fileSystem.KeepFile);
         results.Should().Contain(fileSystem.RetryFile);
@@ -203,6 +203,10 @@ public sealed class FileQueryObservabilityTests {
         public FileAttributes GetAttributes(string path) => FileAttributes.Normal;
 
         public bool DirectoryExists(string path) => path == Root;
+
+        public bool FileExists(string path) => false;
+
+        public string[] ReadAllLines(string path) => [];
 
         public string ResolveRealPath(string path) => path;
 
@@ -267,6 +271,10 @@ public sealed class FileQueryObservabilityTests {
         public FileAttributes GetAttributes(string path) => path == LockedDirectory ? FileAttributes.Directory : FileAttributes.Normal;
 
         public bool DirectoryExists(string path) => path == Root;
+
+        public bool FileExists(string path) => false;
+
+        public string[] ReadAllLines(string path) => [];
 
         public string ResolveRealPath(string path) => path;
 

@@ -102,14 +102,11 @@ TraversalPlanBuilder.Build(query)
 ```csharp
 var engine = FileQueryRuntime.Create();
 
-var options = new FileQueryOptions {
-    PatternInput = new(patterns: [
-        "**",
-        "!*.txt"
-    ])
-};
+var query = FileQuery.From(rootPath)
+    .Where("**", "!*.txt")
+    .Build();
 
-var result = engine.Execute(new(root, options));
+var result = engine.Execute(query);
 ```
 
 `FileQueryRuntime.Create()` is the composition root. It wires the default
@@ -251,19 +248,18 @@ enumeration. For each discovered entry:
 2. Evaluate the path with `HybridPathMatcher.Match`
 3. Apply the decision from `TraversalEvaluator` (yield file / recurse into directory)
 
-Key options:
+Key public options:
 
 ```csharp
-new FileQueryOptions {
-    RecurseSubdirectories = true,                   // default
-    MaxRecursionDepth     = -1,                     // -1 = unlimited
-    IgnoreInaccessible    = true,                   // skip locked/denied directories
-    CaseSensitivity       = PlatformDefault,        // Linux: Sensitive, Windows/macOS: Insensitive
-    Traversal             = new TraversalOptions(
-        Strategy:     TraversalStrategy.DepthFirst,  // or BreadthFirst
-        SymlinkPolicy: SymlinkPolicy.Ignore
-    )
-}
+var query = FileQuery.From(root)
+    .WithRecursion()          // default; WithoutRecursion() limits to the root
+    .WithMaxDepth(3)          // -1 = unlimited; 0 = root only
+    .IgnoreInaccessible()     // default; false surfaces access failures
+    .IgnoreCase(false)        // Sensitive; default is PlatformDefault
+    .WithTraversal(new TraversalOptions(
+        Strategy: TraversalStrategy.DepthFirst,
+        SymlinkPolicy: SymlinkPolicy.Ignore))
+    .Build();
 ```
 
 ---

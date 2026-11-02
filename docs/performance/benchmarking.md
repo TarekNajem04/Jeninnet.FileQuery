@@ -15,6 +15,8 @@ Benchmarks run in a dedicated workflow (`.github/workflows/benchmarks.yml`) on m
 - **Platforms**: Windows (Latest), Ubuntu (Latest), macOS (Latest).
 - **Artifacts**: Benchmark results (Markdown, JSON) are uploaded as build artifacts (e.g., `benchmarks-windows-latest`).
 - **Profile**: Uses the `Short` job profile to balance execution time and data quality in a shared environment.
+- **Controlled baseline**: `CrossPlatformTraversalBenchmark` builds a deterministic 10,000-file tree so results are comparable across operating systems. See [Cross-Platform Baseline](cross-platform-baseline.md).
+- **Enumeration ceiling**: `EnumerationCeilingBenchmark` compares raw BCL enumeration with the engine on the same tree, bounding how much a platform-specific enumerator could recover. See [Native Enumeration Research](native-enumeration-research.md).
 
 ### Key Metrics Tracked
 - **Execution Time**: Average time to traverse a directory tree of $N$ files.
@@ -23,7 +25,7 @@ Benchmarks run in a dedicated workflow (`.github/workflows/benchmarks.yml`) on m
 
 ## How to Run Benchmarks
 1. Navigate to the benchmarks project:
-   `cd benchmarks`
+   `cd src/Jeninnet.FileQuery.Benchmarks`
 2. Run the benchmark suite in Release mode:
    `dotnet run -c Release`
 

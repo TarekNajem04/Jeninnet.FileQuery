@@ -33,7 +33,7 @@ public class CaseSensitivityTests {
             )
         );
 
-        var result = fileQueryEngine.Execute(new(env.Root, options)).ToList();
+        var result = fileQueryEngine.Execute(new(env.Root, options), TestContext.CancellationToken).ToList();
 
         result.Should().HaveCount(RuntimeInformation.IsOSPlatform(OSPlatform.Linux) ? 3 : 1);
     }
@@ -57,13 +57,13 @@ public class CaseSensitivityTests {
             )
         );
 
-        var result = fileQueryEngine.Execute(new(env.Root, options)).ToList();
+        var result = fileQueryEngine.Execute(new(env.Root, options), TestContext.CancellationToken).ToList();
         var stringComparison = RuntimeInformation.IsOSPlatform(OSPlatform.Linux)
             ? StringComparison.Ordinal
             : StringComparison.OrdinalIgnoreCase;
 
         result.Should().HaveCount(1);
-        Assert.IsTrue(result.Single().EndsWith("file.txt", stringComparison));
+        result.Single().EndsWith("file.txt", stringComparison).Should().BeTrue();
     }
 
     /// <summary>
@@ -86,7 +86,7 @@ public class CaseSensitivityTests {
             )
         );
 
-        var result = fileQueryEngine.Execute(new(env.Root, options)).ToList();
+        var result = fileQueryEngine.Execute(new(env.Root, options), TestContext.CancellationToken).ToList();
 
         if(RuntimeInformation.IsOSPlatform(OSPlatform.Linux)) {
             result.Should().ContainSingle(static x => x.EndsWith("sample.txt", StringComparison.Ordinal));
@@ -95,4 +95,10 @@ public class CaseSensitivityTests {
             result.Should().ContainSingle(static x => x.EndsWith("sample.txt", StringComparison.OrdinalIgnoreCase));
         }
     }
+
+    /// <summary>
+    /// Gets or sets the test context, which provides information about the current test run.
+    /// Used here primarily for accessing the <see cref="CancellationToken"/>.
+    /// </summary>
+    public TestContext TestContext { get; set; } = null!;
 }

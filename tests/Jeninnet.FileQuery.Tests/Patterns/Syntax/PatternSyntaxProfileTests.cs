@@ -17,9 +17,9 @@ public sealed class PatternSyntaxProfileTests {
     /// </summary>
     [TestMethod]
     public void GetProfileForPatternType_ShouldReturnCorrectProfile() {
-        Assert.AreEqual(PatternSyntaxProfile.GitIgnore, PatternSyntaxProfile.GetProfileForPatternType(PatternKind.GitIgnore));
-        Assert.AreEqual(PatternSyntaxProfile.Glob, PatternSyntaxProfile.GetProfileForPatternType(PatternKind.Glob));
-        Assert.AreEqual(PatternSyntaxProfile.Regex, PatternSyntaxProfile.GetProfileForPatternType(PatternKind.Regex));
-        Assert.AreEqual(PatternSyntaxProfile.Default, PatternSyntaxProfile.GetProfileForPatternType(PatternKind.Unknown));
+        PatternSyntaxProfile.GetProfileForPatternType(PatternKind.GitIgnore).Should().Be(PatternSyntaxProfile.GitIgnore);
+        PatternSyntaxProfile.GetProfileForPatternType(PatternKind.Glob).Should().Be(PatternSyntaxProfile.Glob);
+        PatternSyntaxProfile.GetProfileForPatternType(PatternKind.Regex).Should().Be(PatternSyntaxProfile.Regex);
+        PatternSyntaxProfile.GetProfileForPatternType(PatternKind.Unknown).Should().Be(PatternSyntaxProfile.Default);
     }
 }

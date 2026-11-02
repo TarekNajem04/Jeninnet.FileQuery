@@ -39,7 +39,9 @@ Jeninnet.FileQuery was designed to address these issues.
 
 The core rule of the engine is intentionally simple:
 
-> Patterns are evaluated sequentially, and the last matching rule determines the final result.
+> Within each dialect, patterns are evaluated sequentially and the last matching rule determines
+> that dialect's result. Across dialects, GitIgnore → Glob → Regex are evaluated in order and the
+> first Include wins.
 
 If you have used `.gitignore` files, this model will feel familiar.
 
@@ -163,18 +165,13 @@ Patterns are tokenized during initialization so matchers operate on structured t
 Here is a minimal example using the library.
 
 ```csharp
-var patterns =
-[
-    "**",
-    "!*.log",
-    "important.log"
-];
+var query = FileQuery.From("logs")
+    .Where("**", "!*.log", "important.log")
+    .Build();
 
-var options = new PatternOptions(patterns);
+var engine = FileQueryRuntime.Create();
 
-var runtime = new FileQueryRuntime(options);
-
-foreach (var file in runtime.Query("logs"))
+foreach (var file in engine.Execute(query))
 {
     Console.WriteLine(file);
 }
@@ -192,13 +189,18 @@ The behavior is deterministic and easy to understand.
 
 # Project Structure
 
-The repository is organized into three packages:
+The repository ships eight packages:
 
-| Package                                | Purpose              |
-| -------------------------------------- | -------------------- |
-| Jeninnet.FileQuery                     | Core engine          |
-| Jeninnet.FileQuery.CommandLine         | CLI argument mapping |
-| Jeninnet.FileQuery.DependencyInjection | DI integration       |
+| Package                                | Purpose                         |
+| -------------------------------------- | ------------------------------- |
+| Jeninnet.FileQuery                     | Core engine                     |
+| Jeninnet.FileQuery.CommandLine         | CLI argument mapping            |
+| Jeninnet.FileQuery.DependencyInjection | DI integration                  |
+| Jeninnet.FileQuery.FileProviders       | `IFileProvider` adapter         |
+| Jeninnet.FileQuery.Tool                | `dotnet-filequery` global tool  |
+| Jeninnet.FileQuery.Tooling             | Pattern inspection SDK          |
+| Jeninnet.FileQuery.Build               | MSBuild validation + SARIF      |
+| Jeninnet.FileQuery.Analyzers           | Roslyn diagnostic + code fix    |
 
 The core library remains lightweight and dependency-free.
 

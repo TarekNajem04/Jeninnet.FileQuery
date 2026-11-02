@@ -51,14 +51,9 @@ public class FileQueryEngineOptionTests {
                                            .ToListAsync(TestContext.CancellationToken);
 
         // ASSERT
-        Assert.AreSequenceEqual(
-            [
+        results.Should().BeEquivalentTo((IEnumerable<string>)[
                 env.Abs("file_root.txt")
-            ],
-            results,
-            SequenceOrder.InAnyOrder,
-            "Only files in the root directory should be returned when recursion is disabled."
-        );
+            ], because: "Only files in the root directory should be returned when recursion is disabled.");
     }
 
     /// <summary>
@@ -91,15 +86,10 @@ public class FileQueryEngineOptionTests {
                                            .ToListAsync(TestContext.CancellationToken);
 
         // ASSERT
-        Assert.AreSequenceEqual(
-            [
+        results.Should().BeEquivalentTo((IEnumerable<string>)[
                 env.Abs("file_depth0.txt"),
                 env.Abs("level1","file_depth1.txt")
-            ],
-            results,
-            SequenceOrder.InAnyOrder,
-            "Should only return files at depth 0 and 1."
-        );
+            ], because: "Should only return files at depth 0 and 1.");
     }
 
     /// <summary>
@@ -132,3 +122,4 @@ public class FileQueryEngineOptionTests {
         TestAssertEx.Contains(results, x => x.EndsWith("testfile.txt", comparisonType), "The file 'testfile.txt' must be included because the test is case-insensitive.");
     }
 }
+

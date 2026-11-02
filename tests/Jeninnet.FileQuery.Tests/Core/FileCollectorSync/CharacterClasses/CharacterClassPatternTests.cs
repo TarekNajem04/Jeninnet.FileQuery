@@ -33,7 +33,7 @@ public class CharacterClassPatternTests {
             )
         );
 
-        var results = fileQueryEngine.Execute(new(env.Root, options)).ToList();
+        var results = fileQueryEngine.Execute(new(env.Root, options), TestContext.CancellationToken).ToList();
 
         TestAssertEx.HasCount(results, 3);
     }
@@ -59,7 +59,7 @@ public class CharacterClassPatternTests {
             )
         );
 
-        var results = fileQueryEngine.Execute(new(env.Root, options)).ToList();
+        var results = fileQueryEngine.Execute(new(env.Root, options), TestContext.CancellationToken).ToList();
 
         TestAssertEx.HasCount(results, 3);
     }
@@ -85,11 +85,17 @@ public class CharacterClassPatternTests {
             )
         );
 
-        var results = fileQueryEngine.Execute(new(env.Root, options)).ToList();
+        var results = fileQueryEngine.Execute(new(env.Root, options), TestContext.CancellationToken).ToList();
 
         TestAssertEx.HasCount(results, 2);
-        Assert.DoesNotContain(static x => x.EndsWith("a.txt", StringComparison.Ordinal), results);
-        Assert.DoesNotContain(static x => x.EndsWith("b.txt", StringComparison.Ordinal), results);
-        Assert.DoesNotContain(static x => x.EndsWith("c.txt", StringComparison.Ordinal), results);
+        results.Should().NotContain(static x => x.EndsWith("a.txt", StringComparison.Ordinal));
+        results.Should().NotContain(static x => x.EndsWith("b.txt", StringComparison.Ordinal));
+        results.Should().NotContain(static x => x.EndsWith("c.txt", StringComparison.Ordinal));
     }
+
+    /// <summary>
+    /// Gets or sets the test context, which provides information about the current test run.
+    /// Used here primarily for accessing the <see cref="CancellationToken"/>.
+    /// </summary>
+    public TestContext TestContext { get; set; } = null!;
 }

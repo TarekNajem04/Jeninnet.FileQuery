@@ -27,4 +27,29 @@ public sealed record FileQueryDiagnostic(
     PatternKind? PatternKind,
     string? Pattern,
     int? PatternIndex
-);
+) {
+    /// <summary>
+    /// Gets the entry length in bytes as reported by the enumeration, when available.
+    /// </summary>
+    public long? Length { get; init; }
+
+    /// <summary>
+    /// Gets the creation time in UTC as reported by the enumeration, when available.
+    /// </summary>
+    public DateTime? CreationTimeUtc { get; init; }
+
+    /// <summary>
+    /// Gets the last-write time in UTC as reported by the enumeration, when available.
+    /// </summary>
+    public DateTime? LastWriteTimeUtc { get; init; }
+
+    /// <summary>
+    /// Gets the raw attribute flags reported by the enumeration, when available.
+    /// </summary>
+    public FileAttributes? Attributes { get; init; }
+
+    /// <summary>
+    /// Gets a value indicating whether the audited entry is a directory, when available.
+    /// </summary>
+    public bool? IsDirectory { get; init; }
+}

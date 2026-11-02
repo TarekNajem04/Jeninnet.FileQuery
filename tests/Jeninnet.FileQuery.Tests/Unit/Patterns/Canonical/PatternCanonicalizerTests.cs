@@ -26,7 +26,7 @@ public sealed class PatternCanonicalizerTests {
         var input = new CanonicalPatternInput();
         var result = PatternCanonicalizer.Canonicalize(input);
 
-        Assert.IsEmpty(result.Patterns);
+        result.Patterns.Should().BeEmpty();
     }
 
     /// <summary>
@@ -40,9 +40,9 @@ public sealed class PatternCanonicalizerTests {
         var input = new CanonicalPatternInput(typedPatterns: typed);
         var result = PatternCanonicalizer.Canonicalize(input);
 
-        Assert.HasCount(1, result.Patterns);
-        Assert.AreEqual("*.txt", result.Patterns[0].Text);
-        Assert.AreEqual(PatternKind.Glob, result.Patterns[0].ExplicitType);
+        result.Patterns.Should().HaveCount(1);
+        result.Patterns[0].Text.Should().Be("*.txt");
+        result.Patterns[0].ExplicitType.Should().Be(PatternKind.Glob);
     }
 
     /// <summary>
@@ -53,9 +53,9 @@ public sealed class PatternCanonicalizerTests {
         var input = new CanonicalPatternInput(patterns: ["*.cs"]);
         var result = PatternCanonicalizer.Canonicalize(input);
 
-        Assert.HasCount(1, result.Patterns);
-        Assert.AreEqual("*.cs", result.Patterns[0].Text);
-        Assert.IsNull(result.Patterns[0].ExplicitType);
+        result.Patterns.Should().HaveCount(1);
+        result.Patterns[0].Text.Should().Be("*.cs");
+        result.Patterns[0].ExplicitType.Should().BeNull();
     }
 
     /// <summary>
@@ -69,7 +69,7 @@ public sealed class PatternCanonicalizerTests {
         var input = new CanonicalPatternInput(typedPatterns: typed);
         var result = PatternCanonicalizer.Canonicalize(input);
 
-        Assert.HasCount(1, result.Patterns);
+        result.Patterns.Should().HaveCount(1);
     }
 
     /// <summary>
@@ -80,7 +80,7 @@ public sealed class PatternCanonicalizerTests {
         var input = new CanonicalPatternInput(patterns: ["*.cs", "*.cs"]);
         var result = PatternCanonicalizer.Canonicalize(input);
 
-        Assert.HasCount(1, result.Patterns);
+        result.Patterns.Should().HaveCount(1);
     }
 
     /// <summary>
@@ -94,7 +94,7 @@ public sealed class PatternCanonicalizerTests {
         var input = new CanonicalPatternInput(patterns: ["test"], typedPatterns: typed);
         var result = PatternCanonicalizer.Canonicalize(input);
 
-        Assert.HasCount(2, result.Patterns);
+        result.Patterns.Should().HaveCount(2);
     }
 
     /// <summary>
@@ -109,6 +109,6 @@ public sealed class PatternCanonicalizerTests {
         var input = new CanonicalPatternInput(typedPatterns: typed);
         var result = PatternCanonicalizer.Canonicalize(input);
 
-        Assert.HasCount(2, result.Patterns);
+        result.Patterns.Should().HaveCount(2);
     }
 }

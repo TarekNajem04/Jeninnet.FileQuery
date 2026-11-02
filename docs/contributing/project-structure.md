@@ -13,21 +13,41 @@ Jeninnet.FileQuery/
 │   ├── Jeninnet.FileQuery/                         Core engine
 │   ├── Jeninnet.FileQuery.CommandLine/             CLI integration
 │   ├── Jeninnet.FileQuery.DependencyInjection/     DI integration
+│   ├── Jeninnet.FileQuery.FileProviders/           IFileProvider adapter
+│   ├── Jeninnet.FileQuery.Tooling/                 Build-tooling SDK
+│   ├── Jeninnet.FileQuery.Build/                   MSBuild/SARIF integration
+│   ├── Jeninnet.FileQuery.Analyzers/               Roslyn analyzer
+│   ├── Jeninnet.FileQuery.Analyzers.CodeFix/      Analyzer code fix
+│   ├── Jeninnet.FileQuery.Tool/                    Global tool
 │   ├── Jeninnet.FileQuery.Benchmarks/              BenchmarkDotNet benchmarks
-│   └── Jeninnet.Testing.Assertions/                Test assertion helpers
+│   ├── Jeninnet.FileQuery.Soak/                    Stability harness
+│   └── Jeninnet.FileQuery.AotSmoke/                Native AOT smoke host
 │
 ├── tests/
 │   ├── Jeninnet.FileQuery.Tests/                   Unit and integration tests
 │   ├── Jeninnet.AdvancedUsage.Tests/               AdvancedUsage sample tests
-│   └── Jeninnet.Testing.Assertions.Tests/          Assertions library tests
+│   ├── Jeninnet.FileQuery.Tool.Tests/              CLI tool tests
+│   ├── Jeninnet.FileQuery.Tooling.Tests/           Build-tooling SDK tests
+│   ├── Jeninnet.FileQuery.Analyzers.Tests/         Roslyn analyzer tests
+│   ├── Jeninnet.FileQuery.Build.Tests/             MSBuild/SARIF tests
+│   ├── Jeninnet.FileQuery.FileProviders.Tests/     IFileProvider adapter tests
+│   └── Jeninnet.FileQuery.FileProviders.Tests/     IFileProvider adapter tests
 │
-├── samples/
+├── samples/                                        13 runnable samples + shared utilities
+│   ├── AdvancedUsage/                              DI + CLI + evaluation demo
 │   ├── BasicMatching/                              Hello-world sample
-│   ├── PatternLanguage/                            GitIgnore pattern demo
-│   ├── RecursiveTraversal/                         Deep traversal demo
+│   ├── DirectoryOnlyMatching/                      Directory-only rules
+│   ├── EntryMetadata/                              Metadata results and filters
 │   ├── HybridMatcher/                              Mixed pattern dialect demo
+│   ├── LogFiltering/                               Async streaming and cancellation
+│   ├── NegationAndRecursive/                       Recursive negation
+│   ├── NestedGlobMatching/                         Multiple recursive globs
+│   ├── PatternLanguage/                            GitIgnore pattern ordering
+│   ├── POSIXClassMatching/                         POSIX character classes
+│   ├── RecursiveTraversal/                         Deep traversal demo
+│   ├── RegexAnchoredMatching/                      Root-anchored regex
 │   ├── RegexMatching/                              Regex pattern demo
-│   └── AdvancedUsage/                              DI + CLI combined demo
+│   └── SamplesUtilities/                           Shared deterministic fixtures
 │
 ├── docs/                                           Documentation source
 ├── artifacts/                                      Build outputs (gitignored)
@@ -136,7 +156,7 @@ Jeninnet.FileQuery.Tests/
 
 ---
 
-## Benchmarks — `benchmarks/Jeninnet.FileQuery.Benchmarks`
+## Benchmarks — `src/Jeninnet.FileQuery.Benchmarks`
 
 One benchmark class per component:
 

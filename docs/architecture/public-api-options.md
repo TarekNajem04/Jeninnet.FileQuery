@@ -1,7 +1,11 @@
 # Public API Options Inspection
 
-`FileQuery` intentionally keeps `FileQueryOptions` internal. The public contract exposes a stable query descriptor (`RootPath`) and sends execution details through `IFileQueryEngine`.
+`FileQuery` keeps its `Options` property internal. `FileQueryOptions` is the public immutable
+configuration snapshot, but the query descriptor exposes only `RootPath`; callers configure options
+through the fluent builder and `FileQueryOptionsConfig`.
 
-This preserves room to change internal matching, traversal, and compilation options without breaking consumers before the 1.0 release. Advanced inspection should be added only through a dedicated read-only diagnostics API, not by exposing mutable options.
+This preserves room to evolve internal matching/traversal composition without exposing mutable
+state. Advanced inspection should be added through a dedicated read-only diagnostics API, not by
+exposing mutable options.
 
-Decision: keep `FileQuery.Options` internal for 1.0.
+Decision: keep `FileQuery.Options` internal for v2.x.

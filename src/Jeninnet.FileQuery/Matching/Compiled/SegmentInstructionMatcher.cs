@@ -143,7 +143,7 @@ internal static class SegmentInstructionMatcher {
             return null;
         }
 
-        if(!CharacterClassMatches(cls.Value, c)) {
+        if(!CharacterClassMatches(cls.Value, c, cmp)) {
             return null;
         }
 
@@ -156,6 +156,7 @@ internal static class SegmentInstructionMatcher {
     /// </summary>
     /// <param name="cls">The character class definition.</param>
     /// <param name="c">The character to test.</param>
+    /// <param name="cmp">The string comparison mode; ignore-case modes make literals and ranges case-insensitive.</param>
     /// <remarks>
     /// <para>
     /// <strong>Allocation fix:</strong> The previous implementation used
@@ -167,15 +168,21 @@ internal static class SegmentInstructionMatcher {
     /// <see cref="MatchesElement"/> directly — no closure, no LINQ overhead,
     /// and an early <c>break</c> as soon as a matching element is found.
     /// </para>
+    /// <para>
+    /// POSIX categories such as <c>[:upper:]</c> and <c>[:lower:]</c> keep their
+    /// category semantics under ignore-case comparisons; only literals and ranges
+    /// are folded.
+    /// </para>
     /// </remarks>
-    private static bool CharacterClassMatches(CharacterClass cls, char c) {
+    private static bool CharacterClassMatches(CharacterClass cls, char c, StringComparison cmp) {
         var elements = cls.Elements;
+        var ignoreCase = IsIgnoreCase(cmp);
         var inSet = false;
 
         // MANUAL LOOP — eliminates the display-class allocation that
         // Any(element => MatchesElement(element, c)) would create per call.
         for(var i = 0; i < elements.Count; i++) {
-            if(MatchesElement(elements[i], c)) {
+            if(MatchesElement(elements[i], c, ignoreCase)) {
                 inSet = true;
                 break; // short-circuit: no need to evaluate remaining elements
             }
@@ -185,19 +192,57 @@ internal static class SegmentInstructionMatcher {
     }
 
     /// <summary>
+    /// Determines whether a <see cref="StringComparison"/> folds character casing.
+    /// </summary>
+    /// <param name="cmp">The comparison mode.</param>
+    /// <returns><see langword="true"/> for an ignore-case comparison.</returns>
+    private static bool IsIgnoreCase(StringComparison cmp) =>
+        cmp is StringComparison.OrdinalIgnoreCase
+            or StringComparison.InvariantCultureIgnoreCase
+            or StringComparison.CurrentCultureIgnoreCase;
+
+    /// <summary>
     /// Pattern-matches a single <see cref="ICharacterClassElement"/> against
     /// character <paramref name="c"/>.
     /// </summary>
     /// <param name="element">The character class element.</param>
     /// <param name="c">The character to test.</param>
-    private static bool MatchesElement(ICharacterClassElement element, char c) =>
+    /// <param name="ignoreCase">Whether literals and ranges should fold casing.</param>
+    private static bool MatchesElement(ICharacterClassElement element, char c, bool ignoreCase) =>
         element switch {
-            CharLiteral literal => literal.Value == c,
-            CharRange range => c >= range.Start && c <= range.End,
+            CharLiteral literal => MatchesLiteral(literal.Value, c, ignoreCase),
+            CharRange range => MatchesRange(range, c, ignoreCase),
             PosixClass posix => MatchesPosixClass(posix.Name, c),
             CharacterClassParseError _ => false, // sentinel; never matches at runtime
             _ => false
         };
+
+    /// <summary>
+    /// Matches a literal character, optionally folding casing.
+    /// </summary>
+    /// <param name="pattern">The literal pattern character.</param>
+    /// <param name="c">The input character.</param>
+    /// <param name="ignoreCase">Whether to compare case-insensitively.</param>
+    private static bool MatchesLiteral(char pattern, char c, bool ignoreCase) =>
+        pattern == c ||
+        (ignoreCase && char.ToUpperInvariant(pattern) == char.ToUpperInvariant(c));
+
+    /// <summary>
+    /// Matches an inclusive range, optionally folding the input character.
+    /// </summary>
+    /// <param name="range">The inclusive range.</param>
+    /// <param name="c">The input character.</param>
+    /// <param name="ignoreCase">Whether to test both case variants of <paramref name="c"/>.</param>
+    private static bool MatchesRange(CharRange range, char c, bool ignoreCase) =>
+        IsInRange(range, c) ||
+        (ignoreCase && (IsInRange(range, char.ToUpperInvariant(c)) || IsInRange(range, char.ToLowerInvariant(c))));
+
+    /// <summary>
+    /// Tests whether <paramref name="c"/> falls inside an inclusive range.
+    /// </summary>
+    /// <param name="range">The inclusive range.</param>
+    /// <param name="c">The input character.</param>
+    private static bool IsInRange(CharRange range, char c) => c >= range.Start && c <= range.End;
 
     /// <summary>
     /// Evaluates whether <paramref name="c"/> belongs to the POSIX named class

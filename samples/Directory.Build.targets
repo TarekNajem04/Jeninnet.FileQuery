@@ -1,0 +1,8 @@
+<!--Samples are runnable examples, not NuGet deliverables.-->
+<Project>
+    <Import Project="$(MSBuildThisFileDirectory)../Directory.Build.targets" />
+
+    <PropertyGroup>
+        <IsPackable>false</IsPackable>
+    </PropertyGroup>
+</Project>

@@ -12,6 +12,8 @@ on:
       - 'samples/**'
       - 'docs/**'
       - 'scripts/**'
+      - 'extensions/**'
+      - '.github/actions/**'
       - '**.csproj'
       - '**.slnx'
       - 'Directory.Build.props'
@@ -31,6 +33,8 @@ on:
       - 'samples/**'
       - 'docs/**'
       - 'scripts/**'
+      - 'extensions/**'
+      - '.github/actions/**'
       - '**.csproj'
       - '**.slnx'
       - 'Directory.Build.props'
@@ -133,7 +137,11 @@ jobs:
           for project in \
             tests/Jeninnet.FileQuery.Tests/Jeninnet.FileQuery.Tests.csproj \
             tests/Jeninnet.AdvancedUsage.Tests/Jeninnet.AdvancedUsage.Tests.csproj \
-            tests/Jeninnet.Testing.Assertions.Tests/Jeninnet.Testing.Assertions.Tests.csproj; do
+            tests/Jeninnet.FileQuery.Tool.Tests/Jeninnet.FileQuery.Tool.Tests.csproj \
+            tests/Jeninnet.FileQuery.Tooling.Tests/Jeninnet.FileQuery.Tooling.Tests.csproj \
+            tests/Jeninnet.FileQuery.Analyzers.Tests/Jeninnet.FileQuery.Analyzers.Tests.csproj \
+            tests/Jeninnet.FileQuery.Build.Tests/Jeninnet.FileQuery.Build.Tests.csproj \
+            tests/Jeninnet.FileQuery.FileProviders.Tests/Jeninnet.FileQuery.FileProviders.Tests.csproj; do
             dotnet test "$project" \
               -c Release \
               --no-build \
@@ -190,6 +198,277 @@ jobs:
           --configuration Release
           --filter "FullyQualifiedName~Architecture"
 
+  vscode-extension:
+
+    name: VS Code Extension Tests
+
+    runs-on: ubuntu-latest
+
+    timeout-minutes: 10
+
+    needs:
+      - build-and-test
+
+    steps:
+
+      - name: Checkout
+        uses: actions/checkout@v7.0.1
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v7.1.0
+        with:
+          node-version: 24
+
+      - name: Run extension tests
+        run: node --test "extensions/vscode/test/*.test.js"
+
+  filequery-action:
+
+    name: FileQuery Action
+
+    runs-on: ubuntu-latest
+
+    timeout-minutes: 15
+
+    needs:
+      - build-and-test
+
+    steps:
+
+      - name: Checkout
+        uses: actions/checkout@v7.0.1
+
+      - name: Setup .NET SDK (global.json)
+        uses: actions/setup-dotnet@v6.0.0
+        with:
+          global-json-file: global.json
+
+      - name: Resolve the tool version
+        id: version
+        shell: bash
+        run: |
+          version=$(sed -n 's:.*<Version>\(.*\)</Version>.*:\1:p' src/Jeninnet.FileQuery.Tool/Jeninnet.FileQuery.Tool.csproj | head -n 1)
+          test -n "$version"
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+
+      - name: Pack the tool for the local source
+        run: dotnet pack src/Jeninnet.FileQuery.Tool/Jeninnet.FileQuery.Tool.csproj -c Release -o artifacts/packages
+
+      - name: Run the local action
+        id: query
+        uses: ./.github/actions/filequery
+        with:
+          patterns: '**;!*.cs'
+          root: .
+          version: ${{ steps.version.outputs.version }}
+          source: artifacts/packages
+
+      - name: Verify the action outputs
+        shell: bash
+        env:
+          COUNT: ${{ steps.query.outputs.count }}
+          FILES: ${{ steps.query.outputs.files }}
+        run: |
+          set -euo pipefail
+          test "$COUNT" -gt 0
+          grep -qx 'src/Jeninnet.FileQuery/FileQueryBuilder.cs' <<< "$FILES"
+
+  aot-smoke:
+
+    name: Native AOT Smoke (linux-x64)
+
+    runs-on: ubuntu-latest
+
+    timeout-minutes: 30
+
+    needs:
+      - build-and-test
+
+    steps:
+
+      - name: Checkout
+        uses: actions/checkout@v7.0.1
+
+      - name: Setup .NET SDK (global.json)
+        uses: actions/setup-dotnet@v6.0.0
+        with:
+          global-json-file: global.json
+
+      - name: Install Native AOT prerequisites
+        run: sudo apt-get update && sudo apt-get install -y clang zlib1g-dev
+
+      - name: Restore
+        run: dotnet restore src/Jeninnet.FileQuery.AotSmoke/Jeninnet.FileQuery.AotSmoke.csproj -r linux-x64
+
+      - name: Publish Native AOT smoke host
+        run: >
+          dotnet publish src/Jeninnet.FileQuery.AotSmoke/Jeninnet.FileQuery.AotSmoke.csproj
+          --configuration Release
+          --runtime linux-x64
+          --self-contained true
+          -p:PublishAot=true
+          -p:TrimmerSingleWarn=false
+          -p:IlcTreatWarningsAsErrors=true
+          --output artifacts/aot
+
+      - name: Run the AOT-compiled binary
+        run: ./artifacts/aot/Jeninnet.FileQuery.AotSmoke
+
+  analyzer-package:
+
+    name: Analyzer Package
+
+    runs-on: ubuntu-latest
+
+    timeout-minutes: 25
+
+    needs:
+      - build-and-test
+
+    steps:
+
+      - name: Checkout
+        uses: actions/checkout@v7.0.1
+
+      - name: Setup .NET SDK (global.json)
+        uses: actions/setup-dotnet@v6.0.0
+        with:
+          global-json-file: global.json
+
+      - name: Pack the library and analyzer
+        run: |
+          set -euo pipefail
+          dotnet pack src/Jeninnet.FileQuery/Jeninnet.FileQuery.csproj -c Release -o artifacts/packages /p:EnablePackageValidation=true
+          dotnet pack src/Jeninnet.FileQuery.Analyzers/Jeninnet.FileQuery.Analyzers.csproj -c Release -o artifacts/packages /p:EnablePackageValidation=true
+
+      - name: Verify the analyzer package contents
+        run: |
+          set -euo pipefail
+          package=$(find artifacts/packages -maxdepth 1 -name 'Jeninnet.FileQuery.Analyzers.*.nupkg' | head -n 1)
+          test -n "$package"
+          unzip -l "$package" | grep -q 'analyzers/dotnet/cs/Jeninnet.FileQuery.Analyzers.dll'
+          unzip -l "$package" | grep -q 'analyzers/dotnet/cs/Jeninnet.FileQuery.Analyzers.CodeFix.dll'
+
+      - name: Build a consumer with the analyzer installed
+        shell: bash
+        run: |
+          set -euo pipefail
+          version=$(sed -n 's:.*<Version>\(.*\)</Version>.*:\1:p' src/Jeninnet.FileQuery.Analyzers/Jeninnet.FileQuery.Analyzers.csproj | head -n 1)
+          consumer="$RUNNER_TEMP/analyzer-consumer"
+          rm -rf "$consumer"
+          mkdir -p "$consumer"
+          cd "$consumer"
+          dotnet new classlib --framework net10.0 --no-restore
+          dotnet add package Jeninnet.FileQuery --version "$version" --source "$GITHUB_WORKSPACE/artifacts/packages"
+          dotnet add package Jeninnet.FileQuery.Analyzers --version "$version" --source "$GITHUB_WORKSPACE/artifacts/packages"
+          rm Class1.cs
+
+          cat > Class1.cs <<'EOF'
+          using Jeninnet.FileQuery;
+
+          public static class Consumer
+          {
+              public static FileQuery Valid() => FileQuery.From(".").UsingGitIgnore().Where("**;!*.cs").Build();
+          }
+          EOF
+          dotnet build -warnaserror
+
+          cat > Class1.cs <<'EOF'
+          using Jeninnet.FileQuery;
+
+          public static class Consumer
+          {
+              public static FileQuery Invalid() => FileQuery.From(".").UsingGitIgnore().Where("src/[a-z.cs").Build();
+          }
+          EOF
+          if dotnet build -warnaserror > malformed.log 2>&1; then
+            echo "Expected the malformed pattern build to fail."
+            exit 1
+          fi
+          grep -q 'JNQ1001' malformed.log
+
+  build-package:
+
+    name: Build Package
+
+    runs-on: ubuntu-latest
+
+    timeout-minutes: 20
+
+    needs:
+      - build-and-test
+
+    steps:
+
+      - name: Checkout
+        uses: actions/checkout@v7.0.1
+
+      - name: Setup .NET SDK (global.json)
+        uses: actions/setup-dotnet@v6.0.0
+        with:
+          global-json-file: global.json
+
+      - name: Pack the Build package
+        run: dotnet pack src/Jeninnet.FileQuery.Build/Jeninnet.FileQuery.Build.csproj -c Release -o artifacts/packages /p:EnablePackageValidation=true
+
+      - name: Build a consumer with the Build package installed
+        shell: bash
+        run: |
+          set -euo pipefail
+          version=$(dotnet msbuild src/Jeninnet.FileQuery.Build/Jeninnet.FileQuery.Build.csproj -getProperty:Version -nologo -verbosity:quiet)
+          consumer="$RUNNER_TEMP/build-consumer"
+          rm -rf "$consumer"
+          mkdir -p "$consumer"
+          cd "$consumer"
+          dotnet new classlib --framework net10.0 --no-restore
+          dotnet add package Jeninnet.FileQuery.Build --version "$version" --no-restore
+          sed -i 's#</Project>#  <PropertyGroup><FileQueryPatterns>**/*.cs;!bin/</FileQueryPatterns><FileQuerySarifOutput>$(MSBuildProjectDirectory)/artifacts/filequery.sarif</FileQuerySarifOutput></PropertyGroup>\n</Project>#' build-consumer.csproj
+          dotnet restore --source "$GITHUB_WORKSPACE/artifacts/packages" --source https://api.nuget.org/v3/index.json
+          dotnet build --no-restore
+          test -f artifacts/filequery.sarif
+          sed -i 's#\*\*/\*.cs;!bin/#**/*.cs;[abc#' build-consumer.csproj
+          if dotnet build --no-restore > malformed.log 2>&1; then
+            echo "Expected the malformed pattern build to fail."
+            exit 1
+          fi
+          grep -q 'JNQ2001' malformed.log
+
+  soak:
+
+    name: Long-Running Stability
+
+    runs-on: ubuntu-latest
+
+    timeout-minutes: 15
+
+    needs:
+      - build-and-test
+
+    steps:
+
+      - name: Checkout
+        uses: actions/checkout@v7.0.1
+
+      - name: Setup .NET SDK (global.json)
+        uses: actions/setup-dotnet@v6.0.0
+        with:
+          global-json-file: global.json
+
+      - name: Run soak harness
+        run: >
+          dotnet run
+          --project src/Jeninnet.FileQuery.Soak/Jeninnet.FileQuery.Soak.csproj
+          --configuration Release
+          -- --duration-seconds 20 --warmup-seconds 3 --directories 50 --files-per-directory 50 --output artifacts/soak
+
+      - name: Upload soak report
+        if: always()
+        uses: actions/upload-artifact@v7.0.2
+        with:
+          name: soak-report
+          path: artifacts/soak/
+          if-no-files-found: warn
+
   package-validation:
 
     name: Package Validation
@@ -230,5 +509,25 @@ jobs:
             /p:EnablePackageValidation=true
 
           dotnet pack src/Jeninnet.FileQuery.DependencyInjection/Jeninnet.FileQuery.DependencyInjection.csproj \
+            -c Release \
+            /p:EnablePackageValidation=true
+
+          dotnet pack src/Jeninnet.FileQuery.Tool/Jeninnet.FileQuery.Tool.csproj \
+            -c Release \
+            /p:EnablePackageValidation=true
+
+          dotnet pack src/Jeninnet.FileQuery.Tooling/Jeninnet.FileQuery.Tooling.csproj \
+            -c Release \
+            /p:EnablePackageValidation=true
+
+          dotnet pack src/Jeninnet.FileQuery.Build/Jeninnet.FileQuery.Build.csproj \
+            -c Release \
+            /p:EnablePackageValidation=true
+
+          dotnet pack src/Jeninnet.FileQuery.FileProviders/Jeninnet.FileQuery.FileProviders.csproj \
+            -c Release \
+            /p:EnablePackageValidation=true
+
+          dotnet pack src/Jeninnet.FileQuery.Analyzers/Jeninnet.FileQuery.Analyzers.csproj \
             -c Release \
             /p:EnablePackageValidation=true

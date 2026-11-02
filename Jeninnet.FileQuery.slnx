@@ -22,10 +22,10 @@
         <File Path=".github/workflows/nuget-publish.yml" />
         <File Path=".github/workflows/sonarcloud.yml" />
     </Folder>
-
-    <Folder Name="/scripts/">
-        <File Path="scripts/README.md" />
+    <Folder Name="/.github/actions/filequery/">
+        <File Path=".github/actions/filequery/action.yml" />
     </Folder>
+
     <Folder Name="/scripts/badges/">
         <File Path="scripts/badges/generate.ps1" />
     </Folder>
@@ -33,18 +33,15 @@
         <File Path="scripts/clean/clean.config.json" />
         <File Path="scripts/clean/clean.ps1" />
         <File Path="scripts/clean/clean.schema.json" />
-        <File Path="scripts/clean/README.md" />
     </Folder>
     <Folder Name="/scripts/common/">
         <File Path="scripts/common/Common.psd1" />
         <File Path="scripts/common/Common.psm1" />
-        <File Path="scripts/common/README.md" />
     </Folder>
     <Folder Name="/scripts/coverage/">
         <File Path="scripts/coverage/coverage.config.json" />
         <File Path="scripts/coverage/coverage.ps1" />
         <File Path="scripts/coverage/coverage.schema.json" />
-        <File Path="scripts/coverage/README.md" />
     </Folder>
     <Folder Name="/scripts/docs/">
         <File Path="scripts/docs/check-api-reference.ps1" />
@@ -55,11 +52,26 @@
         <File Path="scripts/format/format.config.json" />
         <File Path="scripts/format/format.ps1" />
         <File Path="scripts/format/format.schema.json" />
-        <File Path="scripts/format/README.md" />
+    </Folder>
+    <Folder Name="/scripts/performance/">
+        <File Path="scripts/performance/check-runtime.ps1" />
     </Folder>
     <Folder Name="/scripts/sonar/">
         <File Path="scripts/sonar/preview.ps1" />
-        <File Path="scripts/sonar/README.md" />
+    </Folder>
+
+    <Folder Name="/extensions/" />
+    <Folder Name="/extensions/vscode/">
+        <File Path="extensions/vscode/.vscodeignore" />
+        <File Path="extensions/vscode/package.json" />
+        <File Path="extensions/vscode/README.md" />
+    </Folder>
+    <Folder Name="/extensions/vscode/src/">
+        <File Path="extensions/vscode/src/extension.js" />
+        <File Path="extensions/vscode/src/runner.js" />
+    </Folder>
+    <Folder Name="/extensions/vscode/test/">
+        <File Path="extensions/vscode/test/runner.test.js" />
     </Folder>
 
     <Folder Name="/Solution Items/">
@@ -81,7 +93,6 @@
 
     <Folder Name="/doc/">
         <File Path="docs/ARCHITECTURE_NOTICE.md" />
-        <File Path="docs/README.md" />
         <File Path="docs/architecture-refactor-tracking.md" />
         <File Path="docs/command-line-integration.md" />
         <File Path="docs/docfx.json" />
@@ -107,6 +118,7 @@
     </Folder>
     <Folder Name="/doc/articles/">
         <File Path="docs/articles/introducing-jeninnet-filequery.md" />
+        <File Path="docs/articles/library-capability-review.md" />
         <File Path="docs/articles/toc.yml" />
     </Folder>
     <Folder Name="/doc/contributing/">
@@ -115,19 +127,42 @@
         <File Path="docs/contributing/release-checklist.md" />
         <File Path="docs/contributing/testing-and-release-plan.md" />
         <File Path="docs/contributing/testing.md" />
+        <File Path="docs/contributing/toc.yml" />
     </Folder>
     <Folder Name="/doc/getting-started/">
         <File Path="docs/getting-started/basic-patterns.md" />
+        <File Path="docs/getting-started/common-recipes.md" />
         <File Path="docs/getting-started/installation.md" />
         <File Path="docs/getting-started/quick-start.md" />
         <File Path="docs/getting-started/toc.yml" />
     </Folder>
     <Folder Name="/doc/guides/">
+        <File Path="docs/guides/brace-expansion.md" />
         <File Path="docs/guides/cli-usage.md" />
         <File Path="docs/guides/command-line-integration.md" />
         <File Path="docs/guides/dependency-injection.md" />
+        <File Path="docs/guides/diff-aware-queries.md" />
+        <File Path="docs/guides/directory-results.md" />
+        <File Path="docs/guides/entry-metadata-and-filters.md" />
+        <File Path="docs/guides/error-handling-and-validation.md" />
+        <File Path="docs/guides/file-provider-adapter.md" />
+        <File Path="docs/guides/gitignore-files.md" />
+        <File Path="docs/guides/global-tool.md" />
+        <File Path="docs/guides/ide-extension.md" />
+        <File Path="docs/guides/in-memory-matching.md" />
+        <File Path="docs/guides/integrations.md" />
+        <File Path="docs/guides/json-output.md" />
+        <File Path="docs/guides/msbuild-validation.md" />
+        <File Path="docs/guides/multiple-roots.md" />
+        <File Path="docs/guides/native-aot.md" />
         <File Path="docs/guides/observability-and-diagnostics.md" />
+        <File Path="docs/guides/roslyn-analyzers.md" />
         <File Path="docs/guides/toc.yml" />
+        <File Path="docs/guides/tooling-sdk.md" />
+    </Folder>
+    <Folder Name="/doc/images/">
+        <File Path="docs/images/favicon.png" />
+        <File Path="docs/images/icon.png" />
     </Folder>
     <Folder Name="/doc/introduction/">
         <File Path="docs/introduction/design-goals.md" />
@@ -137,12 +172,18 @@
     <Folder Name="/doc/performance/">
         <File Path="docs/performance/allocation-strategy.md" />
         <File Path="docs/performance/benchmarking.md" />
+        <File Path="docs/performance/cross-platform-baseline.json" />
+        <File Path="docs/performance/cross-platform-baseline.md" />
         <File Path="docs/performance/design-for-performance.md" />
+        <File Path="docs/performance/long-running-stability.md" />
         <File Path="docs/performance/matcher-performance.md" />
+        <File Path="docs/performance/native-enumeration-research.md" />
         <File Path="docs/performance/phase5-perf-investigation.md" />
         <File Path="docs/performance/phase6-perf-optimization.md" />
         <File Path="docs/performance/phase7-perf-investigation.md" />
         <File Path="docs/performance/release-benchmark-baseline.md" />
+        <File Path="docs/performance/runtime-evolution.json" />
+        <File Path="docs/performance/runtime-evolution.md" />
         <File Path="docs/performance/toc.yml" />
         <File Path="docs/performance/traversal-model.md" />
     </Folder>
@@ -159,6 +200,7 @@
         <File Path="docs/runtime/case-sensitivity.md" />
         <File Path="docs/runtime/filequery-runtime.md" />
         <File Path="docs/runtime/recursion-depth.md" />
+        <File Path="docs/runtime/toc.yml" />
         <File Path="docs/runtime/traversal-model.md" />
     </Folder>
     <Folder Name="/doc/specification/">
@@ -171,23 +213,40 @@
         <File Path="docs/whitepaper/Whitepaper Cover.png" />
     </Folder>
 
+    <Folder Name="/assets/">
+        <File Path="assets/icon.png" />
+        <File Path="assets/icon.svg" />
+    </Folder>
+
     <Folder Name="/src/">
         <Project Path="src/Jeninnet.FileQuery/Jeninnet.FileQuery.csproj" />
         <Project Path="src/Jeninnet.FileQuery.CommandLine/Jeninnet.FileQuery.CommandLine.csproj" />
         <Project Path="src/Jeninnet.FileQuery.DependencyInjection/Jeninnet.FileQuery.DependencyInjection.csproj" />
-        <Project Path="src/Jeninnet.Testing.Assertions/Jeninnet.Testing.Assertions.csproj" />
+        <Project Path="src/Jeninnet.FileQuery.Tool/Jeninnet.FileQuery.Tool.csproj" />
+        <Project Path="src/Jeninnet.FileQuery.Tooling/Jeninnet.FileQuery.Tooling.csproj" />
+        <Project Path="src/Jeninnet.FileQuery.Soak/Jeninnet.FileQuery.Soak.csproj" />
+        <Project Path="src/Jeninnet.FileQuery.AotSmoke/Jeninnet.FileQuery.AotSmoke.csproj" />
+        <Project Path="src/Jeninnet.FileQuery.Analyzers/Jeninnet.FileQuery.Analyzers.csproj" />
+        <Project Path="src/Jeninnet.FileQuery.Analyzers.CodeFix/Jeninnet.FileQuery.Analyzers.CodeFix.csproj" />
+        <Project Path="src/Jeninnet.FileQuery.Build/Jeninnet.FileQuery.Build.csproj" />
+        <Project Path="src/Jeninnet.FileQuery.FileProviders/Jeninnet.FileQuery.FileProviders.csproj" />
     </Folder>
 
     <Folder Name="/tests/">
         <Project Path="tests/Jeninnet.AdvancedUsage.Tests/Jeninnet.AdvancedUsage.Tests.csproj" />
         <Project Path="tests/Jeninnet.FileQuery.Tests/Jeninnet.FileQuery.Tests.csproj" />
-        <Project Path="tests/Jeninnet.Testing.Assertions.Tests/Jeninnet.Testing.Assertions.Tests.csproj" />
+        <Project Path="tests/Jeninnet.FileQuery.Tool.Tests/Jeninnet.FileQuery.Tool.Tests.csproj" />
+        <Project Path="tests/Jeninnet.FileQuery.Tooling.Tests/Jeninnet.FileQuery.Tooling.Tests.csproj" />
+        <Project Path="tests/Jeninnet.FileQuery.Analyzers.Tests/Jeninnet.FileQuery.Analyzers.Tests.csproj" />
+        <Project Path="tests/Jeninnet.FileQuery.Build.Tests/Jeninnet.FileQuery.Build.Tests.csproj" />
+        <Project Path="tests/Jeninnet.FileQuery.FileProviders.Tests/Jeninnet.FileQuery.FileProviders.Tests.csproj" />
     </Folder>
 
     <Folder Name="/samples/">
         <Project Path="samples/AdvancedUsage/AdvancedUsage.csproj" />
         <Project Path="samples/BasicMatching/BasicMatching.csproj" />
         <Project Path="samples/DirectoryOnlyMatching/DirectoryOnlyMatching.csproj" />
+        <Project Path="samples/EntryMetadata/EntryMetadata.csproj" />
         <Project Path="samples/HybridMatcher/HybridMatcher.csproj" />
         <Project Path="samples/LogFiltering/LogFiltering.csproj" />
         <Project Path="samples/NegationAndRecursive/NegationAndRecursive.csproj" />

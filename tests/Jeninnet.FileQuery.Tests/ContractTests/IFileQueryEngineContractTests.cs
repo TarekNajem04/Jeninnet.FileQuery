@@ -17,7 +17,7 @@ public class IFileQueryEngineContractTests {
 
     /// <summary>Tests Execute_NullQuery_ShouldThrow.</summary>
     [TestMethod]
-    public void Execute_NullQuery_ShouldThrow() => TestAssertEx.Throws<ArgumentNullException>(() => _engine.Execute(null!));
+    public void Execute_NullQuery_ShouldThrow() => TestAssertEx.Throws<ArgumentNullException>(() => _engine.Execute(null!, TestContext.CancellationToken));
 
     /// <summary>Tests Execute_NonExistentDirectory_ShouldThrowDirectoryNotFoundException.</summary>
     [TestMethod]
@@ -40,7 +40,7 @@ public class IFileQueryEngineContractTests {
             new FileQueryOptions(new FileQueryOptionsConfig(new([])))
         );
 
-        void Act() => _ = _engine.Execute(query).ToList();
+        void Act() => _ = _engine.Execute(query, TestContext.CancellationToken).ToList();
 
         TestAssertEx.Throws<DirectoryNotFoundException>(Act);
     }
@@ -98,9 +98,9 @@ public class IFileQueryEngineContractTests {
         var options = new FileQueryOptions(new FileQueryOptionsConfig(PatternInput: new(Patterns: ["**"])));
         var query = new FileQuery(env.Root, options);
 
-        var results = _engine.Execute(query).ToList();
+        var results = _engine.Execute(query, TestContext.CancellationToken).ToList();
 
-        Assert.IsEmpty(results);
+        results.Should().BeEmpty();
     }
 
     /// <summary>

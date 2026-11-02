@@ -37,7 +37,7 @@ public class FileQueryEngineSyncTests {
                 CaseSensitivity: Enums.CaseSensitivity.Insensitive
             )
         );
-        var files = _fileQueryEngine.Execute(new(env.Root, options))
+        var files = _fileQueryEngine.Execute(new(env.Root, options), TestContext.CancellationToken)
                                     .ToList();
 
         files.Should().HaveCount(2);
@@ -67,7 +67,7 @@ public class FileQueryEngineSyncTests {
             )
         );
 
-        var files = _fileQueryEngine.Execute(new(env.Root, options)).ToList();
+        var files = _fileQueryEngine.Execute(new(env.Root, options), TestContext.CancellationToken).ToList();
 
         files.Should().HaveCount(2);
         files.Should().Contain(Path.Combine(env.Root, "file1.txt"));
@@ -98,11 +98,17 @@ public class FileQueryEngineSyncTests {
             )
         );
 
-        var files = _fileQueryEngine.Execute(new(env.Root, options))
+        var files = _fileQueryEngine.Execute(new(env.Root, options), TestContext.CancellationToken)
                                     .Select(PathUtilities.Normalize)
                                     .ToList();
 
         files.Should().ContainSingle();
         files.Should().Contain(PathUtilities.Normalize(Path.Combine(env.Root, "root.txt")));
     }
+
+    /// <summary>
+    /// Gets or sets the test context, which provides information about the current test run.
+    /// Used here primarily for accessing the <see cref="CancellationToken"/>.
+    /// </summary>
+    public TestContext TestContext { get; set; } = null!;
 }

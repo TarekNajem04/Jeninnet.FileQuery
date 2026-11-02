@@ -8,5 +8,8 @@
 namespace Jeninnet.FileQuery.Composition;
 
 internal static class DefaultEngineBuilder {
-    public static IFileQueryEngine Create() => new Engine.FileQueryEngine(new TraversalExecutor(), new TraversalPlanBuilder(FileSystem.Instance));
+    public static IFileQueryEngine Create() => Create(FileSystem.Instance);
+
+    public static IFileQueryEngine Create(IFileSystem fileSystem) =>
+        new Engine.FileQueryEngine(new TraversalExecutor(), new TraversalPlanBuilder(fileSystem));
 }

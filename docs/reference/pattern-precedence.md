@@ -1,116 +1,137 @@
 # Pattern Precedence
 
-Understanding precedence is essential for writing correct rule sets. This page explains exactly how the engine evaluates patterns and resolves conflicts.
+Understanding precedence is essential for writing correct rule sets. This page explains the
+two levels at which the engine resolves conflicts.
 
 ---
 
-## The Evaluation Model
+## Two-Level Evaluation Model
 
-There is no precedence hierarchy between pattern types. There is no concept of "GitIgnore rules override Glob rules" or "specific patterns override general ones". There is only **sequential evaluation with last-rule-wins**.
+### 1. Within a dialect: last matching rule wins
 
-```
-Rule 1 evaluated → current state updated
-Rule 2 evaluated → current state updated
-Rule 3 evaluated → current state updated
-...
-Final state → file included or excluded
-```
+Each dialect keeps its rules in declaration order. The last rule in that dialect that matches the
+path determines the dialect's result. GitIgnore negation (`!`) is part of this rule order.
 
-The current state after all rules have been evaluated determines whether the file appears in the results.
+### 2. Across dialects: GitIgnore → Glob → Regex, first Include wins
+
+The compiled pattern set has three subsets. The engine evaluates them in this fixed order:
+**GitIgnore → Glob → Regex**.
+
+- If the GitIgnore subset returns **Include**, evaluation stops and the path is included.
+- Otherwise the Glob subset is evaluated. If it returns **Include**, evaluation stops and the
+  path is included.
+- Otherwise the Regex subset is evaluated and its result is returned.
+- If a subset has no matching rule, it does not override an earlier Exclude.
+- If the pattern set is empty, the path is **included**; an empty path is **excluded**.
+
+This is not the same as "the last pattern in the input list wins". A later dialect can override
+an earlier **Exclude**, but it cannot override an earlier **Include**.
+
+| GitIgnore result | Glob result | Regex result | Final result |
+|---|---|---|---|
+| Include | — | — | **Include** |
+| Exclude | Include | — | **Include** |
+| Exclude | Exclude | Include | **Include** |
+| Exclude | Exclude | Exclude | **Exclude** |
+| Exclude | Exclude | no match | **Exclude** |
+| no match | no match | no match | **Include** |
 
 ---
 
 ## Worked Examples
 
-### Example 1 — Simple last-rule-wins
+### Example 1 — GitIgnore-only last-rule-wins
 
-```
-**           → state: Exclude
-!*.cs        → state: Include  (for .cs files)
-src/gen/**   → state: Exclude  (for files under src/gen/)
+```text
+**
+!*.cs
+src/gen/**
 ```
 
 A file `src/gen/Generated.cs`:
-- Rule 1 matches → Exclude
-- Rule 2 matches (`*.cs`) → Include
-- Rule 3 matches (`src/gen/**`) → Exclude
 
-Final state: **Excluded**.
+1. `**` → Exclude
+2. `!*.cs` → Include
+3. `src/gen/**` → Exclude
 
----
+Final result: **Excluded**.
 
-### Example 2 — Re-inclusion after deep exclusion
+This is normal GitIgnore ordering: all three rules live in the GitIgnore subset.
 
+### Example 2 — Directory pruning and re-inclusion
+
+```text
+bin/
+!bin/release/
 ```
-**              → Exclude
-src/gen/**      → Exclude (no change — already excluded)
-!src/gen/keep/  → Include (directory-only inclusion — re-opens traversal)
-```
 
-A file `src/gen/keep/Registry.cs`:
-- Rule 1 → Exclude
-- Rule 2 → Exclude (no change)
-- Rule 3 matches the parent directory `src/gen/keep/` → Include
+`bin/` prunes the directory during traversal. `!bin/release/` re-opens that subtree. Files under
+`bin/release/` can then be matched by the remaining rules. The directory decision uses the same
+last-match rule inside the GitIgnore subset.
 
-Final state: **Included**.
+### Example 3 — Mixed dialects
 
----
-
-### Example 3 — Multiple pattern types in Hybrid mode
-
-```
-**                      → GitIgnore: Exclude
-!**/*.cs                → GitIgnore: Include (.cs files)
-r:^src/.*\.generated\.cs$  → Regex: Exclude (generated .cs files)
-!src/Main.generated.cs  → GitIgnore: Include (specific override)
+```text
+**
+!**/*.cs
+r:^src/.*\.generated\.cs$
 ```
 
 A file `src/Main.generated.cs`:
-- Rule 1 → Exclude
-- Rule 2 → Include
-- Rule 3 matches the regex → Exclude
-- Rule 4 matches → Include
 
-Final state: **Included**.
+1. GitIgnore `**` → Exclude
+2. GitIgnore `!**/*.cs` → Include (for `.cs` files)
+3. The GitIgnore subset therefore returns **Include**, so evaluation stops.
 
-In Hybrid mode, GitIgnore and Regex patterns share the same ordered evaluation list. There is no separation by type at evaluation time.
+Final result: **Included**. The Regex rule cannot exclude a path that GitIgnore already included.
+
+To exclude generated C# files, put that rule in the GitIgnore subset, for example:
+
+```text
+**
+!**/*.cs
+src/**/*.generated.cs
+```
+
+### Example 4 — Regex as a fallback Include
+
+```text
+**
+r:^src/.*\.cs$
+```
+
+1. GitIgnore `**` → Exclude
+2. Glob has no rules → no override
+3. Regex matches `src/Program.cs` → Include
+
+Final result for `src/Program.cs`: **Included**. The Regex subset acts as a fallback include,
+not as a final override of an earlier include.
 
 ---
 
 ## Directory Pruning and File Re-inclusion
 
-Directory-only patterns affect traversal, not just inclusion state. When a directory is pruned, the engine does not enumerate files inside it — unless a subsequent negated pattern causes re-inclusion of the directory.
+Directory-only patterns affect traversal as well as inclusion state. When a directory is pruned,
+the engine does not enumerate its files unless a later rule can re-include something below it.
 
-```
+```text
 bin/            ← prune bin/ (traversal stops)
 !bin/release/   ← re-open bin/release/ (traversal resumes)
 ```
 
-The engine evaluates directory patterns against directory paths as they are encountered during traversal. A directory is pruned when its most recent match is a non-negated directory-only pattern.
-
----
-
-## GitIgnore Sub-set, Glob Sub-set, Regex Sub-set
-
-Internally, `HybridPathMatcher` evaluates three sub-sets in order:
-
-1. GitIgnore patterns
-2. Glob patterns
-3. Regex patterns
-
-Within each sub-set, patterns are evaluated in the order they were declared. The outcome of each sub-set can be overridden by the next.
-
-This means that in practice, Regex patterns act as the final override layer, followed by Glob, followed by GitIgnore at the base.
-
-If you want a GitIgnore rule to override a Regex rule, declare the GitIgnore rule after the Regex rule in the input list — it will be included in a later evaluation position within the GitIgnore sub-set.
+GitIgnore negation uses the same last-match rule as file matching. Glob and Regex re-inclusion is
+also honored across dialects: when an excluded directory could contain a path matched by a Glob
+rule, the engine traverses it. Regex rules are conservatively treated as potentially matching
+anywhere below an excluded directory. Files that no later rule matches remain excluded.
 
 ---
 
 ## Summary Rules
 
-1. All patterns are evaluated in declaration order.
-2. The last matching pattern determines the outcome.
-3. Negated patterns (`!`) restore the Include state.
-4. Non-negated patterns set the Exclude state (or re-exclude if already excluded).
-5. Directory-only patterns (`/`) affect traversal AND state.
-6. In Hybrid mode, the GitIgnore → Glob → Regex sub-set order determines which sub-set can override which, but within each sub-set, declaration order still governs.
+1. Within each dialect, rules are evaluated in declaration order and the last matching rule wins.
+2. Across dialects, the order is GitIgnore → Glob → Regex.
+3. The first subset that returns **Include** wins; later subsets are not consulted.
+4. A later subset can override an earlier **Exclude**, but not an earlier **Include**.
+5. Negated patterns (`!`) restore the Include state within the GitIgnore subset.
+6. Directory-only patterns (`/`) affect traversal and state within the GitIgnore subset.
+7. An empty pattern set includes everything; an empty path is excluded.

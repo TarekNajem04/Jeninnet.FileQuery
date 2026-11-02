@@ -33,12 +33,12 @@ public class NegationAndOrderTests {
             )
         );
 
-        var result = fileQueryEngine.Execute(new(env.Root, options))
+        var result = fileQueryEngine.Execute(new(env.Root, options), TestContext.CancellationToken)
                                     .Order()
                                     .ToList();
 
         result.Should().HaveCount(1);
-        Assert.EndsWith("a.txt", result.Single());
+        result.Single().Should().EndWith("a.txt");
     }
 
     /// <summary>
@@ -63,7 +63,7 @@ public class NegationAndOrderTests {
             )
         );
 
-        var result = fileQueryEngine.Execute(new(env.Root, options))
+        var result = fileQueryEngine.Execute(new(env.Root, options), TestContext.CancellationToken)
                                     .ToList();
 
         result.Should().ContainSingle(static x => x.EndsWith("data.log", StringComparison.Ordinal));
@@ -93,10 +93,45 @@ public class NegationAndOrderTests {
             )
         );
 
-        var result = fileQueryEngine.Execute(new(env.Root, options))
+        var result = fileQueryEngine.Execute(new(env.Root, options), TestContext.CancellationToken)
                                     .ToList();
 
         result.Should().Contain(static x => x.EndsWith(Path.Combine("sub", "file.txt"), StringComparison.Ordinal));
         result.Should().Contain(static x => x.EndsWith("file.txt", StringComparison.Ordinal));
     }
+
+    /// <summary>
+    /// An unanchored directory negation can re-include a nested directory below an excluded sibling.
+    /// </summary>
+    [TestMethod]
+    public void Should_ReincludeNestedDirectory_When_NegationIsUnanchored() {
+        using var env = new TestEnvironment();
+        env.CreateFile("other/keep/inside.txt");
+
+        var fileQueryEngine = FileQueryRuntime.Create();
+        var options = new FileQueryOptions(
+            new FileQueryOptionsConfig(
+                PatternInput: new(
+                    Patterns: [
+                        "**",
+                        "!keep/"
+                    ]
+                ),
+                RecurseSubdirectories: true
+            )
+        );
+
+        var result = fileQueryEngine.Execute(new(env.Root, options), TestContext.CancellationToken)
+                                    .ToList();
+
+        TestAssertEx.Contains(
+            result,
+            static x => x.EndsWith(Path.Combine("other", "keep", "inside.txt"), StringComparison.Ordinal));
+    }
+
+    /// <summary>
+    /// Gets or sets the test context, which provides information about the current test run.
+    /// Used here primarily for accessing the <see cref="CancellationToken"/>.
+    /// </summary>
+    public TestContext TestContext { get; set; } = null!;
 }

@@ -14,6 +14,6 @@ internal sealed class EmptyPatternInvariant : IPatternInvariant {
 
     public PatternInvariantResult Validate(PatternCompilationContext context) =>
         string.IsNullOrWhiteSpace(context.Pattern.Text)
-            ? PatternInvariantResult.Fail("Pattern cannot be empty.")
+            ? PatternInvariantResult.Fail("Pattern cannot be empty.", 0, 0)
             : PatternInvariantResult.Success;
 }

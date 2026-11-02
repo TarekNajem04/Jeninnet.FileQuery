@@ -39,26 +39,14 @@ public sealed class DatasetGeneratorBoundaryTests {
         try {
             // Act: must not throw an IndexOutOfRangeException or any other
             // exception when the final file exhausts the last extension capacity.
-            var result = await new DatasetGenerator().GenerateAsync(options, cancellationToken: TestContext?.CancellationToken ?? CancellationToken.None);
+            var result = await new DatasetGenerator().GenerateAsync(options, cancellationToken: TestContext.CancellationToken);
 
             // Assert: exactly the target number of files must exist.
-            Assert.AreEqual(
-                targetFileCount,
-                result.Manifest.ActualFileCount,
-                "Exact-capacity generation must reach the target file count.");
-            Assert.AreEqual(
-                targetFileCount,
-                CountGeneratedFiles(root),
-                "The number of files on disk must match the target file count.");
-            Assert.AreEqual(
-                targetFileCount,
-                result.Manifest.ExtensionCounts.Values.Sum(),
-                "The recorded per-extension counts must sum to the target file count.");
-            Assert.AreEqual(
-                90,
-                result.Manifest.ExtensionCounts[".cs"],
-                "The .cs extension must receive its exact 30 percent share.");
-            Assert.IsFalse(result.Reused, "A fresh dataset must be generated.");
+            result.Manifest.ActualFileCount.Should().Be(targetFileCount, because: "Exact-capacity generation must reach the target file count.");
+            CountGeneratedFiles(root).Should().Be(targetFileCount, because: "The number of files on disk must match the target file count.");
+            result.Manifest.ExtensionCounts.Values.Sum().Should().Be(targetFileCount, because: "The recorded per-extension counts must sum to the target file count.");
+            result.Manifest.ExtensionCounts[".cs"].Should().Be(90, because: "The .cs extension must receive its exact 30 percent share.");
+            result.Reused.Should().BeFalse(because: "A fresh dataset must be generated.");
         }
         finally {
             DeleteTemporaryRoot(root);
@@ -88,21 +76,12 @@ public sealed class DatasetGeneratorBoundaryTests {
 
         try {
             // Act
-            var result = await new DatasetGenerator().GenerateAsync(options, cancellationToken: TestContext?.CancellationToken ?? CancellationToken.None);
+            var result = await new DatasetGenerator().GenerateAsync(options, cancellationToken: TestContext.CancellationToken);
 
             // Assert
-            Assert.AreEqual(
-                targetFileCount,
-                result.Manifest.ActualFileCount,
-                "Small-target generation must reach the target file count.");
-            Assert.AreEqual(
-                targetFileCount,
-                CountGeneratedFiles(root),
-                "The number of files on disk must match the target file count.");
-            Assert.AreEqual(
-                targetFileCount,
-                result.Manifest.ExtensionCounts.Values.Sum(),
-                "The recorded per-extension counts must sum to the target file count.");
+            result.Manifest.ActualFileCount.Should().Be(targetFileCount, because: "Small-target generation must reach the target file count.");
+            CountGeneratedFiles(root).Should().Be(targetFileCount, because: "The number of files on disk must match the target file count.");
+            result.Manifest.ExtensionCounts.Values.Sum().Should().Be(targetFileCount, because: "The recorded per-extension counts must sum to the target file count.");
 
             AssertDistribution(result.Manifest.ExtensionCounts);
         }
@@ -112,17 +91,17 @@ public sealed class DatasetGeneratorBoundaryTests {
     }
 
     private static void AssertDistribution(IReadOnlyDictionary<string, int> counts) {
-        Assert.AreEqual(30, counts[".cs"]);
-        Assert.AreEqual(15, counts[".json"]);
-        Assert.AreEqual(10, counts[".xml"]);
-        Assert.AreEqual(10, counts[".log"]);
-        Assert.AreEqual(8, counts[".md"]);
-        Assert.AreEqual(8, counts[".txt"]);
-        Assert.AreEqual(5, counts[".config"]);
-        Assert.AreEqual(4, counts[".csproj"]);
-        Assert.AreEqual(4, counts[".dll"]);
-        Assert.AreEqual(3, counts[".tmp"]);
-        Assert.AreEqual(3, counts[".generated.cs"]);
+        counts[".cs"].Should().Be(30);
+        counts[".json"].Should().Be(15);
+        counts[".xml"].Should().Be(10);
+        counts[".log"].Should().Be(10);
+        counts[".md"].Should().Be(8);
+        counts[".txt"].Should().Be(8);
+        counts[".config"].Should().Be(5);
+        counts[".csproj"].Should().Be(4);
+        counts[".dll"].Should().Be(4);
+        counts[".tmp"].Should().Be(3);
+        counts[".generated.cs"].Should().Be(3);
     }
 
     private static string CreateTemporaryRoot() =>
@@ -147,5 +126,5 @@ public sealed class DatasetGeneratorBoundaryTests {
                 StringComparison.OrdinalIgnoreCase));
 
     /// <inheritdoc/>
-    public TestContext? TestContext { get; set; }
+    public TestContext TestContext { get; set; } = null!;
 }

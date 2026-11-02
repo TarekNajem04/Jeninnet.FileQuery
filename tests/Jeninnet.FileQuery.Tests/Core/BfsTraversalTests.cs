@@ -51,12 +51,12 @@ public sealed class BfsTraversalTests {
             )
         );
 
-        var bfsResults = engine.Execute(new(env.Root, bfsOptions)).ToList();
-        var dfsResults = engine.Execute(new(env.Root, dfsOptions)).ToList();
+        var bfsResults = engine.Execute(new(env.Root, bfsOptions), TestContext.CancellationToken).ToList();
+        var dfsResults = engine.Execute(new(env.Root, dfsOptions), TestContext.CancellationToken).ToList();
 
-        Assert.AreSequenceEqual(dfsResults, bfsResults, SequenceOrder.InAnyOrder, "BFS and DFS must return the same set of files.");
+        bfsResults.Should().BeEquivalentTo(dfsResults, because: "BFS and DFS must return the same set of files.");
 
-        Assert.HasCount(4, bfsResults);
+        bfsResults.Should().HaveCount(4);
     }
 
     /// <summary>
@@ -79,16 +79,14 @@ public sealed class BfsTraversalTests {
             )
         );
 
-        var results = engine.Execute(new(env.Root, options)).ToList();
+        var results = engine.Execute(new(env.Root, options), TestContext.CancellationToken).ToList();
 
-        Assert.HasCount(2, results);
+        results.Should().HaveCount(2);
 
         var rootIndex = results.FindIndex(static p => p.EndsWith("root.txt", StringComparison.Ordinal));
         var deepIndex = results.FindIndex(static p => p.EndsWith("deep.txt", StringComparison.Ordinal));
 
-        Assert.IsLessThan(
-            deepIndex, rootIndex,
-            $"BFS must return 'root.txt' (index {rootIndex}) before 'deep.txt' (index {deepIndex}).");
+        rootIndex.Should().BeLessThan(deepIndex, because: $"BFS must return 'root.txt' (index {rootIndex}) before 'deep.txt' (index {deepIndex}).");
     }
 
     /// <summary>
@@ -113,14 +111,13 @@ public sealed class BfsTraversalTests {
             )
         );
 
-        var results = engine.Execute(new(env.Root, options)).ToList();
+        var results = engine.Execute(new(env.Root, options), TestContext.CancellationToken).ToList();
 
-        Assert.HasCount(2, results,
-            "MaxRecursionDepth = 1 must include depth 0 and 1 only.");
+        results.Should().HaveCount(2, because: "MaxRecursionDepth = 1 must include depth 0 and 1 only.");
 
-        Assert.Contains(static p => p.EndsWith("root.txt", StringComparison.Ordinal), results, "root.txt at depth 0 must be included.");
-        Assert.Contains(static p => p.EndsWith("a.txt", StringComparison.Ordinal), results, "a.txt at depth 1 must be included.");
-        Assert.DoesNotContain(static p => p.EndsWith("b.txt", StringComparison.Ordinal), results, "b.txt at depth 2 must be excluded.");
+        results.Should().Contain(static p => p.EndsWith("root.txt", StringComparison.Ordinal), because: "root.txt at depth 0 must be included.");
+        results.Should().Contain(static p => p.EndsWith("a.txt", StringComparison.Ordinal), because: "a.txt at depth 1 must be included.");
+        results.Should().NotContain(static p => p.EndsWith("b.txt", StringComparison.Ordinal), because: "b.txt at depth 2 must be excluded.");
     }
 
     /// <summary>
@@ -141,13 +138,13 @@ public sealed class BfsTraversalTests {
             )
         );
 
-        var syncResults = engine.Execute(new(env.Root, options)).Order().ToList();
+        var syncResults = engine.Execute(new(env.Root, options), TestContext.CancellationToken).Order().ToList();
         var asyncResults = await engine
             .ExecuteAsync(new(env.Root, options), TestContext.CancellationToken)
             .ToListAsync(TestContext.CancellationToken);
         asyncResults.Sort();
 
-        Assert.AreSequenceEqual(syncResults, asyncResults, "BFS async must match BFS sync when both results are sorted.");
+        asyncResults.Should().Equal(syncResults, because: "BFS async must match BFS sync when both results are sorted.");
     }
 
     /// <summary>
@@ -182,8 +179,7 @@ public sealed class PathUtilitiesUncTests {
         const string input = @"\\server\share\file.txt";
         const string expected = "//server/share/file.txt";
 
-        Assert.AreEqual(expected, PathUtilities.Normalize(input).Replace('\\', '/'),
-            "Backslashes must become forward slashes and '//' must not be collapsed to '/'.");
+        PathUtilities.Normalize(input).Replace('\\', '/').Should().Be(expected, because: "Backslashes must become forward slashes and '//' must not be collapsed to '/'.");
     }
 
     /// <summary>
@@ -203,8 +199,7 @@ public sealed class PathUtilitiesUncTests {
         const string input = @"\\server\share\";
         const string expected = "//server/share/";
 
-        Assert.AreEqual(expected, PathUtilities.Normalize(input),
-            "A UNC root path's trailing slash must be preserved.");
+        PathUtilities.Normalize(input).Should().Be(expected, because: "A UNC root path's trailing slash must be preserved.");
     }
 
     /// <summary>
@@ -215,7 +210,7 @@ public sealed class PathUtilitiesUncTests {
         const string input = @"\\server\share";
         const string expected = "//server/share";
 
-        Assert.AreEqual(expected, PathUtilities.Normalize(input));
+        PathUtilities.Normalize(input).Should().Be(expected);
     }
 
     /// <summary>
@@ -227,8 +222,7 @@ public sealed class PathUtilitiesUncTests {
         const string input = "//server/share/folder/";
         const string expected = "//server/share/folder";
 
-        Assert.AreEqual(expected, PathUtilities.Normalize(input),
-            "Trailing slash on a non-root UNC path must be trimmed.");
+        PathUtilities.Normalize(input).Should().Be(expected, because: "Trailing slash on a non-root UNC path must be trimmed.");
     }
 
     /// <summary>
@@ -240,7 +234,7 @@ public sealed class PathUtilitiesUncTests {
         const string input = @"\\server\share\project\src\Program.cs";
         const string expected = "//server/share/project/src/Program.cs";
 
-        Assert.AreEqual(expected, PathUtilities.Normalize(input));
+        PathUtilities.Normalize(input).Should().Be(expected);
     }
 
     // ======================================================================
@@ -256,8 +250,7 @@ public sealed class PathUtilitiesUncTests {
         const string input = "//server//share//file.txt";
         const string expected = "//server/share/file.txt";
 
-        Assert.AreEqual(expected, PathUtilities.Normalize(input),
-            "Internal consecutive slashes must be collapsed; leading '//' must survive.");
+        PathUtilities.Normalize(input).Should().Be(expected, because: "Internal consecutive slashes must be collapsed; leading '//' must survive.");
     }
 
     /// <summary>
@@ -269,8 +262,7 @@ public sealed class PathUtilitiesUncTests {
         const string input = @"C:\Users\Test\";
         const string expected = "C:/Users/Test/";
 
-        Assert.AreEqual(expected, PathUtilities.Normalize(input, trimTrailingSlash: false),
-            "trimTrailingSlash: false must preserve a trailing slash on non-root paths.");
+        PathUtilities.Normalize(input, trimTrailingSlash: false).Should().Be(expected, because: "trimTrailingSlash: false must preserve a trailing slash on non-root paths.");
     }
 
     /// <summary>
@@ -282,8 +274,7 @@ public sealed class PathUtilitiesUncTests {
         const string input = @"\\server\share\folder\";
         const string expected = "//server/share/folder/";
 
-        Assert.AreEqual(expected, PathUtilities.Normalize(input, trimTrailingSlash: false),
-            "trimTrailingSlash: false must preserve trailing slash on non-root UNC paths.");
+        PathUtilities.Normalize(input, trimTrailingSlash: false).Should().Be(expected, because: "trimTrailingSlash: false must preserve trailing slash on non-root UNC paths.");
     }
 
     /// <summary>
@@ -296,33 +287,28 @@ public sealed class PathUtilitiesUncTests {
         const string input = @"C:\Users\Test\";
         const string expected = "C:/Users/Test";
 
-        Assert.AreEqual(expected, PathUtilities.Normalize(input),
-            "Default behavior (trimTrailingSlash: true) must not be altered by adding the optional parameter.");
+        PathUtilities.Normalize(input).Should().Be(expected, because: "Default behavior (trimTrailingSlash: true) must not be altered by adding the optional parameter.");
     }
 
     /// <summary>Tests Normalize_WindowsPath_BackslashesToForwardSlashes.</summary>
     [TestMethod]
     public void Normalize_WindowsPath_BackslashesToForwardSlashes() =>
-        Assert.AreEqual(
-            "C:/Users/Test/file.txt",
-            PathUtilities.Normalize(@"C:\Users\Test\file.txt"));
+        PathUtilities.Normalize(@"C:\Users\Test\file.txt").Should().Be("C:/Users/Test/file.txt");
 
     /// <summary>Tests Normalize_LocalPath_DuplicateSlashesCollapsed.</summary>
     [TestMethod]
     public void Normalize_LocalPath_DuplicateSlashesCollapsed() =>
-        Assert.AreEqual(
-            "C:/Users/Test/file.txt",
-            PathUtilities.Normalize(@"C:\\Users//Test\\file.txt"));
+        PathUtilities.Normalize(@"C:\\Users//Test\\file.txt").Should().Be("C:/Users/Test/file.txt");
 
     /// <summary>Tests Normalize_DriveRoot_TrailingSlashPreserved.</summary>
     [TestMethod]
     public void Normalize_DriveRoot_TrailingSlashPreserved() =>
-        Assert.AreEqual("C:/", PathUtilities.Normalize("C:/"));
+        PathUtilities.Normalize("C:/").Should().Be("C:/");
 
     /// <summary>Tests Normalize_NullOrEmpty_ThrowsArgumentException.</summary>
     [TestMethod]
     public void Normalize_NullOrEmpty_ThrowsArgumentException() {
-        Assert.ThrowsExactly<ArgumentNullException>(static () => PathUtilities.Normalize(null));
-        Assert.ThrowsExactly<ArgumentException>(static () => PathUtilities.Normalize(""));
+        FluentActions.Invoking(static () => PathUtilities.Normalize(null)).Should().ThrowExactly<ArgumentNullException>();
+        FluentActions.Invoking(static () => PathUtilities.Normalize("")).Should().ThrowExactly<ArgumentException>();
     }
 }

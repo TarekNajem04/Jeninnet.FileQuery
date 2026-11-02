@@ -23,7 +23,7 @@ public sealed class PatternClassificationTests {
             ]
         };
 
-        Assert.ThrowsExactly<PatternException>(() =>
-            PatternClassifier.Classify(canonical, PatternInterpretationMode.Specific));
+        FluentActions.Invoking(() =>
+            PatternClassifier.Classify(canonical, PatternInterpretationMode.Specific)).Should().ThrowExactly<PatternException>();
     }
 }

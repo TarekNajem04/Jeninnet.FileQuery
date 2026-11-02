@@ -20,7 +20,7 @@ public sealed class FileSystemGuardsTests {
         try {
             FileSystemGuards.EnsureAccessible(tempDir, false);
             // Assert: If we reached here, no exception was thrown, which is correct.
-            Assert.IsTrue(Directory.Exists(tempDir));
+            Directory.Exists(tempDir).Should().BeTrue();
         }
         finally {
             Directory.Delete(tempDir);

@@ -26,8 +26,8 @@ public class FileQueryCoreTests {
         var query = FileQuery.CreateUnsafe(rootPath, options);
 
         // Assert
-        Assert.IsNotNull(query);
-        Assert.AreEqual(rootPath, query.RootPath);
-        Assert.AreEqual(options, query.Options);
+        query.Should().NotBeNull();
+        query.RootPath.Should().Be(rootPath);
+        query.Options.Should().Be(options);
     }
 }

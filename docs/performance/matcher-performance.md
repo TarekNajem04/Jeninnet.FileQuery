@@ -145,9 +145,9 @@ evaluated in under one second of pure matching time.
 `ConcurrentDictionary` lookup keyed by `(pattern text, case sensitivity)`. The
 first call per key compiles the `Regex`; subsequent calls are pure cache hits.
 
-**Pattern compilation** is a one-time initialization cost per query. For applications
-that reuse the same pattern set across many root paths, a `PrecompiledQuery` API
-is planned for v1.1.
+**Pattern compilation** is a one-time initialization cost per query. A
+`PrecompiledQuery` API for reusing one pattern set across many root paths is a
+future consideration, not a current feature.
 
 **Traversal** is typically the dominant cost in real workloads. The 2 ms benchmark
 covers a real directory tree traversal including `File.GetAttributes()` calls per

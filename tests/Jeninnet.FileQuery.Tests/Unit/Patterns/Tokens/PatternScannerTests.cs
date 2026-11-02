@@ -23,7 +23,7 @@ public sealed class PatternScannerTests {
 
         PatternScanner.Scan(context, syntax);
 
-        Assert.IsNotNull(context.Tokens);
-        Assert.HasCount(2, context.Tokens); // foo, bar
+        context.Tokens.Should().NotBeNull();
+        context.Tokens.Should().HaveCount(2); // foo, bar
     }
 }

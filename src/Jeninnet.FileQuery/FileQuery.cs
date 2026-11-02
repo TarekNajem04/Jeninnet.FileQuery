@@ -28,12 +28,12 @@ public sealed class FileQuery(string rootPath, FileQueryOptions options) {
     /// <summary>
     /// Gets the root directory from which the file query begins.
     /// </summary>
-    public string RootPath { get; } = rootPath;
+    public string RootPath { get; } = rootPath ?? throw new ArgumentNullException(nameof(rootPath));
 
     /// <summary>
     /// Gets the internal configuration options for the query.
     /// </summary>
-    internal FileQueryOptions Options { get; } = options;
+    internal FileQueryOptions Options { get; } = options ?? throw new ArgumentNullException(nameof(options));
 
     /// <summary>
     /// Creates a new <see cref="FileQueryBuilder"/> rooted at the specified directory.

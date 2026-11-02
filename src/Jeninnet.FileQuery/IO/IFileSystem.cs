@@ -67,6 +67,20 @@ internal interface IFileSystem {
     bool DirectoryExists(string path);
 
     /// <summary>
+    /// Determines whether the specified file exists.
+    /// </summary>
+    /// <param name="path">The absolute path to check.</param>
+    /// <returns><see langword="true"/> if the file exists; otherwise, <see langword="false"/>.</returns>
+    bool FileExists(string path);
+
+    /// <summary>
+    /// Reads all lines of a text file.
+    /// </summary>
+    /// <param name="path">The absolute path of the file.</param>
+    /// <returns>The file lines.</returns>
+    string[] ReadAllLines(string path);
+
+    /// <summary>
     /// Resolves the final absolute path of the specified entry, following symbolic links if necessary.
     /// </summary>
     /// <param name="path">The path to resolve.</param>

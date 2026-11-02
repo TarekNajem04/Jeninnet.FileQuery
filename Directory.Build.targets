@@ -6,6 +6,19 @@
         <ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
     </PropertyGroup>
 
+    <!-- Shared package icon for every packable project. -->
+    <PropertyGroup Condition="'$(IsPackable)' != 'false' and '$(PackageIcon)' == ''">
+        <PackageIcon>icon.png</PackageIcon>
+    </PropertyGroup>
+
+    <ItemGroup Condition="'$(IsPackable)' != 'false' and Exists('$(MSBuildThisFileDirectory)assets/icon.png')">
+        <None Include="$(MSBuildThisFileDirectory)assets/icon.png"
+              Pack="true"
+              PackagePath="\"
+              Link="icon.png"
+              Visible="false" />
+    </ItemGroup>
+
     <!-- Ensure the local package output folder exists before any pack -->
     <Target Name="EnsureLocalPackagesDirectory"
             BeforeTargets="Pack">

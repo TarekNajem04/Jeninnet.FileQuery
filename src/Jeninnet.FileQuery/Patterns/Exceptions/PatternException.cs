@@ -39,10 +39,33 @@ public class PatternException : Exception {
 
     /// <summary>
     /// Initializes a new instance of the <see cref="PatternException"/> class
+    /// with a descriptive error message and the location of the failure.
+    /// </summary>
+    /// <param name="message">The error message.</param>
+    /// <param name="position">The zero-based character position of the error, when known.</param>
+    /// <param name="segment">The zero-based segment index of the error, when known.</param>
+    public PatternException(string message, int? position, int? segment = null)
+            : base(message) {
+        Position = position;
+        Segment = segment;
+    }
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="PatternException"/> class
     /// with a descriptive error message and an inner exception.
     /// </summary>
     /// <param name="message">The error message.</param>
     /// <param name="innerException">The inner exception.</param>
     public PatternException(string message, Exception innerException)
         : base(message, innerException) { }
+
+    /// <summary>
+    /// Gets the zero-based character position of the error, when known.
+    /// </summary>
+    public int? Position { get; }
+
+    /// <summary>
+    /// Gets the zero-based slash-separated segment index of the error, when known.
+    /// </summary>
+    public int? Segment { get; }
 }

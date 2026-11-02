@@ -36,7 +36,7 @@ public class AnchoredPatternTests {
             )
         );
 
-        var result = fileQueryEngine.Execute(new(env.Root, options)).ToList();
+        var result = fileQueryEngine.Execute(new(env.Root, options), TestContext.CancellationToken).ToList();
 
         result.Should().ContainSingle(static x => x.EndWithPath("file.txt"));
         result.Should().NotContain(static x => x.EndWithPath("sub/file.txt"));
@@ -64,7 +64,7 @@ public class AnchoredPatternTests {
             )
         );
 
-        var result = fileQueryEngine.Execute(new(env.Root, options)).ToList();
+        var result = fileQueryEngine.Execute(new(env.Root, options), TestContext.CancellationToken).ToList();
 
         result.Should().HaveCount(2);
     }
@@ -92,11 +92,17 @@ public class AnchoredPatternTests {
             )
         );
 
-        var result = fileQueryEngine.Execute(new(env.Root, options)).ToList();
+        var result = fileQueryEngine.Execute(new(env.Root, options), TestContext.CancellationToken).ToList();
 
         // The result should contain ONLY sub/a.txt (included by !/sub/ override).
         // The nested file x/sub/b.txt is pruned because directory x is not re-included.
         var onlyResult = result.Should().ContainSingle();
         onlyResult.Which.Should().EndsWith(Path.Combine("sub", "a.txt"), "Only the file inside the root-level 'sub' directory should be included.");
     }
+
+    /// <summary>
+    /// Gets or sets the test context, which provides information about the current test run.
+    /// Used here primarily for accessing the <see cref="CancellationToken"/>.
+    /// </summary>
+    public TestContext TestContext { get; set; } = null!;
 }

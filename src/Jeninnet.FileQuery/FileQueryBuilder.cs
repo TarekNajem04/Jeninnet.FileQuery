@@ -24,14 +24,26 @@ public sealed class FileQueryBuilder {
     private IFileQueryEngine? _engine;
     private readonly IFileSystem _fileSystem;
     private readonly string _rootPath;
-    private readonly Dictionary<PatternKind, HashSet<string>> _patternStorage = [];
+    private readonly Dictionary<PatternKind, List<string>> _patternStorage = [];
+    private readonly Dictionary<PatternKind, HashSet<string>> _patternLookup = [];
     private PatternInterpretationMode _interpretationMode = PatternInterpretationMode.Hybrid;
     private PatternMatchingMode _patternMatchingMode = PatternMatchingMode.GitIgnore;
     private CaseSensitivity _caseSensitivity = CaseSensitivity.PlatformDefault;
     private bool _recurse = true;
+    private int _maxRecursionDepth = FileQueryOptions.UNLIMITED_RECURSION_DEPTH;
+    private TraversalOptions? _traversal;
+    private bool _ignoreInaccessible = true;
     private bool _auditMatches;
     private IProgress<FileQueryDiagnostic>? _diagnostics;
     private FileQueryErrorRecoveryOptions? _errorRecovery;
+    private List<string>? _includedPaths;
+    private long? _minSize;
+    private long? _maxSize;
+    private DateTimeOffset? _modifiedAfter;
+    private DateTimeOffset? _modifiedBefore;
+    private FileAttributes _attributesToSkip = FileAttributes.None;
+    private GitIgnoreOptions? _gitIgnoreFiles;
+    private bool _includeDirectories;
 
     /// <summary>
     /// Initializes a new <see cref="FileQueryBuilder"/> rooted at the specified directory.
@@ -85,11 +97,26 @@ public sealed class FileQueryBuilder {
     /// <exception cref="ArgumentNullException">
     /// Thrown when <paramref name="patterns"/> is <see langword="null"/>.
     /// </exception>
+    /// <exception cref="ArgumentException">
+    /// Thrown when <paramref name="patterns"/> contains empty or whitespace-only entries.
+    /// </exception>
     public FileQueryBuilder Where(params IEnumerable<string> patterns) {
         ArgumentNullException.ThrowIfNull(patterns);
 
         foreach(var pattern in patterns) {
-            var kind = PatternClassifier.Classify(pattern);
+            if(string.IsNullOrWhiteSpace(pattern)) {
+                throw new ArgumentException(
+                    "Patterns cannot contain empty or whitespace-only entries.",
+                    nameof(patterns));
+            }
+
+            // In Specific mode every untyped pattern is interpreted with the forced
+            // dialect. Classifying it would silently produce a mismatched bucket,
+            // which pattern validation rejects at Build time.
+            var kind = _interpretationMode is PatternInterpretationMode.Hybrid
+                ? PatternClassifier.Classify(pattern)
+                : GetSpecificPatternKind();
+
             MergeIntoTypedBucket(kind, [pattern]);
         }
 
@@ -239,6 +266,32 @@ public sealed class FileQueryBuilder {
         return this;
     }
 
+    /// <summary>
+    /// Restricts the query to an explicit allow-list of root-relative file paths.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// This is intended for incremental scans: pass the files reported by a version-control
+    /// diff and the engine skips every other file, pruning directories that cannot contain a
+    /// listed path. Paths use forward slashes and are relative to the query root; absolute
+    /// paths, parent segments (<c>..</c>), empty entries, and directory entries are rejected
+    /// when <see cref="Build"/> runs.
+    /// </para>
+    /// <para>
+    /// An empty sequence matches no files. Calling this method replaces any previously supplied
+    /// allow-list.
+    /// </para>
+    /// </remarks>
+    /// <param name="relativePaths">The root-relative file paths to include.</param>
+    /// <returns>The current <see cref="FileQueryBuilder"/> instance for method chaining.</returns>
+    /// <exception cref="ArgumentNullException">Thrown when <paramref name="relativePaths"/> is <see langword="null"/>.</exception>
+    public FileQueryBuilder RestrictToPaths(IEnumerable<string> relativePaths) {
+        ArgumentNullException.ThrowIfNull(relativePaths);
+
+        _includedPaths = [.. relativePaths];
+        return this;
+    }
+
     // =====Traversal configuration =====
 
     /// <summary>
@@ -263,6 +316,41 @@ public sealed class FileQueryBuilder {
     }
 
     /// <summary>
+    /// Limits directory traversal to the specified depth below the root.
+    /// </summary>
+    /// <param name="maxDepth">
+    /// The maximum depth. <c>0</c> visits the root only; <c>-1</c>
+    /// (<see cref="FileQueryOptions.UNLIMITED_RECURSION_DEPTH"/>) allows unlimited depth.
+    /// </param>
+    /// <returns>The current <see cref="FileQueryBuilder"/> instance for method chaining.</returns>
+    /// <exception cref="ArgumentOutOfRangeException">
+    /// Thrown when <paramref name="maxDepth"/> is less than <c>-1</c>.
+    /// </exception>
+    public FileQueryBuilder WithMaxDepth(int maxDepth) {
+        ArgumentOutOfRangeException.ThrowIfLessThan(
+            maxDepth,
+            FileQueryOptions.UNLIMITED_RECURSION_DEPTH);
+
+        _maxRecursionDepth = maxDepth;
+        return this;
+    }
+
+    /// <summary>
+    /// Configures traversal strategy and symbolic-link behavior.
+    /// </summary>
+    /// <param name="traversal">The traversal options to apply.</param>
+    /// <returns>The current <see cref="FileQueryBuilder"/> instance for method chaining.</returns>
+    /// <exception cref="ArgumentNullException">
+    /// Thrown when <paramref name="traversal"/> is <see langword="null"/>.
+    /// </exception>
+    public FileQueryBuilder WithTraversal(TraversalOptions traversal) {
+        ArgumentNullException.ThrowIfNull(traversal);
+
+        _traversal = traversal;
+        return this;
+    }
+
+    /// <summary>
     /// Controls how character casing is handled during pattern matching.
     /// </summary>
     /// <param name="ignoreCase">
@@ -274,6 +362,26 @@ public sealed class FileQueryBuilder {
         _caseSensitivity = ignoreCase
             ? CaseSensitivity.Insensitive
             : CaseSensitivity.Sensitive;
+        return this;
+    }
+
+    /// <summary>
+    /// Controls whether inaccessible files and directories are skipped during traversal.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// Enabled by default. When disabled, recoverable IO failures follow
+    /// <see cref="WithErrorRecovery"/> instead of being skipped; the default abort policy then
+    /// surfaces the failure to the caller.
+    /// </para>
+    /// </remarks>
+    /// <param name="ignoreInaccessible">
+    /// <see langword="true"/> to skip inaccessible entries (default); <see langword="false"/> to
+    /// treat them as recoverable errors.
+    /// </param>
+    /// <returns>The current <see cref="FileQueryBuilder"/> instance for method chaining.</returns>
+    public FileQueryBuilder IgnoreInaccessible(bool ignoreInaccessible = true) {
+        _ignoreInaccessible = ignoreInaccessible;
         return this;
     }
 
@@ -302,6 +410,133 @@ public sealed class FileQueryBuilder {
         return this;
     }
 
+    // =====Metadata filters =====
+
+    /// <summary>
+    /// Restricts files to a minimum size, inclusive.
+    /// </summary>
+    /// <remarks>
+    /// Size filters use the size already reported by the directory enumeration and are applied
+    /// before pattern matching. Directories are never rejected by a size filter.
+    /// </remarks>
+    /// <param name="bytes">The minimum size in bytes. Must be zero or greater.</param>
+    /// <returns>The current <see cref="FileQueryBuilder"/> instance for method chaining.</returns>
+    /// <exception cref="ArgumentOutOfRangeException">Thrown when <paramref name="bytes"/> is negative.</exception>
+    public FileQueryBuilder MinSize(long bytes) {
+        ArgumentOutOfRangeException.ThrowIfNegative(bytes);
+
+        _minSize = bytes;
+        return this;
+    }
+
+    /// <summary>
+    /// Restricts files to a maximum size, inclusive.
+    /// </summary>
+    /// <remarks>
+    /// Size filters use the size already reported by the directory enumeration and are applied
+    /// before pattern matching. Directories are never rejected by a size filter.
+    /// </remarks>
+    /// <param name="bytes">The maximum size in bytes. Must be zero or greater.</param>
+    /// <returns>The current <see cref="FileQueryBuilder"/> instance for method chaining.</returns>
+    /// <exception cref="ArgumentOutOfRangeException">Thrown when <paramref name="bytes"/> is negative.</exception>
+    public FileQueryBuilder MaxSize(long bytes) {
+        ArgumentOutOfRangeException.ThrowIfNegative(bytes);
+
+        _maxSize = bytes;
+        return this;
+    }
+
+    /// <summary>
+    /// Restricts files to those last written strictly after a timestamp.
+    /// </summary>
+    /// <remarks>
+    /// The timestamp is compared against the last-write time reported by the enumeration.
+    /// Directories are never rejected by a time filter.
+    /// </remarks>
+    /// <param name="timestamp">The exclusive lower last-write boundary.</param>
+    /// <returns>The current <see cref="FileQueryBuilder"/> instance for method chaining.</returns>
+    public FileQueryBuilder ModifiedAfter(DateTimeOffset timestamp) {
+        _modifiedAfter = timestamp;
+        return this;
+    }
+
+    /// <summary>
+    /// Restricts files to those last written strictly before a timestamp.
+    /// </summary>
+    /// <remarks>
+    /// The timestamp is compared against the last-write time reported by the enumeration.
+    /// Directories are never rejected by a time filter.
+    /// </remarks>
+    /// <param name="timestamp">The exclusive upper last-write boundary.</param>
+    /// <returns>The current <see cref="FileQueryBuilder"/> instance for method chaining.</returns>
+    public FileQueryBuilder ModifiedBefore(DateTimeOffset timestamp) {
+        _modifiedBefore = timestamp;
+        return this;
+    }
+
+    /// <summary>
+    /// Skips files and directories that carry any of the specified attributes.
+    /// </summary>
+    /// <remarks>
+    /// A matching directory is pruned, so its contents are not traversed. This mirrors the
+    /// attribute-skipping behavior of the operating-system enumeration while keeping all
+    /// metadata available to the result APIs.
+    /// </remarks>
+    /// <param name="attributes">The attribute flags that exclude an entry.</param>
+    /// <returns>The current <see cref="FileQueryBuilder"/> instance for method chaining.</returns>
+    public FileQueryBuilder AttributesToSkip(FileAttributes attributes) {
+        _attributesToSkip = attributes;
+        return this;
+    }
+
+    /// <summary>
+    /// Loads Git ignore files into the query: the root <c>.gitignore</c>, nested
+    /// <c>.gitignore</c> files, <c>.git/info/exclude</c>, and an optional global excludes file.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// Loaded rules are appended before the query's own GitIgnore patterns, so explicit patterns
+    /// always take precedence. Deeper ignore files are appended after their parents, preserving
+    /// Git's last-match-wins behavior.
+    /// </para>
+    /// <para>
+    /// Nested ignore files are scoped to their directory. A query using a forced Glob or Regex
+    /// dialect cannot load ignore files; use hybrid interpretation or <see cref="UsingGitIgnore"/>.
+    /// </para>
+    /// </remarks>
+    /// <param name="options">The loading options, or <see langword="null"/> for the defaults.</param>
+    /// <returns>The current <see cref="FileQueryBuilder"/> instance for method chaining.</returns>
+    public FileQueryBuilder UseGitIgnoreFiles(GitIgnoreOptions? options = null) {
+        _gitIgnoreFiles = options ?? new GitIgnoreOptions();
+        return this;
+    }
+
+    /// <summary>
+    /// Includes matching directories in the result stream in addition to files.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// Disabled by default. When enabled, the traversal yields a directory after evaluating the
+    /// same match outcome used to decide whether to descend. Directory-only rules such as
+    /// <c>bin/</c> and negations such as <c>!keep/</c> therefore apply directly to directory
+    /// results, and an excluded directory is still pruned unless a negated rule could re-include
+    /// content below it.
+    /// </para>
+    /// <para>
+    /// No second traversal is performed; directory results come from the existing walk. Entry
+    /// results expose <see cref="FileQueryEntry.IsDirectory"/> for callers that need to separate
+    /// directories from files.
+    /// </para>
+    /// </remarks>
+    /// <param name="includeDirectories">
+    /// <see langword="true"/> to yield included directories; <see langword="false"/> to return files only.
+    /// </param>
+    /// <returns>The current <see cref="FileQueryBuilder"/> instance for method chaining.</returns>
+    public FileQueryBuilder IncludeDirectories(bool includeDirectories = true) {
+        _includeDirectories = includeDirectories;
+        return this;
+    }
+
     // =====Terminal operations =====
 
     /// <summary>
@@ -309,6 +544,29 @@ public sealed class FileQueryBuilder {
     /// </summary>
     /// <returns>A lazy enumerable of matching absolute file paths.</returns>
     public IEnumerable<string> Execute() => GetEngine().Execute(Build());
+
+    /// <summary>
+    /// Executes the query synchronously and observes cancellation.
+    /// </summary>
+    /// <param name="cancellationToken">A token to cancel the sync enumeration.</param>
+    /// <returns>A lazy enumerable of matching absolute file paths.</returns>
+    public IEnumerable<string> Execute(CancellationToken cancellationToken) => GetEngine().Execute(Build(), cancellationToken);
+
+    /// <summary>
+    /// Executes the query synchronously and reports traversal progress using the same snapshot shape as the async API.
+    /// </summary>
+    /// <param name="progress">The progress sink that receives traversal snapshots.</param>
+    /// <param name="cancellationToken">A token to cancel the sync enumeration.</param>
+    /// <returns>A lazy enumerable of matching absolute file paths.</returns>
+    /// <exception cref="ArgumentNullException">Thrown when <paramref name="progress"/> is <see langword="null"/>.</exception>
+    public IEnumerable<string> Execute(
+        IProgress<FileQueryProgress> progress,
+        CancellationToken cancellationToken = default
+    ) {
+        ArgumentNullException.ThrowIfNull(progress);
+
+        return GetEngine().Execute(Build(), progress, cancellationToken);
+    }
 
     /// <summary>
     /// Executes the query asynchronously using the configured or default engine.
@@ -333,13 +591,68 @@ public sealed class FileQueryBuilder {
     }
 
     /// <summary>
+    /// Executes the query synchronously and returns matching entries with metadata.
+    /// </summary>
+    /// <returns>A lazy enumerable of matching entries.</returns>
+    public IEnumerable<FileQueryEntry> ExecuteEntries() => GetEngine().ExecuteEntries(Build());
+
+    /// <summary>
+    /// Executes the query synchronously and returns matching entries while observing cancellation.
+    /// </summary>
+    /// <param name="cancellationToken">A token to cancel the sync enumeration.</param>
+    /// <returns>A lazy enumerable of matching entries.</returns>
+    public IEnumerable<FileQueryEntry> ExecuteEntries(CancellationToken cancellationToken) =>
+        GetEngine().ExecuteEntries(Build(), cancellationToken);
+
+    /// <summary>
+    /// Executes the query synchronously and returns matching entries with progress reporting.
+    /// </summary>
+    /// <param name="progress">The progress sink that receives traversal snapshots.</param>
+    /// <param name="cancellationToken">A token to cancel the sync enumeration.</param>
+    /// <returns>A lazy enumerable of matching entries.</returns>
+    /// <exception cref="ArgumentNullException">Thrown when <paramref name="progress"/> is <see langword="null"/>.</exception>
+    public IEnumerable<FileQueryEntry> ExecuteEntries(
+        IProgress<FileQueryProgress> progress,
+        CancellationToken cancellationToken = default
+    ) {
+        ArgumentNullException.ThrowIfNull(progress);
+
+        return GetEngine().ExecuteEntries(Build(), progress, cancellationToken);
+    }
+
+    /// <summary>
+    /// Executes the query asynchronously and returns matching entries with metadata.
+    /// </summary>
+    /// <param name="cancellationToken">A token to cancel the async enumeration.</param>
+    /// <returns>An async enumerable of matching entries.</returns>
+    public IAsyncEnumerable<FileQueryEntry> ExecuteEntriesAsync(CancellationToken cancellationToken = default) =>
+        GetEngine().ExecuteEntriesAsync(Build(), cancellationToken);
+
+    /// <summary>
+    /// Executes the query asynchronously and returns matching entries with metadata,
+    /// reporting traversal progress.
+    /// </summary>
+    /// <param name="progress">The progress sink that receives traversal snapshots.</param>
+    /// <param name="cancellationToken">A token to cancel the async enumeration.</param>
+    /// <returns>An async enumerable of matching entries.</returns>
+    /// <exception cref="ArgumentNullException">Thrown when <paramref name="progress"/> is <see langword="null"/>.</exception>
+    public IAsyncEnumerable<FileQueryEntry> ExecuteEntriesAsync(
+        IProgress<FileQueryProgress> progress,
+        CancellationToken cancellationToken = default
+    ) {
+        ArgumentNullException.ThrowIfNull(progress);
+
+        return GetEngine().ExecuteEntriesAsync(Build(), progress, cancellationToken);
+    }
+
+    /// <summary>
     /// Builds the immutable <see cref="FileQuery"/> descriptor from the current configuration.
     /// </summary>
     /// <remarks>
     /// <para>
     /// This method validates the configuration and throws if it is inconsistent.
     /// The returned <see cref="FileQuery"/> instance contains no execution logic — it
-    /// is a pure data object passed to <see cref="IFileQueryEngine.Execute"/>.
+    /// is a pure data object passed to <see cref="IFileQueryEngine.Execute(FileQuery)"/>.
     /// </para>
     /// </remarks>
     /// <returns>An immutable <see cref="FileQuery"/> ready for execution.</returns>
@@ -347,29 +660,15 @@ public sealed class FileQueryBuilder {
     /// Thrown when the root path is null or whitespace.
     /// </exception>
     public FileQuery Build() {
+        var options = GetOptions();
+
         // Use centralized validation pipeline
-        FileQueryValidator.ValidateExecution(_fileSystem, _rootPath, GetOptions());
+        FileQueryValidator.ValidateExecution(_fileSystem, _rootPath, options);
 
-        var patternInput = new PatternInput(
-            Patterns: [],
-            TypedPatterns: _patternStorage.ToDictionary(
-                static kvp => kvp.Key,
-                static kvp => (IEnumerable<string>)kvp.Value),
-            InterpretationMode: _interpretationMode
-        );
-
-        var options = new FileQueryOptions(
-            new FileQueryOptionsConfig(
-                PatternInput: patternInput,
-                RecurseSubdirectories: _recurse,
-                IgnoreInaccessible: true,
-                PatternMatchingMode: _patternMatchingMode,
-                CaseSensitivity: _caseSensitivity,
-                AuditMatches: _auditMatches,
-                Diagnostics: _diagnostics,
-                ErrorRecovery: _errorRecovery
-            )
-        );
+        if(_includedPaths is not null) {
+            // Validate eagerly so malformed allow-lists fail at Build instead of first execution.
+            _ = RelativePathFilter.Create(_includedPaths, _caseSensitivity.Resolve());
+        }
 
         return new FileQuery(_rootPath, options);
     }
@@ -387,19 +686,30 @@ public sealed class FileQueryBuilder {
             new FileQueryOptionsConfig(
                 PatternInput: patternInput,
                 RecurseSubdirectories: _recurse,
-                IgnoreInaccessible: true,
+                MaxRecursionDepth: _maxRecursionDepth,
+                IgnoreInaccessible: _ignoreInaccessible,
                 PatternMatchingMode: _patternMatchingMode,
                 CaseSensitivity: _caseSensitivity,
+                Traversal: _traversal,
                 AuditMatches: _auditMatches,
                 Diagnostics: _diagnostics,
-                ErrorRecovery: _errorRecovery
-            )
+                ErrorRecovery: _errorRecovery,
+                MinSize: _minSize,
+                MaxSize: _maxSize,
+                ModifiedAfter: _modifiedAfter,
+                ModifiedBefore: _modifiedBefore,
+                AttributesToSkip: _attributesToSkip,
+                GitIgnoreFiles: _gitIgnoreFiles,
+                IncludeDirectories: _includeDirectories
+            ) {
+                IncludedPaths = _includedPaths
+            }
         );
     }
 
     // ===== Private helpers =====
 
-    private IFileQueryEngine GetEngine() => _engine ??= FileQueryRuntime.Create();
+    private IFileQueryEngine GetEngine() => _engine ??= DefaultEngineBuilder.Create(_fileSystem);
 
     /// <summary>
     /// Merges <paramref name="patterns"/> into the typed bucket for <paramref name="patternKind"/>,
@@ -407,16 +717,40 @@ public sealed class FileQueryBuilder {
     /// </summary>
     /// <param name="patternKind">The semantic type of the pattern.</param>
     /// <param name="patterns">A sequence of patterns to merge.</param>
+    /// <exception cref="ArgumentException">
+    /// Thrown when <paramref name="patterns"/> contains empty or whitespace-only entries.
+    /// </exception>
     private void MergeIntoTypedBucket(PatternKind patternKind, IEnumerable<string> patterns) {
         if(!_patternStorage.TryGetValue(patternKind, out var bucket)) {
-            _patternStorage[patternKind] = [.. patterns];
-            return;
+            bucket = [];
+            _patternStorage[patternKind] = bucket;
+            _patternLookup[patternKind] = new HashSet<string>(StringComparer.Ordinal);
         }
 
+        var lookup = _patternLookup[patternKind];
+
         foreach(var pattern in patterns) {
-            bucket.Add(pattern);
+            if(string.IsNullOrWhiteSpace(pattern)) {
+                throw new ArgumentException(
+                    "Patterns cannot contain empty or whitespace-only entries.",
+                    nameof(patterns));
+            }
+
+            if(lookup.Add(pattern)) {
+                bucket.Add(pattern);
+            }
         }
     }
+
+    /// <summary>
+    /// Gets the pattern kind selected by <see cref="PatternMatchingMode"/> for
+    /// <see cref="PatternInterpretationMode.Specific"/> interpretation.
+    /// </summary>
+    private PatternKind GetSpecificPatternKind() => _patternMatchingMode switch {
+        PatternMatchingMode.Glob => PatternKind.Glob,
+        PatternMatchingMode.Regex => PatternKind.Regex,
+        _ => PatternKind.GitIgnore
+    };
 
     /// <summary>
     /// Validates that <paramref name="patternKind"/> is compatible with the current
@@ -427,7 +761,17 @@ public sealed class FileQueryBuilder {
     /// Thrown when the combination of <paramref name="patternKind"/> and
     /// <see cref="_patternMatchingMode"/> is invalid.
     /// </exception>
+    /// <exception cref="ArgumentOutOfRangeException">
+    /// Thrown when <paramref name="patternKind"/> is not a defined value of <see cref="PatternKind"/>.
+    /// </exception>
     private void ValidatePatternType(PatternKind patternKind) {
+        if(!Enum.IsDefined(patternKind)) {
+            throw new ArgumentOutOfRangeException(
+                nameof(patternKind),
+                patternKind,
+                "Unknown pattern kind.");
+        }
+
         if(_interpretationMode != PatternInterpretationMode.Specific) {
             return;
         }

@@ -16,7 +16,11 @@ internal sealed class CurrentDirectoryInvariant : IPatternInvariant {
 
     public PatternInvariantResult Validate(PatternCompilationContext context) {
         if(context.Tokens!.Any(static seg => seg.Count == 1 && seg[0] is LiteralToken { Text: "." })) {
-            return PatternInvariantResult.Fail("'.' is not a valid pattern segment.");
+            var position = PatternTextPosition.Find(context.Pattern.Text.AsSpan(), ".");
+            return PatternInvariantResult.Fail(
+                "'.' is not a valid pattern segment.",
+                position,
+                position is { } value ? PatternTextPosition.SegmentAt(context.Pattern.Text.AsSpan(), value) : null);
         }
 
         return PatternInvariantResult.Success;

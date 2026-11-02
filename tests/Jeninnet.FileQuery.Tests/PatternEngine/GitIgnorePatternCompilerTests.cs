@@ -22,8 +22,8 @@ public class GitIgnorePatternCompilerTests {
         TestAssertEx.HasCount(compiledPatternSets, 1, "because we compiled a single pattern string");
         var compiledPattern = compiledPatternSets[0];
 
-        Assert.IsTrue(compiledPattern.IsNegated);
-        Assert.IsTrue(compiledPattern.DirectoryOnly);
+        compiledPattern.IsNegated.Should().BeTrue();
+        compiledPattern.DirectoryOnly.Should().BeTrue();
         /*
          * 1- [! + end with /] if(negated && directoryOnly) Prduce segments:
          * [RecursiveWildcard(**)] // PatternToken[] { new RecursiveWildcardToken() }
@@ -42,8 +42,8 @@ public class GitIgnorePatternCompilerTests {
 
         TestAssertEx.HasCount(compiledPatternSets, 1, "because we compiled a single pattern string");
         var compiledPattern = compiledPatternSets[0];
-        Assert.IsFalse(compiledPattern.IsNegated);
-        Assert.IsFalse(compiledPattern.DirectoryOnly);
+        compiledPattern.IsNegated.Should().BeFalse();
+        compiledPattern.DirectoryOnly.Should().BeFalse();
         // Should produce the segments: "obj", "**", "*.tmp"
         TestAssertEx.HasCount(compiledPattern.Segments, 3);
     }
@@ -67,6 +67,6 @@ public class GitIgnorePatternCompilerTests {
     [TestMethod]
     public void GitIgnore_EmptyPattern_ShouldHandleCorrectly() {
         var compiledPatternSets = CompiledPatternFactory.Compile(PatternKind.GitIgnore, "");
-        Assert.IsEmpty(compiledPatternSets);
+        compiledPatternSets.Should().BeEmpty();
     }
 }

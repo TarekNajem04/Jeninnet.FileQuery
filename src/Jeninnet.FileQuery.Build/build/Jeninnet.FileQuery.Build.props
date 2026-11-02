@@ -1,0 +1,7 @@
+<Project>
+
+    <PropertyGroup>
+        <FileQuerySarifOutput Condition="'$(FileQuerySarifOutput)' == ''"></FileQuerySarifOutput>
+    </PropertyGroup>
+
+</Project>

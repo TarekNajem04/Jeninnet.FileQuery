@@ -32,8 +32,14 @@ public class FileQueryEngineTests {
         public void Should_Reject_NullQuery() {
             var engine = DefaultEngineBuilder.Create();
 
-            Assert.ThrowsExactly<ArgumentNullException>(() => engine.Execute(null!));
+            FluentActions.Invoking(() => engine.Execute(null!, TestContext.CancellationToken)).Should().ThrowExactly<ArgumentNullException>();
         }
+
+        /// <summary>
+        /// Gets or sets the test context, which provides information about the current test run.
+        /// Used here primarily for accessing the <see cref="CancellationToken"/>.
+        /// </summary>
+        public TestContext TestContext { get; set; } = null!;
     }
 
     /// <summary>
@@ -43,7 +49,7 @@ public class FileQueryEngineTests {
     public void Should_ConvertBackslashesToForward_When_Normalized() {
         var input = System.IO.Path.Combine("C:", "Users", "Test", "Folder", "File.txt");
         var normalized = PathUtilities.Normalize(input);
-        Assert.AreEqual("C:/Users/Test/Folder/File.txt", PathUtilities.Normalize(normalized));
+        PathUtilities.Normalize(normalized).Should().Be("C:/Users/Test/Folder/File.txt");
     }
 
     /// <summary>
@@ -53,7 +59,7 @@ public class FileQueryEngineTests {
     public void Should_RemoveDuplicateSlashes_When_Normalized() {
         const string input = @"C:\\Users//Test\\Folder/File.txt";
         var normalized = PathUtilities.Normalize(input);
-        Assert.AreEqual("C:/Users/Test/Folder/File.txt", normalized);
+        normalized.Should().Be("C:/Users/Test/Folder/File.txt");
     }
 
     /// <summary>
@@ -63,7 +69,7 @@ public class FileQueryEngineTests {
     public void Should_PreserveRoot_When_TrailingSlashTrimmed() {
         const string root = "C:/";
         var normalized = PathUtilities.Normalize(root);
-        Assert.AreEqual("C:/", normalized);
+        normalized.Should().Be("C:/");
     }
 
     /// <summary>
@@ -85,13 +91,13 @@ public class FileQueryEngineTests {
             .Patterns
             .Single();
 
-        Assert.IsTrue(compiled.IsNegated);
-        Assert.IsTrue(compiled.DirectoryOnly);
+        compiled.IsNegated.Should().BeTrue();
+        compiled.DirectoryOnly.Should().BeTrue();
         compiled.Segments.Should().HaveCount(2);
         compiled.Segments[0].Should().ContainSingle(static token => token is RecursiveWildcardToken);
         compiled.Segments[1].Should().ContainSingle(static token => token is LiteralToken literal && literal.Text == "bin");
-        Assert.IsTrue(compiled.IsNegated);
-        Assert.IsTrue(compiled.DirectoryOnly);
+        compiled.IsNegated.Should().BeTrue();
+        compiled.DirectoryOnly.Should().BeTrue();
     }
 
     /// <summary>
@@ -104,9 +110,9 @@ public class FileQueryEngineTests {
             .Patterns
             .Single();
 
-        Assert.IsFalse(compiled.IsNegated);
-        Assert.IsFalse(compiled.DirectoryOnly);
-        Assert.IsTrue(compiled.AnchoredToRoot);
+        compiled.IsNegated.Should().BeFalse();
+        compiled.DirectoryOnly.Should().BeFalse();
+        compiled.AnchoredToRoot.Should().BeTrue();
         compiled.Segments.Should().HaveCount(3);
         compiled.Segments[0].Should().ContainSingle(static token => token is LiteralToken literal && literal.Text == "obj");
         compiled.Segments[1].Should().ContainSingle(static token => token is RecursiveWildcardToken);
@@ -150,8 +156,8 @@ public class FileQueryEngineTests {
         var matcher = CreateMatcher();
         var patterns = Compile(["*.cs", "!Program.cs"]);
 
-        Assert.IsFalse(matcher.Match(patterns, CreateFileContext("Test.cs")).IsSuccess());
-        Assert.IsTrue(matcher.Match(patterns, CreateFileContext("Program.cs")).IsSuccess());
+        matcher.Match(patterns, CreateFileContext("Test.cs")).IsSuccess().Should().BeFalse();
+        matcher.Match(patterns, CreateFileContext("Program.cs")).IsSuccess().Should().BeTrue();
     }
 
     /// <summary>
@@ -162,8 +168,8 @@ public class FileQueryEngineTests {
         var matcher = CreateMatcher();
         var patterns = Compile(["obj/"]);
 
-        Assert.IsFalse(matcher.Match(patterns, CreateDirectoryContext("obj")).IsSuccess());
-        Assert.IsTrue(matcher.Match(patterns, CreateFileContext("obj")).IsSuccess());
+        matcher.Match(patterns, CreateDirectoryContext("obj")).IsSuccess().Should().BeFalse();
+        matcher.Match(patterns, CreateFileContext("obj")).IsSuccess().Should().BeTrue();
     }
 
     /// <summary>
@@ -180,7 +186,7 @@ public class FileQueryEngineTests {
             }.AsReadOnly());
         var token = new CharacterClassToken(cls);
 
-        Assert.IsTrue(token.Value.IsNegated);
+        token.Value.IsNegated.Should().BeTrue();
         token.Value.Elements.Should().ContainSubset([new CharLiteral('a'), new CharLiteral('b')]);
         token.Value.Elements.Should().ContainSubset([new CharRange('x', 'z')]);
     }

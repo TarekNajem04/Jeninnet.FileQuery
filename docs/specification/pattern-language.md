@@ -32,15 +32,15 @@ The `HybridPathMatcher` automatically selects the appropriate matcher.
 
 # Pattern Precedence Model
 
-The engine follows **GitIgnore-style rule precedence**.
+Precedence has two levels:
 
-Rules are evaluated **in order**.
+1. **Within each dialect**, rules are evaluated in declaration order and the last matching rule
+   wins (GitIgnore-style `!` negation is part of this order).
+2. **Across dialects**, subsets are evaluated in the order GitIgnore → Glob → Regex. The first
+   subset that returns **Include** wins; a later subset can override an earlier **Exclude**, but
+   not an earlier **Include**.
 
-```
-Last rule wins
-```
-
-Example:
+Example within the GitIgnore subset:
 
 ```csharp
 patterns: [

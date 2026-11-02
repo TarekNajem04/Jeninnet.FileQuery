@@ -18,9 +18,9 @@ public class SegmentMatchEngineTests {
     [TestMethod]
     public void Should_ReturnCorrectComparison_When_GetStringComparisonCalled() {
         var contextSensitive = new PathMatchContext("test", PathKind.File, CaseSensitivity.Sensitive);
-        Assert.AreEqual(StringComparison.Ordinal, contextSensitive.GetStringComparison());
+        contextSensitive.GetStringComparison().Should().Be(StringComparison.Ordinal);
 
         var contextInsensitive = new PathMatchContext("test", PathKind.File, CaseSensitivity.Insensitive);
-        Assert.AreEqual(StringComparison.OrdinalIgnoreCase, contextInsensitive.GetStringComparison());
+        contextInsensitive.GetStringComparison().Should().Be(StringComparison.OrdinalIgnoreCase);
     }
 }
