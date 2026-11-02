@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="assets/icon.png" alt="Jeninnet.FileQuery icon" width="128" />
+</p>
+
 # Jeninnet.FileQuery
 
 ![GitHub Actions CI Workflow Status](https://img.shields.io/github/actions/workflow/status/TarekNajem04/Jeninnet.FileQuery/ci.yml)

@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024" role="img" aria-label="Jeninnet.FileQuery icon">
+  <defs>
+    <linearGradient id="background" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#0B1220"/>
+      <stop offset="0.55" stop-color="#0D1829"/>
+      <stop offset="1" stop-color="#13233B"/>
+    </linearGradient>
+    <linearGradient id="rim" x1="0.15" y1="0.05" x2="0.9" y2="0.95">
+      <stop offset="0" stop-color="#A5F3FC"/>
+      <stop offset="0.4" stop-color="#22D3EE"/>
+      <stop offset="0.78" stop-color="#3B82F6"/>
+      <stop offset="1" stop-color="#6366F1"/>
+    </linearGradient>
+    <radialGradient id="lensGlow" cx="0.42" cy="0.38" r="0.62">
+      <stop offset="0" stop-color="#12314D"/>
+      <stop offset="0.65" stop-color="#0A1727"/>
+      <stop offset="1" stop-color="#07111E"/>
+    </radialGradient>
+    <radialGradient id="ambient" cx="0.42" cy="0.4" r="0.55">
+      <stop offset="0" stop-color="#22D3EE" stop-opacity="0.14"/>
+      <stop offset="1" stop-color="#22D3EE" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="glow" x="-40%" y="-40%" width="180%" height="180%">
+      <feGaussianBlur stdDeviation="18"/>
+    </filter>
+  </defs>
+
+  <!-- App tile -->
+  <rect x="32" y="32" width="960" height="960" rx="224" fill="url(#background)"/>
+  <rect x="33" y="33" width="958" height="958" rx="223" fill="none" stroke="#274463" stroke-width="2" opacity="0.55"/>
+
+  <!-- Ambient light behind the lens -->
+  <circle cx="440" cy="425" r="355" fill="url(#ambient)"/>
+
+  <!-- Magnifier handle (behind the rim) -->
+  <path d="M 598 592 L 792 786" fill="none" stroke="#07101D" stroke-width="116" stroke-linecap="round"/>
+  <path d="M 598 592 L 792 786" fill="none" stroke="url(#rim)" stroke-width="84" stroke-linecap="round"/>
+  <path d="M 620 614 L 772 766" fill="none" stroke="#E0F2FE" stroke-width="10" stroke-linecap="round" opacity="0.28"/>
+
+  <!-- Lens -->
+  <circle cx="440" cy="425" r="278" fill="#07111E"/>
+  <circle cx="440" cy="425" r="268" fill="url(#lensGlow)" stroke="url(#rim)" stroke-width="58"/>
+  <circle cx="440" cy="425" r="236" fill="none" stroke="#16405F" stroke-width="3" opacity="0.9"/>
+
+  <!-- File tree / query paths inside the lens -->
+  <g fill="none" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M 330 585 C 360 540 402 500 460 455" stroke="#22D3EE" stroke-width="26"/>
+    <path d="M 460 455 C 420 392 372 344 322 316" stroke="#F59E0B" stroke-width="24"/>
+    <path d="M 460 455 C 455 384 460 332 470 292" stroke="#60A5FA" stroke-width="24"/>
+    <path d="M 460 455 C 518 412 556 376 592 352" stroke="#A78BFA" stroke-width="24"/>
+  </g>
+
+  <!-- Path nodes -->
+  <g>
+    <circle cx="322" cy="316" r="32" fill="#0B1220" stroke="#F59E0B" stroke-width="14"/>
+    <circle cx="322" cy="316" r="9" fill="#F59E0B"/>
+
+    <circle cx="470" cy="292" r="32" fill="#0B1220" stroke="#60A5FA" stroke-width="14"/>
+    <circle cx="470" cy="292" r="9" fill="#60A5FA"/>
+
+    <circle cx="592" cy="352" r="32" fill="#0B1220" stroke="#A78BFA" stroke-width="14"/>
+    <circle cx="592" cy="352" r="9" fill="#A78BFA"/>
+
+    <circle cx="330" cy="585" r="28" fill="#0B1220" stroke="#22D3EE" stroke-width="13"/>
+    <circle cx="330" cy="585" r="8" fill="#22D3EE"/>
+  </g>
+
+  <!-- Query spark at the convergence point -->
+  <path d="M 460 398 L 477 438 L 517 455 L 477 472 L 460 512 L 443 472 L 403 455 L 443 438 Z"
+        fill="#F8FAFC"/>
+  <circle cx="460" cy="455" r="14" fill="#A5F3FC"/>
+
+  <!-- Rim highlight -->
+  <path d="M 244 302 A 232 232 0 0 1 518 186"
+        fill="none" stroke="#F0FDFF" stroke-width="17" stroke-linecap="round" opacity="0.38"/>
+
+  <!-- Small deterministic order accents -->
+  <circle cx="250" cy="730" r="7" fill="#22D3EE" opacity="0.7"/>
+  <circle cx="284" cy="730" r="7" fill="#60A5FA" opacity="0.7"/>
+  <circle cx="318" cy="730" r="7" fill="#A78BFA" opacity="0.7"/>
+</svg>

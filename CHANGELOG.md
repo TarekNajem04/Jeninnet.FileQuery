@@ -34,6 +34,7 @@ Versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - **Roslyn Analyzer**: Added the `Jeninnet.FileQuery.Analyzers` package with `JNQ1001` (malformed pattern literal) and a safe code fix that closes a character class.
 - **Inaccessible-Entry Policy**: Added `FileQueryBuilder.IgnoreInaccessible(bool)` so callers can surface recoverable access failures instead of always skipping them. Disabling the default selects the abort recovery policy unless `WithErrorRecovery` is supplied.
 - **Traversal Controls**: Added `FileQueryBuilder.WithMaxDepth(int)` and `WithTraversal(TraversalOptions)`, exposing depth limits, DFS/BFS strategy, and symlink policy through the fluent API.
+- **Project Icon**: Added `assets/icon.svg` and a 1024×1024 PNG, wired the icon into all eight NuGet packages via shared build targets, and used it as the DocFX logo/favicon and README mark.
 - **Native AOT Validation**: Added the `Jeninnet.FileQuery.AotSmoke` host and a `linux-x64` CI job that publishes with `PublishAot`, treats trimming/AOT warnings as errors, and runs a real query.
 
 ### Changed
