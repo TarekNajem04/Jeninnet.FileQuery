@@ -97,38 +97,24 @@ internal sealed class FileQueryEngine(
         var startTimestamp = FileQueryInstrumentation.RecordStarted();
         using var activity = FileQueryInstrumentation.StartActivity(FileQueryTelemetry.ExecuteActivityName, options);
         using var ownedEnumerator = enumerator;
-        var completed = false;
 
         while(true) {
             T current;
 
             try {
                 if(!ownedEnumerator.MoveNext()) {
-                    completed = true;
-                    activity?.SetTag("filequery.outcome", "completed");
-                    break;
+                    CompletePlan(activity, startTimestamp);
+                    yield break;
                 }
 
                 current = ownedEnumerator.Current;
             }
-            catch(OperationCanceledException exception) {
-                activity?.SetStatus(ActivityStatusCode.Error, exception.Message);
-                activity?.SetTag("filequery.outcome", "cancelled");
-                FileQueryInstrumentation.RecordCancelled(startTimestamp);
-                throw;
-            }
             catch(Exception exception) {
-                activity?.SetStatus(ActivityStatusCode.Error, exception.Message);
-                activity?.SetTag("filequery.outcome", "error");
-                FileQueryInstrumentation.RecordError(startTimestamp);
+                FailPlan(activity, exception, startTimestamp);
                 throw;
             }
 
             yield return current;
-        }
-
-        if(completed) {
-            FileQueryInstrumentation.RecordCompleted(startTimestamp);
         }
     }
 
@@ -147,38 +133,54 @@ internal sealed class FileQueryEngine(
         var startTimestamp = FileQueryInstrumentation.RecordStarted();
         using var activity = FileQueryInstrumentation.StartActivity(activityName, options);
         await using var ownedEnumerator = enumerator;
-        var completed = false;
 
         while(true) {
             T current;
 
             try {
                 if(!await ownedEnumerator.MoveNextAsync().ConfigureAwait(false)) {
-                    completed = true;
-                    activity?.SetTag("filequery.outcome", "completed");
-                    break;
+                    CompletePlan(activity, startTimestamp);
+                    yield break;
                 }
 
                 current = ownedEnumerator.Current;
             }
-            catch(OperationCanceledException exception) {
-                activity?.SetStatus(ActivityStatusCode.Error, exception.Message);
-                activity?.SetTag("filequery.outcome", "cancelled");
-                FileQueryInstrumentation.RecordCancelled(startTimestamp);
-                throw;
-            }
             catch(Exception exception) {
-                activity?.SetStatus(ActivityStatusCode.Error, exception.Message);
-                activity?.SetTag("filequery.outcome", "error");
-                FileQueryInstrumentation.RecordError(startTimestamp);
+                FailPlan(activity, exception, startTimestamp);
                 throw;
             }
 
             yield return current;
         }
+    }
 
-        if(completed) {
-            FileQueryInstrumentation.RecordCompleted(startTimestamp);
+    /// <summary>
+    /// Records a plan enumeration that reached its end.
+    /// </summary>
+    /// <param name="activity">The current activity, if any.</param>
+    /// <param name="startTimestamp">The enumeration start timestamp.</param>
+    private static void CompletePlan(Activity? activity, long startTimestamp) {
+        activity?.SetTag("filequery.outcome", "completed");
+        FileQueryInstrumentation.RecordCompleted(startTimestamp);
+    }
+
+    /// <summary>
+    /// Records a plan enumeration that ended with an exception.
+    /// </summary>
+    /// <param name="activity">The current activity, if any.</param>
+    /// <param name="exception">The failure that ended the enumeration.</param>
+    /// <param name="startTimestamp">The enumeration start timestamp.</param>
+    private static void FailPlan(Activity? activity, Exception exception, long startTimestamp) {
+        activity?.SetStatus(ActivityStatusCode.Error, exception.Message);
+
+        if(exception is OperationCanceledException) {
+            activity?.SetTag("filequery.outcome", "cancelled");
+            FileQueryInstrumentation.RecordCancelled(startTimestamp);
+
+            return;
         }
+
+        activity?.SetTag("filequery.outcome", "error");
+        FileQueryInstrumentation.RecordError(startTimestamp);
     }
 }

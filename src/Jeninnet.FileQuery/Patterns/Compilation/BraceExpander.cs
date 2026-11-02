@@ -115,55 +115,33 @@ internal static class BraceExpander {
     /// <param name="start">The position to start scanning.</param>
     /// <returns>The group bounds or an error.</returns>
     private static (int Open, int Close, BraceError? Error) FindGroup(string pattern, int start) {
-        var inCharacterClass = false;
-        var i = start;
+        var scanner = new BraceScanner(pattern, start, pattern.Length);
 
-        while(i < pattern.Length) {
-            var c = pattern[i];
-
-            if(c == '\\') {
-                i += 2;
-                continue;
-            }
-
-            if(c == '[') {
-                inCharacterClass = true;
-                i++;
-                continue;
-            }
-
-            if(c == ']' && inCharacterClass) {
-                inCharacterClass = false;
-                i++;
-                continue;
-            }
-
-            if(inCharacterClass) {
-                i++;
-                continue;
-            }
+        while(scanner.MoveNext()) {
+            var c = scanner.Current;
 
             if(c == '}') {
-                return (-1, -1, new BraceError("Closing brace '}' has no matching opening brace '{'.", i));
+                return (-1, -1, new BraceError("Closing brace '}' has no matching opening brace '{'.", scanner.Position));
             }
 
             if(c != '{') {
-                i++;
+                scanner.Advance();
                 continue;
             }
 
-            var close = FindClosingBrace(pattern, i + 1);
+            var open = scanner.Position;
+            var close = FindClosingBrace(pattern, open + 1);
 
             if(close < 0) {
-                return (-1, -1, new BraceError("Opening brace '{' has no matching closing brace '}'.", i));
+                return (-1, -1, new BraceError("Opening brace '{' has no matching closing brace '}'.", open));
             }
 
-            if(HasTopLevelComma(pattern, i + 1, close)) {
-                return (i, close, null);
+            if(HasTopLevelComma(pattern, open + 1, close)) {
+                return (open, close, null);
             }
 
             // A brace group without a comma is a literal sequence, not alternation.
-            i = close + 1;
+            scanner.MoveTo(close + 1);
         }
 
         return (-1, -1, null);
@@ -177,41 +155,18 @@ internal static class BraceExpander {
     /// <returns>The closing position, or <c>-1</c> when absent.</returns>
     private static int FindClosingBrace(string pattern, int start) {
         var depth = 1;
-        var inCharacterClass = false;
-        var i = start;
+        var scanner = new BraceScanner(pattern, start, pattern.Length);
 
-        while(i < pattern.Length) {
-            var c = pattern[i];
-
-            if(c == '\\') {
-                i += 2;
-                continue;
-            }
-
-            if(c == '[') {
-                inCharacterClass = true;
-                i++;
-                continue;
-            }
-
-            if(c == ']' && inCharacterClass) {
-                inCharacterClass = false;
-                i++;
-                continue;
-            }
-
-            if(inCharacterClass) {
-                i++;
-                continue;
-            }
+        while(scanner.MoveNext()) {
+            var c = scanner.Current;
 
             if(c == '{') {
                 depth++;
             } else if(c == '}' && --depth == 0) {
-                return i;
+                return scanner.Position;
             }
 
-            i++;
+            scanner.Advance();
         }
 
         return -1;
@@ -225,33 +180,10 @@ internal static class BraceExpander {
     /// <param name="end">The closing brace position.</param>
     private static bool HasTopLevelComma(string pattern, int start, int end) {
         var depth = 0;
-        var inCharacterClass = false;
-        var i = start;
+        var scanner = new BraceScanner(pattern, start, end);
 
-        while(i < end) {
-            var c = pattern[i];
-
-            if(c == '\\') {
-                i += 2;
-                continue;
-            }
-
-            if(c == '[') {
-                inCharacterClass = true;
-                i++;
-                continue;
-            }
-
-            if(c == ']' && inCharacterClass) {
-                inCharacterClass = false;
-                i++;
-                continue;
-            }
-
-            if(inCharacterClass) {
-                i++;
-                continue;
-            }
+        while(scanner.MoveNext()) {
+            var c = scanner.Current;
 
             if(c == '{') {
                 depth++;
@@ -261,7 +193,7 @@ internal static class BraceExpander {
                 return true;
             }
 
-            i++;
+            scanner.Advance();
         }
 
         return false;
@@ -276,45 +208,22 @@ internal static class BraceExpander {
     private static List<string> SplitAlternatives(string pattern, int start, int end) {
         var alternatives = new List<string>();
         var depth = 0;
-        var inCharacterClass = false;
         var partStart = start;
-        var i = start;
+        var scanner = new BraceScanner(pattern, start, end);
 
-        while(i < end) {
-            var c = pattern[i];
-
-            if(c == '\\') {
-                i += 2;
-                continue;
-            }
-
-            if(c == '[') {
-                inCharacterClass = true;
-                i++;
-                continue;
-            }
-
-            if(c == ']' && inCharacterClass) {
-                inCharacterClass = false;
-                i++;
-                continue;
-            }
-
-            if(inCharacterClass) {
-                i++;
-                continue;
-            }
+        while(scanner.MoveNext()) {
+            var c = scanner.Current;
 
             if(c == '{') {
                 depth++;
             } else if(c == '}') {
                 depth--;
             } else if(c == ',' && depth == 0) {
-                alternatives.Add(pattern[partStart..i]);
-                partStart = i + 1;
+                alternatives.Add(pattern[partStart..scanner.Position]);
+                partStart = scanner.Position + 1;
             }
 
-            i++;
+            scanner.Advance();
         }
 
         alternatives.Add(pattern[partStart..end]);

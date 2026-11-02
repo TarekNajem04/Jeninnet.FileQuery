@@ -150,30 +150,10 @@ internal sealed class TraversalExecutor : ITraversalExecutor {
                     plan.Traversal.ErrorRecovery,
                     cancellationToken
                 )) {
-                    cancellationToken.ThrowIfCancellationRequested();
-                    state.EntriesScanned++;
-                    entriesScanned++;
-                    ReportProgress(plan, state, entry.FullPath);
-
-                    if(
-                        !TryProcessEntry(
-                            plan,
-                            entry,
-                            frame,
-                            buffer,
-                            visited,
-                            pathBuffer,
-                            out var yieldedEntry
-                        )
-                    ) {
-                        continue;
-                    }
-
-                    if(yieldedEntry.HasValue) {
-                        state.FilesMatched++;
-                        filesMatched++;
-                        ReportProgress(plan, state, yieldedEntry.Value.FullPath);
-                        yield return project(yieldedEntry.Value, pathBuffer);
+                    if(TryAdvance(
+                        plan, entry, frame, buffer, visited, pathBuffer, state,
+                        ref entriesScanned, ref filesMatched, project, cancellationToken, out var result)) {
+                        yield return result;
                     }
                 }
             }
@@ -209,30 +189,10 @@ internal sealed class TraversalExecutor : ITraversalExecutor {
                     plan.Traversal.IgnoreInaccessible,
                     plan.Traversal.ErrorRecovery
                 )) {
-                    cancellationToken.ThrowIfCancellationRequested();
-                    state.EntriesScanned++;
-                    entriesScanned++;
-                    ReportProgress(plan, state, entry.FullPath);
-
-                    if(
-                        !TryProcessEntry(
-                            plan,
-                            entry,
-                            frame,
-                            buffer,
-                            visited,
-                            pathBuffer,
-                            out var yieldedEntry
-                        )
-                    ) {
-                        continue;
-                    }
-
-                    if(yieldedEntry.HasValue) {
-                        state.FilesMatched++;
-                        filesMatched++;
-                        ReportProgress(plan, state, yieldedEntry.Value.FullPath);
-                        yield return project(yieldedEntry.Value, pathBuffer);
+                    if(TryAdvance(
+                        plan, entry, frame, buffer, visited, pathBuffer, state,
+                        ref entriesScanned, ref filesMatched, project, cancellationToken, out var result)) {
+                        yield return result;
                     }
                 }
             }
@@ -240,6 +200,66 @@ internal sealed class TraversalExecutor : ITraversalExecutor {
         finally {
             FileQueryInstrumentation.RecordTraversal(entriesScanned, filesMatched);
         }
+    }
+
+    /// <summary>
+    /// Processes one filesystem entry and projects it when the entry is yielded.
+    /// </summary>
+    /// <typeparam name="T">The result type.</typeparam>
+    /// <param name="plan">The traversal plan.</param>
+    /// <param name="entry">The filesystem entry to process.</param>
+    /// <param name="frame">The current traversal frame.</param>
+    /// <param name="buffer">The traversal frontier buffer.</param>
+    /// <param name="visited">The set of visited directory paths (for symlink cycle detection).</param>
+    /// <param name="pathBuffer">The reusable buffer used to compose the root-relative path.</param>
+    /// <param name="state">The shared traversal progress state.</param>
+    /// <param name="entriesScanned">The running entry count.</param>
+    /// <param name="filesMatched">The running match count.</param>
+    /// <param name="project">The projection applied to each matched entry.</param>
+    /// <param name="cancellationToken">Token to monitor for cancellation requests.</param>
+    /// <param name="result">The projected result when the entry is yielded.</param>
+    /// <returns><see langword="true"/> when the entry produces a result.</returns>
+    private static bool TryAdvance<T>(
+        TraversalPlan plan,
+        FileSystemEntry entry,
+        TraversalFrame frame,
+        TraversalFrontier buffer,
+        HashSet<string>? visited,
+        RelativePathBuffer pathBuffer,
+        TraversalProgressState state,
+        ref long entriesScanned,
+        ref long filesMatched,
+        Func<FileSystemEntry, RelativePathBuffer, T> project,
+        CancellationToken cancellationToken,
+        out T result
+    ) {
+        cancellationToken.ThrowIfCancellationRequested();
+        state.EntriesScanned++;
+        entriesScanned++;
+        ReportProgress(plan, state, entry.FullPath);
+
+        if(
+            !TryProcessEntry(
+                plan,
+                entry,
+                frame,
+                buffer,
+                visited,
+                pathBuffer,
+                out var yieldedEntry
+            ) ||
+            !yieldedEntry.HasValue
+        ) {
+            result = default!;
+            return false;
+        }
+
+        state.FilesMatched++;
+        filesMatched++;
+        ReportProgress(plan, state, yieldedEntry.Value.FullPath);
+        result = project(yieldedEntry.Value, pathBuffer);
+
+        return true;
     }
 
     /// <summary>

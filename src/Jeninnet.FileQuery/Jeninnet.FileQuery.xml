@@ -35,6 +35,21 @@
             <param name="enumerator">The traversal enumerator.</param>
             <param name="activityName">The activity name for the operation.</param>
         </member>
+        <member name="M:Jeninnet.FileQuery.Engine.FileQueryEngine.CompletePlan(System.Diagnostics.Activity,System.Int64)">
+            <summary>
+            Records a plan enumeration that reached its end.
+            </summary>
+            <param name="activity">The current activity, if any.</param>
+            <param name="startTimestamp">The enumeration start timestamp.</param>
+        </member>
+        <member name="M:Jeninnet.FileQuery.Engine.FileQueryEngine.FailPlan(System.Diagnostics.Activity,System.Exception,System.Int64)">
+            <summary>
+            Records a plan enumeration that ended with an exception.
+            </summary>
+            <param name="activity">The current activity, if any.</param>
+            <param name="exception">The failure that ended the enumeration.</param>
+            <param name="startTimestamp">The enumeration start timestamp.</param>
+        </member>
         <member name="T:Jeninnet.FileQuery.Enums.CaseSensitivity">
             <summary>
             Specifies how textual comparisons should treat character casing.
@@ -4037,6 +4052,46 @@
         <member name="P:Jeninnet.FileQuery.Patterns.Compilation.BraceExpander.BraceError.Position">
             <summary>The character position of the failure.</summary>
         </member>
+        <member name="T:Jeninnet.FileQuery.Patterns.Compilation.BraceScanner">
+            <summary>
+            Scans brace-pattern text while skipping escaped characters and character-class contents.
+            </summary>
+        </member>
+        <member name="M:Jeninnet.FileQuery.Patterns.Compilation.BraceScanner.#ctor(System.ReadOnlySpan{System.Char},System.Int32,System.Int32)">
+            <summary>
+            Initializes a scanner over a pattern range.
+            </summary>
+            <param name="text">The pattern text.</param>
+            <param name="start">The first position to scan.</param>
+            <param name="end">The exclusive end position.</param>
+        </member>
+        <member name="P:Jeninnet.FileQuery.Patterns.Compilation.BraceScanner.Position">
+            <summary>
+            Gets the position of the current significant character.
+            </summary>
+        </member>
+        <member name="P:Jeninnet.FileQuery.Patterns.Compilation.BraceScanner.Current">
+            <summary>
+            Gets the current significant character.
+            </summary>
+        </member>
+        <member name="M:Jeninnet.FileQuery.Patterns.Compilation.BraceScanner.MoveNext">
+            <summary>
+            Moves to the next significant character, skipping escapes and character classes.
+            </summary>
+            <returns><see langword="true"/> when another significant character is available.</returns>
+        </member>
+        <member name="M:Jeninnet.FileQuery.Patterns.Compilation.BraceScanner.Advance">
+            <summary>
+            Advances past the current significant character.
+            </summary>
+        </member>
+        <member name="M:Jeninnet.FileQuery.Patterns.Compilation.BraceScanner.MoveTo(System.Int32)">
+            <summary>
+            Moves the scan position to a specific index.
+            </summary>
+            <param name="position">The new scan position.</param>
+        </member>
         <member name="T:Jeninnet.FileQuery.Patterns.Compilation.CompiledPatternFactory">
             <summary>
             Static facade for compiling patterns using a shared <see cref="T:Jeninnet.FileQuery.Patterns.Compilation.PatternPipeline"/>.
@@ -6719,6 +6774,25 @@
             <param name="plan">The traversal plan.</param>
             <param name="project">The projection applied to each matched entry.</param>
             <param name="cancellationToken">Token to monitor for cancellation requests.</param>
+        </member>
+        <member name="M:Jeninnet.FileQuery.Traversal.TraversalExecutor.TryAdvance``1(Jeninnet.FileQuery.Traversal.TraversalPlan,Jeninnet.FileQuery.IO.FileSystemEntry,Jeninnet.FileQuery.Traversal.TraversalFrame,Jeninnet.FileQuery.Traversal.TraversalFrontier,System.Collections.Generic.HashSet{System.String},Jeninnet.FileQuery.Traversal.RelativePathBuffer,Jeninnet.FileQuery.Traversal.TraversalExecutor.TraversalProgressState,System.Int64@,System.Int64@,System.Func{Jeninnet.FileQuery.IO.FileSystemEntry,Jeninnet.FileQuery.Traversal.RelativePathBuffer,``0},System.Threading.CancellationToken,``0@)">
+            <summary>
+            Processes one filesystem entry and projects it when the entry is yielded.
+            </summary>
+            <typeparam name="T">The result type.</typeparam>
+            <param name="plan">The traversal plan.</param>
+            <param name="entry">The filesystem entry to process.</param>
+            <param name="frame">The current traversal frame.</param>
+            <param name="buffer">The traversal frontier buffer.</param>
+            <param name="visited">The set of visited directory paths (for symlink cycle detection).</param>
+            <param name="pathBuffer">The reusable buffer used to compose the root-relative path.</param>
+            <param name="state">The shared traversal progress state.</param>
+            <param name="entriesScanned">The running entry count.</param>
+            <param name="filesMatched">The running match count.</param>
+            <param name="project">The projection applied to each matched entry.</param>
+            <param name="cancellationToken">Token to monitor for cancellation requests.</param>
+            <param name="result">The projected result when the entry is yielded.</param>
+            <returns><see langword="true"/> when the entry produces a result.</returns>
         </member>
         <member name="M:Jeninnet.FileQuery.Traversal.TraversalExecutor.TakeFrame(Jeninnet.FileQuery.Traversal.TraversalFrontier,Jeninnet.FileQuery.Traversal.TraversalConfiguration)">
             <summary>

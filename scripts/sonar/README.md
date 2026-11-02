@@ -103,9 +103,9 @@ The 2026-11-02 local run used SonarQube Community Build 26.10 with `-Local -With
 |---|---|
 | Open issues | **0** |
 | Quality Gate | **OK** |
-| Sonar coverage | **84.0%** (84.8% lines, 82.5% branches) |
-| Maintained lines (ncloc) | 8,671 |
-| Duplicated lines | 1.3% |
+| Sonar coverage | **84.6%** (85.4% lines, 83.1% branches) |
+| Maintained lines (ncloc) | 8,613 |
+| Duplicated lines | **0.0%** (0 lines, 0 blocks) |
 | Bugs / vulnerabilities / code smells | 0 / 0 / 0 |
 
 The Sonar server reuses the `SonarAnalyzer.CSharp` rules that already run during `dotnet build`;

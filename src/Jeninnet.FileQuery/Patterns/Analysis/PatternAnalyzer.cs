@@ -5,6 +5,8 @@
 // Solution Repository: https://github.com/TarekNajem04/Jeninnet.FileQuery [LIVE]
 // Licensed under the MIT License.
 //
+using Jeninnet.FileQuery.Patterns.Compilation;
+
 namespace Jeninnet.FileQuery.Patterns.Analysis;
 
 /// <inheritdoc/>
@@ -204,33 +206,10 @@ internal sealed class PatternAnalyzer : IPatternAnalyzer {
     /// <param name="start">The position after the opening brace.</param>
     private static bool HasTopLevelComma(ReadOnlySpan<char> pattern, int start) {
         var depth = 1;
-        var inCharacterClass = false;
-        var i = start;
+        var scanner = new BraceScanner(pattern, start, pattern.Length);
 
-        while(i < pattern.Length) {
-            var c = pattern[i];
-
-            if(c == '\\') {
-                i += 2;
-                continue;
-            }
-
-            if(c == '[') {
-                inCharacterClass = true;
-                i++;
-                continue;
-            }
-
-            if(c == ']' && inCharacterClass) {
-                inCharacterClass = false;
-                i++;
-                continue;
-            }
-
-            if(inCharacterClass) {
-                i++;
-                continue;
-            }
+        while(scanner.MoveNext()) {
+            var c = scanner.Current;
 
             if(c == '{') {
                 depth++;
@@ -240,7 +219,7 @@ internal sealed class PatternAnalyzer : IPatternAnalyzer {
                 return true;
             }
 
-            i++;
+            scanner.Advance();
         }
 
         return false;
