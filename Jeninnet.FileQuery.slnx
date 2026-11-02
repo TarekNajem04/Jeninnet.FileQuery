@@ -60,13 +60,17 @@
         <File Path="scripts/sonar/preview.ps1" />
     </Folder>
 
-    <Folder Name="/extensions/">
-        <File Path="extensions/vscode/package.json" />
-    </Folder>
+    <Folder Name="/extensions/" />
     <Folder Name="/extensions/vscode/">
         <File Path="extensions/vscode/.vscodeignore" />
+        <File Path="extensions/vscode/package.json" />
+        <File Path="extensions/vscode/README.md" />
+    </Folder>
+    <Folder Name="/extensions/vscode/src/">
         <File Path="extensions/vscode/src/extension.js" />
         <File Path="extensions/vscode/src/runner.js" />
+    </Folder>
+    <Folder Name="/extensions/vscode/test/">
         <File Path="extensions/vscode/test/runner.test.js" />
     </Folder>
 
