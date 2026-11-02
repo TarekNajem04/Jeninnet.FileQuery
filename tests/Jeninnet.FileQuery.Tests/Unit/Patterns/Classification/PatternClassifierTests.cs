@@ -18,36 +18,36 @@ public sealed class PatternClassifierTests {
     [TestMethod]
     public void Should_HandleAllBranches_When_Classified() {
         // Unknown (Malformed)
-        Assert.AreEqual(PatternKind.Unknown, PatternClassifier.Classify("[a-z"));
+        (PatternClassifier.Classify("[a-z")).Should().Be(PatternKind.Unknown);
 
         // Empty
-        Assert.AreEqual(PatternKind.GitIgnore, PatternClassifier.Classify(""));
+        PatternClassifier.Classify("").Should().Be(PatternKind.GitIgnore);
 
         // Regex
-        Assert.AreEqual(PatternKind.Regex, PatternClassifier.Classify("r:.*"));
-        Assert.AreEqual(PatternKind.GitIgnore, PatternClassifier.Classify("regex:^.*$"));
-        Assert.AreEqual(PatternKind.GitIgnore, PatternClassifier.Classify("regex:"));
+        (PatternClassifier.Classify("r:.*")).Should().Be(PatternKind.Regex);
+        (PatternClassifier.Classify("regex:^.*$")).Should().Be(PatternKind.GitIgnore);
+        PatternClassifier.Classify("regex:").Should().Be(PatternKind.GitIgnore);
 
         // Glob (Stray bracket)
-        Assert.AreEqual(PatternKind.Glob, PatternClassifier.Classify("a]"));
+        PatternClassifier.Classify("a]").Should().Be(PatternKind.Glob);
 
         // Glob (Windows Path)
-        Assert.AreEqual(PatternKind.Glob, PatternClassifier.Classify(@"C:\foo"));
-        Assert.AreEqual(PatternKind.Unknown, PatternClassifier.Classify(@"C:\"));
+        PatternClassifier.Classify(@"C:\foo").Should().Be(PatternKind.Glob);
+        PatternClassifier.Classify(@"C:\").Should().Be(PatternKind.Unknown);
 
         // Glob (Windows Path - negative)
-        Assert.AreNotEqual(PatternKind.Glob, PatternClassifier.Classify(@"!C:\foo"));
+        PatternClassifier.Classify(@"!C:\foo").Should().NotBe(PatternKind.Glob);
 
         // Literal with escaped characters (no backslash)
-        Assert.AreEqual(PatternKind.GitIgnore, PatternClassifier.Classify(@"\!foo"));
+        PatternClassifier.Classify(@"\!foo").Should().Be(PatternKind.GitIgnore);
 
         // GitIgnore (GitIgnore syntax)
-        Assert.AreEqual(PatternKind.GitIgnore, PatternClassifier.Classify("!foo"));
+        PatternClassifier.Classify("!foo").Should().Be(PatternKind.GitIgnore);
 
         // GitIgnore (Wildcard)
-        Assert.AreEqual(PatternKind.GitIgnore, PatternClassifier.Classify("*"));
+        (PatternClassifier.Classify("*")).Should().Be(PatternKind.GitIgnore);
 
         // Literal
-        Assert.AreEqual(PatternKind.GitIgnore, PatternClassifier.Classify("foo"));
+        PatternClassifier.Classify("foo").Should().Be(PatternKind.GitIgnore);
     }
 }

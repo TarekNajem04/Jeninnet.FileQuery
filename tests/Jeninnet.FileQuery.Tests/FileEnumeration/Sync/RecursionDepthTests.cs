@@ -40,7 +40,7 @@ public class RecursionDepthTests {
         var result = fileQueryEngine.Execute(new(env.Root, options), TestContext.CancellationToken).ToList();
 
         result.Should().HaveCount(1);
-        Assert.EndsWith("root.txt", result.Single());
+        result.Single().Should().EndWith("root.txt");
     }
 
     /// <summary>

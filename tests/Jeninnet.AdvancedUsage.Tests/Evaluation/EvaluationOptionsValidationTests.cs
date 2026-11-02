@@ -22,16 +22,10 @@ public sealed class EvaluationOptionsValidationTests {
         foreach(var invalidTarget in new[] { 10, 1_000_001 }) {
             var options = CreateValidOptions(invalidTarget);
 
-            var exception = Assert.ThrowsExactly<ArgumentOutOfRangeException>(
-                options.Validate);
+            var exception = FluentActions.Invoking(() => options.Validate()).Should().ThrowExactly<ArgumentOutOfRangeException>().Which;
 
-            Assert.AreEqual(
-                nameof(EvaluationOptions.TargetFileCount),
-                exception.ParamName,
-                $"The parameter name must identify {nameof(EvaluationOptions.TargetFileCount)}.");
-            Assert.IsTrue(
-                exception.Message.Contains("divisible by 100", StringComparison.OrdinalIgnoreCase),
-                "The exception message must explain the divisibility constraint.");
+            exception.ParamName.Should().Be(nameof(EvaluationOptions.TargetFileCount), because: $"The parameter name must identify {nameof(EvaluationOptions.TargetFileCount)}.");
+            (exception.Message.Contains("divisible by 100", StringComparison.OrdinalIgnoreCase)).Should().BeTrue(because: "The exception message must explain the divisibility constraint.");
         }
     }
 

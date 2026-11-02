@@ -27,11 +27,7 @@ public sealed class DatasetGeneratorCapacityTests {
         var repeated = DatasetGenerator.BuildRuntimeCapacities(targetFileCount);
 
         AssertSumsToTarget(capacities, targetFileCount);
-        Assert.AreSequenceEqual(
-            capacities,
-            repeated,
-            SequenceOrder.InOrder,
-            "Capacities must be deterministic for the same target.");
+        repeated.Should().Equal(capacities, because: "Capacities must be deterministic for the same target.");
 
         AssertMaximumCount(capacities, ".cs", 300_000);
         AssertMaximumCount(capacities, ".json", 150_000);
@@ -135,21 +131,15 @@ public sealed class DatasetGeneratorCapacityTests {
     [TestMethod]
     public void BuildRuntimeCapacities_WhenTargetFileCountIsNotDivisibleByOneHundred_Throws() {
         foreach(var invalidTarget in new[] { 10, 1_000_001 }) {
-            var exception = Assert.ThrowsExactly<ArgumentOutOfRangeException>(
-                () => DatasetGenerator.BuildRuntimeCapacities(invalidTarget));
+            var exception = FluentActions.Invoking(() => DatasetGenerator.BuildRuntimeCapacities(invalidTarget)).Should().ThrowExactly<ArgumentOutOfRangeException>().Which;
 
-            Assert.AreEqual("targetFileCount", exception.ParamName);
-            Assert.IsTrue(
-                exception.Message.Contains("divisible by 100", StringComparison.OrdinalIgnoreCase),
-                "The exception message must explain the divisibility constraint.");
+            exception.ParamName.Should().Be("targetFileCount");
+            (exception.Message.Contains("divisible by 100", StringComparison.OrdinalIgnoreCase)).Should().BeTrue(because: "The exception message must explain the divisibility constraint.");
         }
     }
 
     private static void AssertSumsToTarget(IReadOnlyList<ExtensionDefinition> capacities, int targetFileCount) =>
-        Assert.AreEqual(
-            targetFileCount,
-            capacities.Sum(static extension => extension.MaximumCount),
-            "The sum of all extension capacities must equal the target file count.");
+        (capacities.Sum(static extension => extension.MaximumCount)).Should().Be(targetFileCount, because: "The sum of all extension capacities must equal the target file count.");
 
     private static void AssertMaximumCount(
         IReadOnlyList<ExtensionDefinition> capacities,
@@ -159,9 +149,6 @@ public sealed class DatasetGeneratorCapacityTests {
         var match = capacities.Single(extension =>
             string.Equals(extension.Suffix, suffix, StringComparison.OrdinalIgnoreCase));
 
-        Assert.AreEqual(
-            expected,
-            match.MaximumCount,
-            $"The capacity for '{suffix}' must be {expected}, but was {match.MaximumCount}.");
+        match.MaximumCount.Should().Be(expected, because: $"The capacity for '{suffix}' must be {expected}, but was {match.MaximumCount}.");
     }
 }

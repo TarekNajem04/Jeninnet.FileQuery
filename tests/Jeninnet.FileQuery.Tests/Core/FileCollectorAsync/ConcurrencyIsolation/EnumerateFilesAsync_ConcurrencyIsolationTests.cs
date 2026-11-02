@@ -60,9 +60,9 @@ public class EnumerateFilesAsync_ConcurrencyIsolationTests {
         // All three result sets must contain the *same 4 files*
         foreach(var result in bag) {
             TestAssertEx.HasCount(result, 4);
-            Assert.Contains(x => x.EndsWith("x1.txt", StringComparison.Ordinal), result);
-            Assert.Contains(x => x.EndsWith("x2.txt", StringComparison.Ordinal), result);
-            Assert.Contains(x => x.EndsWith(Path.Combine("sub", "deep", "z1.txt"), StringComparison.Ordinal), result);
+            result.Should().Contain(x => x.EndsWith("x1.txt", StringComparison.Ordinal));
+            result.Should().Contain(x => x.EndsWith("x2.txt", StringComparison.Ordinal));
+            result.Should().Contain(x => x.EndsWith(Path.Combine("sub", "deep", "z1.txt"), StringComparison.Ordinal));
         }
     }
 

@@ -66,7 +66,7 @@ public class DotfileAndHiddenFileTests {
         var result = fileQueryEngine.Execute(new(env.Root, options), TestContext.CancellationToken).ToList();
 
         result.Should().HaveCount(1);
-        Assert.EndsWith("file.txt", result.Single());
+        result.Single().Should().EndWith("file.txt");
     }
 
     /// <summary>

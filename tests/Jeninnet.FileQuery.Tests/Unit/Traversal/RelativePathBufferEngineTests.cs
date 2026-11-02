@@ -33,12 +33,12 @@ public class RelativePathBufferEngineTests {
         var results = engine.Execute(query, TestContext.CancellationToken).ToList();
 
         TestAssertEx.HasCount(results, 2);
-        Assert.Contains(static x => x.EndsWith("a.txt", StringComparison.Ordinal), results);
-        Assert.Contains(static x => x.EndsWith(System.IO.Path.Combine("sub", "c.txt"), StringComparison.Ordinal), results);
+        results.Should().Contain(static x => x.EndsWith("a.txt", StringComparison.Ordinal));
+        results.Should().Contain(static x => x.EndsWith(System.IO.Path.Combine("sub", "c.txt"), StringComparison.Ordinal));
 
         foreach(var result in results) {
-            Assert.IsTrue(result.StartsWith(env.Root, StringComparison.Ordinal));
-            Assert.IsTrue(File.Exists(result), $"Result '{result}' must be a real file path.");
+            (result.StartsWith(env.Root, StringComparison.Ordinal)).Should().BeTrue();
+            File.Exists(result).Should().BeTrue(because: $"Result '{result}' must be a real file path.");
         }
     }
 
@@ -57,7 +57,7 @@ public class RelativePathBufferEngineTests {
             [.. segments, "deeply-nested-file.txt"]
         );
 
-        Assert.IsGreaterThan(256, relativeDeep.Length, "Test must exercise buffer growth.");
+        relativeDeep.Length.Should().BeGreaterThan(256, because: "Test must exercise buffer growth.");
 
         env.CreateFiles(relativeDeep, "root-level.txt");
 
@@ -67,12 +67,9 @@ public class RelativePathBufferEngineTests {
         var results = engine.Execute(query, TestContext.CancellationToken).ToList();
 
         TestAssertEx.HasCount(results, 2);
-        Assert.Contains(
-            x => x.EndsWith(System.IO.Path.Combine(relativeDeep), StringComparison.Ordinal),
-            results
-        );
-        Assert.Contains(static x => x.EndsWith("root-level.txt", StringComparison.Ordinal), results);
-        Assert.IsTrue(File.Exists(results[0]));
+        results.Should().Contain(x => x.EndsWith(System.IO.Path.Combine(relativeDeep), StringComparison.Ordinal));
+        results.Should().Contain(static x => x.EndsWith("root-level.txt", StringComparison.Ordinal));
+        File.Exists(results[0]).Should().BeTrue();
     }
 
     /// <summary>
@@ -100,11 +97,11 @@ public class RelativePathBufferEngineTests {
         var results = engine.Execute(query, TestContext.CancellationToken).ToList();
 
         TestAssertEx.HasCount(results, 3);
-        Assert.Contains(static x => x.EndsWith("keep.txt", StringComparison.Ordinal), results);
-        Assert.Contains(static x => x.EndsWith("keep.md", StringComparison.Ordinal), results);
-        Assert.Contains(static x => x.EndsWith(System.IO.Path.Combine("sub", "keep.txt"), StringComparison.Ordinal), results);
-        Assert.DoesNotContain(static x => x.EndsWith("drop.log", StringComparison.Ordinal), results);
-        Assert.DoesNotContain(static x => x.EndsWith("drop.tmp", StringComparison.Ordinal), results);
+        results.Should().Contain(static x => x.EndsWith("keep.txt", StringComparison.Ordinal));
+        results.Should().Contain(static x => x.EndsWith("keep.md", StringComparison.Ordinal));
+        results.Should().Contain(static x => x.EndsWith(System.IO.Path.Combine("sub", "keep.txt"), StringComparison.Ordinal));
+        results.Should().NotContain(static x => x.EndsWith("drop.log", StringComparison.Ordinal));
+        results.Should().NotContain(static x => x.EndsWith("drop.tmp", StringComparison.Ordinal));
     }
 
     /// <summary>
@@ -133,27 +130,27 @@ public class RelativePathBufferEngineTests {
             static r => r.EndsWith(System.IO.Path.Combine("sub", "c.txt"), StringComparison.Ordinal)
         );
 
-        Assert.IsGreaterThanOrEqualTo(0, aIndex);
-        Assert.IsGreaterThanOrEqualTo(0, bIndex);
-        Assert.IsGreaterThanOrEqualTo(0, cIndex);
+        aIndex.Should().BeGreaterThanOrEqualTo(0);
+        bIndex.Should().BeGreaterThanOrEqualTo(0);
+        cIndex.Should().BeGreaterThanOrEqualTo(0);
 
         // BFS default: root files appear before descendants.
-        Assert.IsLessThan(cIndex, aIndex);
-        Assert.IsLessThan(cIndex, bIndex);
+        aIndex.Should().BeLessThan(cIndex);
+        bIndex.Should().BeLessThan(cIndex);
 
         // Sibling order must match native directory enumeration order.
         var rootSiblingOrder = Directory
             .EnumerateFileSystemEntries(env.Root)
-            .Select(System.IO.Path.GetFileName)
+            .Select(static path => System.IO.Path.GetFileName(path))
             .Where(static name => name is "a.txt" or "b.txt")
             .ToList();
 
-        Assert.HasCount(2, rootSiblingOrder);
-        var expectedFirstSibling = rootSiblingOrder[0]!;
-        var expectedSecondSibling = rootSiblingOrder[1]!;
+        rootSiblingOrder.Should().HaveCount(2);
+        var expectedFirstSibling = rootSiblingOrder[0];
+        var expectedSecondSibling = rootSiblingOrder[1];
         var firstSiblingIndex = expectedFirstSibling == "a.txt" ? aIndex : bIndex;
         var secondSiblingIndex = expectedSecondSibling == "a.txt" ? aIndex : bIndex;
-        Assert.IsLessThan(secondSiblingIndex, firstSiblingIndex);
+        firstSiblingIndex.Should().BeLessThan(secondSiblingIndex);
     }
 
     /// <summary>
@@ -176,8 +173,8 @@ public class RelativePathBufferEngineTests {
         var syncResults = engine.Execute(query, TestContext.CancellationToken).Order().ToList();
         var asyncResults = await engine.ExecuteAsync(query, TestContext.CancellationToken)
                                        .ToListAsync(TestContext.CancellationToken);
-
-        Assert.AreSequenceEqual(syncResults, [.. asyncResults.Order()]);
-        Assert.HasCount(2, asyncResults);
+        asyncResults.Order().Should().Equal(syncResults);
+        asyncResults.Should().HaveCount(2);
     }
 }
+

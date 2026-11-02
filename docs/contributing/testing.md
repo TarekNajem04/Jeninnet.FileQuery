@@ -29,11 +29,12 @@ public void Execute_HandlesMixedPatterns()
     var engine = FileQueryRuntime.Create();
     var results = engine.Execute(query).ToList();
 
-    Assert.IsFalse(results.Any(f => f.Contains("bin") || f.Contains("obj")));
+    results.Should().NotContain(f => f.Contains("bin") || f.Contains("obj"));
 }
 ```
 
 ## Best Practices
+- **Assertions**: Use `Jeninnet.Assertions` (`value.Should()...`, `FluentActions.Invoking(...)`); do not call MSTest `Assert`.
 - **Isolation**: Use the `TestEnvironment` helper to create ephemeral temporary directories.
 - **Determinism**: Always test with both case-sensitive and case-insensitive configurations.
 - **Coverage**: Priority is given to the `Matching` and `Traversal` namespaces.

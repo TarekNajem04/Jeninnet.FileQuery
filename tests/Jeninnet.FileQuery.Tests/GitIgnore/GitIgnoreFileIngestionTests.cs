@@ -29,8 +29,7 @@ public sealed class GitIgnoreFileIngestionTests {
         using var environment = CreateRootEnvironment();
         environment.CreateFile(".gitignore", "*.log\n");
 
-        Assert.AreSequenceEqual(
-            _rootOnly, QueryFiles(environment));
+        QueryFiles(environment).Should().Equal(_rootOnly);
     }
 
     /// <summary>
@@ -42,8 +41,7 @@ public sealed class GitIgnoreFileIngestionTests {
         environment.CreateFile("src/.gitignore", "*.tmp\n");
         environment.CreateFiles("src/a.tmp", "other/b.tmp");
 
-        Assert.AreSequenceEqual(
-            _nestedScope, QueryFiles(environment));
+        QueryFiles(environment).Should().Equal(_nestedScope);
     }
 
     /// <summary>
@@ -55,8 +53,7 @@ public sealed class GitIgnoreFileIngestionTests {
         environment.CreateFile(".gitignore", "*.log\n!important.log\n");
         environment.CreateFile("important.log", "keep");
 
-        Assert.AreSequenceEqual(
-            _negationResult, QueryFiles(environment));
+        QueryFiles(environment).Should().Equal(_negationResult);
     }
 
     /// <summary>
@@ -70,8 +67,7 @@ public sealed class GitIgnoreFileIngestionTests {
         environment.CreateFile("src/keep.txt", "included");
         environment.CreateFile("src/other.txt", "excluded");
 
-        Assert.AreSequenceEqual(
-            _nestedNegationResult, QueryFiles(environment));
+        QueryFiles(environment).Should().Equal(_nestedNegationResult);
     }
 
     /// <summary>
@@ -83,8 +79,7 @@ public sealed class GitIgnoreFileIngestionTests {
         environment.CreateFile(".gitignore", "build/\n");
         environment.CreateFiles("build/output.txt", "build/nested/result.txt");
 
-        Assert.AreSequenceEqual(
-            _buildIgnored, QueryFiles(environment));
+        QueryFiles(environment).Should().Equal(_buildIgnored);
     }
 
     /// <summary>
@@ -96,8 +91,7 @@ public sealed class GitIgnoreFileIngestionTests {
         environment.CreateFile(".gitignore", "\\#literal.txt\n\\!important.txt\n");
         environment.CreateFiles("#literal.txt", "!important.txt");
 
-        Assert.AreSequenceEqual(
-            _buildIgnored, QueryFiles(environment));
+        QueryFiles(environment).Should().Equal(_buildIgnored);
     }
 
     /// <summary>
@@ -109,8 +103,7 @@ public sealed class GitIgnoreFileIngestionTests {
         environment.CreateFile(".gitignore", "trailing.txt   \n");
         environment.CreateFile("trailing.txt", "ignored");
 
-        Assert.AreSequenceEqual(
-            _buildIgnored, QueryFiles(environment));
+        QueryFiles(environment).Should().Equal(_buildIgnored);
     }
 
     /// <summary>
@@ -122,8 +115,7 @@ public sealed class GitIgnoreFileIngestionTests {
         environment.CreateFile(".git/info/exclude", "*.bak\n");
         environment.CreateFile("backup.bak", "ignored");
 
-        Assert.AreSequenceEqual(
-            _buildIgnored, QueryFiles(environment));
+        QueryFiles(environment).Should().Equal(_buildIgnored);
     }
 
     /// <summary>
@@ -144,7 +136,7 @@ public sealed class GitIgnoreFileIngestionTests {
             .OrderBy(static path => path, StringComparer.Ordinal)
             .ToArray();
 
-        Assert.AreSequenceEqual(_buildIgnored, files);
+        files.Should().Equal(_buildIgnored);
     }
 
     /// <summary>
@@ -157,8 +149,7 @@ public sealed class GitIgnoreFileIngestionTests {
         environment.CreateFile("src/.gitignore", "!keep.txt\n");
         environment.CreateFile("src/keep.txt", "must stay ignored");
 
-        Assert.AreSequenceEqual(
-            _parentOnly, QueryFiles(environment));
+        QueryFiles(environment).Should().Equal(_parentOnly);
     }
 
     /// <summary>
@@ -169,8 +160,7 @@ public sealed class GitIgnoreFileIngestionTests {
         using var environment = CreateRootEnvironment();
         environment.CreateFile(".gitignore", "[abc\n*.log\n");
 
-        Assert.AreSequenceEqual(
-            _rootOnly, QueryFiles(environment));
+        QueryFiles(environment).Should().Equal(_rootOnly);
     }
 
     /// <summary>
@@ -183,7 +173,7 @@ public sealed class GitIgnoreFileIngestionTests {
 
         var files = QueryFiles(environment);
 
-        Assert.DoesNotContain(".git/config", files);
+        files.Should().NotContain(".git/config");
     }
 
     /// <summary>
@@ -199,8 +189,7 @@ public sealed class GitIgnoreFileIngestionTests {
             "frotz/file.txt",
             "other/doc/frotz/file.txt");
 
-        Assert.AreSequenceEqual(
-            _gitVectorResult, QueryFiles(environment));
+        QueryFiles(environment).Should().Equal(_gitVectorResult);
     }
 
     /// <summary>
@@ -212,8 +201,7 @@ public sealed class GitIgnoreFileIngestionTests {
         environment.CreateFile(".gitignore", "/a.txt\n");
         environment.CreateFile("src/a.txt", "nested");
 
-        Assert.AreSequenceEqual(
-            _anchoredFileResult, QueryFiles(environment));
+        QueryFiles(environment).Should().Equal(_anchoredFileResult);
     }
 
     /// <summary>
@@ -225,8 +213,7 @@ public sealed class GitIgnoreFileIngestionTests {
         environment.CreateFile(".gitignore", "**/foo\n");
         environment.CreateFiles("foo", "a/foo", "a/b/foo");
 
-        Assert.AreSequenceEqual(
-            _buildIgnored, QueryFiles(environment));
+        QueryFiles(environment).Should().Equal(_buildIgnored);
     }
 
     /// <summary>
@@ -242,12 +229,12 @@ public sealed class GitIgnoreFileIngestionTests {
         var queryRoot = Path.Combine(environment.Root, "ignored", "sub");
 
         var files = FileQuery.From(queryRoot)
-            .UseGitIgnoreFiles()
-            .Execute()
-            .Select(path => Relative(queryRoot, path))
-            .ToArray();
+                             .UseGitIgnoreFiles()
+                             .Execute(TestContext.CancellationToken)
+                             .Select(path => Relative(queryRoot, path))
+                             .ToArray();
 
-        Assert.IsEmpty(files);
+        files.Should().BeEmpty();
     }
 
     /// <summary>

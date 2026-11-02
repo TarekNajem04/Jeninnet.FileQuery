@@ -177,15 +177,15 @@ public sealed class PatternInspectorTests {
     /// Verifies that a forced unknown dialect is rejected.
     /// </summary>
     [TestMethod]
-    public void Inspect_ShouldRejectForcedUnknownDialect() => Assert.Throws<ArgumentException>(() =>
-            PatternInspector.Inspect("*.cs", PatternKind.Unknown));
+    public void Inspect_ShouldRejectForcedUnknownDialect() => FluentActions.Invoking(() =>
+            PatternInspector.Inspect("*.cs", PatternKind.Unknown)).Should().Throw<ArgumentException>();
 
     /// <summary>
     /// Verifies that an undefined forced dialect is rejected.
     /// </summary>
     [TestMethod]
-    public void Inspect_ShouldRejectUndefinedDialect() => Assert.Throws<ArgumentOutOfRangeException>(() =>
-            PatternInspector.Inspect("*.cs", (PatternKind)99));
+    public void Inspect_ShouldRejectUndefinedDialect() => FluentActions.Invoking(() =>
+            PatternInspector.Inspect("*.cs", (PatternKind)99)).Should().Throw<ArgumentOutOfRangeException>();
 
     /// <summary>
     /// Verifies malformed pattern reporting.
@@ -244,13 +244,13 @@ public sealed class PatternInspectorTests {
         var location = result.GetProperty("locations")[0].GetProperty("physicalLocation");
         var region = location.GetProperty("region");
 
-        Assert.AreEqual("2.1.0", root.GetProperty("version").GetString());
-        Assert.AreEqual(SarifExporter.RuleId, run.GetProperty("tool").GetProperty("driver").GetProperty("rules")[0].GetProperty("id").GetString());
-        Assert.AreEqual(SarifExporter.RuleId, result.GetProperty("ruleId").GetString());
-        Assert.AreEqual("src/My%20File.cs", location.GetProperty("artifactLocation").GetProperty("uri").GetString());
-        Assert.AreEqual(12, region.GetProperty("startLine").GetInt32());
-        Assert.AreEqual(5, region.GetProperty("startColumn").GetInt32());
-        Assert.AreEqual(1, result.GetProperty("properties").GetProperty("segment").GetInt32());
+        root.GetProperty("version").GetString().Should().Be("2.1.0");
+        run.GetProperty("tool").GetProperty("driver").GetProperty("rules")[0].GetProperty("id").GetString().Should().Be(SarifExporter.RuleId);
+        result.GetProperty("ruleId").GetString().Should().Be(SarifExporter.RuleId);
+        location.GetProperty("artifactLocation").GetProperty("uri").GetString().Should().Be("src/My%20File.cs");
+        region.GetProperty("startLine").GetInt32().Should().Be(12);
+        region.GetProperty("startColumn").GetInt32().Should().Be(5);
+        result.GetProperty("properties").GetProperty("segment").GetInt32().Should().Be(1);
     }
 
     /// <summary>
@@ -263,7 +263,7 @@ public sealed class PatternInspectorTests {
         using var document = JsonDocument.Parse(json);
         var results = document.RootElement.GetProperty("runs")[0].GetProperty("results");
 
-        Assert.AreEqual(0, results.GetArrayLength());
+        results.GetArrayLength().Should().Be(0);
     }
 
     /// <summary>
@@ -284,8 +284,8 @@ public sealed class PatternInspectorTests {
     /// </summary>
     [TestMethod]
     public void Methods_ShouldRejectNullPattern() {
-        Assert.Throws<ArgumentNullException>(() => PatternInspector.Classify(null!));
-        Assert.Throws<ArgumentNullException>(() => PatternInspector.Validate(null!));
-        Assert.Throws<ArgumentNullException>(() => PatternInspector.Inspect(null!));
+        FluentActions.Invoking(() => PatternInspector.Classify(null!)).Should().Throw<ArgumentNullException>();
+        FluentActions.Invoking(() => PatternInspector.Validate(null!)).Should().Throw<ArgumentNullException>();
+        FluentActions.Invoking(() => PatternInspector.Inspect(null!)).Should().Throw<ArgumentNullException>();
     }
 }

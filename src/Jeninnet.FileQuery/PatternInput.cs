@@ -181,6 +181,9 @@ public sealed record PatternInput {
     /// <exception cref="ArgumentException">
     /// Thrown when a typed-pattern list contains an empty or whitespace-only pattern.
     /// </exception>
+    /// <exception cref="ArgumentOutOfRangeException">
+    /// Thrown when <paramref name="TypedPatterns"/> contains an undefined PatternKind.
+    /// </exception>
     private static Dictionary<PatternKind, IReadOnlyList<string>> BuildTypedPatterns(IReadOnlyDictionary<PatternKind, IEnumerable<string>> TypedPatterns) {
         var result = new Dictionary<PatternKind, IReadOnlyList<string>>(TypedPatterns.Count);
 

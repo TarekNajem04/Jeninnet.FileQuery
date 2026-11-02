@@ -38,7 +38,7 @@ public class BasicMatchingTests {
                                     .ToList();
 
         result.Should().ContainSingle();
-        Assert.IsTrue(PathHelper.Equivalent(result[0], env.Abs("file1.txt")));
+        (PathHelper.Equivalent(result[0], env.Abs("file1.txt"))).Should().BeTrue();
     }
 
     /// <summary>

@@ -24,7 +24,7 @@ public class FileQueryEngineExtensionsTests {
         var builder = FileQuery.From(path);
 
         // Assert
-        Assert.IsNotNull(builder);
+        builder.Should().NotBeNull();
     }
 
     /// <summary>
@@ -40,6 +40,6 @@ public class FileQueryEngineExtensionsTests {
         var builder = mockEngine.Object.From(path);
 
         // Assert
-        Assert.IsNotNull(builder);
+        builder.Should().NotBeNull();
     }
 }

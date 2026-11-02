@@ -16,19 +16,19 @@ public class PathUtilitiesTests {
     /// Verifies that Should ConvertBackslashes When Normalized.
     /// </summary>
     [TestMethod]
-    public void Should_ConvertBackslashes_When_Normalized() => Assert.AreEqual("C:/foo/bar", PathUtilities.Normalize(@"C:\foo\bar"));
+    public void Should_ConvertBackslashes_When_Normalized() => PathUtilities.Normalize(@"C:\foo\bar").Should().Be("C:/foo/bar");
 
     /// <summary>
     /// Verifies that Should RemoveDoubleSeparators When Normalized.
     /// </summary>
     [TestMethod]
-    public void Should_RemoveDoubleSeparators_When_Normalized() => Assert.AreEqual("C:/foo/bar", PathUtilities.Normalize(@"C:\\foo//bar"));
+    public void Should_RemoveDoubleSeparators_When_Normalized() => (PathUtilities.Normalize(@"C:\\foo//bar")).Should().Be("C:/foo/bar");
 
     /// <summary>
     /// Verifies that Should PreserveRoot When Normalized.
     /// </summary>
     [TestMethod]
-    public void Should_PreserveRoot_When_Normalized() => Assert.AreEqual("C:/", PathUtilities.Normalize("C:/"));
+    public void Should_PreserveRoot_When_Normalized() => (PathUtilities.Normalize("C:/")).Should().Be("C:/");
 
     /// <summary>
     /// Verifies that Should HandleTrailingSlash When BuildingRelativePath.
@@ -45,7 +45,7 @@ public class PathUtilitiesTests {
         // Ensure it doesn't have a leading slash
         var trimmed = normalized.TrimStart('/');
 
-        Assert.AreEqual("subdir/", trimmed, $"Path was: '{actual}'");
+        trimmed.Should().Be("subdir/", because: $"Path was: '{actual}'");
     }
 
     /// <summary>
@@ -54,12 +54,12 @@ public class PathUtilitiesTests {
     [TestMethod]
     public void Should_HandleRootOnly_When_SplittingNormalizedPath() {
         var result = PathUtilities.SplitNormalizedPath("/", true);
-        Assert.IsEmpty(result);
+        result.Should().BeEmpty();
     }
 
     /// <summary>
     /// Verifies that Should ReturnZero When CountingSegmentsOfEmptyPath.
     /// </summary>
     [TestMethod]
-    public void Should_ReturnZero_When_CountingSegmentsOfEmptyPath() => Assert.AreEqual(0, PathUtilities.CountSegments([], false));
+    public void Should_ReturnZero_When_CountingSegmentsOfEmptyPath() => (PathUtilities.CountSegments([], false)).Should().Be(0);
 }

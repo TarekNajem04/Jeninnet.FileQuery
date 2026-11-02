@@ -21,7 +21,7 @@ public sealed class CompilerContractTests {
 
         var pattern = new ClassifiedPattern(Text: "*.cs", Type: PatternKind.GitIgnore);
 
-        Assert.ThrowsExactly<PatternException>(() =>
-            compiler.Compile(new(pattern)));
+        FluentActions.Invoking(() =>
+            compiler.Compile(new(pattern))).Should().ThrowExactly<PatternException>();
     }
 }

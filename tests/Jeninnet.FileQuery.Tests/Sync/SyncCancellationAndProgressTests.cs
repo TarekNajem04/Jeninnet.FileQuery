@@ -24,7 +24,7 @@ public sealed class SyncCancellationAndProgressTests {
 
         var query = FileQuery.From(environment.Root);
 
-        Assert.ThrowsExactly<OperationCanceledException>(() => query.Execute(cancellation.Token).ToList());
+        FluentActions.Invoking(() => { _ = query.Execute(cancellation.Token).ToList(); }).Should().ThrowExactly<OperationCanceledException>();
     }
 
     /// <summary>
@@ -36,14 +36,14 @@ public sealed class SyncCancellationAndProgressTests {
         using var cancellation = new CancellationTokenSource();
         var visited = 0;
 
-        Assert.ThrowsExactly<OperationCanceledException>(() => {
+        FluentActions.Invoking(() => {
             foreach(var _ in FileQuery.From(environment.Root).Execute(cancellation.Token)) {
                 visited++;
                 cancellation.Cancel();
             }
-        });
+        }).Should().ThrowExactly<OperationCanceledException>();
 
-        Assert.AreEqual(1, visited);
+        visited.Should().Be(1);
     }
 
     /// <summary>
@@ -63,16 +63,16 @@ public sealed class SyncCancellationAndProgressTests {
             asyncResults.Add(path);
         }
 
-        Assert.HasCount(syncResults.Count, asyncResults);
-        Assert.IsNotEmpty(syncProgress.Values);
-        Assert.IsNotEmpty(asyncProgress.Values);
+        asyncResults.Should().HaveCount(syncResults.Count);
+        syncProgress.Values.Should().NotBeEmpty();
+        asyncProgress.Values.Should().NotBeEmpty();
 
         var syncLast = syncProgress.Values[^1];
         var asyncLast = asyncProgress.Values[^1];
 
-        Assert.AreEqual(asyncLast.DirectoriesVisited, syncLast.DirectoriesVisited);
-        Assert.AreEqual(asyncLast.EntriesScanned, syncLast.EntriesScanned);
-        Assert.AreEqual(asyncLast.FilesMatched, syncLast.FilesMatched);
+        syncLast.DirectoriesVisited.Should().Be(asyncLast.DirectoriesVisited);
+        syncLast.EntriesScanned.Should().Be(asyncLast.EntriesScanned);
+        syncLast.FilesMatched.Should().Be(asyncLast.FilesMatched);
     }
 
     /// <summary>
@@ -86,14 +86,14 @@ public sealed class SyncCancellationAndProgressTests {
 
         var entries = query.ExecuteEntries(progress, TestContext.CancellationToken).ToList();
 
-        Assert.IsNotEmpty(entries);
-        Assert.IsNotEmpty(progress.Values);
-        Assert.AreEqual(entries.Count, progress.Values[^1].FilesMatched);
+        entries.Should().NotBeEmpty();
+        progress.Values.Should().NotBeEmpty();
+        progress.Values[^1].FilesMatched.Should().Be(entries.Count);
 
         using var cancellation = new CancellationTokenSource();
         cancellation.Cancel();
 
-        Assert.ThrowsExactly<OperationCanceledException>(() => query.ExecuteEntries(cancellation.Token).ToList());
+        FluentActions.Invoking(() => { _ = query.ExecuteEntries(cancellation.Token).ToList(); }).Should().ThrowExactly<OperationCanceledException>();
     }
 
     /// <summary>
@@ -104,8 +104,8 @@ public sealed class SyncCancellationAndProgressTests {
         using var environment = CreateEnvironment();
         var query = FileQuery.From(environment.Root);
 
-        Assert.ThrowsExactly<ArgumentNullException>(() => query.Execute(progress: null!, TestContext.CancellationToken));
-        Assert.ThrowsExactly<ArgumentNullException>(() => query.ExecuteEntries(progress: null!, TestContext.CancellationToken));
+        FluentActions.Invoking(() => query.Execute(progress: null!, TestContext.CancellationToken)).Should().ThrowExactly<ArgumentNullException>();
+        FluentActions.Invoking(() => query.ExecuteEntries(progress: null!, TestContext.CancellationToken)).Should().ThrowExactly<ArgumentNullException>();
     }
 
     /// <summary>

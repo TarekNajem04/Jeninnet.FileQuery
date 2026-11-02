@@ -28,33 +28,25 @@ public sealed class InvariantRegressionTests {
     [TestMethod]
     public void Should_BeRejected_When_GitIgnoreStarStarLiteralSegmentMixed() =>
         // "**a" produces [RecursiveWildcardToken, LiteralToken("a")] in one segment.
-        Assert.ThrowsExactly<PatternException>(
-            static () => CompiledPatternFactory.Compile(PatternKind.GitIgnore, "**a"),
-            "A mixed segment '**a' must be rejected for GitIgnore patterns.");
+        FluentActions.Invoking(static () => CompiledPatternFactory.Compile(PatternKind.GitIgnore, "**a")).Should().ThrowExactly<PatternException>(because: "A mixed segment '**a' must be rejected for GitIgnore patterns.");
 
     /// <summary>
     /// Verifies that Should BeRejected When GlobDoubleStarMixedSegment.
     /// </summary>
     [TestMethod]
-    public void Should_BeRejected_When_GlobDoubleStarMixedSegment() => Assert.ThrowsExactly<PatternException>(
-            static () => CompiledPatternFactory.Compile(PatternKind.Glob, "**a"),
-            "In Glob patterns, '**' must appear as a standalone segment.");
+    public void Should_BeRejected_When_GlobDoubleStarMixedSegment() => FluentActions.Invoking(static () => CompiledPatternFactory.Compile(PatternKind.Glob, "**a")).Should().ThrowExactly<PatternException>(because: "In Glob patterns, '**' must appear as a standalone segment.");
 
     /// <summary>
     /// Verifies that Should BeRejected When GitIgnoreLiteralStarStarSegmentMixed.
     /// </summary>
     [TestMethod]
-    public void Should_BeRejected_When_GitIgnoreLiteralStarStarSegmentMixed() => Assert.ThrowsExactly<PatternException>(
-            static () => CompiledPatternFactory.Compile(PatternKind.GitIgnore, "a**"),
-            "A mixed segment 'a**' must be rejected for GitIgnore patterns.");
+    public void Should_BeRejected_When_GitIgnoreLiteralStarStarSegmentMixed() => FluentActions.Invoking(static () => CompiledPatternFactory.Compile(PatternKind.GitIgnore, "a**")).Should().ThrowExactly<PatternException>(because: "A mixed segment 'a**' must be rejected for GitIgnore patterns.");
 
     /// <summary>
     /// Verifies that Should BeRejected When GitIgnoreLiteralStarStarLiteral.
     /// </summary>
     [TestMethod]
-    public void Should_BeRejected_When_GitIgnoreLiteralStarStarLiteral() => Assert.ThrowsExactly<PatternException>(
-            static () => CompiledPatternFactory.Compile(PatternKind.GitIgnore, "a**b"),
-            "A mixed segment 'a**b' must be rejected.");
+    public void Should_BeRejected_When_GitIgnoreLiteralStarStarLiteral() => FluentActions.Invoking(static () => CompiledPatternFactory.Compile(PatternKind.GitIgnore, "a**b")).Should().ThrowExactly<PatternException>(because: "A mixed segment 'a**b' must be rejected.");
 
     /// <summary>
     /// Verifies that Should BeAccepted When GitIgnoreStandaloneDoubleStar.
@@ -63,7 +55,7 @@ public sealed class InvariantRegressionTests {
     public void Should_BeAccepted_When_GitIgnoreStandaloneDoubleStar() {
         // A standalone ** in its own segment must still be valid.
         var compiled = CompiledPatternFactory.Compile(PatternKind.GitIgnore, "**/src");
-        Assert.IsNotEmpty(compiled, "'**/src' must compile successfully.");
+        compiled.Should().NotBeEmpty(because: "'**/src' must compile successfully.");
     }
 
     // ======================================================================
@@ -80,9 +72,7 @@ public sealed class InvariantRegressionTests {
     [TestMethod]
     public void Should_RejectCorrectly_When_InvalidRegexUsed() =>
         // "[invalid" is not valid regex — unclosed bracket.
-        Assert.ThrowsExactly<PatternException>(
-            static () => CompiledPatternFactory.Compile(PatternKind.Regex, "r:[invalid"),
-            "An invalid regex pattern must be rejected.");
+        FluentActions.Invoking(static () => CompiledPatternFactory.Compile(PatternKind.Regex, "r:[invalid")).Should().ThrowExactly<PatternException>(because: "An invalid regex pattern must be rejected.");
 
     /// <summary>
     /// Verifies that Should BeAccepted When ValidRegexUsed.
@@ -91,7 +81,7 @@ public sealed class InvariantRegressionTests {
     public void Should_BeAccepted_When_ValidRegexUsed() {
         // "r:^src/.*\.cs$" is a valid .NET regex expression.
         var compiled = CompiledPatternFactory.Compile(PatternKind.Regex, @"r:^src/.*\.cs$");
-        Assert.IsNotEmpty(compiled, "A valid regex pattern must compile successfully.");
+        compiled.Should().NotBeEmpty(because: "A valid regex pattern must compile successfully.");
     }
 
     /// <summary>
@@ -101,19 +91,12 @@ public sealed class InvariantRegressionTests {
     public void Should_ShowExpressionNotPrefix_When_ErrorMessageGenerated() {
         // The error message must reference the expression ("[invalid"),
         // not the full raw string ("r:[invalid").
-        var ex = Assert.ThrowsExactly<PatternException>(static () =>
-            CompiledPatternFactory.Compile(PatternKind.Regex, "r:[invalid")
-        );
+        var ex = FluentActions.Invoking(static () =>
+            CompiledPatternFactory.Compile(PatternKind.Regex, "r:[invalid")).Should().ThrowExactly<PatternException>().Which;
 
-        Assert.Contains(
-            "[invalid", ex.Message,
-            $"Error message must reference the expression. Actual: {ex.Message}"
-        );
+        ex.Message.Should().Contain("[invalid", because: $"Error message must reference the expression. Actual: {ex.Message}");
 
-        Assert.DoesNotStartWith(
-            "Invalid regex syntax in 'r:", ex.Message,
-            $"Error message must not include the 'r:' prefix. Actual: {ex.Message}"
-        );
+        ex.Message.Should().NotStartWith("Invalid regex syntax in 'r:", because: $"Error message must not include the 'r:' prefix. Actual: {ex.Message}");
     }
 
     // ======================================================================
@@ -129,17 +112,13 @@ public sealed class InvariantRegressionTests {
     /// Verifies that Should BeRejected When GitIgnoreBareSlash.
     /// </summary>
     [TestMethod]
-    public void Should_BeRejected_When_GitIgnoreBareSlash() => Assert.ThrowsExactly<PatternException>(
-            static () => CompiledPatternFactory.Compile(PatternKind.GitIgnore, "/"),
-            "A bare '/' must be rejected as a GitIgnore pattern.");
+    public void Should_BeRejected_When_GitIgnoreBareSlash() => FluentActions.Invoking(static () => CompiledPatternFactory.Compile(PatternKind.GitIgnore, "/")).Should().ThrowExactly<PatternException>(because: "A bare '/' must be rejected as a GitIgnore pattern.");
 
     /// <summary>
     /// Verifies that Should BeRejected When GitIgnoreMultipleSlashes.
     /// </summary>
     [TestMethod]
-    public void Should_BeRejected_When_GitIgnoreMultipleSlashes() => Assert.ThrowsExactly<PatternException>(
-            static () => CompiledPatternFactory.Compile(PatternKind.GitIgnore, "///"),
-            "A pattern of only '/' separators must be rejected.");
+    public void Should_BeRejected_When_GitIgnoreMultipleSlashes() => FluentActions.Invoking(static () => CompiledPatternFactory.Compile(PatternKind.GitIgnore, "///")).Should().ThrowExactly<PatternException>(because: "A pattern of only '/' separators must be rejected.");
 
     /// <summary>
     /// Verifies that Should BeAccepted When GitIgnoreRootAnchoredWithBody.
@@ -148,7 +127,7 @@ public sealed class InvariantRegressionTests {
     public void Should_BeAccepted_When_GitIgnoreRootAnchoredWithBody() {
         // "/src" is a valid root-anchored GitIgnore pattern.
         var compiled = CompiledPatternFactory.Compile(PatternKind.GitIgnore, "/src");
-        Assert.IsNotEmpty(compiled, "'/src' must compile successfully.");
+        compiled.Should().NotBeEmpty(because: "'/src' must compile successfully.");
     }
 
     // ======================================================================
@@ -169,14 +148,10 @@ public sealed class InvariantRegressionTests {
             .Single();
 
         // First segment must be a standalone recursive wildcard.
-        Assert.IsGreaterThanOrEqualTo(
-            2, compiled.Segments.Count,
-            "'*.txt' must have at least two segments after implicit ** is prepended.");
+        compiled.Segments.Count.Should().BeGreaterThanOrEqualTo(2, because: "'*.txt' must have at least two segments after implicit ** is prepended.");
 
-        Assert.IsTrue(
-            compiled.Segments[0].Count == 1 &&
-            compiled.Segments[0][0] is RecursiveWildcardToken,
-            "First segment of '*.txt' must be the implicit '**'.");
+        (compiled.Segments[0].Count == 1 &&
+            compiled.Segments[0][0] is RecursiveWildcardToken).Should().BeTrue(because: "First segment of '*.txt' must be the implicit '**'.");
     }
 
     /// <summary>
@@ -190,13 +165,10 @@ public sealed class InvariantRegressionTests {
             .Patterns
             .Single();
 
-        Assert.IsTrue(compiled.AnchoredToRoot,
-            "'/src/*.cs' must be marked as root-anchored.");
+        compiled.AnchoredToRoot.Should().BeTrue(because: "'/src/*.cs' must be marked as root-anchored.");
 
-        Assert.IsFalse(
-            compiled.Segments[0].Count == 1 &&
-            compiled.Segments[0][0] is RecursiveWildcardToken,
-            "Root-anchored pattern must not have an implicit '**' prepended.");
+        (compiled.Segments[0].Count == 1 &&
+            compiled.Segments[0][0] is RecursiveWildcardToken).Should().BeFalse(because: "Root-anchored pattern must not have an implicit '**' prepended.");
     }
 
     /// <summary>
@@ -213,7 +185,6 @@ public sealed class InvariantRegressionTests {
         var doubleStarCount = compiled.Segments
             .Count(static seg => seg.Count == 1 && seg[0] is RecursiveWildcardToken);
 
-        Assert.AreEqual(1, doubleStarCount,
-            "'**/*.cs' must contain exactly one '**' segment — not two.");
+        doubleStarCount.Should().Be(1, because: "'**/*.cs' must contain exactly one '**' segment — not two.");
     }
 }

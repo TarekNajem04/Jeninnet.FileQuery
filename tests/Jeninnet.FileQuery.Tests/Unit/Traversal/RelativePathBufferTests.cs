@@ -29,7 +29,7 @@ public class RelativePathBufferTests {
 
         var relative = buffer.BuildRelativePath(root, entry);
 
-        Assert.AreEqual("file.txt", relative.ToString());
+        relative.ToString().Should().Be("file.txt");
     }
 
     /// <summary>
@@ -46,7 +46,7 @@ public class RelativePathBufferTests {
 
         var relative = buffer.BuildRelativePath(root, entry);
 
-        Assert.AreEqual("sub/file.txt", relative.ToString());
+        relative.ToString().Should().Be("sub/file.txt");
     }
 
     /// <summary>
@@ -64,7 +64,7 @@ public class RelativePathBufferTests {
 
         var relative = buffer.BuildRelativePath(root, entry);
 
-        Assert.AreEqual("subdir/", relative.ToString());
+        relative.ToString().Should().Be("subdir/");
     }
 
     /// <summary>
@@ -81,7 +81,7 @@ public class RelativePathBufferTests {
 
         var relative = buffer.BuildRelativePath(root, entry);
 
-        Assert.AreEqual("a/b.txt", relative.ToString());
+        relative.ToString().Should().Be("a/b.txt");
     }
 
     /// <summary>
@@ -103,8 +103,8 @@ public class RelativePathBufferTests {
         var expected = PathUtilities.BuildRelativePath(root, entry);
         var relative = buffer.BuildRelativePath(root, entry);
 
-        Assert.IsGreaterThan(256, buffer.Capacity, "Buffer should have grown beyond the initial capacity.");
-        Assert.AreEqual(expected, relative.ToString());
+        buffer.Capacity.Should().BeGreaterThan(256, because: "Buffer should have grown beyond the initial capacity.");
+        relative.ToString().Should().Be(expected);
     }
 
     /// <summary>
@@ -120,7 +120,7 @@ public class RelativePathBufferTests {
             root,
             new FileSystemEntry(System.IO.Path.Combine(root, "a.txt"), FileAttributes.Normal)
         );
-        Assert.AreEqual("a.txt", first.ToString());
+        first.ToString().Should().Be("a.txt");
 
         var longSegments = string.Join(
             System.IO.Path.DirectorySeparatorChar,
@@ -131,10 +131,7 @@ public class RelativePathBufferTests {
             new FileSystemEntry(System.IO.Path.Combine(root, longSegments, "b.txt"), FileAttributes.Normal)
         );
 
-        Assert.AreEqual(
-            "segment-00/segment-01/segment-02/segment-03/segment-04/segment-05/segment-06/segment-07/segment-08/segment-09/b.txt",
-            second.ToString()
-        );
+        second.ToString().Should().Be("segment-00/segment-01/segment-02/segment-03/segment-04/segment-05/segment-06/segment-07/segment-08/segment-09/b.txt");
     }
 
     /// <summary>
@@ -145,7 +142,7 @@ public class RelativePathBufferTests {
         var buffer = new RelativePathBuffer();
 
         var capacity = buffer.Capacity;
-        Assert.IsGreaterThan(0, capacity);
+        capacity.Should().BeGreaterThan(0);
 
         buffer.Dispose();
     }
@@ -162,6 +159,6 @@ public class RelativePathBufferTests {
 
         var relative = buffer.BuildRelativePath(root, entry);
 
-        Assert.AreEqual("/", relative.ToString());
+        relative.ToString().Should().Be("/");
     }
 }

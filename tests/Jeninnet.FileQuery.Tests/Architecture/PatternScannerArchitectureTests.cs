@@ -40,7 +40,6 @@ public sealed class PatternScannerArchitectureTests {
     /// <summary>
     /// Verifies that <see cref="PatternScanner.Scan"/> does not throw <see cref="PatternException"/> for known invalid pattern strings.
     /// </summary>
-    /// <exception cref="AssertFailedException">Thrown when the assertion fails.</exception>
     [TestMethod]
     public void PatternScanner_MustNotThrow_PatternException() {
         foreach(var syntax in _profiles) {
@@ -49,25 +48,9 @@ public sealed class PatternScannerArchitectureTests {
                     pattern: new(Text: pattern, Type: PatternKind.GitIgnore)
                 );
 
-                try {
-                    PatternScanner.Scan(context, syntax);
-                }
-                catch(PatternException ex) {
-#pragma warning disable MSTEST0058 // Do not use asserts in catch blocks
-                    throw new AssertFailedException(
-                        $"""
-                        PatternScanner threw PatternException.
-
-                        Pattern: "{pattern}"
-                        Syntax: {syntax}
-
-                        Exception:
-                        {ex}
-                        """
-                    );
-#pragma warning restore MSTEST0058 // Do not use asserts in catch blocks
-                }
+                FluentActions.Invoking(() => PatternScanner.Scan(context, syntax)).Should().NotThrow();
             }
         }
     }
 }
+

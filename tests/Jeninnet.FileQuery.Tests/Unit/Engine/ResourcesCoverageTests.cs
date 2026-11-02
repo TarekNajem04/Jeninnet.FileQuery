@@ -19,11 +19,11 @@ public class ResourcesCoverageTests {
     public void Should_AccessResourceStrings_Properties() {
         // Access static properties to get coverage on the auto-generated class.
         var rm = Strings.ResourceManager;
-        Assert.IsNotNull(rm);
+        rm.Should().NotBeNull();
 
         var culture = Strings.Culture;
         Strings.Culture = CultureInfo.InvariantCulture;
-        Assert.AreEqual(CultureInfo.InvariantCulture, Strings.Culture);
+        Strings.Culture.Should().Be(CultureInfo.InvariantCulture);
         Strings.Culture = culture; // Restore
     }
 
@@ -39,8 +39,8 @@ public class ResourcesCoverageTests {
             Type.EmptyTypes,
             null);
 
-        Assert.IsNotNull(ctor, "Internal constructor not found");
-        var instance = ctor.Invoke(null);
-        Assert.IsNotNull(instance);
+        ctor.Should().NotBeNull(because: "Internal constructor not found");
+        var instance = ctor!.Invoke(null);
+        instance.Should().NotBeNull();
     }
 }

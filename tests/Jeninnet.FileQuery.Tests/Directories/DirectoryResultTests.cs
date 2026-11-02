@@ -43,9 +43,9 @@ public sealed class DirectoryResultTests {
             .Select(path => Relative(environment.Root, path))
             .ToArray();
 
-        Assert.IsFalse(paths.Contains("src", StringComparer.Ordinal));
-        Assert.IsFalse(paths.Contains("src/nested", StringComparer.Ordinal));
-        Assert.IsTrue(paths.Contains("src/a.cs", StringComparer.Ordinal));
+        (paths.Contains("src", StringComparer.Ordinal)).Should().BeFalse();
+        (paths.Contains("src/nested", StringComparer.Ordinal)).Should().BeFalse();
+        (paths.Contains("src/a.cs", StringComparer.Ordinal)).Should().BeTrue();
     }
 
     /// <summary>
@@ -62,7 +62,7 @@ public sealed class DirectoryResultTests {
             .OrderBy(static path => path, StringComparer.Ordinal)
             .ToArray();
 
-        Assert.AreSequenceEqual(_allResults, paths, Microsoft.VisualStudio.TestTools.UnitTesting.SequenceOrder.InAnyOrder);
+        paths.Should().BeEquivalentTo(_allResults);
     }
 
     /// <summary>
@@ -80,9 +80,9 @@ public sealed class DirectoryResultTests {
         var directory = entries.Single(entry => entry.RelativePath == "src/nested");
         var file = entries.Single(entry => entry.RelativePath == "src/nested/b.cs");
 
-        Assert.IsTrue(directory.IsDirectory);
-        Assert.IsFalse(file.IsDirectory);
-        Assert.IsFalse(directory.RelativePath.EndsWith('/'));
+        directory.IsDirectory.Should().BeTrue();
+        file.IsDirectory.Should().BeFalse();
+        (directory.RelativePath.EndsWith('/')).Should().BeFalse();
     }
 
     /// <summary>
@@ -101,7 +101,7 @@ public sealed class DirectoryResultTests {
             .OrderBy(static path => path, StringComparer.Ordinal)
             .ToArray();
 
-        Assert.AreSequenceEqual(_reincludedKeep, entries);
+        entries.Should().Equal(_reincludedKeep);
     }
 
     /// <summary>
@@ -119,9 +119,9 @@ public sealed class DirectoryResultTests {
             .Select(entry => entry.RelativePath)
             .ToArray();
 
-        Assert.IsFalse(entries.Contains("bin", StringComparer.Ordinal));
-        Assert.IsFalse(entries.Contains("bin/tool.exe", StringComparer.Ordinal));
-        Assert.IsTrue(entries.Contains("keep/keep.txt", StringComparer.Ordinal));
+        (entries.Contains("bin", StringComparer.Ordinal)).Should().BeFalse();
+        (entries.Contains("bin/tool.exe", StringComparer.Ordinal)).Should().BeFalse();
+        (entries.Contains("keep/keep.txt", StringComparer.Ordinal)).Should().BeTrue();
     }
 
     /// <summary>
@@ -142,7 +142,7 @@ public sealed class DirectoryResultTests {
             asyncResults.Add($"{entry.RelativePath}|{entry.IsDirectory}");
         }
 
-        Assert.AreSequenceEqual(sync, asyncResults.OrderBy(static value => value, StringComparer.Ordinal));
+        (asyncResults.OrderBy(static value => value, StringComparer.Ordinal)).Should().Equal(sync);
     }
 
     /// <summary>
@@ -158,8 +158,8 @@ public sealed class DirectoryResultTests {
             .Select(path => Relative(environment.Root, path))
             .ToArray();
 
-        Assert.IsFalse(paths.Contains("src", StringComparer.Ordinal));
-        Assert.IsTrue(paths.Contains("src/a.cs", StringComparer.Ordinal));
+        (paths.Contains("src", StringComparer.Ordinal)).Should().BeFalse();
+        (paths.Contains("src/a.cs", StringComparer.Ordinal)).Should().BeTrue();
     }
 
     /// <summary>

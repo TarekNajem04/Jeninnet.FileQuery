@@ -21,9 +21,9 @@ public sealed class BraceExpansionTests {
     public void Compile_ExpandsSimpleAlternation() {
         var patterns = FileQueryPatternSet.Compile(["*.{cs,vb}"]);
 
-        Assert.IsTrue(patterns.IsMatch("Program.cs"));
-        Assert.IsTrue(patterns.IsMatch("Program.vb"));
-        Assert.IsFalse(patterns.IsMatch("Program.txt"));
+        patterns.IsMatch("Program.cs").Should().BeTrue();
+        patterns.IsMatch("Program.vb").Should().BeTrue();
+        patterns.IsMatch("Program.txt").Should().BeFalse();
     }
 
     /// <summary>
@@ -33,9 +33,9 @@ public sealed class BraceExpansionTests {
     public void Compile_ExpandsNestedAlternation() {
         var patterns = CompileGlobSet("{src,test}/**/*.{cs,vb}");
 
-        Assert.IsTrue(patterns.IsMatch("src/Program.cs"));
-        Assert.IsTrue(patterns.IsMatch("test/Program.vb"));
-        Assert.IsFalse(patterns.IsMatch("test/Program.txt"));
+        (patterns.IsMatch("src/Program.cs")).Should().BeTrue();
+        (patterns.IsMatch("test/Program.vb")).Should().BeTrue();
+        (patterns.IsMatch("test/Program.txt")).Should().BeFalse();
     }
 
     /// <summary>
@@ -45,8 +45,8 @@ public sealed class BraceExpansionTests {
     public void Compile_RegexWithLiteralBrace_IsValid() {
         var patterns = FileQueryPatternSet.Compile(["r:^a}$"]);
 
-        Assert.IsTrue(patterns.IsMatch("a}"));
-        Assert.IsFalse(patterns.IsMatch("a"));
+        patterns.IsMatch("a}").Should().BeTrue();
+        patterns.IsMatch("a").Should().BeFalse();
     }
 
     /// <summary>
@@ -62,8 +62,8 @@ public sealed class BraceExpansionTests {
                 InterpretationMode: PatternInterpretationMode.Specific),
             PatternMatchingMode.Regex);
 
-        Assert.IsTrue(patterns.IsMatch("a"));
-        Assert.IsFalse(patterns.IsMatch(" a"));
+        patterns.IsMatch("a").Should().BeTrue();
+        (patterns.IsMatch(" a")).Should().BeFalse();
     }
 
     /// <summary>
@@ -73,36 +73,36 @@ public sealed class BraceExpansionTests {
     public void Compile_TreatsEscapedBracesAsLiteral() {
         var patterns = FileQueryPatternSet.Compile([@"\{a,b\}.txt"]);
 
-        Assert.IsTrue(patterns.IsMatch("{a,b}.txt"));
-        Assert.IsFalse(patterns.IsMatch("a.txt"));
+        patterns.IsMatch("{a,b}.txt").Should().BeTrue();
+        patterns.IsMatch("a.txt").Should().BeFalse();
     }
 
     /// <summary>
     /// Brace alternation is classified as a Glob feature.
     /// </summary>
     [TestMethod]
-    public void Classification_RecognizesBraceAlternation() => Assert.AreEqual(PatternKind.Glob, PatternClassifier.Classify("*.{cs,vb}"));
+    public void Classification_RecognizesBraceAlternation() => (PatternClassifier.Classify("*.{cs,vb}")).Should().Be(PatternKind.Glob);
 
     /// <summary>
     /// An unterminated group reports a validation error with a position.
     /// </summary>
     [TestMethod]
     public void Compile_ReportsUnterminatedBrace() {
-        var exception = Assert.ThrowsExactly<PatternException>(() => CompileGlob("src/{a,b"));
+        var exception = FluentActions.Invoking(() => CompileGlob("src/{a,b")).Should().ThrowExactly<PatternException>().Which;
 
-        Assert.AreEqual(4, exception.Position);
-        Assert.AreEqual(1, exception.Segment);
-        Assert.Contains("matching closing brace", exception.Message);
+        exception.Position.Should().Be(4);
+        exception.Segment.Should().Be(1);
+        exception.Message.Should().Contain("matching closing brace");
     }
     /// <summary>
     /// A stray closing brace is rejected.
     /// </summary>
     [TestMethod]
     public void Compile_ReportsStrayClosingBrace() {
-        var exception = Assert.ThrowsExactly<PatternException>(() => CompileGlob("src/a}b"));
+        var exception = FluentActions.Invoking(() => CompileGlob("src/a}b")).Should().ThrowExactly<PatternException>().Which;
 
-        Assert.AreEqual(5, exception.Position);
-        Assert.Contains("no matching opening brace", exception.Message);
+        exception.Position.Should().Be(5);
+        exception.Message.Should().Contain("no matching opening brace");
     }
 
     /// <summary>
@@ -110,9 +110,9 @@ public sealed class BraceExpansionTests {
     /// </summary>
     [TestMethod]
     public void Compile_RejectsEmptyAlternative() {
-        var exception = Assert.ThrowsExactly<PatternException>(() => CompileGlob("src/{a,}"));
+        var exception = FluentActions.Invoking(() => CompileGlob("src/{a,}")).Should().ThrowExactly<PatternException>().Which;
 
-        Assert.Contains("cannot be empty", exception.Message);
+        exception.Message.Should().Contain("cannot be empty");
     }
 
     /// <summary>
@@ -122,9 +122,9 @@ public sealed class BraceExpansionTests {
     public void Compile_RejectsExcessiveExpansion() {
         var pattern = string.Concat(Enumerable.Repeat("{a,b}", 10));
 
-        var exception = Assert.ThrowsExactly<PatternException>(() => CompileGlob(pattern));
+        var exception = FluentActions.Invoking(() => CompileGlob(pattern)).Should().ThrowExactly<PatternException>().Which;
 
-        Assert.Contains("exceeds", exception.Message);
+        exception.Message.Should().Contain("exceeds");
     }
 
     /// <summary>
@@ -140,9 +140,9 @@ public sealed class BraceExpansionTests {
                 InterpretationMode: PatternInterpretationMode.Specific),
             PatternMatchingMode.Regex);
 
-        Assert.IsTrue(patterns.IsMatch("aa"));
-        Assert.IsTrue(patterns.IsMatch("aaa"));
-        Assert.IsFalse(patterns.IsMatch("a"));
+        patterns.IsMatch("aa").Should().BeTrue();
+        patterns.IsMatch("aaa").Should().BeTrue();
+        patterns.IsMatch("a").Should().BeFalse();
     }
 
     /// <summary>
@@ -160,11 +160,11 @@ public sealed class BraceExpansionTests {
             .OrderBy(static path => path, StringComparer.Ordinal)
             .ToArray();
 
-        Assert.AreSequenceEqual(_expectedFiles, paths);
+        paths.Should().Equal(_expectedFiles);
     }
 
     private static void CompileGlob(string pattern) =>
-        _ = FileQueryPatternSet.Compile(
+        FileQueryPatternSet.Compile(
             new PatternInput(
                 TypedPatterns: new Dictionary<PatternKind, IEnumerable<string>> {
                     [PatternKind.Glob] = [pattern]

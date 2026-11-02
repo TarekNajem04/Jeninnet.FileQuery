@@ -19,10 +19,10 @@ public sealed class PatternInvariantContextTests {
     public void Should_SetNulls_When_AllNullConstructor() {
         var context = new PatternInvariantContext();
 
-        Assert.IsNull(context.Text);
-        Assert.IsNull(context.Segments);
-        Assert.IsNull(context.Classified);
-        Assert.IsNull(context.Compiled);
+        context.Text.Should().BeNull();
+        context.Segments.Should().BeNull();
+        context.Classified.Should().BeNull();
+        context.Compiled.Should().BeNull();
     }
 
     /// <summary>
@@ -32,7 +32,7 @@ public sealed class PatternInvariantContextTests {
     public void Should_SetText_When_ConstructedWithText() {
         var context = new PatternInvariantContext { Text = "test" };
 
-        Assert.AreEqual("test", context.Text);
+        context.Text.Should().Be("test");
     }
 
     /// <summary>
@@ -50,9 +50,9 @@ public sealed class PatternInvariantContextTests {
             Compiled = compiled
         };
 
-        Assert.AreEqual("a", context.Text);
-        Assert.IsNotNull(context.Segments);
-        Assert.AreEqual(classified, context.Classified);
-        Assert.AreEqual(compiled, context.Compiled);
+        context.Text.Should().Be("a");
+        context.Segments.Should().NotBeNull();
+        context.Classified.Should().Be(classified);
+        context.Compiled.Should().Be(compiled);
     }
 }

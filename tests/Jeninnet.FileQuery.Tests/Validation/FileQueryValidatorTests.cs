@@ -38,17 +38,18 @@ public sealed class FileQueryValidatorTests {
     [TestMethod]
     public void ValidateExecution_NullRootPath_ThrowsInvalidOperationException() {
         var fs = new DummyFileSystem();
-        Assert.ThrowsExactly<InvalidOperationException>(() => FileQueryValidator.ValidateExecution(fs, null, null));
+        FluentActions.Invoking(() => FileQueryValidator.ValidateExecution(fs, null, null)).Should().ThrowExactly<InvalidOperationException>();
     }
 
     /// <summary>Tests ValidateExecution_EmptyRootPath_ThrowsInvalidOperationException.</summary>
     [TestMethod]
     public void ValidateExecution_EmptyRootPath_ThrowsInvalidOperationException() {
         var fs = new DummyFileSystem();
-        Assert.ThrowsExactly<InvalidOperationException>(() => FileQueryValidator.ValidateExecution(fs, "  ", null));
+        FluentActions.Invoking(() => FileQueryValidator.ValidateExecution(fs, "  ", null)).Should().ThrowExactly<InvalidOperationException>();
     }
 
     /// <summary>Tests ValidateExecution_InvalidCharacters_ThrowsException.</summary>
+    /// <exception cref="AssertionFailedException">Thrown when the test assertion fails.</exception>
     [TestMethod]
     public void ValidateExecution_InvalidCharacters_ThrowsException() {
         var fs = new DummyFileSystem();
@@ -63,7 +64,7 @@ public sealed class FileQueryValidatorTests {
             return;
         }
 
-        Assert.Fail("Expected ArgumentException or DirectoryNotFoundException.");
+        throw new AssertionFailedException("Expected ArgumentException or DirectoryNotFoundException.");
     }
 
     /// <summary>Tests ValidateExecution_ExceedsMaxLength_ThrowsArgumentException.</summary>
@@ -71,20 +72,20 @@ public sealed class FileQueryValidatorTests {
     public void ValidateExecution_ExceedsMaxLength_ThrowsArgumentException() {
         var fs = new DummyFileSystem();
         var longPath = new string('a', 4097);
-        Assert.ThrowsExactly<ArgumentException>(() => FileQueryValidator.ValidateExecution(fs, longPath, null));
+        FluentActions.Invoking(() => FileQueryValidator.ValidateExecution(fs, longPath, null)).Should().ThrowExactly<ArgumentException>();
     }
 
     /// <summary>Tests ValidateExecution_MalformedUncPath_ThrowsArgumentException.</summary>
     [TestMethod]
     public void ValidateExecution_MalformedUncPath_ThrowsArgumentException() {
         var fs = new DummyFileSystem();
-        Assert.ThrowsExactly<ArgumentException>(() => FileQueryValidator.ValidateExecution(fs, @"\\C\", null));
+        FluentActions.Invoking(() => FileQueryValidator.ValidateExecution(fs, @"\\C\", null)).Should().ThrowExactly<ArgumentException>();
     }
 
     /// <summary>Tests ValidateExecution_NullOptions_ThrowsInvalidOperationException.</summary>
     [TestMethod]
     public void ValidateExecution_NullOptions_ThrowsInvalidOperationException() {
         var fs = new DummyFileSystem();
-        Assert.ThrowsExactly<InvalidOperationException>(() => FileQueryValidator.ValidateExecution(fs, "C:\\valid", null));
+        FluentActions.Invoking(() => FileQueryValidator.ValidateExecution(fs, "C:\\valid", null)).Should().ThrowExactly<InvalidOperationException>();
     }
 }

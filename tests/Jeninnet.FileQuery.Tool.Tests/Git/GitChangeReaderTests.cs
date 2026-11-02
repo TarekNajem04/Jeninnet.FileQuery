@@ -108,8 +108,8 @@ public sealed class GitChangeReaderTests {
         repository.Write("a.txt", "one");
         repository.Commit("initial");
 
-        var exception = Assert.Throws<GitException>(() =>
-            GitChangeReader.Read(repository.Root, "does-not-exist", null, includeUntracked: true));
+        var exception = FluentActions.Invoking(() =>
+            GitChangeReader.Read(repository.Root, "does-not-exist", null, includeUntracked: true)).Should().Throw<GitException>().Which;
 
         exception.Message.Should().Contain("Unknown Git revision");
     }
@@ -121,8 +121,8 @@ public sealed class GitChangeReaderTests {
     public void Read_ShouldThrow_WhenDirectoryIsNotRepository() {
         using var environment = new TestEnvironment();
 
-        var exception = Assert.Throws<GitException>(() =>
-            GitChangeReader.Read(environment.Root, "HEAD", null, includeUntracked: true));
+        var exception = FluentActions.Invoking(() =>
+            GitChangeReader.Read(environment.Root, "HEAD", null, includeUntracked: true)).Should().Throw<GitException>().Which;
 
         exception.Message.Should().Contain("Not a Git repository");
     }

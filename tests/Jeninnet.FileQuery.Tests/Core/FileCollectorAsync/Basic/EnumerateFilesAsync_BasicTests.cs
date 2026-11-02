@@ -41,9 +41,9 @@ public class EnumerateFilesAsync_BasicTests {
                                            .ToListAsync(TestContext.CancellationToken);
 
         TestAssertEx.HasCount(results, 3);
-        Assert.Contains(static x => x.EndsWith("a.txt", StringComparison.Ordinal), results);
-        Assert.Contains(static x => x.EndsWith("b.txt", StringComparison.Ordinal), results);
-        Assert.Contains(static x => x.EndsWith(Path.Combine("sub", "d.txt"), StringComparison.Ordinal), results);
+        results.Should().Contain(static x => x.EndsWith("a.txt", StringComparison.Ordinal));
+        results.Should().Contain(static x => x.EndsWith("b.txt", StringComparison.Ordinal));
+        results.Should().Contain(static x => x.EndsWith(Path.Combine("sub", "d.txt"), StringComparison.Ordinal));
     }
 
     /// <summary>
@@ -72,8 +72,7 @@ public class EnumerateFilesAsync_BasicTests {
         // async results
         var asyncResults = await fileQueryEngine.ExecuteAsync(new(env.Root, options), TestContext.CancellationToken)
                                                 .ToListAsync(TestContext.CancellationToken);
-
-        Assert.AreSequenceEqual(syncResults, [.. asyncResults.Order()]);
+        asyncResults.Order().Should().Equal(syncResults);
     }
 
     /// <summary>

@@ -17,14 +17,14 @@ public sealed class PatternValidatorBoundaryTests {
     /// </summary>
     [TestMethod]
     public void IsMalformed_NullInput_ReturnsFalse() =>
-        Assert.IsFalse(PatternValidator.IsMalformed(default));
+        PatternValidator.IsMalformed(default).Should().BeFalse();
 
     /// <summary>
     /// Verifies that <see cref="PatternValidator.IsMalformed"/> handles non-ASCII (Unicode) characters gracefully without flagging them as malformed.
     /// </summary>
     [TestMethod]
     public void IsMalformed_UnicodeCharacters_IsNotMalformed() =>
-        Assert.IsFalse(PatternValidator.IsMalformed("file-🌸.txt".AsSpan()));
+        (PatternValidator.IsMalformed("file-🌸.txt".AsSpan())).Should().BeFalse();
 
     /// <summary>
     /// Verifies that <see cref="PatternValidator.IsMalformed"/> handles an extremely long pattern string gracefully, ensuring no stack or performance issues.
@@ -32,7 +32,7 @@ public sealed class PatternValidatorBoundaryTests {
     [TestMethod]
     public void IsMalformed_ExtremelyLongPattern_HandlesGracefully() {
         var longPattern = new string('a', 10000) + ".txt";
-        Assert.IsFalse(PatternValidator.IsMalformed(longPattern.AsSpan()));
+        PatternValidator.IsMalformed(longPattern.AsSpan()).Should().BeFalse();
     }
 
     /// <summary>
@@ -40,11 +40,11 @@ public sealed class PatternValidatorBoundaryTests {
     /// </summary>
     [TestMethod]
     public void IsMalformed_ComplexMixedPattern_IsNotMalformed() =>
-        Assert.IsFalse(PatternValidator.IsMalformed("!**/[a-z[:digit:]]/{sub,dir}/file-🌸.txt".AsSpan()));
+        (PatternValidator.IsMalformed("!**/[a-z[:digit:]]/{sub,dir}/file-🌸.txt".AsSpan())).Should().BeFalse();
 
     /// <summary>
     /// Verifies that <see cref="PatternValidator.HasStrayClosingBracket"/> correctly handles a null input by returning <c>false</c>.
     /// </summary>
     [TestMethod]
-    public void HasStrayClosingBracket_NullInput_ReturnsFalse() => Assert.IsFalse(PatternValidator.HasStrayClosingBracket(default));
+    public void HasStrayClosingBracket_NullInput_ReturnsFalse() => PatternValidator.HasStrayClosingBracket(default).Should().BeFalse();
 }

@@ -15,44 +15,44 @@ public sealed class ExtensionTests {
     /// <summary>Tests MatchOutcomeExtensions_ShouldReturnCorrectBooleans.</summary>
     [TestMethod]
     public void MatchOutcomeExtensions_ShouldReturnCorrectBooleans() {
-        Assert.IsTrue(MatchOutcome.Include.IsSuccess());
-        Assert.IsTrue(MatchOutcome.Include.IsIncluded());
-        Assert.IsFalse(MatchOutcome.Include.IsExcluded());
-        Assert.IsFalse(MatchOutcome.Include.IsUnmatched());
+        MatchOutcome.Include.IsSuccess().Should().BeTrue();
+        MatchOutcome.Include.IsIncluded().Should().BeTrue();
+        MatchOutcome.Include.IsExcluded().Should().BeFalse();
+        MatchOutcome.Include.IsUnmatched().Should().BeFalse();
 
-        Assert.IsFalse(MatchOutcome.Exclude.IsSuccess());
-        Assert.IsFalse(MatchOutcome.Exclude.IsIncluded());
-        Assert.IsTrue(MatchOutcome.Exclude.IsExcluded());
-        Assert.IsFalse(MatchOutcome.Exclude.IsUnmatched());
+        MatchOutcome.Exclude.IsSuccess().Should().BeFalse();
+        MatchOutcome.Exclude.IsIncluded().Should().BeFalse();
+        MatchOutcome.Exclude.IsExcluded().Should().BeTrue();
+        MatchOutcome.Exclude.IsUnmatched().Should().BeFalse();
 
-        Assert.IsFalse(MatchOutcome.NoMatch.IsSuccess());
-        Assert.IsFalse(MatchOutcome.NoMatch.IsIncluded());
-        Assert.IsFalse(MatchOutcome.NoMatch.IsExcluded());
-        Assert.IsTrue(MatchOutcome.NoMatch.IsUnmatched());
+        MatchOutcome.NoMatch.IsSuccess().Should().BeFalse();
+        MatchOutcome.NoMatch.IsIncluded().Should().BeFalse();
+        MatchOutcome.NoMatch.IsExcluded().Should().BeFalse();
+        MatchOutcome.NoMatch.IsUnmatched().Should().BeTrue();
     }
 
     /// <summary>Tests MatchResultExtensions_ShouldReturnCorrectBooleans.</summary>
     [TestMethod]
     public void MatchResultExtensions_ShouldReturnCorrectBooleans() {
         var includeResult = MatchResult.Included().Match();
-        Assert.IsTrue(includeResult.IsSuccess());
-        Assert.IsFalse(includeResult.IsExcluded());
-        Assert.IsFalse(includeResult.IsUnmatched());
-        Assert.IsTrue(includeResult.ShouldYield());
-        Assert.AreEqual("Matched: True, Included: True", includeResult.ToDebugString());
+        includeResult.IsSuccess().Should().BeTrue();
+        includeResult.IsExcluded().Should().BeFalse();
+        includeResult.IsUnmatched().Should().BeFalse();
+        includeResult.ShouldYield().Should().BeTrue();
+        includeResult.ToDebugString().Should().Be("Matched: True, Included: True");
 
         var excludeResult = MatchResult.Fail().Match();
-        Assert.IsFalse(excludeResult.IsSuccess());
-        Assert.IsTrue(excludeResult.IsExcluded());
-        Assert.IsFalse(excludeResult.IsUnmatched());
-        Assert.IsFalse(excludeResult.ShouldYield());
-        Assert.AreEqual("Matched: True, Included: False", excludeResult.ToDebugString());
+        excludeResult.IsSuccess().Should().BeFalse();
+        excludeResult.IsExcluded().Should().BeTrue();
+        excludeResult.IsUnmatched().Should().BeFalse();
+        excludeResult.ShouldYield().Should().BeFalse();
+        excludeResult.ToDebugString().Should().Be("Matched: True, Included: False");
 
         var noMatchResult = MatchResult.Fail();
-        Assert.IsFalse(noMatchResult.IsSuccess());
-        Assert.IsFalse(noMatchResult.IsExcluded());
-        Assert.IsTrue(noMatchResult.IsUnmatched());
-        Assert.IsTrue(noMatchResult.ShouldYield());
-        Assert.AreEqual("Matched: False, Included: False", noMatchResult.ToDebugString());
+        noMatchResult.IsSuccess().Should().BeFalse();
+        noMatchResult.IsExcluded().Should().BeFalse();
+        noMatchResult.IsUnmatched().Should().BeTrue();
+        noMatchResult.ShouldYield().Should().BeTrue();
+        noMatchResult.ToDebugString().Should().Be("Matched: False, Included: False");
     }
 }

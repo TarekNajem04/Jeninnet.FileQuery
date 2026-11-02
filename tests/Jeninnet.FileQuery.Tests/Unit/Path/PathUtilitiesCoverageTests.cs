@@ -17,24 +17,15 @@ public class PathUtilitiesCoverageTests {
     /// </summary>
     [TestMethod]
     public void Should_Throw_When_NormalizingNullOrEmpty() {
-        try {
-            PathUtilities.Normalize(null);
-            Assert.Fail("Should have thrown ArgumentException");
-        }
-        catch(ArgumentException) { /* Ignore */ }
-
-        try {
-            PathUtilities.Normalize("");
-            Assert.Fail("Should have thrown ArgumentException");
-        }
-        catch(ArgumentException) { /* Ignore */ }
+        FluentActions.Invoking(() => PathUtilities.Normalize(null)).Should().Throw<ArgumentException>();
+        FluentActions.Invoking(() => PathUtilities.Normalize("")).Should().Throw<ArgumentException>();
     }
 
     /// <summary>
     /// Verifies that Should ConvertToForwardSlash When ToForwardCalled.
     /// </summary>
     [TestMethod]
-    public void Should_ConvertToForwardSlash_When_ToForwardCalled() => Assert.AreEqual("a/b/c", PathUtilities.ToForward("a\\b\\c"));
+    public void Should_ConvertToForwardSlash_When_ToForwardCalled() => PathUtilities.ToForward("a\\b\\c").Should().Be("a/b/c");
 
     /// <summary>
     /// Verifies that Should HandleUncRoot When Normalized.
@@ -42,14 +33,14 @@ public class PathUtilitiesCoverageTests {
     [TestMethod]
     public void Should_HandleUncRoot_When_Normalized() {
         // UNC roots should keep their trailing slash
-        Assert.AreEqual("//server/share/", PathUtilities.Normalize("//server/share/", true));
-        Assert.AreEqual("//server/share", PathUtilities.Normalize("//server/share", true));
+        (PathUtilities.Normalize("//server/share/", true)).Should().Be("//server/share/");
+        (PathUtilities.Normalize("//server/share", true)).Should().Be("//server/share");
 
         // Not a root, should be trimmed
-        Assert.AreEqual("//server/share/folder", PathUtilities.Normalize("//server/share/folder/", true));
+        (PathUtilities.Normalize("//server/share/folder/", true)).Should().Be("//server/share/folder");
 
         // Invalid UNC (no share)
-        Assert.AreEqual("//server", PathUtilities.Normalize("//server", true));
+        (PathUtilities.Normalize("//server", true)).Should().Be("//server");
     }
 
     /// <summary>
@@ -57,10 +48,10 @@ public class PathUtilitiesCoverageTests {
     /// </summary>
     [TestMethod]
     public void Should_HandleEdgeCases_When_CountingSegments() {
-        Assert.AreEqual(0, PathUtilities.CountSegments("".AsSpan(), false));
-        Assert.AreEqual(1, PathUtilities.CountSegments("a".AsSpan(), false));
-        Assert.AreEqual(2, PathUtilities.CountSegments("a/b".AsSpan(), false));
-        Assert.AreEqual(2, PathUtilities.CountSegments("a/b/".AsSpan(), true));
+        (PathUtilities.CountSegments("".AsSpan(), false)).Should().Be(0);
+        (PathUtilities.CountSegments("a".AsSpan(), false)).Should().Be(1);
+        (PathUtilities.CountSegments("a/b".AsSpan(), false)).Should().Be(2);
+        (PathUtilities.CountSegments("a/b/".AsSpan(), true)).Should().Be(2);
     }
 
     /// <summary>
@@ -69,20 +60,20 @@ public class PathUtilitiesCoverageTests {
     [TestMethod]
     public void Should_HandleEdgeCases_When_SplittingNormalizedPath() {
         var empty = PathUtilities.SplitNormalizedPath("".AsSpan(), false);
-        Assert.IsEmpty(empty);
+        empty.Should().BeEmpty();
 
         var root = PathUtilities.SplitNormalizedPath("/".AsSpan(), false);
-        Assert.IsEmpty(root);
+        root.Should().BeEmpty();
 
         var single = PathUtilities.SplitNormalizedPath("a".AsSpan(), false);
-        Assert.HasCount(1, single);
-        Assert.AreEqual("a", single[0]);
+        single.Should().HaveCount(1);
+        single[0].Should().Be("a");
 
         var multi = PathUtilities.SplitNormalizedPath("a/b/c".AsSpan(), false);
-        Assert.HasCount(3, multi);
-        Assert.AreEqual("a", multi[0]);
-        Assert.AreEqual("b", multi[1]);
-        Assert.AreEqual("c", multi[2]);
+        multi.Should().HaveCount(3);
+        multi[0].Should().Be("a");
+        multi[1].Should().Be("b");
+        multi[2].Should().Be("c");
     }
 
     /// <summary>
@@ -97,6 +88,6 @@ public class PathUtilitiesCoverageTests {
         var entry = new FileSystemEntry(full, FileAttributes.Normal);
 
         var relative = PathUtilities.BuildRelativePath(root, entry);
-        Assert.AreEqual($"{longSegment}/file.txt", relative);
+        relative.Should().Be($"{longSegment}/file.txt");
     }
 }

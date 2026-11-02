@@ -100,7 +100,7 @@ public class IFileQueryEngineContractTests {
 
         var results = _engine.Execute(query, TestContext.CancellationToken).ToList();
 
-        Assert.IsEmpty(results);
+        results.Should().BeEmpty();
     }
 
     /// <summary>

@@ -28,11 +28,11 @@ public sealed class FileQueryBatchTests {
         var firstPaths = paths.TakeWhile(path => path.StartsWith(first.Root, StringComparison.Ordinal)).ToArray();
         var secondPaths = paths.Skip(firstPaths.Length).ToArray();
 
-        Assert.IsNotEmpty(firstPaths);
-        Assert.IsNotEmpty(secondPaths);
-        Assert.IsTrue(secondPaths.All(path => path.StartsWith(second.Root, StringComparison.Ordinal)));
-        Assert.AreSequenceEqual(FileQueryRuntime.Create().Execute(batchQuery(first), TestContext.CancellationToken), firstPaths);
-        Assert.AreSequenceEqual(FileQueryRuntime.Create().Execute(batchQuery(second), TestContext.CancellationToken), secondPaths);
+        firstPaths.Should().NotBeEmpty();
+        secondPaths.Should().NotBeEmpty();
+        (secondPaths.All(path => path.StartsWith(second.Root, StringComparison.Ordinal))).Should().BeTrue();
+        firstPaths.Should().Equal(FileQueryRuntime.Create().Execute(batchQuery(first), TestContext.CancellationToken));
+        secondPaths.Should().Equal(FileQueryRuntime.Create().Execute(batchQuery(second), TestContext.CancellationToken));
 
         static FileQuery batchQuery(TestEnvironment environment) =>
             FileQuery.From(environment.Root)
@@ -54,11 +54,10 @@ public sealed class FileQueryBatchTests {
 
         var entries = batch.ExecuteEntries(cancellationToken: TestContext.CancellationToken).Where(static entry => entry.RelativePath == "a.txt").ToArray();
 
-        Assert.HasCount(2, entries);
-        Assert.AreSequenceEqual(
-            [first.Root, second.Root], entries.Select(static entry => entry.RootPath), Microsoft.VisualStudio.TestTools.UnitTesting.SequenceOrder.InAnyOrder);
-        Assert.AreEqual(Path.Combine(first.Root, "a.txt"), entries.Single(entry => entry.RootPath == first.Root).FullPath);
-        Assert.AreEqual(Path.Combine(second.Root, "a.txt"), entries.Single(entry => entry.RootPath == second.Root).FullPath);
+        entries.Should().HaveCount(2);
+        (entries.Select(static entry => entry.RootPath)).Should().BeEquivalentTo((IEnumerable<string>)[first.Root, second.Root]);
+        (entries.Single(entry => entry.RootPath == first.Root).FullPath).Should().Be(Path.Combine(first.Root, "a.txt"));
+        (entries.Single(entry => entry.RootPath == second.Root).FullPath).Should().Be(Path.Combine(second.Root, "a.txt"));
     }
 
     /// <summary>
@@ -81,7 +80,7 @@ public sealed class FileQueryBatchTests {
             asyncResults.Add($"{entry.RootPath}|{entry.RelativePath}");
         }
 
-        Assert.AreSequenceEqual(sync, asyncResults);
+        asyncResults.Should().Equal(sync);
     }
 
     /// <summary>
@@ -97,9 +96,9 @@ public sealed class FileQueryBatchTests {
 
         var paths = batch.Execute(cancellationToken: TestContext.CancellationToken).ToArray();
 
-        Assert.Contains(path => path.StartsWith(first.Root, StringComparison.Ordinal) && path.EndsWith(".txt", StringComparison.Ordinal), paths);
-        Assert.DoesNotContain(path => path.StartsWith(first.Root, StringComparison.Ordinal) && path.EndsWith(".log", StringComparison.Ordinal), paths);
-        Assert.Contains(path => path.StartsWith(second.Root, StringComparison.Ordinal) && path.EndsWith(".log", StringComparison.Ordinal), paths);
+        paths.Should().Contain(path => path.StartsWith(first.Root, StringComparison.Ordinal) && path.EndsWith(".txt", StringComparison.Ordinal));
+        paths.Should().NotContain(path => path.StartsWith(first.Root, StringComparison.Ordinal) && path.EndsWith(".log", StringComparison.Ordinal));
+        paths.Should().Contain(path => path.StartsWith(second.Root, StringComparison.Ordinal) && path.EndsWith(".log", StringComparison.Ordinal));
     }
 
     /// <summary>
@@ -114,7 +113,7 @@ public sealed class FileQueryBatchTests {
 
         cancellation.Cancel();
 
-        Assert.ThrowsExactly<OperationCanceledException>(() => batch.Execute(cancellationToken: cancellation.Token).ToList());
+        FluentActions.Invoking(() => { _ = batch.Execute(cancellationToken: cancellation.Token).ToList(); }).Should().ThrowExactly<OperationCanceledException>();
     }
 
     /// <summary>
@@ -124,9 +123,9 @@ public sealed class FileQueryBatchTests {
     public void Execute_EmptyBatch_ReturnsEmpty() {
         var batch = FileQueryBatch.Create([]);
 
-        Assert.IsEmpty(batch.Roots);
-        Assert.IsEmpty(batch.Execute(cancellationToken: TestContext.CancellationToken));
-        Assert.IsEmpty(batch.ExecuteEntries(cancellationToken: TestContext.CancellationToken));
+        batch.Roots.Should().BeEmpty();
+        (batch.Execute(cancellationToken: TestContext.CancellationToken)).Should().BeEmpty();
+        (batch.ExecuteEntries(cancellationToken: TestContext.CancellationToken)).Should().BeEmpty();
     }
 
     private static TestEnvironment CreateFirstRoot() {
@@ -147,3 +146,4 @@ public sealed class FileQueryBatchTests {
     /// </summary>
     public TestContext TestContext { get; set; } = null!;
 }
+

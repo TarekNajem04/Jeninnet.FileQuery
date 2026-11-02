@@ -19,7 +19,7 @@ public class PatternMergingTests {
     public void Debug_Classifier_Output() {
         var result = PatternClassifier.Classify(@"src\**\*.cs");
 
-        Assert.AreEqual(PatternKind.Glob, result);
+        result.Should().Be(PatternKind.Glob);
     }
 
     /// <summary>
@@ -45,13 +45,13 @@ public class PatternMergingTests {
 
         // Assert
         // 1. Verify GitIgnore bucket (contains *.cs and bin/)
-        Assert.IsTrue(result.ContainsKey(PatternKind.GitIgnore), "Should have GitIgnore patterns");
-        Assert.HasCount(2, result[PatternKind.GitIgnore]);
+        result.ContainsKey(PatternKind.GitIgnore).Should().BeTrue(because: "Should have GitIgnore patterns");
+        result[PatternKind.GitIgnore].Should().HaveCount(2);
 
         // 2. Verify Glob bucket (contains the Windows-style path)
-        Assert.IsTrue(result.ContainsKey(PatternKind.Glob), "Should have Glob patterns");
-        Assert.HasCount(1, result[PatternKind.Glob]);
-        Assert.AreEqual(@"src\**\*.cs", result[PatternKind.Glob][0]);
+        result.ContainsKey(PatternKind.Glob).Should().BeTrue(because: "Should have Glob patterns");
+        result[PatternKind.Glob].Should().HaveCount(1);
+        result[PatternKind.Glob][0].Should().Be(@"src\**\*.cs");
     }
 
     /// <summary>
@@ -70,9 +70,9 @@ public class PatternMergingTests {
         var result = PatternsMerger.Merge(options.PatternInput);
 
         // Assert
-        Assert.HasCount(1, result);
-        Assert.HasCount(2, result[PatternKind.Regex]);
-        Assert.AreEqual("LICENSE", result[PatternKind.Regex][0]);
+        result.Should().HaveCount(1);
+        result[PatternKind.Regex].Should().HaveCount(2);
+        result[PatternKind.Regex][0].Should().Be("LICENSE");
     }
 
     /// <summary>
@@ -96,13 +96,13 @@ public class PatternMergingTests {
         var result = PatternsMerger.Merge(options.PatternInput);
 
         // Assert
-        Assert.HasCount(1, result);
+        result.Should().HaveCount(1);
         var gitIgnoreList = result[PatternKind.GitIgnore];
-        Assert.HasCount(2, gitIgnoreList);
+        gitIgnoreList.Should().HaveCount(2);
 
         // Verification of "Last Rule Wins" order: Typed first, then Raw appended
-        Assert.AreEqual(".env", gitIgnoreList[0]);
-        Assert.AreEqual("node_modules/", gitIgnoreList[1]);
+        gitIgnoreList[0].Should().Be(".env");
+        gitIgnoreList[1].Should().Be("node_modules/");
     }
 
     /// <summary>
@@ -117,8 +117,8 @@ public class PatternMergingTests {
         var result = PatternsMerger.Merge(options.PatternInput);
 
         // Assert
-        Assert.IsNotNull(result);
-        Assert.IsEmpty(result);
+        result.Should().NotBeNull();
+        result.Should().BeEmpty();
     }
 
     /// <summary>
@@ -140,11 +140,12 @@ public class PatternMergingTests {
 
         // Act
         var result = PatternsMerger.Merge(options.PatternInput);
-        //Assert.Throws
+        // Exception behavior is covered by TestAssertEx.Throws.
         result[PatternKind.Glob].Add("new_item");
 
         // Assert
-        Assert.HasCount(1, originalList, "The original list in options should not have been modified.");
-        Assert.HasCount(1, result[PatternKind.Glob], "Want the merged result to be immutable and not reflect changes to the original or the merged list.");
+        originalList.Should().HaveCount(1, because: "The original list in options should not have been modified.");
+        result[PatternKind.Glob].Should().HaveCount(1, because: "Want the merged result to be immutable and not reflect changes to the original or the merged list.");
     }
 }
+

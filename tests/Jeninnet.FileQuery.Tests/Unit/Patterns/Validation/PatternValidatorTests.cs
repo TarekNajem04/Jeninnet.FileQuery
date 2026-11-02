@@ -141,10 +141,7 @@ public sealed class PatternValidatorTests {
     /// </summary>
     [TestMethod]
     public void Should_BeDetectedByHasStrayClosingBracket_When_StrayClosingBracket() =>
-        Assert.IsTrue(
-            PatternValidator.HasStrayClosingBracket("file].txt".AsSpan()),
-            "A ']' without a preceding '[' must be detected by HasStrayClosingBracket."
-        );
+        PatternValidator.HasStrayClosingBracket("file].txt".AsSpan()).Should().BeTrue(because: "A ']' without a preceding '[' must be detected by HasStrayClosingBracket.");
 
     /// <summary>
     /// PatternClassifier must not return <see cref="PatternKind.Unknown"/>
@@ -156,13 +153,9 @@ public sealed class PatternValidatorTests {
     public void Should_NotReturnUnknown_When_PatternWithPosixClass() {
         var kind = PatternClassifier.Classify("!file[[:digit:]].txt");
 
-        Assert.AreNotEqual(
-            PatternKind.Unknown,
-            kind,
-            "A pattern containing a POSIX class must not be classified as Unknown. " +
+        kind.Should().NotBe(PatternKind.Unknown, because: "A pattern containing a POSIX class must not be classified as Unknown. " +
             "Unknown causes a PatternException at compile time because no compiler " +
-            "is registered for that kind."
-        );
+            "is registered for that kind.");
     }
 
     /// <summary>
@@ -172,18 +165,12 @@ public sealed class PatternValidatorTests {
     public void Should_NotReturnUnknown_When_PurePosixClass() {
         var kind = PatternClassifier.Classify("[[:alpha:]]");
 
-        Assert.AreNotEqual(PatternKind.Unknown, kind);
+        kind.Should().NotBe(PatternKind.Unknown);
     }
 
     private static void AssertMalformed(string pattern) =>
-        Assert.IsTrue(
-            PatternValidator.IsMalformed(pattern.AsSpan()),
-            $"Pattern '{pattern}' must be reported as malformed."
-        );
+        PatternValidator.IsMalformed(pattern.AsSpan()).Should().BeTrue(because: $"Pattern '{pattern}' must be reported as malformed.");
 
     private static void AssertNotMalformed(string pattern) =>
-        Assert.IsFalse(
-            PatternValidator.IsMalformed(pattern.AsSpan()),
-            $"Pattern '{pattern}' must not be reported as malformed."
-        );
+        PatternValidator.IsMalformed(pattern.AsSpan()).Should().BeFalse(because: $"Pattern '{pattern}' must not be reported as malformed.");
 }

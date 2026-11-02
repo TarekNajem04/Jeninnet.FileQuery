@@ -25,7 +25,7 @@ public sealed class DirectoryOnlyPatternTests {
 
         // A directory-only pattern should not match a file, even if the file's name matches the pattern.
         // The default behavior of Gitignore is to include until excluded via a pattern, so we expect an Include result here.
-        Assert.AreEqual(MatchOutcome.Include, result);
+        result.Should().Be(MatchOutcome.Include);
     }
 
     /// <summary>
@@ -39,6 +39,6 @@ public sealed class DirectoryOnlyPatternTests {
 
         var result = matcher.Match(pattern, context);
 
-        Assert.AreEqual(MatchOutcome.Exclude, result);
+        result.Should().Be(MatchOutcome.Exclude);
     }
 }

@@ -13,7 +13,7 @@ namespace Jeninnet.FileQuery.Tests.Unit.Patterns.Classification;
 /// </summary>
 [TestClass]
 public class AdvancedPatternClassifierTests {
-    private static void AssertClassification(string pattern, PatternKind expected) => Assert.AreEqual(expected, PatternClassifier.Classify(pattern));
+    private static void AssertClassification(string pattern, PatternKind expected) => PatternClassifier.Classify(pattern).Should().Be(expected);
 
     /// <summary>
     /// Verifies that Should DetectNegationPatterns When GitIgnoreClassifierUsed.

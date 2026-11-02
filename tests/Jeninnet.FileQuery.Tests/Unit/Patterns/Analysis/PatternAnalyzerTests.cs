@@ -21,8 +21,8 @@ public class PatternAnalyzerTests {
 
         var result = analyzer.Analyze("**/*.cs");
 
-        Assert.IsTrue(result.HasRecursiveWildcard);
-        Assert.AreEqual(2, result.SegmentCount);
+        result.HasRecursiveWildcard.Should().BeTrue();
+        result.SegmentCount.Should().Be(2);
     }
 
     /// <summary>
@@ -32,6 +32,6 @@ public class PatternAnalyzerTests {
     public void Should_DetectTrailingSlash_When_Analyzed() {
         var analyzer = new PatternAnalyzer();
         var result = analyzer.Analyze("foo/");
-        Assert.IsTrue(result.HasGitIgnoreSyntax);
+        result.HasGitIgnoreSyntax.Should().BeTrue();
     }
 }

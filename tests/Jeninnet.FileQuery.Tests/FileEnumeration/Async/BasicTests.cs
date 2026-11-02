@@ -72,8 +72,7 @@ public class EnumerateFilesAsync_BasicTests {
         // async results
         var asyncResults = await fileQueryEngine.ExecuteAsync(new(env.Root, options), TestContext.CancellationToken)
                                                 .ToListAsync(TestContext.CancellationToken);
-
-        Assert.AreSequenceEqual(syncResults, [.. asyncResults.Order()]);
+        asyncResults.Order().Should().Equal(syncResults);
     }
 
     /// <summary>

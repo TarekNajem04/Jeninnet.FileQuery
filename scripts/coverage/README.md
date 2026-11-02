@@ -52,9 +52,9 @@ Report from `2026-11-02`:
 
 | Metric | Value |
 |---|---|
-| Line coverage | **89.4%** (5,852 of 6,540) |
+| Line coverage | **89.4%** (5,851 of 6,539) |
 | Branch coverage | **79.7%** (2,277 of 2,855) |
-| Method coverage | **92.1%** (967 of 1,049) |
+| Method coverage | **92.1%** (966 of 1,048) |
 | Assemblies | 9 |
 | Classes | 175 |
 

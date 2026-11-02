@@ -29,10 +29,10 @@ public sealed class FileQueryEntryTests {
             .ExecuteEntries(TestContext.CancellationToken)
             .Single(candidate => candidate.RelativePath == "small.txt");
 
-        Assert.AreEqual(smallPath, entry.FullPath);
-        Assert.AreEqual(3, entry.Length);
-        Assert.IsFalse(entry.IsDirectory);
-        Assert.AreEqual(File.GetLastWriteTimeUtc(smallPath).Ticks / TimeSpan.TicksPerSecond, entry.LastWriteTimeUtc.Ticks / TimeSpan.TicksPerSecond);
+        entry.FullPath.Should().Be(smallPath);
+        entry.Length.Should().Be(3);
+        entry.IsDirectory.Should().BeFalse();
+        (entry.LastWriteTimeUtc.Ticks / TimeSpan.TicksPerSecond).Should().Be(File.GetLastWriteTimeUtc(smallPath).Ticks / TimeSpan.TicksPerSecond);
     }
 
     /// <summary>
@@ -48,8 +48,7 @@ public sealed class FileQueryEntryTests {
             .ExecuteEntries(TestContext.CancellationToken)
             .ToArray();
 
-        Assert.AreSequenceEqual(
-            _nestedEntries, entries.Select(static entry => entry.RelativePath), Microsoft.VisualStudio.TestTools.UnitTesting.SequenceOrder.InAnyOrder);
+        (entries.Select(static entry => entry.RelativePath)).Should().BeEquivalentTo(_nestedEntries);
     }
 
     /// <summary>
@@ -69,7 +68,7 @@ public sealed class FileQueryEntryTests {
             asyncEntries.Add(entry.RelativePath);
         }
 
-        Assert.AreSequenceEqual(sync, asyncEntries.OrderBy(static path => path, StringComparer.Ordinal));
+        (asyncEntries.OrderBy(static path => path, StringComparer.Ordinal)).Should().Equal(sync);
     }
 
     /// <summary>
@@ -88,7 +87,7 @@ public sealed class FileQueryEntryTests {
             .OrderBy(static path => path, StringComparer.Ordinal)
             .ToArray();
 
-        Assert.AreSequenceEqual(paths, entryPaths);
+        entryPaths.Should().Equal(paths);
     }
 
     /// <summary>
@@ -108,7 +107,7 @@ public sealed class FileQueryEntryTests {
             .OrderBy(static path => path, StringComparer.Ordinal)
             .ToArray();
 
-        Assert.AreSequenceEqual(_sizeFilteredEntries, entries);
+        entries.Should().Equal(_sizeFilteredEntries);
     }
 
     /// <summary>
@@ -128,7 +127,7 @@ public sealed class FileQueryEntryTests {
             .OrderBy(static path => path, StringComparer.Ordinal)
             .ToArray();
 
-        Assert.AreSequenceEqual(_sizeFilteredEntries, entries);
+        entries.Should().Equal(_sizeFilteredEntries);
     }
 
     /// <summary>
@@ -143,9 +142,9 @@ public sealed class FileQueryEntryTests {
             ModifiedBeforeUtc: null,
             AttributesToSkip: FileAttributes.ReadOnly);
 
-        Assert.IsFalse(filter.ShouldInclude(new FileSystemEntry("readonly.txt", FileAttributes.ReadOnly)));
-        Assert.IsTrue(filter.ShouldInclude(new FileSystemEntry("normal.txt", FileAttributes.Normal)));
-        Assert.IsFalse(filter.ShouldInclude(new FileSystemEntry("readonly-dir", FileAttributes.ReadOnly | FileAttributes.Directory)));
+        (filter.ShouldInclude(new FileSystemEntry("readonly.txt", FileAttributes.ReadOnly))).Should().BeFalse();
+        (filter.ShouldInclude(new FileSystemEntry("normal.txt", FileAttributes.Normal))).Should().BeTrue();
+        (filter.ShouldInclude(new FileSystemEntry("readonly-dir", FileAttributes.ReadOnly | FileAttributes.Directory))).Should().BeFalse();
     }
 
     /// <summary>
@@ -162,8 +161,8 @@ public sealed class FileQueryEntryTests {
             ModifiedAfter: _recentTimestamp,
             ModifiedBefore: _oldTimestamp));
 
-        Assert.ThrowsExactly<ArgumentException>(sizeOptions.Validate);
-        Assert.ThrowsExactly<ArgumentException>(timeOptions.Validate);
+        FluentActions.Invoking(() => sizeOptions.Validate()).Should().ThrowExactly<ArgumentException>();
+        FluentActions.Invoking(() => timeOptions.Validate()).Should().ThrowExactly<ArgumentException>();
     }
 
     private static readonly DateTimeOffset _oldTimestamp = new(2020, 1, 1, 0, 0, 0, TimeSpan.Zero);

@@ -19,8 +19,8 @@ public class PatternAnalyzerTests {
 
         var result = analyzer.Analyze("**/*.cs");
 
-        Assert.IsTrue(result.HasRecursiveWildcard);
-        Assert.AreEqual(2, result.SegmentCount);
+        result.HasRecursiveWildcard.Should().BeTrue();
+        result.SegmentCount.Should().Be(2);
     }
 
     /// <summary>Tests Analyze_ShouldDetectTrailingSlash.</summary>
@@ -28,7 +28,7 @@ public class PatternAnalyzerTests {
     public void Analyze_ShouldDetectTrailingSlash() {
         var analyzer = new PatternAnalyzer();
         var result = analyzer.Analyze("foo/");
-        Assert.IsTrue(result.HasGitIgnoreSyntax);
+        result.HasGitIgnoreSyntax.Should().BeTrue();
     }
 
     /// <summary>An empty pattern produces an empty analysis result.</summary>
@@ -38,6 +38,6 @@ public class PatternAnalyzerTests {
 
         var result = analyzer.Analyze("");
 
-        Assert.IsTrue(result.IsEmpty);
+        result.IsEmpty.Should().BeTrue();
     }
 }

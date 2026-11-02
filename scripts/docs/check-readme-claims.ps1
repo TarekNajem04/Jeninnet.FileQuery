@@ -48,6 +48,12 @@ foreach ($directory in $projectDirectories) {
     }
 }
 
+# External packages that are intentionally referenced by the README but are not projects in
+# this repository. Keep this list narrow and explicit.
+$knownExternalPackages = [System.Collections.Generic.HashSet[string]]::new(
+    [string[]]@('Jeninnet.Assertions'),
+    [System.StringComparer]::Ordinal)
+
 $readme = [System.IO.File]::ReadAllText($ReadmePath)
 $tokens = [regex]::Matches($readme, '`(Jeninnet\.[A-Za-z0-9._*]+)`') |
     ForEach-Object { $_.Groups[1].Value } |
@@ -64,7 +70,7 @@ foreach ($token in $tokens) {
         continue
     }
 
-    if (-not $knownProjects.Contains($token)) {
+    if (-not $knownProjects.Contains($token) -and -not $knownExternalPackages.Contains($token)) {
         [void]$unresolved.Add("$token (no such project)")
     }
 }

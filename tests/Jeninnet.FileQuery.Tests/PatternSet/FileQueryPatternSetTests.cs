@@ -19,9 +19,9 @@ public sealed class FileQueryPatternSetTests {
     public void IsMatch_MatchesGlobPatterns() {
         var patternSet = CreateGlobSet("**/*.cs");
 
-        Assert.IsTrue(patternSet.IsMatch("src/Program.cs"));
-        Assert.IsTrue(patternSet.IsMatch("Program.cs"));
-        Assert.IsFalse(patternSet.IsMatch("README.md"));
+        (patternSet.IsMatch("src/Program.cs")).Should().BeTrue();
+        patternSet.IsMatch("Program.cs").Should().BeTrue();
+        patternSet.IsMatch("README.md").Should().BeFalse();
     }
 
     /// <summary>
@@ -37,8 +37,8 @@ public sealed class FileQueryPatternSetTests {
                 InterpretationMode: PatternInterpretationMode.Specific),
             PatternMatchingMode.GitIgnore);
 
-        Assert.IsTrue(patternSet.IsMatch("app.log"));
-        Assert.IsFalse(patternSet.IsMatch("app.txt"));
+        patternSet.IsMatch("app.log").Should().BeTrue();
+        patternSet.IsMatch("app.txt").Should().BeFalse();
     }
 
     /// <summary>
@@ -54,8 +54,8 @@ public sealed class FileQueryPatternSetTests {
                 InterpretationMode: PatternInterpretationMode.Specific),
             PatternMatchingMode.GitIgnore);
 
-        Assert.IsFalse(patternSet.IsMatch("src/a.cs"));
-        Assert.IsTrue(patternSet.IsMatch("other/src/a.cs"));
+        (patternSet.IsMatch("src/a.cs")).Should().BeFalse();
+        (patternSet.IsMatch("other/src/a.cs")).Should().BeTrue();
     }
 
     /// <summary>
@@ -71,7 +71,7 @@ public sealed class FileQueryPatternSetTests {
                 InterpretationMode: PatternInterpretationMode.Specific),
             PatternMatchingMode.Regex);
 
-        Assert.IsTrue(patternSet.IsMatch("foo"));
+        patternSet.IsMatch("foo").Should().BeTrue();
     }
 
     /// <summary>
@@ -96,11 +96,11 @@ public sealed class FileQueryPatternSetTests {
             PatternMatchingMode.Glob,
             CaseSensitivity.Sensitive);
 
-        Assert.IsTrue(insensitive.IsMatch("A.txt"));
-        Assert.IsTrue(insensitive.IsMatch("z.txt"));
-        Assert.IsFalse(insensitive.IsMatch("1.txt"));
-        Assert.IsFalse(sensitive.IsMatch("A.txt"));
-        Assert.IsTrue(sensitive.IsMatch("a.txt"));
+        insensitive.IsMatch("A.txt").Should().BeTrue();
+        insensitive.IsMatch("z.txt").Should().BeTrue();
+        insensitive.IsMatch("1.txt").Should().BeFalse();
+        sensitive.IsMatch("A.txt").Should().BeFalse();
+        sensitive.IsMatch("a.txt").Should().BeTrue();
     }
 
     /// <summary>
@@ -112,7 +112,7 @@ public sealed class FileQueryPatternSetTests {
         var path = "src/Program.cs".AsSpan();
 
         for(var i = 0; i < 100; i++) {
-            _ = patternSet.IsMatch(path);
+            patternSet.IsMatch(path);
         }
 
 #pragma warning disable S1215 // "GC.Collect" should not be called
@@ -123,8 +123,8 @@ public sealed class FileQueryPatternSetTests {
         var isMatch = patternSet.IsMatch(path);
         var after = GC.GetAllocatedBytesForCurrentThread();
 
-        Assert.IsTrue(isMatch);
-        Assert.AreEqual(before, after);
+        isMatch.Should().BeTrue();
+        after.Should().Be(before);
     }
 
     /// <summary>
@@ -136,11 +136,11 @@ public sealed class FileQueryPatternSetTests {
 
         var explanation = patternSet.Explain("src/Program.cs");
 
-        Assert.AreEqual(FileQueryMatchOutcome.Include, explanation.Outcome);
-        Assert.IsTrue(explanation.IsMatch);
-        Assert.AreEqual("**/*.cs", explanation.Pattern);
-        Assert.AreEqual(PatternKind.Glob, explanation.PatternKind);
-        Assert.AreEqual("Include by Glob pattern.", explanation.Reason);
+        explanation.Outcome.Should().Be(FileQueryMatchOutcome.Include);
+        explanation.IsMatch.Should().BeTrue();
+        explanation.Pattern.Should().Be("**/*.cs");
+        explanation.PatternKind.Should().Be(PatternKind.Glob);
+        explanation.Reason.Should().Be("Include by Glob pattern.");
     }
 
     /// <summary>
@@ -152,9 +152,9 @@ public sealed class FileQueryPatternSetTests {
 
         var explanation = patternSet.Explain("README.md");
 
-        Assert.AreEqual(FileQueryMatchOutcome.NoMatch, explanation.Outcome);
-        Assert.IsFalse(explanation.IsMatch);
-        Assert.IsNull(explanation.Pattern);
+        explanation.Outcome.Should().Be(FileQueryMatchOutcome.NoMatch);
+        explanation.IsMatch.Should().BeFalse();
+        explanation.Pattern.Should().BeNull();
     }
 
     /// <summary>
@@ -164,7 +164,7 @@ public sealed class FileQueryPatternSetTests {
     public void IsMatch_NormalizesBackslashes() {
         var patternSet = CreateGlobSet("**/*.cs");
 
-        Assert.IsTrue(patternSet.IsMatch(@"src\Program.cs"));
+        patternSet.IsMatch(@"src\Program.cs").Should().BeTrue();
     }
 
     /// <summary>
@@ -181,11 +181,11 @@ public sealed class FileQueryPatternSetTests {
                 InterpretationMode: PatternInterpretationMode.Specific),
             PatternMatchingMode.GitIgnore);
 
-        Assert.IsFalse(patternSet.IsMatch("bin/"));
-        Assert.IsTrue(patternSet.IsMatch("bin"));
-        Assert.IsFalse(patternSet.IsMatch("bin/x.cs"));
-        Assert.IsFalse(patternSet.IsMatch("other/bin/x.cs"));
-        Assert.IsTrue(patternSet.IsMatch("other/bin"));
+        (patternSet.IsMatch("bin/")).Should().BeFalse();
+        patternSet.IsMatch("bin").Should().BeTrue();
+        (patternSet.IsMatch("bin/x.cs")).Should().BeFalse();
+        (patternSet.IsMatch("other/bin/x.cs")).Should().BeFalse();
+        (patternSet.IsMatch("other/bin")).Should().BeTrue();
     }
 
     /// <summary>
@@ -197,9 +197,9 @@ public sealed class FileQueryPatternSetTests {
             new PatternInput(),
             PatternMatchingMode.GitIgnore);
 
-        Assert.IsTrue(patternSet.IsMatch("src/Program.cs"));
-        Assert.IsFalse(patternSet.IsMatch(""));
-        Assert.AreEqual(FileQueryMatchOutcome.Exclude, patternSet.Explain("").Outcome);
+        (patternSet.IsMatch("src/Program.cs")).Should().BeTrue();
+        patternSet.IsMatch("").Should().BeFalse();
+        patternSet.Explain("").Outcome.Should().Be(FileQueryMatchOutcome.Exclude);
     }
 
     /// <summary>
@@ -213,7 +213,7 @@ public sealed class FileQueryPatternSetTests {
                 Patterns: ["**", "!keep/", "keep/file.txt"]),
             PatternMatchingMode.GitIgnore);
 
-        Assert.IsFalse(patternSet.IsMatch("keep/file.txt"));
+        (patternSet.IsMatch("keep/file.txt")).Should().BeFalse();
     }
 
     /// <summary>
@@ -227,8 +227,8 @@ public sealed class FileQueryPatternSetTests {
                 Patterns: ["**", "!keep/"]),
             PatternMatchingMode.GitIgnore);
 
-        Assert.IsTrue(patternSet.IsMatch("keep/file.txt"));
-        Assert.IsTrue(patternSet.IsMatch("other/keep/inside.txt"));
+        (patternSet.IsMatch("keep/file.txt")).Should().BeTrue();
+        (patternSet.IsMatch("other/keep/inside.txt")).Should().BeTrue();
     }
 
     /// <summary>
@@ -246,9 +246,9 @@ public sealed class FileQueryPatternSetTests {
 
         var explanation = patternSet.Explain("src/Program.cs");
 
-        Assert.AreEqual(FileQueryMatchOutcome.Include, explanation.Outcome);
-        Assert.AreEqual("**/*.cs", explanation.Pattern);
-        Assert.AreEqual(PatternKind.Glob, explanation.PatternKind);
+        explanation.Outcome.Should().Be(FileQueryMatchOutcome.Include);
+        explanation.Pattern.Should().Be("**/*.cs");
+        explanation.PatternKind.Should().Be(PatternKind.Glob);
     }
 
     /// <summary>
@@ -265,9 +265,9 @@ public sealed class FileQueryPatternSetTests {
 
         var explanation = patternSet.Explain("src/notes.txt");
 
-        Assert.AreEqual(FileQueryMatchOutcome.Include, explanation.Outcome);
-        Assert.AreEqual(@"r:^src/.*\.txt$", explanation.Pattern);
-        Assert.AreEqual(PatternKind.Regex, explanation.PatternKind);
+        explanation.Outcome.Should().Be(FileQueryMatchOutcome.Include);
+        explanation.Pattern.Should().Be(@"r:^src/.*\.txt$");
+        explanation.PatternKind.Should().Be(PatternKind.Regex);
     }
 
     /// <summary>
@@ -283,9 +283,9 @@ public sealed class FileQueryPatternSetTests {
 
         var explanation = patternSet.Explain("Program.cs");
 
-        Assert.AreEqual(FileQueryMatchOutcome.Include, explanation.Outcome);
-        Assert.AreEqual("!*.cs", explanation.Pattern);
-        Assert.AreEqual(PatternKind.GitIgnore, explanation.PatternKind);
+        explanation.Outcome.Should().Be(FileQueryMatchOutcome.Include);
+        explanation.Pattern.Should().Be("!*.cs");
+        explanation.PatternKind.Should().Be(PatternKind.GitIgnore);
     }
 
     /// <summary>
@@ -303,9 +303,9 @@ public sealed class FileQueryPatternSetTests {
 
         var explanation = patternSet.Explain("notes.txt");
 
-        Assert.AreEqual(FileQueryMatchOutcome.Exclude, explanation.Outcome);
-        Assert.AreEqual("**", explanation.Pattern);
-        Assert.AreEqual(PatternKind.GitIgnore, explanation.PatternKind);
+        explanation.Outcome.Should().Be(FileQueryMatchOutcome.Exclude);
+        explanation.Pattern.Should().Be("**");
+        explanation.PatternKind.Should().Be(PatternKind.GitIgnore);
     }
 
     /// <summary>
@@ -317,8 +317,8 @@ public sealed class FileQueryPatternSetTests {
             Patterns: ["*.cs"],
             InterpretationMode: PatternInterpretationMode.Specific);
 
-        _ = Assert.ThrowsExactly<PatternException>(() =>
-            FileQueryPatternSet.Compile(input, PatternMatchingMode.GitIgnore));
+        FluentActions.Invoking(() =>
+            FileQueryPatternSet.Compile(input, PatternMatchingMode.GitIgnore)).Should().ThrowExactly<PatternException>();
     }
 
     /// <summary>
@@ -333,8 +333,8 @@ public sealed class FileQueryPatternSetTests {
             },
             InterpretationMode: PatternInterpretationMode.Specific);
 
-        _ = Assert.ThrowsExactly<PatternException>(() =>
-            FileQueryPatternSet.Compile(input, PatternMatchingMode.GitIgnore));
+        FluentActions.Invoking(() =>
+            FileQueryPatternSet.Compile(input, PatternMatchingMode.GitIgnore)).Should().ThrowExactly<PatternException>();
     }
 
     /// <summary>
@@ -342,51 +342,50 @@ public sealed class FileQueryPatternSetTests {
     /// </summary>
     [TestMethod]
     public void PatternInput_RejectsEmptyAndWhitespacePatterns() {
-        _ = Assert.ThrowsExactly<ArgumentException>(() => new PatternInput(Patterns: [""]));
-        _ = Assert.ThrowsExactly<ArgumentException>(() => new PatternInput(Patterns: ["   "]));
-        _ = Assert.ThrowsExactly<ArgumentException>(() =>
-            new PatternInput(
+        FluentActions.Invoking(() => { _ = new PatternInput(Patterns: [""]); }).Should().ThrowExactly<ArgumentException>();
+        FluentActions.Invoking(() => { _ = new PatternInput(Patterns: ["   "]); }).Should().ThrowExactly<ArgumentException>();
+        FluentActions.Invoking(() => {
+            _ = new PatternInput(
                 TypedPatterns: new Dictionary<PatternKind, IEnumerable<string>> {
                     [PatternKind.GitIgnore] = [" "]
-                }));
+                });
+        }).Should().ThrowExactly<ArgumentException>();
     }
 
     /// <summary>
     /// Undefined interpretation modes are rejected at the public boundary.
     /// </summary>
     [TestMethod]
-    public void PatternInput_RejectsUndefinedInterpretationMode() {
-        _ = Assert.ThrowsExactly<ArgumentOutOfRangeException>(() =>
-            new PatternInput(InterpretationMode: (PatternInterpretationMode)99));
-    }
+    public void PatternInput_RejectsUndefinedInterpretationMode() =>
+        FluentActions.Invoking(() => { _ = new PatternInput(InterpretationMode: (PatternInterpretationMode)99); }).Should().ThrowExactly<ArgumentOutOfRangeException>();
 
     /// <summary>
     /// Undefined pattern kinds are rejected at the public boundary.
     /// </summary>
     [TestMethod]
-    public void PatternInput_RejectsUndefinedPatternKind() {
-        _ = Assert.ThrowsExactly<ArgumentOutOfRangeException>(() =>
-            new PatternInput(
+    public void PatternInput_RejectsUndefinedPatternKind() =>
+        FluentActions.Invoking(() => {
+            _ = new PatternInput(
                 TypedPatterns: new Dictionary<PatternKind, IEnumerable<string>> {
                     [(PatternKind)99] = ["*.cs"]
-                }));
-    }
+                });
+        }).Should().ThrowExactly<ArgumentOutOfRangeException>();
 
     /// <summary>
     /// Undefined case-sensitivity and matching-mode values are rejected.
     /// </summary>
     [TestMethod]
     public void Compile_RejectsUndefinedCaseSensitivityAndMatchingMode() {
-        _ = Assert.ThrowsExactly<ArgumentOutOfRangeException>(() =>
+        FluentActions.Invoking(() =>
             FileQueryPatternSet.Compile(
                 new PatternInput(),
                 PatternMatchingMode.GitIgnore,
-                (CaseSensitivity)99));
+                (CaseSensitivity)99)).Should().ThrowExactly<ArgumentOutOfRangeException>();
 
-        _ = Assert.ThrowsExactly<ArgumentOutOfRangeException>(() =>
+        FluentActions.Invoking(() =>
             FileQueryPatternSet.Compile(
                 new PatternInput(),
-                (PatternMatchingMode)99));
+                (PatternMatchingMode)99)).Should().ThrowExactly<ArgumentOutOfRangeException>();
     }
 
     /// <summary>
@@ -401,10 +400,10 @@ public sealed class FileQueryPatternSetTests {
             },
             InterpretationMode: PatternInterpretationMode.Specific);
 
-        var exception = Assert.ThrowsExactly<PatternException>(() =>
-            FileQueryPatternSet.Compile(input, PatternMatchingMode.Glob));
+        var exception = FluentActions.Invoking(() =>
+            FileQueryPatternSet.Compile(input, PatternMatchingMode.Glob)).Should().ThrowExactly<PatternException>().Which;
 
-        StringAssert.Contains(exception.Message, "use '/' as the path separator");
+        exception.Message.Should().Contain("use '/' as the path separator");
     }
 
     /// <summary>

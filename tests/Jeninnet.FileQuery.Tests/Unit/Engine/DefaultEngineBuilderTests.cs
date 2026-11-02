@@ -46,9 +46,9 @@ public sealed class DefaultEngineBuilderTests {
 
         var actual = engine.Execute(query, TestContext.CancellationToken).ToList();
 
-        Assert.IsNotNull(expected);
-        Assert.IsNotNull(actual);
-        Assert.AreSequenceEqual(expected, actual);
+        expected.Should().NotBeNull();
+        actual.Should().NotBeNull();
+        actual.Should().Equal(expected);
     }
 
     /// <summary>

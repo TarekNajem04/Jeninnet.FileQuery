@@ -27,8 +27,7 @@ public sealed class PathUtilitiesUncTests {
         const string input = @"\\server\share\file.txt";
         const string expected = "//server/share/file.txt";
 
-        Assert.AreEqual(expected, PathUtilities.Normalize(PathUtilities.Normalize(input)),
-            "Backslashes must become forward slashes and '//' must not be collapsed to '/'.");
+        PathUtilities.Normalize(PathUtilities.Normalize(input)).Should().Be(expected, because: "Backslashes must become forward slashes and '//' must not be collapsed to '/'.");
     }
 
     /// <summary>
@@ -39,8 +38,7 @@ public sealed class PathUtilitiesUncTests {
         const string input = @"\\server\share\";
         const string expected = "//server/share/";
 
-        Assert.AreEqual(expected, PathUtilities.Normalize(input),
-            "A UNC root path's trailing slash must be preserved.");
+        PathUtilities.Normalize(input).Should().Be(expected, because: "A UNC root path's trailing slash must be preserved.");
     }
 
     /// <summary>
@@ -51,7 +49,7 @@ public sealed class PathUtilitiesUncTests {
         const string input = @"\\server\share";
         const string expected = "//server/share";
 
-        Assert.AreEqual(expected, PathUtilities.Normalize(input));
+        PathUtilities.Normalize(input).Should().Be(expected);
     }
 
     /// <summary>
@@ -62,8 +60,7 @@ public sealed class PathUtilitiesUncTests {
         const string input = "//server/share/folder/";
         const string expected = "//server/share/folder";
 
-        Assert.AreEqual(expected, PathUtilities.Normalize(input),
-            "Trailing slash on a non-root UNC path must be trimmed.");
+        PathUtilities.Normalize(input).Should().Be(expected, because: "Trailing slash on a non-root UNC path must be trimmed.");
     }
 
     /// <summary>
@@ -74,7 +71,7 @@ public sealed class PathUtilitiesUncTests {
         const string input = @"\\server\share\project\src\Program.cs";
         const string expected = "//server/share/project/src/Program.cs";
 
-        Assert.AreEqual(expected, PathUtilities.Normalize(input));
+        PathUtilities.Normalize(input).Should().Be(expected);
     }
 
     /// <summary>
@@ -85,8 +82,7 @@ public sealed class PathUtilitiesUncTests {
         const string input = "//server//share//file.txt";
         const string expected = "//server/share/file.txt";
 
-        Assert.AreEqual(expected, PathUtilities.Normalize(input),
-            "Internal consecutive slashes must be collapsed; leading '//' must survive.");
+        PathUtilities.Normalize(input).Should().Be(expected, because: "Internal consecutive slashes must be collapsed; leading '//' must survive.");
     }
 
     /// <summary>
@@ -97,8 +93,7 @@ public sealed class PathUtilitiesUncTests {
         const string input = @"C:\Users\Test\";
         const string expected = "C:/Users/Test/";
 
-        Assert.AreEqual(expected, PathUtilities.Normalize(input, trimTrailingSlash: false),
-            "trimTrailingSlash: false must preserve a trailing slash on non-root paths.");
+        (PathUtilities.Normalize(input, trimTrailingSlash: false)).Should().Be(expected, because: "trimTrailingSlash: false must preserve a trailing slash on non-root paths.");
     }
 
     /// <summary>
@@ -109,8 +104,7 @@ public sealed class PathUtilitiesUncTests {
         const string input = @"\\server\share\folder\";
         const string expected = "//server/share/folder/";
 
-        Assert.AreEqual(expected, PathUtilities.Normalize(input, trimTrailingSlash: false),
-            "trimTrailingSlash: false must preserve trailing slash on non-root UNC paths.");
+        (PathUtilities.Normalize(input, trimTrailingSlash: false)).Should().Be(expected, because: "trimTrailingSlash: false must preserve trailing slash on non-root UNC paths.");
     }
 
     /// <summary>
@@ -121,8 +115,7 @@ public sealed class PathUtilitiesUncTests {
         const string input = @"C:\Users\Test\";
         const string expected = "C:/Users/Test";
 
-        Assert.AreEqual(expected, PathUtilities.Normalize(input),
-            "Default behavior (trimTrailingSlash: true) must not be altered by adding the optional parameter.");
+        PathUtilities.Normalize(input).Should().Be(expected, because: "Default behavior (trimTrailingSlash: true) must not be altered by adding the optional parameter.");
     }
 
     /// <summary>
@@ -130,32 +123,28 @@ public sealed class PathUtilitiesUncTests {
     /// </summary>
     [TestMethod]
     public void Should_ConvertBackslashes_When_WindowsPathNormalized() =>
-        Assert.AreEqual(
-            "C:/Users/Test/file.txt",
-            PathUtilities.Normalize(@"C:\Users\Test\file.txt"));
+        PathUtilities.Normalize(@"C:\Users\Test\file.txt").Should().Be("C:/Users/Test/file.txt");
 
     /// <summary>
     /// Verifies that Should CollapseDuplicateSlashes When LocalPathNormalized.
     /// </summary>
     [TestMethod]
     public void Should_CollapseDuplicateSlashes_When_LocalPathNormalized() =>
-        Assert.AreEqual(
-            "C:/Users/Test/file.txt",
-            PathUtilities.Normalize(@"C:\\Users//Test\\file.txt"));
+        (PathUtilities.Normalize(@"C:\\Users//Test\\file.txt")).Should().Be("C:/Users/Test/file.txt");
 
     /// <summary>
     /// Verifies that Should PreserveTrailingSlash When DriveRootNormalized.
     /// </summary>
     [TestMethod]
     public void Should_PreserveTrailingSlash_When_DriveRootNormalized() =>
-        Assert.AreEqual("C:/", PathUtilities.Normalize("C:/"));
+        (PathUtilities.Normalize("C:/")).Should().Be("C:/");
 
     /// <summary>
     /// Verifies that Should ThrowArgumentException When NormalizingNullOrEmpty.
     /// </summary>
     [TestMethod]
     public void Should_ThrowArgumentException_When_NormalizingNullOrEmpty() {
-        Assert.ThrowsExactly<ArgumentNullException>(static () => PathUtilities.Normalize(null));
-        Assert.ThrowsExactly<ArgumentException>(static () => PathUtilities.Normalize(""));
+        FluentActions.Invoking(static () => PathUtilities.Normalize(null)).Should().ThrowExactly<ArgumentNullException>();
+        FluentActions.Invoking(static () => PathUtilities.Normalize("")).Should().ThrowExactly<ArgumentException>();
     }
 }

@@ -28,14 +28,14 @@ public sealed class ValidateFileQueryPatternsTaskTests {
             SarifOutput = sarifPath
         };
 
-        Assert.IsTrue(task.Execute());
-        Assert.IsEmpty(engine.Errors);
+        task.Execute().Should().BeTrue();
+        engine.Errors.Should().BeEmpty();
 
         using var document = JsonDocument.Parse(File.ReadAllText(sarifPath));
         var results = document.RootElement.GetProperty("runs")[0].GetProperty("results");
 
-        Assert.AreEqual(JsonValueKind.Array, results.ValueKind);
-        Assert.AreEqual(0, results.GetArrayLength());
+        results.ValueKind.Should().Be(JsonValueKind.Array);
+        results.GetArrayLength().Should().Be(0);
     }
 
     /// <summary>
@@ -57,22 +57,22 @@ public sealed class ValidateFileQueryPatternsTaskTests {
             SarifOutput = sarifPath
         };
 
-        Assert.IsFalse(task.Execute());
-        Assert.HasCount(1, engine.Errors);
-        Assert.AreEqual("JNQ2001", engine.Errors[0].Code);
-        Assert.AreEqual("build/patterns.props", engine.Errors[0].File);
-        Assert.AreEqual(12, engine.Errors[0].LineNumber);
-        Assert.AreEqual(3, engine.Errors[0].ColumnNumber);
+        task.Execute().Should().BeFalse();
+        engine.Errors.Should().HaveCount(1);
+        engine.Errors[0].Code.Should().Be("JNQ2001");
+        engine.Errors[0].File.Should().Be("build/patterns.props");
+        engine.Errors[0].LineNumber.Should().Be(12);
+        engine.Errors[0].ColumnNumber.Should().Be(3);
 
         using var document = JsonDocument.Parse(File.ReadAllText(sarifPath));
         var result = document.RootElement.GetProperty("runs")[0].GetProperty("results")[0];
         var location = result.GetProperty("locations")[0].GetProperty("physicalLocation");
         var region = location.GetProperty("region");
 
-        Assert.AreEqual("JNQ2001", result.GetProperty("ruleId").GetString());
-        Assert.AreEqual("build/patterns.props", location.GetProperty("artifactLocation").GetProperty("uri").GetString());
-        Assert.AreEqual(12, region.GetProperty("startLine").GetInt32());
-        Assert.AreEqual(3, region.GetProperty("startColumn").GetInt32());
+        result.GetProperty("ruleId").GetString().Should().Be("JNQ2001");
+        location.GetProperty("artifactLocation").GetProperty("uri").GetString().Should().Be("build/patterns.props");
+        region.GetProperty("startLine").GetInt32().Should().Be(12);
+        region.GetProperty("startColumn").GetInt32().Should().Be(3);
     }
 
     /// <summary>
@@ -86,8 +86,8 @@ public sealed class ValidateFileQueryPatternsTaskTests {
             Patterns = []
         };
 
-        Assert.IsTrue(task.Execute());
-        Assert.IsEmpty(engine.Errors);
+        task.Execute().Should().BeTrue();
+        engine.Errors.Should().BeEmpty();
     }
 
     /// <summary>
@@ -97,8 +97,8 @@ public sealed class ValidateFileQueryPatternsTaskTests {
     public void Target_ValidatesPropertyPatterns() {
         var (output, sarif) = RunProject("**/*.cs;[abc", expectSuccess: false);
 
-        Assert.Contains("JNQ2001", output);
-        Assert.IsNotNull(sarif);
+        output.Should().Contain("JNQ2001");
+        sarif.Should().NotBeNull();
     }
 
     /// <summary>
@@ -108,7 +108,7 @@ public sealed class ValidateFileQueryPatternsTaskTests {
     public void Target_AcceptsValidPropertyPatterns() {
         var (_, sarif) = RunProject("**/*.cs;!bin/", expectSuccess: true);
 
-        Assert.IsNotNull(sarif);
+        sarif.Should().NotBeNull();
     }
 
     private static (string Output, string? Sarif) RunProject(string patterns, bool expectSuccess) {
@@ -158,9 +158,9 @@ public sealed class ValidateFileQueryPatternsTaskTests {
             process.WaitForExit();
 
             if(expectSuccess) {
-                Assert.AreEqual(0, process.ExitCode, output);
+                process.ExitCode.Should().Be(0, because: output);
             } else {
-                Assert.AreNotEqual(0, process.ExitCode, output);
+                process.ExitCode.Should().NotBe(0, because: output);
             }
 
             var sarif = File.Exists(sarifPath) ? File.ReadAllText(sarifPath) : null;

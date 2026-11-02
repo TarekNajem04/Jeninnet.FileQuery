@@ -97,7 +97,7 @@ public class ComplexWildcardTests {
         var results = fileQueryEngine.Execute(new(env.Root, options), TestContext.CancellationToken).ToList();
 
         results.Should().HaveCount(2);
-        Assert.IsTrue(results.All(static x => x.Contains('a')));
+        (results.All(static x => x.Contains('a'))).Should().BeTrue();
     }
 
     /// <summary>

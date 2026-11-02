@@ -19,8 +19,8 @@ public sealed class Phase2CoverageDeepDiveTests {
     public void SegmentInstructionMatcher_PosixClasses_ShouldMatchCorrectly() {
         static void AssertPosix(string className, char match, char noMatch) {
             var tokens = new List<IPatternToken> { new CharacterClassToken(new CharacterClass(false, [new PosixClass(className)])) };
-            Assert.IsTrue(SegmentInstructionMatcher.MatchSegment(match.ToString().AsSpan(), tokens, StringComparison.Ordinal), $"Expected {match} to match {className}");
-            Assert.IsFalse(SegmentInstructionMatcher.MatchSegment(noMatch.ToString().AsSpan(), tokens, StringComparison.Ordinal), $"Expected {noMatch} NOT to match {className}");
+            (SegmentInstructionMatcher.MatchSegment(match.ToString().AsSpan(), tokens, StringComparison.Ordinal)).Should().BeTrue(because: $"Expected {match} to match {className}");
+            (SegmentInstructionMatcher.MatchSegment(noMatch.ToString().AsSpan(), tokens, StringComparison.Ordinal)).Should().BeFalse(because: $"Expected {noMatch} NOT to match {className}");
         }
 
         AssertPosix("digit", '5', 'a');
@@ -38,7 +38,7 @@ public sealed class Phase2CoverageDeepDiveTests {
 
         // Unknown class should never match anything
         var unknownTokens = new List<IPatternToken> { new CharacterClassToken(new CharacterClass(false, [new PosixClass("unknown")])) };
-        Assert.IsFalse(SegmentInstructionMatcher.MatchSegment("a".AsSpan(), unknownTokens, StringComparison.Ordinal));
+        (SegmentInstructionMatcher.MatchSegment("a".AsSpan(), unknownTokens, StringComparison.Ordinal)).Should().BeFalse();
     }
 
     /// <summary>
@@ -47,10 +47,10 @@ public sealed class Phase2CoverageDeepDiveTests {
     [TestMethod]
     public void SegmentInstructionMatcher_CharRange_ShouldMatchCorrectly() {
         var tokens = new List<IPatternToken> { new CharacterClassToken(new CharacterClass(false, [new CharRange('a', 'c')])) };
-        Assert.IsTrue(SegmentInstructionMatcher.MatchSegment("a".AsSpan(), tokens, StringComparison.Ordinal));
-        Assert.IsTrue(SegmentInstructionMatcher.MatchSegment("b".AsSpan(), tokens, StringComparison.Ordinal));
-        Assert.IsTrue(SegmentInstructionMatcher.MatchSegment("c".AsSpan(), tokens, StringComparison.Ordinal));
-        Assert.IsFalse(SegmentInstructionMatcher.MatchSegment("d".AsSpan(), tokens, StringComparison.Ordinal));
+        (SegmentInstructionMatcher.MatchSegment("a".AsSpan(), tokens, StringComparison.Ordinal)).Should().BeTrue();
+        (SegmentInstructionMatcher.MatchSegment("b".AsSpan(), tokens, StringComparison.Ordinal)).Should().BeTrue();
+        (SegmentInstructionMatcher.MatchSegment("c".AsSpan(), tokens, StringComparison.Ordinal)).Should().BeTrue();
+        (SegmentInstructionMatcher.MatchSegment("d".AsSpan(), tokens, StringComparison.Ordinal)).Should().BeFalse();
     }
 
     /// <summary>
@@ -65,19 +65,19 @@ public sealed class Phase2CoverageDeepDiveTests {
         frontier.Push(new TraversalFrame("/b", 0));
         frontier.Push(new TraversalFrame("/c", 0)); // Triggers resize
 
-        Assert.AreEqual("/c", frontier.Pop().Directory);
-        Assert.AreEqual("/b", frontier.Pop().Directory);
-        Assert.AreEqual("/a", frontier.Pop().Directory);
-        Assert.IsTrue(frontier.IsEmpty);
+        frontier.Pop().Directory.Should().Be("/c");
+        frontier.Pop().Directory.Should().Be("/b");
+        frontier.Pop().Directory.Should().Be("/a");
+        frontier.IsEmpty.Should().BeTrue();
 
         // Test BFS resize behavior
         frontier.Enqueue(new TraversalFrame("/1", 0));
         frontier.Enqueue(new TraversalFrame("/2", 0));
         frontier.Enqueue(new TraversalFrame("/3", 0)); // Triggers resize
 
-        Assert.AreEqual("/1", frontier.Dequeue().Directory);
-        Assert.AreEqual("/2", frontier.Dequeue().Directory);
-        Assert.AreEqual("/3", frontier.Dequeue().Directory);
+        frontier.Dequeue().Directory.Should().Be("/1");
+        frontier.Dequeue().Directory.Should().Be("/2");
+        frontier.Dequeue().Directory.Should().Be("/3");
     }
 
     /// <summary>
@@ -98,33 +98,34 @@ public sealed class Phase2CoverageDeepDiveTests {
         var mockPattern = new MockCompiledPattern(PatternKind.Glob, isNegated: true, directoryOnly: true, anchoredToRoot: true);
         var set = new CompiledPatternSet([mockPattern]);
 
-        Assert.AreEqual(1, set.Count);
-        Assert.IsNotNull(set[0]);
-        Assert.IsNotNull(set.GetEnumerator());
+        set.Count.Should().Be(1);
+        set[0].Should().NotBeNull();
+        set.GetEnumerator().Should().NotBeNull();
 
         var grouped = set.GroupByType().ToList();
-        Assert.HasCount(1, grouped);
-        Assert.AreEqual(PatternKind.Glob, grouped[0].PatternKind);
+        grouped.Should().HaveCount(1);
+        grouped[0].PatternKind.Should().Be(PatternKind.Glob);
 
-        Assert.HasCount(1, set.FindNegated());
-        Assert.IsEmpty(set.FindPositive());
-        Assert.HasCount(1, set.OfType(PatternKind.Glob));
-        Assert.IsEmpty(set.OfType(PatternKind.Unknown));
-        Assert.HasCount(1, set.DirectoryOnly());
-        Assert.HasCount(1, set.AnchoredToRoot());
+        set.FindNegated().Should().HaveCount(1);
+        set.FindPositive().Should().BeEmpty();
+        set.OfType(PatternKind.Glob).Should().HaveCount(1);
+        set.OfType(PatternKind.Unknown).Should().BeEmpty();
+        set.DirectoryOnly().Should().HaveCount(1);
+        set.AnchoredToRoot().Should().HaveCount(1);
 
         // Equality
-        Assert.IsTrue(set.Equals(set));
-        Assert.IsFalse(set.Equals(null));
-        Assert.IsFalse(set.Equals(CompiledPatternSet.Empty));
+        set.Equals(set).Should().BeTrue();
+        set.Equals(null).Should().BeFalse();
+        set!.Equals(CompiledPatternSet.Empty).Should().BeFalse();
 
         // HashCode
-        Assert.AreNotEqual(0, set.GetHashCode());
+        set.GetHashCode().Should().NotBe(0);
     }
 
     /// <summary>
     /// Verifies that <see cref="MatchResult.Include(Func{bool})"/> correctly delegates inclusion logic.
     /// </summary>
+    /// <exception cref="AssertionFailedException">Thrown when the test assertion fails.</exception>
     [TestMethod]
     public void MatchResult_DelegateInclusion_ShouldWorkCorrectly() {
         TestInclusion(true);
@@ -134,7 +135,7 @@ public sealed class Phase2CoverageDeepDiveTests {
         var result = MatchResult.Fail();
         try {
             result.Include(null!);
-            Assert.Fail("Should have thrown");
+            throw new AssertionFailedException("Should have thrown");
         }
         catch(ArgumentNullException) {
             // Ignore the exception, as it's expected behavior
@@ -144,12 +145,13 @@ public sealed class Phase2CoverageDeepDiveTests {
     private static void TestInclusion(bool value) {
         var result = MatchResult.Fail();
         result.Include(() => value);
-        Assert.AreEqual(value, result.IsIncluded);
+        (result.IsIncluded == value).Should().BeTrue();
     }
 
     /// <summary>
     /// Verifies that <see cref="MatchResult.Match(Func{bool})"/> correctly delegates matching logic.
     /// </summary>
+    /// <exception cref="AssertionFailedException">Thrown when the test assertion fails.</exception>
     [TestMethod]
     public void MatchResult_DelegateMatch_ShouldWorkCorrectly() {
         TestMatch(true);
@@ -158,7 +160,7 @@ public sealed class Phase2CoverageDeepDiveTests {
         var result = MatchResult.Fail();
         try {
             result.Match(null!);
-            Assert.Fail("Should have thrown");
+            throw new AssertionFailedException("Should have thrown");
         }
         catch(ArgumentNullException) {
             // Ignore the exception, as it's expected behavior
@@ -168,7 +170,7 @@ public sealed class Phase2CoverageDeepDiveTests {
     private static void TestMatch(bool value) {
         var result = MatchResult.Fail();
         result.Match(() => value);
-        Assert.AreEqual(value, result.IsMatched);
+        (result.IsMatched == value).Should().BeTrue();
     }
 
     /// <summary>
@@ -179,17 +181,17 @@ public sealed class Phase2CoverageDeepDiveTests {
         using var env = new TestEnvironment();
 
         var gitIgnoreQuery = FileQueryBuilder.From(env.Root).UsingGitIgnore().Build();
-        Assert.AreEqual(PatternMatchingMode.GitIgnore, gitIgnoreQuery.Options.PatternMatchingMode);
+        gitIgnoreQuery.Options.PatternMatchingMode.Should().Be(PatternMatchingMode.GitIgnore);
 
         var globQuery = FileQueryBuilder.From(env.Root).UsingGlob().Build();
-        Assert.AreEqual(PatternMatchingMode.Glob, globQuery.Options.PatternMatchingMode);
+        globQuery.Options.PatternMatchingMode.Should().Be(PatternMatchingMode.Glob);
 
         var regexQuery = FileQueryBuilder.From(env.Root).UsingRegex().Build();
-        Assert.AreEqual(PatternMatchingMode.Regex, regexQuery.Options.PatternMatchingMode);
+        regexQuery.Options.PatternMatchingMode.Should().Be(PatternMatchingMode.Regex);
 
         var hybridQuery = FileQueryBuilder.From(env.Root).UsingHybrid().Build();
         // InterpretationMode is internal, but we can verify it doesn't throw and uses defaults
-        Assert.IsNotNull(hybridQuery);
+        hybridQuery.Should().NotBeNull();
     }
 
     /// <summary>
@@ -216,8 +218,8 @@ public sealed class Phase2CoverageDeepDiveTests {
         };
 
         var query = FileQueryBuilder.From(env.Root).Where(typedPatterns).Build();
-        Assert.IsTrue(query.Options.PatternInput.TypedPatterns.ContainsKey(PatternKind.Glob));
-        Assert.IsTrue(query.Options.PatternInput.TypedPatterns.ContainsKey(PatternKind.GitIgnore));
+        query.Options.PatternInput.TypedPatterns.ContainsKey(PatternKind.Glob).Should().BeTrue();
+        query.Options.PatternInput.TypedPatterns.ContainsKey(PatternKind.GitIgnore).Should().BeTrue();
     }
 
     /// <summary>
@@ -228,8 +230,8 @@ public sealed class Phase2CoverageDeepDiveTests {
         using var env = new TestEnvironment();
         var options = FileQueryErrorRecoveryOptions.Retry(3);
         var query = FileQueryBuilder.From(env.Root).WithErrorRecovery(options).Build();
-        Assert.AreEqual(FileQueryErrorAction.Retry, query.Options.ErrorRecovery.Action);
-        Assert.AreEqual(3, query.Options.ErrorRecovery.MaxRetryAttempts);
+        query.Options.ErrorRecovery.Action.Should().Be(FileQueryErrorAction.Retry);
+        query.Options.ErrorRecovery.MaxRetryAttempts.Should().Be(3);
     }
 
     /// <summary>
@@ -245,16 +247,16 @@ public sealed class Phase2CoverageDeepDiveTests {
 
         // Sync
         var resultsSync = builder.Execute(TestContext.CancellationToken).ToList();
-        Assert.HasCount(1, resultsSync);
+        resultsSync.Should().HaveCount(1);
 
         // Async
         var resultsAsync = await builder.ExecuteAsync(TestContext.CancellationToken).ToListAsync(TestContext.CancellationToken);
-        Assert.HasCount(1, resultsAsync);
+        resultsAsync.Should().HaveCount(1);
 
         // Async with progress
         var progress = new MockProgress<FileQueryProgress>();
         var resultsProgress = await builder.ExecuteAsync(progress, TestContext.CancellationToken).ToListAsync(TestContext.CancellationToken);
-        Assert.HasCount(1, resultsProgress);
+        resultsProgress.Should().HaveCount(1);
     }
 
     /// <summary>

@@ -45,9 +45,9 @@ public class FileQueryBuilderTests {
         var query = builder.Build();
 
         // Assert
-        Assert.IsNotNull(query.Options.PatternInput.TypedPatterns);
-        Assert.IsTrue(query.Options.PatternInput.TypedPatterns.ContainsKey(PatternKind.Glob));
-        Assert.AreSequenceEqual(patterns, [.. query.Options.PatternInput.TypedPatterns[PatternKind.Glob]], SequenceOrder.InAnyOrder);
+        query.Options.PatternInput.TypedPatterns.Should().NotBeNull();
+        query.Options.PatternInput.TypedPatterns.ContainsKey(PatternKind.Glob).Should().BeTrue();
+        query.Options.PatternInput.TypedPatterns[PatternKind.Glob].Should().BeEquivalentTo(patterns);
     }
 
     /// <summary>Tests UsingHybrid_ShouldSetMatchingModeToHybrid_WhenCalled.</summary>
@@ -61,7 +61,7 @@ public class FileQueryBuilderTests {
         var query = builder.Build();
 
         // Assert
-        Assert.AreEqual(PatternInterpretationMode.Hybrid, query.Options.PatternInput.InterpretationMode);
+        query.Options.PatternInput.InterpretationMode.Should().Be(PatternInterpretationMode.Hybrid);
     }
 
     /// <summary>Tests UsingGitIgnore_ShouldSetMatchingModeToGitIgnore_WhenCalled.</summary>
@@ -75,7 +75,7 @@ public class FileQueryBuilderTests {
         var query = builder.Build();
 
         // Assert
-        Assert.AreEqual(PatternMatchingMode.GitIgnore, query.Options.PatternMatchingMode);
+        query.Options.PatternMatchingMode.Should().Be(PatternMatchingMode.GitIgnore);
     }
 
     /// <summary>Tests UsingGlob_ShouldSetMatchingModeToGlob_WhenCalled.</summary>
@@ -89,7 +89,7 @@ public class FileQueryBuilderTests {
         var query = builder.Build();
 
         // Assert
-        Assert.AreEqual(PatternMatchingMode.Glob, query.Options.PatternMatchingMode);
+        query.Options.PatternMatchingMode.Should().Be(PatternMatchingMode.Glob);
     }
 
     /// <summary>Tests UsingRegex_ShouldSetMatchingModeToRegex_WhenCalled.</summary>
@@ -103,7 +103,7 @@ public class FileQueryBuilderTests {
         var query = builder.Build();
 
         // Assert
-        Assert.AreEqual(PatternMatchingMode.Regex, query.Options.PatternMatchingMode);
+        query.Options.PatternMatchingMode.Should().Be(PatternMatchingMode.Regex);
     }
 
     /// <summary>Tests WithRecursion_ShouldUpdateRecurseSubdirectories_WhenValueProvided.</summary>
@@ -117,7 +117,7 @@ public class FileQueryBuilderTests {
         var query = builder.Build();
 
         // Assert
-        Assert.IsFalse(query.Options.RecurseSubdirectories);
+        query.Options.RecurseSubdirectories.Should().BeFalse();
     }
 
     /// <summary>Tests WithoutRecursion_ShouldSetRecurseSubdirectoriesToFalse_WhenCalled.</summary>
@@ -131,7 +131,7 @@ public class FileQueryBuilderTests {
         var query = builder.Build();
 
         // Assert
-        Assert.IsFalse(query.Options.RecurseSubdirectories);
+        query.Options.RecurseSubdirectories.Should().BeFalse();
     }
 
     /// <summary>Tests IgnoreCase_ShouldUpdateCaseSensitivity_WhenValueProvided.</summary>
@@ -145,7 +145,7 @@ public class FileQueryBuilderTests {
         var query = builder.Build();
 
         // Assert
-        Assert.AreEqual(CaseSensitivity.Insensitive, query.Options.CaseSensitivity);
+        query.Options.CaseSensitivity.Should().Be(CaseSensitivity.Insensitive);
     }
 
     /// <summary>Tests WithMaxDepth_ShouldUpdateDepth_AndRejectInvalidValues.</summary>
@@ -155,10 +155,9 @@ public class FileQueryBuilderTests {
             .WithMaxDepth(2)
             .Build();
 
-        Assert.AreEqual(2, query.Options.MaxRecursionDepth);
+        query.Options.MaxRecursionDepth.Should().Be(2);
 
-        Assert.ThrowsExactly<ArgumentOutOfRangeException>(
-            () => FileQuery.From(_tempRoot).WithMaxDepth(-2));
+        FluentActions.Invoking(() => FileQuery.From(_tempRoot).WithMaxDepth(-2)).Should().ThrowExactly<ArgumentOutOfRangeException>();
     }
 
     /// <summary>Tests WithTraversal_ShouldApplyStrategyAndSymlinkPolicy.</summary>
@@ -172,10 +171,9 @@ public class FileQueryBuilderTests {
             .WithTraversal(traversal)
             .Build();
 
-        Assert.AreEqual(TraversalStrategy.BreadthFirst, query.Options.Traversal.Strategy);
-        Assert.AreEqual(SymlinkPolicy.FollowWithCycleDetection, query.Options.Traversal.SymlinkPolicy);
-        Assert.ThrowsExactly<ArgumentNullException>(
-            () => FileQuery.From(_tempRoot).WithTraversal(null!));
+        query.Options.Traversal.Strategy.Should().Be(TraversalStrategy.BreadthFirst);
+        query.Options.Traversal.SymlinkPolicy.Should().Be(SymlinkPolicy.FollowWithCycleDetection);
+        FluentActions.Invoking(() => FileQuery.From(_tempRoot).WithTraversal(null!)).Should().ThrowExactly<ArgumentNullException>();
     }
 
     /// <summary>Tests IgnoreInaccessible_ShouldUpdateOptionAndDefaultRecovery_WhenDisabled.</summary>
@@ -185,13 +183,13 @@ public class FileQueryBuilderTests {
             .IgnoreInaccessible(false)
             .Build();
 
-        Assert.IsFalse(explicitFalse.Options.IgnoreInaccessible);
-        Assert.AreEqual(FileQueryErrorAction.Abort, explicitFalse.Options.ErrorRecovery.Action);
+        explicitFalse.Options.IgnoreInaccessible.Should().BeFalse();
+        explicitFalse.Options.ErrorRecovery.Action.Should().Be(FileQueryErrorAction.Abort);
 
         var defaulted = FileQuery.From(_tempRoot).Build();
 
-        Assert.IsTrue(defaulted.Options.IgnoreInaccessible);
-        Assert.AreEqual(FileQueryErrorAction.Skip, defaulted.Options.ErrorRecovery.Action);
+        defaulted.Options.IgnoreInaccessible.Should().BeTrue();
+        defaulted.Options.ErrorRecovery.Action.Should().Be(FileQueryErrorAction.Skip);
     }
 
     /// <summary>Tests ValidatePatternType_ShouldThrowInvalidOperationException_WhenModeAndKindConflict_AllCases.</summary>
@@ -199,24 +197,24 @@ public class FileQueryBuilderTests {
     public void ValidatePatternType_ShouldThrowInvalidOperationException_WhenModeAndKindConflict_AllCases() {
         // Test GitIgnore mode conflicts
         var builder1 = FileQuery.From(_tempRoot).UsingGitIgnore();
-        Assert.Throws<InvalidOperationException>(() => builder1.Where(PatternKind.Glob, ["*.txt"]));
+        FluentActions.Invoking(() => builder1.Where(PatternKind.Glob, ["*.txt"])).Should().Throw<InvalidOperationException>();
 
         var builder2 = FileQuery.From(_tempRoot).UsingGitIgnore();
-        Assert.Throws<InvalidOperationException>(() => builder2.Where(PatternKind.Regex, [".*"]));
+        FluentActions.Invoking(() => builder2.Where(PatternKind.Regex, [".*"])).Should().Throw<InvalidOperationException>();
 
         // Test Glob mode conflicts
         var builder3 = FileQuery.From(_tempRoot).UsingGlob();
-        Assert.Throws<InvalidOperationException>(() => builder3.Where(PatternKind.GitIgnore, ["*.txt"]));
+        FluentActions.Invoking(() => builder3.Where(PatternKind.GitIgnore, ["*.txt"])).Should().Throw<InvalidOperationException>();
 
         var builder4 = FileQuery.From(_tempRoot).UsingGlob();
-        Assert.Throws<InvalidOperationException>(() => builder4.Where(PatternKind.Regex, [".*"]));
+        FluentActions.Invoking(() => builder4.Where(PatternKind.Regex, [".*"])).Should().Throw<InvalidOperationException>();
 
         // Test Regex mode conflicts
         var builder5 = FileQuery.From(_tempRoot).UsingRegex();
-        Assert.Throws<InvalidOperationException>(() => builder5.Where(PatternKind.GitIgnore, ["*.txt"]));
+        FluentActions.Invoking(() => builder5.Where(PatternKind.GitIgnore, ["*.txt"])).Should().Throw<InvalidOperationException>();
 
         var builder6 = FileQuery.From(_tempRoot).UsingRegex();
-        Assert.Throws<InvalidOperationException>(() => builder6.Where(PatternKind.Glob, ["*.txt"]));
+        FluentActions.Invoking(() => builder6.Where(PatternKind.Glob, ["*.txt"])).Should().Throw<InvalidOperationException>();
     }
 
     /// <summary>Tests ValidatePatternType_ShouldHandleAllPatternKinds_WhenHybrid.</summary>
@@ -238,13 +236,13 @@ public class FileQueryBuilderTests {
     [TestMethod]
     public void Build_ShouldThrow_WhenRootPathIsNullOrEmpty() {
         var builder = new FileQueryBuilder("   ", FileSystem.Instance);
-        Assert.Throws<InvalidOperationException>(builder.Build);
+        FluentActions.Invoking(() => builder.Build()).Should().Throw<InvalidOperationException>();
     }
 
     /// <summary>Tests Build_ShouldThrow_WhenRootPathDoesNotExist.</summary>
     [TestMethod]
     public void Build_ShouldThrow_WhenRootPathDoesNotExist() {
         var builder = FileQuery.From(Path.Combine(_tempRoot, "does-not-exist"));
-        Assert.Throws<DirectoryNotFoundException>(builder.Build);
+        FluentActions.Invoking(() => builder.Build()).Should().Throw<DirectoryNotFoundException>();
     }
 }

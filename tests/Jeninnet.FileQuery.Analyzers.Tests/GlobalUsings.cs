@@ -8,6 +8,7 @@
 global using System.Collections.Immutable;
 global using System.Globalization;
 global using System.Text;
+global using Jeninnet.Assertions;
 global using Microsoft.CodeAnalysis;
 global using Microsoft.CodeAnalysis.CodeActions;
 global using Microsoft.CodeAnalysis.CodeFixes;
@@ -15,3 +16,4 @@ global using Microsoft.CodeAnalysis.CSharp;
 global using Microsoft.CodeAnalysis.Diagnostics;
 global using Microsoft.CodeAnalysis.Text;
 global using Microsoft.VisualStudio.TestTools.UnitTesting;
+

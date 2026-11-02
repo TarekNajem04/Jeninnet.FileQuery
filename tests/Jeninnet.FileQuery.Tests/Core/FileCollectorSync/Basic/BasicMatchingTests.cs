@@ -38,7 +38,7 @@ public class BasicMatchingTests {
                                     .ToList();
 
         TestAssertEx.ContainsSingle(result);
-        Assert.IsTrue(PathHelper.Equivalent(result[0], env.Abs("file1.txt")));
+        (PathHelper.Equivalent(result[0], env.Abs("file1.txt"))).Should().BeTrue();
     }
 
     /// <summary>
@@ -92,8 +92,8 @@ public class BasicMatchingTests {
                                     .ToList();
 
         TestAssertEx.HasCount(result, 2);
-        Assert.Contains(static x => x.EndsWith("fileA.txt", StringComparison.Ordinal), result);
-        Assert.Contains(static x => x.EndsWith("fileB.txt", StringComparison.Ordinal), result);
+        result.Should().Contain(static x => x.EndsWith("fileA.txt", StringComparison.Ordinal));
+        result.Should().Contain(static x => x.EndsWith("fileB.txt", StringComparison.Ordinal));
     }
 
     /// <summary>

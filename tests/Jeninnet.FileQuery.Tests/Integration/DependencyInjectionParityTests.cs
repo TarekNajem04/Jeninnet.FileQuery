@@ -34,8 +34,8 @@ public sealed class DependencyInjectionParityTests {
         var expected = defaultEngine.Execute(query, TestContext.CancellationToken).Order().ToArray();
         var actual = diEngine.Execute(query, TestContext.CancellationToken).Order().ToArray();
 
-        Assert.AreSame(diEngine, secondResolvedEngine);
-        Assert.AreSequenceEqual(expected, actual);
+        secondResolvedEngine.Should().BeSameAs(diEngine);
+        actual.Should().Equal(expected);
     }
 
     /// <summary>
@@ -65,7 +65,7 @@ public sealed class DependencyInjectionParityTests {
             .Order()
             .ToArray();
 
-        Assert.AreSequenceEqual(expected, actual);
+        actual.Should().Equal(expected);
     }
 
     /// <summary>

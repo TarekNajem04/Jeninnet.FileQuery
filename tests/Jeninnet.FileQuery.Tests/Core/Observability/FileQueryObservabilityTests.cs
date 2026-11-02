@@ -36,10 +36,10 @@ public sealed class FileQueryObservabilityTests {
                                   .ToListAsync(TestContext.CancellationToken);
 
         TestAssertEx.HasCount(results, 2);
-        Assert.IsNotEmpty(progress.Values);
-        Assert.IsGreaterThanOrEqualTo(1, progress.Values[^1].DirectoriesVisited);
-        Assert.IsGreaterThanOrEqualTo(3, progress.Values[^1].EntriesScanned);
-        Assert.AreEqual(2, progress.Values[^1].FilesMatched);
+        progress.Values.Should().NotBeEmpty();
+        progress.Values[^1].DirectoriesVisited.Should().BeGreaterThanOrEqualTo(1);
+        progress.Values[^1].EntriesScanned.Should().BeGreaterThanOrEqualTo(3);
+        progress.Values[^1].FilesMatched.Should().Be(2);
     }
 
     /// <summary>
@@ -68,12 +68,12 @@ public sealed class FileQueryObservabilityTests {
         var included = diagnostics.Values.Single(static d => d.RelativePath == "keep.txt");
         var excluded = diagnostics.Values.Single(static d => d.RelativePath == "drop.log");
 
-        Assert.AreEqual("Include", included.Outcome);
-        Assert.AreEqual("!**/*.txt", included.Pattern);
-        Assert.AreEqual(1, included.PatternIndex);
-        Assert.AreEqual("Exclude", excluded.Outcome);
-        Assert.AreEqual("**", excluded.Pattern);
-        Assert.AreEqual(0, excluded.PatternIndex);
+        included.Outcome.Should().Be("Include");
+        included.Pattern.Should().Be("!**/*.txt");
+        included.PatternIndex.Should().Be(1);
+        excluded.Outcome.Should().Be("Exclude");
+        excluded.Pattern.Should().Be("**");
+        excluded.PatternIndex.Should().Be(0);
     }
 
     /// <summary>
@@ -114,8 +114,8 @@ public sealed class FileQueryObservabilityTests {
 
         var results = engine.Execute(query, TestContext.CancellationToken).ToList();
 
-        Assert.Contains(fileSystem.KeepFile, results);
-        Assert.DoesNotContain(fileSystem.RetryFile, results);
+        results.Should().Contain(fileSystem.KeepFile);
+        results.Should().NotContain(fileSystem.RetryFile);
     }
 
     /// <summary>
@@ -143,8 +143,8 @@ public sealed class FileQueryObservabilityTests {
 
         var results = engine.Execute(query, TestContext.CancellationToken).ToList();
 
-        Assert.Contains(fileSystem.KeepFile, results);
-        Assert.Contains(fileSystem.RetryFile, results);
+        results.Should().Contain(fileSystem.KeepFile);
+        results.Should().Contain(fileSystem.RetryFile);
     }
 
     /// <summary>

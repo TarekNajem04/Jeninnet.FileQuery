@@ -330,8 +330,8 @@ public sealed class QueryExecutionTests {
         root.GetProperty("path").GetString().Should().Be(environment.Abs("a.txt"));
         root.GetProperty("relativePath").GetString().Should().Be("a.txt");
         root.GetProperty("length").GetInt64().Should().Be(0L);
-        Assert.IsFalse(string.IsNullOrEmpty(root.GetProperty("createdUtc").GetString()));
-        Assert.IsFalse(string.IsNullOrEmpty(root.GetProperty("modifiedUtc").GetString()));
+        string.IsNullOrEmpty(root.GetProperty("createdUtc").GetString()).Should().BeFalse();
+        string.IsNullOrEmpty(root.GetProperty("modifiedUtc").GetString()).Should().BeFalse();
         root.GetProperty("attributes").ValueKind.Should().Be(JsonValueKind.Array);
         root.GetProperty("isDirectory").GetBoolean().Should().BeFalse();
     }

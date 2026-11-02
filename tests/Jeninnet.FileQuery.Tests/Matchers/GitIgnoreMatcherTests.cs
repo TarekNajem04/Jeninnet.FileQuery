@@ -28,8 +28,8 @@ public class GitIgnoreMatcherTests {
         var matcher = CreateMatcher();
         var patterns = Compile(patterns: ["!*.cs", "Program.cs"]);
 
-        Assert.IsTrue(matcher.Match(patterns, CreateFileContext(path: "Test.cs")).IsSuccess());
-        Assert.IsFalse(matcher.Match(patterns, CreateFileContext(path: "Program.cs")).IsSuccess());
+        (matcher.Match(patterns, CreateFileContext(path: "Test.cs")).IsSuccess()).Should().BeTrue();
+        (matcher.Match(patterns, CreateFileContext(path: "Program.cs")).IsSuccess()).Should().BeFalse();
     }
 
     /// <summary>Tests DirectoryOnlyRule_ShouldApplyCorrectly.</summary>
@@ -38,8 +38,8 @@ public class GitIgnoreMatcherTests {
         var matcher = CreateMatcher();
         var patterns = Compile(patterns: ["**", "!bin/"]);
 
-        Assert.IsTrue(matcher.Match(patterns, CreateDirectoryContext(path: "bin")).IsSuccess());
-        Assert.IsFalse(matcher.Match(patterns, CreateFileContext(path: "bin")).IsSuccess());
+        (matcher.Match(patterns, CreateDirectoryContext(path: "bin")).IsSuccess()).Should().BeTrue();
+        (matcher.Match(patterns, CreateFileContext(path: "bin")).IsSuccess()).Should().BeFalse();
     }
 
     /// <summary>Tests RecursiveWildcard_ShouldMatchDeepPaths.</summary>
@@ -48,7 +48,7 @@ public class GitIgnoreMatcherTests {
         var matcher = CreateMatcher();
         var patterns = Compile(patterns: ["!**/temp/*.txt"]);
 
-        Assert.IsTrue(matcher.Match(patterns, CreateFileContext(path: "a/b/c/temp/d.txt")).IsSuccess());
+        (matcher.Match(patterns, CreateFileContext(path: "a/b/c/temp/d.txt")).IsSuccess()).Should().BeTrue();
     }
 
     /// <summary>Tests BasicExclusion_ShouldMatchUnanchored.</summary>
@@ -58,9 +58,9 @@ public class GitIgnoreMatcherTests {
         var matcher = CreateMatcher();
         var patterns = Compile(patterns: ["!*.log", "*.md"]);
 
-        Assert.IsTrue(matcher.Match(patterns, CreateFileContext(path: "debug.log")).IsSuccess(), "File at root should match *.log.");
-        Assert.IsTrue(matcher.Match(patterns, CreateFileContext(path: "src/release.log")).IsSuccess(), "Nested file should match unanchored *.log.");
-        Assert.IsFalse(matcher.Match(patterns, CreateFileContext(path: "README.md")).IsSuccess(), "Unrelated file should not match.");
+        (matcher.Match(patterns, CreateFileContext(path: "debug.log")).IsSuccess()).Should().BeTrue(because: "File at root should match *.log.");
+        (matcher.Match(patterns, CreateFileContext(path: "src/release.log")).IsSuccess()).Should().BeTrue(because: "Nested file should match unanchored *.log.");
+        (matcher.Match(patterns, CreateFileContext(path: "README.md")).IsSuccess()).Should().BeFalse(because: "Unrelated file should not match.");
     }
 
     /// <summary>Tests AnchoredExclusion_ShouldMatchOnlyFromRoot.</summary>
@@ -71,11 +71,11 @@ public class GitIgnoreMatcherTests {
         var patterns = Compile(patterns: ["!/temp", "!/src/*.txt"]);
 
         // Matches at root
-        Assert.IsTrue(matcher.Match(patterns, CreateDirectoryContext(path: "temp")).IsSuccess(), "Directory 'temp' at root should match '/temp'.");
-        Assert.IsTrue(matcher.Match(patterns, CreateFileContext(path: "src/file.txt")).IsSuccess(), "File 'src/file.txt' at root should match '/src/*.txt'.");
+        (matcher.Match(patterns, CreateDirectoryContext(path: "temp")).IsSuccess()).Should().BeTrue(because: "Directory 'temp' at root should match '/temp'.");
+        (matcher.Match(patterns, CreateFileContext(path: "src/file.txt")).IsSuccess()).Should().BeTrue(because: "File 'src/file.txt' at root should match '/src/*.txt'.");
         // Included by default GitIgnoreMatcher: IsIncluded=true
-        Assert.IsTrue(matcher.Match(patterns, CreateDirectoryContext(path: "bin/temp")).IsSuccess(), "Directory 'bin/temp' should not match anchored '/temp'.");
-        Assert.IsTrue(matcher.Match(patterns, CreateFileContext(path: "other/src/file.txt")).IsSuccess(), "File should not match if prefix is present.");
+        (matcher.Match(patterns, CreateDirectoryContext(path: "bin/temp")).IsSuccess()).Should().BeTrue(because: "Directory 'bin/temp' should not match anchored '/temp'.");
+        (matcher.Match(patterns, CreateFileContext(path: "other/src/file.txt")).IsSuccess()).Should().BeTrue(because: "File should not match if prefix is present.");
     }
 
     /// <summary>Tests DirectoryOnlyExclusion_ShouldMatchDirectory.</summary>
@@ -86,20 +86,18 @@ public class GitIgnoreMatcherTests {
         var patterns = Compile(patterns: ["!logs/"]);
 
         // Matches directory itself (crucial for FileQueryEngine pruning)
-        Assert.IsTrue(matcher.Match(patterns, CreateDirectoryContext(path: "logs")).IsSuccess(), "Directory 'logs' should be matched.");
+        (matcher.Match(patterns, CreateDirectoryContext(path: "logs")).IsSuccess()).Should().BeTrue(because: "Directory 'logs' should be matched.");
         // Does NOT match file with the same name (by matcher logic, if no other pattern does)
         // Since there are no exclusion rules, the file defaults to included.
-        Assert.IsTrue(matcher.Match(patterns, CreateFileContext(path: "logs")).IsSuccess(), "File 'logs' should be included because the default is to include and the directory-only rule does not match files.");
+        (matcher.Match(patterns, CreateFileContext(path: "logs")).IsSuccess()).Should().BeTrue(because: "File 'logs' should be included because the default is to include and the directory-only rule does not match files.");
         // this match the nested directory as well, because unanchored patterns match anywhere in the path
-        Assert.IsTrue(matcher.Match(patterns, CreateDirectoryContext(path: "src/logs")).IsSuccess(), "Nested directory 'src/logs' should be matched.");
+        (matcher.Match(patterns, CreateDirectoryContext(path: "src/logs")).IsSuccess()).Should().BeTrue(because: "Nested directory 'src/logs' should be matched.");
         // ===== to Prevent the Match =====
         var matcher2 = CreateMatcher();
         var patterns2 = Compile(patterns: ["/logs/"]);
 
         //with anchored exclusion this should NOT match the nested directory
-        Assert.IsTrue(
-            matcher2.Match(patterns2, CreateDirectoryContext(path: "src/logs")).IsSuccess(),
-            "Nested directory 'src/logs' should be matched by default.");
+        (matcher2.Match(patterns2, CreateDirectoryContext(path: "src/logs")).IsSuccess()).Should().BeTrue(because: "Nested directory 'src/logs' should be matched by default.");
     }
 
     /// <summary>Tests DirectoryReInclusionSemantics.</summary>
@@ -115,11 +113,11 @@ public class GitIgnoreMatcherTests {
                       );
 
         // 1. Directory is excluded (matched by ignored_dir/).
-        Assert.IsFalse(matcher.Match(patterns, CreateDirectoryContext(path: "ignored_dir")).IsSuccess(), "Directory 'ignored_dir' is matched by the EXCLUSION rule 'ignored_dir/', But not included.");
+        (matcher.Match(patterns, CreateDirectoryContext(path: "ignored_dir")).IsSuccess()).Should().BeFalse(because: "Directory 'ignored_dir' is matched by the EXCLUSION rule 'ignored_dir/', But not included.");
         // 2. File to keep is included (Last rule wins)
-        Assert.IsTrue(matcher.Match(patterns, CreateFileContext(path: "ignored_dir/keep.txt")).IsSuccess(), "File 'keep.txt' should be included by '!ignored_dir/keep.txt'.");
+        (matcher.Match(patterns, CreateFileContext(path: "ignored_dir/keep.txt")).IsSuccess()).Should().BeTrue(because: "File 'keep.txt' should be included by '!ignored_dir/keep.txt'.");
         // 3. File to exclude is excluded (matched by ignored_dir/)
-        Assert.IsFalse(matcher.Match(patterns, CreateFileContext(path: "ignored_dir/dump.txt")).IsSuccess(), "Files under an ignored directory are excluded.");
+        (matcher.Match(patterns, CreateFileContext(path: "ignored_dir/dump.txt")).IsSuccess()).Should().BeFalse(because: "Files under an ignored directory are excluded.");
     }
 
     /// <summary>Tests RecursiveWildcard_ShouldMatchDeeply.</summary>
@@ -128,9 +126,9 @@ public class GitIgnoreMatcherTests {
         var matcher = CreateMatcher();
         var patterns = Compile(patterns: ["!**/a.txt"]);
 
-        Assert.IsTrue(matcher.Match(patterns, CreateFileContext(path: "a.txt")).IsSuccess());
-        Assert.IsTrue(matcher.Match(patterns, CreateFileContext(path: "dir/a.txt")).IsSuccess());
-        Assert.IsTrue(matcher.Match(patterns, CreateFileContext(path: "dir/subdir/a.txt")).IsSuccess());
+        (matcher.Match(patterns, CreateFileContext(path: "a.txt")).IsSuccess()).Should().BeTrue();
+        (matcher.Match(patterns, CreateFileContext(path: "dir/a.txt")).IsSuccess()).Should().BeTrue();
+        (matcher.Match(patterns, CreateFileContext(path: "dir/subdir/a.txt")).IsSuccess()).Should().BeTrue();
     }
 
     /// <summary>Tests Negation_LastRuleWins.</summary>
@@ -140,18 +138,18 @@ public class GitIgnoreMatcherTests {
         var matcher = CreateMatcher();
         var patterns = Compile(patterns: ["**", "!*.tmp"]);
 
-        Assert.IsTrue(matcher.Match(patterns, CreateFileContext(path: "delete.tmp")).IsSuccess(), "!*.tmp matches and is the last rule. (True = Included, which is the problem with this matcher's logic. GitIgnore means True=Excluded).");
+        (matcher.Match(patterns, CreateFileContext(path: "delete.tmp")).IsSuccess()).Should().BeTrue(because: "!*.tmp matches and is the last rule. (True = Included, which is the problem with this matcher's logic. GitIgnore means True=Excluded).");
         // Test with `*.tmp` first:
         var matcher1 = CreateMatcher();
         var patterns1 = Compile(patterns: ["*.tmp"]);
-        Assert.IsFalse(matcher1.Match(patterns1, CreateFileContext(path: "delete.tmp")).IsSuccess(), "Must be excluded by '*.tmp' (IsMatch=False).");
-        Assert.IsTrue(matcher1.Match(patterns1, CreateFileContext(path: "README.md")).IsSuccess(), "Default is Include (IsMatch=True)."); // Default isIncluded=true in GitIgnoreMatcher!
+        (matcher1.Match(patterns1, CreateFileContext(path: "delete.tmp")).IsSuccess()).Should().BeFalse(because: "Must be excluded by '*.tmp' (IsMatch=False).");
+        (matcher1.Match(patterns1, CreateFileContext(path: "README.md")).IsSuccess()).Should().BeTrue(because: "Default is Include (IsMatch=True)."); // Default isIncluded=true in GitIgnoreMatcher!
 
         // Test complex:
         var matcher2 = CreateMatcher();
         var patterns2 = Compile(patterns: ["*.tmp", "!important.tmp"]);
-        Assert.IsFalse(matcher2.Match(patterns2, CreateFileContext(path: "delete.tmp")).IsSuccess(), "Excluded by '*.tmp'.");
-        Assert.IsTrue(matcher2.Match(patterns2, CreateFileContext(path: "important.tmp")).IsSuccess(), "Included by '!important.tmp'.");
+        (matcher2.Match(patterns2, CreateFileContext(path: "delete.tmp")).IsSuccess()).Should().BeFalse(because: "Excluded by '*.tmp'.");
+        (matcher2.Match(patterns2, CreateFileContext(path: "important.tmp")).IsSuccess()).Should().BeTrue(because: "Included by '!important.tmp'.");
     }
 
     /// <summary>
@@ -168,10 +166,10 @@ public class GitIgnoreMatcherTests {
         var patterns = Compile(patterns: ["!"]);
 
         // Assuming normalized path for root is "", which your SplitNormalizedPath converts to Array.Empty<string>()
-        Assert.IsFalse(matcher.Match(patterns, CreateDirectoryContext(path: "")).IsSuccess(), "The project root (empty path) should be excluded by default.");
+        (matcher.Match(patterns, CreateDirectoryContext(path: "")).IsSuccess()).Should().BeFalse(because: "The project root (empty path) should be excluded by default.");
         // Test explicit inclusion of the root directory itself (using a compiler that treats "/" as a match for the root path)
         // NOTE: This behavior is highly implementation-specific. Assuming it shouldn't match.
-        Assert.IsTrue(matcher.Match(patterns, CreateDirectoryContext(path: "src")).IsSuccess(), "A normal subdirectory should be included by default.");
+        (matcher.Match(patterns, CreateDirectoryContext(path: "src")).IsSuccess()).Should().BeTrue(because: "A normal subdirectory should be included by default.");
     }
 
     /// <summary>Tests EdgeCase_EmptyPathShouldThrowForBareRootPattern.</summary>
@@ -184,7 +182,7 @@ public class GitIgnoreMatcherTests {
 
         // Assert
         var exception = TestAssertEx.Throws<PatternException>(act);
-        Assert.Contains("bare '/' is not a valid pattern", exception.Message);
+        exception.Message.Should().Contain("bare '/' is not a valid pattern");
     }
 
     /// <summary>Tests EmptyPathShouldBeExcludedByDefault.</summary>
@@ -194,7 +192,7 @@ public class GitIgnoreMatcherTests {
         // Empty pattern set, so no rules to match, should default to exclude (IsIncluded=false).
         var patterns = Compile(patterns: []);
 
-        Assert.IsFalse(matcher.Match(patterns, CreateDirectoryContext(path: "")).IsSuccess());
+        (matcher.Match(patterns, CreateDirectoryContext(path: "")).IsSuccess()).Should().BeFalse();
     }
 
     /// <summary>
@@ -209,12 +207,12 @@ public class GitIgnoreMatcherTests {
         var patterns = Compile(patterns: ["!docs/**"]);
 
         // Matches 'docs' directory itself (assuming 'docs' segments: ['docs'] is matched by ['docs', '**'])
-        Assert.IsTrue(matcher.Match(patterns, CreateDirectoryContext(path: "docs")).IsSuccess(), "Directory 'docs' should match 'docs/**'.");
+        (matcher.Match(patterns, CreateDirectoryContext(path: "docs")).IsSuccess()).Should().BeTrue(because: "Directory 'docs' should match 'docs/**'.");
         // Matches content in the docs subdirectory
-        Assert.IsTrue(matcher.Match(patterns, CreateFileContext(path: "docs/README.md")).IsSuccess(), "File one level deep should match.");
-        Assert.IsTrue(matcher.Match(patterns, CreateFileContext(path: "docs/sub/image.jpg")).IsSuccess(), "File multiple levels deep should match.");
+        (matcher.Match(patterns, CreateFileContext(path: "docs/README.md")).IsSuccess()).Should().BeTrue(because: "File one level deep should match.");
+        (matcher.Match(patterns, CreateFileContext(path: "docs/sub/image.jpg")).IsSuccess()).Should().BeTrue(because: "File multiple levels deep should match.");
         // Should NOT match a directory named 'docs' that is nested. (Unanchored behavior is assumed to be handled by the ** prefix of the pattern 'docs/**')
-        Assert.IsTrue(matcher.Match(patterns, CreateFileContext(path: "project/docs/README.md")).IsSuccess(), "Pattern 'docs/**' is unanchored and should match nested paths too.");
+        (matcher.Match(patterns, CreateFileContext(path: "project/docs/README.md")).IsSuccess()).Should().BeTrue(because: "Pattern 'docs/**' is unanchored and should match nested paths too.");
     }
 
     /// <summary>
@@ -233,23 +231,23 @@ public class GitIgnoreMatcherTests {
         // ==========================================
 
         // 1. Root Directory 'temp'
-        Assert.IsFalse(matcher.Match(patterns, CreateDirectoryContext(path: "temp")).IsSuccess(), "Root directory 'temp' must be EXCLUDED by the anchored pattern.");
+        (matcher.Match(patterns, CreateDirectoryContext(path: "temp")).IsSuccess()).Should().BeFalse(because: "Root directory 'temp' must be EXCLUDED by the anchored pattern.");
         // 2. File 'temp' (same name as directory)
         // A directory-only pattern SHOULD NOT match a file with the same name. It should default to Included.
-        Assert.IsTrue(matcher.Match(patterns, CreateFileContext(path: "temp")).IsSuccess(), "File 'temp' (not a directory) should be INCLUDED because /temp/ is directory-only.");
+        (matcher.Match(patterns, CreateFileContext(path: "temp")).IsSuccess()).Should().BeTrue(because: "File 'temp' (not a directory) should be INCLUDED because /temp/ is directory-only.");
         // 3. File inside root 'temp'
         // This file must be EXCLUDED because its ancestor directory 'temp' matched the exclusion rule.
-        Assert.IsFalse(matcher.Match(patterns, CreateFileContext(path: "temp/file.log")).IsSuccess(), "File inside root 'temp' must be EXCLUDED.");
+        (matcher.Match(patterns, CreateFileContext(path: "temp/file.log")).IsSuccess()).Should().BeFalse(because: "File inside root 'temp' must be EXCLUDED.");
         // ==========================================
         // Nested Must NOT Match: Should default to INCLUDED (Successed() = True).
         // ==========================================
 
         // 1. Nested Directory 'src/temp'
         // The anchored rule /temp/ does not match nested directories, so it defaults to INCLUDED.
-        Assert.IsTrue(matcher.Match(patterns, CreateDirectoryContext(path: "src/temp")).IsSuccess(), "Nested directory 'src/temp' must be INCLUDED (Traversed) as it doesn't match the anchored rule.");
+        (matcher.Match(patterns, CreateDirectoryContext(path: "src/temp")).IsSuccess()).Should().BeTrue(because: "Nested directory 'src/temp' must be INCLUDED (Traversed) as it doesn't match the anchored rule.");
         // 2. File inside nested 'src/temp'
         // Since the directory is traversed, the file inside is INCLUDED by default.
-        Assert.IsTrue(matcher.Match(patterns, CreateFileContext(path: "src/temp/file.log")).IsSuccess(), "File inside nested 'src/temp' must be INCLUDED by default.");
+        (matcher.Match(patterns, CreateFileContext(path: "src/temp/file.log")).IsSuccess()).Should().BeTrue(because: "File inside nested 'src/temp' must be INCLUDED by default.");
     }
 
     /// <summary>
@@ -270,10 +268,10 @@ public class GitIgnoreMatcherTests {
         );
 
         // Excluded by **/*.log
-        Assert.IsFalse(matcher.Match(patterns, CreateFileContext(path: "root.log")).IsSuccess(), "File at root excluded by **/*.log.");
-        Assert.IsFalse(matcher.Match(patterns, CreateFileContext(path: "src/temp/dump.log")).IsSuccess(), "Deep file excluded by **/*.log.");
+        (matcher.Match(patterns, CreateFileContext(path: "root.log")).IsSuccess()).Should().BeFalse(because: "File at root excluded by **/*.log.");
+        (matcher.Match(patterns, CreateFileContext(path: "src/temp/dump.log")).IsSuccess()).Should().BeFalse(because: "Deep file excluded by **/*.log.");
         // Included by the last rule
-        Assert.IsTrue(matcher.Match(patterns, CreateFileContext(path: "src/data/config.log")).IsSuccess(), "Specific file included by !src/data/config.log.");
+        (matcher.Match(patterns, CreateFileContext(path: "src/data/config.log")).IsSuccess()).Should().BeTrue(because: "Specific file included by !src/data/config.log.");
     }
 
     /// <summary>
@@ -287,11 +285,11 @@ public class GitIgnoreMatcherTests {
         var patterns = Compile(patterns: ["!"]);
 
         // 1. The empty path ("") is matched by [**] and included.
-        Assert.IsFalse(matcher.Match(patterns, CreateDirectoryContext(path: "")).IsSuccess(), "The project root (empty path) should be EXCLUDED by the global '!' rule.");
+        (matcher.Match(patterns, CreateDirectoryContext(path: "")).IsSuccess()).Should().BeFalse(because: "The project root (empty path) should be EXCLUDED by the global '!' rule.");
         // 2. A subdirectory path ("src") is matched by [**] and included.
-        Assert.IsTrue(matcher.Match(patterns, CreateDirectoryContext(path: "src")).IsSuccess(), "A normal subdirectory should be INCLUDED by the global '!' rule.");
+        (matcher.Match(patterns, CreateDirectoryContext(path: "src")).IsSuccess()).Should().BeTrue(because: "A normal subdirectory should be INCLUDED by the global '!' rule.");
         // 3. A file path is matched by [**] and included.
-        Assert.IsTrue(matcher.Match(patterns, CreateFileContext(path: "file.txt")).IsSuccess(), "A file should be INCLUDED by the global '!' rule.");
+        (matcher.Match(patterns, CreateFileContext(path: "file.txt")).IsSuccess()).Should().BeTrue(because: "A file should be INCLUDED by the global '!' rule.");
     }
 
     /// <summary>
@@ -304,6 +302,6 @@ public class GitIgnoreMatcherTests {
         var matcher = CreateMatcher();
         var patterns = Compile(patterns: ["!**/*.txt"]);
 
-        Assert.IsTrue(matcher.Match(patterns, CreateDirectoryContext(path: "bin/file3.txt")).IsSuccess(), "The 'bin' directory should be INCLUDED by the global '!**/*.txt' rule.");
+        (matcher.Match(patterns, CreateDirectoryContext(path: "bin/file3.txt")).IsSuccess()).Should().BeTrue(because: "The 'bin' directory should be INCLUDED by the global '!**/*.txt' rule.");
     }
 }

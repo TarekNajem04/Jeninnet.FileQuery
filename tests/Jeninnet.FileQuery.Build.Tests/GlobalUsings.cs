@@ -8,9 +8,11 @@
 global using System.Collections;
 global using System.Diagnostics;
 global using System.Text.Json;
+global using Jeninnet.Assertions;
 global using Jeninnet.Assertions.IO;
 global using Jeninnet.FileQuery.Build.Tasks;
 global using Jeninnet.FileQuery.Tooling;
 global using Microsoft.Build.Framework;
 global using Microsoft.Build.Utilities;
 global using Microsoft.VisualStudio.TestTools.UnitTesting;
+

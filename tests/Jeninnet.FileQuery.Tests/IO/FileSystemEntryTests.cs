@@ -17,11 +17,11 @@ public class FileSystemEntryTests {
     public void FileSystemEntry_Properties_TestAllAttributes() {
         var entry = new FileSystemEntry("test", FileAttributes.ReadOnly | FileAttributes.Hidden | FileAttributes.Directory);
 
-        Assert.IsTrue(entry.IsReadOnly);
-        Assert.IsTrue(entry.IsHidden);
-        Assert.IsTrue(entry.IsDirectory);
-        Assert.IsFalse(entry.IsSystem);
-        Assert.IsFalse(entry.IsArchive);
+        entry.IsReadOnly.Should().BeTrue();
+        entry.IsHidden.Should().BeTrue();
+        entry.IsDirectory.Should().BeTrue();
+        entry.IsSystem.Should().BeFalse();
+        entry.IsArchive.Should().BeFalse();
     }
 
     /// <summary>Tests FileSystemEntry_HasAttribute_Test.</summary>
@@ -29,8 +29,8 @@ public class FileSystemEntryTests {
     public void FileSystemEntry_HasAttribute_Test() {
         var entry = new FileSystemEntry("test", FileAttributes.Encrypted);
 
-        Assert.IsTrue(entry.HasAttribute(FileAttributes.Encrypted));
-        Assert.IsFalse(entry.HasAttribute(FileAttributes.ReadOnly));
+        entry.HasAttribute(FileAttributes.Encrypted).Should().BeTrue();
+        entry.HasAttribute(FileAttributes.ReadOnly).Should().BeFalse();
     }
 
     /// <summary>Tests FileSystemEntry_ActiveAttributes_Test.</summary>
@@ -39,8 +39,8 @@ public class FileSystemEntryTests {
         var entry = new FileSystemEntry("test", FileAttributes.ReadOnly | FileAttributes.Hidden);
         var active = entry.ActiveAttributes.ToList();
 
-        Assert.Contains(FileAttributes.ReadOnly, active);
-        Assert.Contains(FileAttributes.Hidden, active);
-        Assert.HasCount(2, active);
+        active.Should().Contain(FileAttributes.ReadOnly);
+        active.Should().Contain(FileAttributes.Hidden);
+        active.Should().HaveCount(2);
     }
 }

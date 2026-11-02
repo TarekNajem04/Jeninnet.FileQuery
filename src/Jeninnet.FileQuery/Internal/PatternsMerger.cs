@@ -51,56 +51,6 @@ internal static class PatternsMerger {
         );
 
     /// <summary>
-    /// Validates that a <see cref="PatternInput"/> is consistent with
-    /// <see cref="PatternInterpretationMode.Specific"/> before compilation.
-    /// </summary>
-    /// <param name="patternInput">The pattern configuration.</param>
-    /// <param name="matchingMode">
-    /// The dialect selected for <see cref="PatternInterpretationMode.Specific"/>.
-    /// </param>
-    /// <exception cref="ArgumentNullException">
-    /// Thrown when <paramref name="patternInput"/> is <see langword="null"/>.
-    /// </exception>
-    /// <exception cref="PatternException">
-    /// Thrown when untyped patterns are present in Specific mode, or when a typed
-    /// pattern uses a dialect that does not match <paramref name="matchingMode"/>.
-    /// </exception>
-    public static void ValidateSpecificMode(
-        PatternInput patternInput,
-        PatternMatchingMode matchingMode
-    ) {
-        ArgumentNullException.ThrowIfNull(patternInput);
-
-        if(patternInput.InterpretationMode is not PatternInterpretationMode.Specific) {
-            return;
-        }
-
-        if(patternInput.Patterns.Count > 0) {
-            throw new PatternException(
-                $"Pattern '{patternInput.Patterns[0]}' requires an explicit PatternKind " +
-                "when interpretation mode is set to 'Specific'.");
-        }
-
-        var expectedKind = matchingMode switch {
-            PatternMatchingMode.GitIgnore => PatternKind.GitIgnore,
-            PatternMatchingMode.Glob => PatternKind.Glob,
-            PatternMatchingMode.Regex => PatternKind.Regex,
-            _ => PatternKind.Unknown
-        };
-
-        var mismatch = patternInput.TypedPatterns.Keys
-            .Where(kind => kind != expectedKind)
-            .Select(static kind => (PatternKind?)kind)
-            .FirstOrDefault();
-
-        if(mismatch is { } mismatchedKind) {
-            throw new PatternException(
-                $"Pattern kind '{mismatchedKind}' cannot be used when interpretation mode is " +
-                $"'Specific' and the matching mode is '{matchingMode}'.");
-        }
-    }
-
-    /// <summary>
     /// Merges a raw pattern sequence and a typed-pattern dictionary into a single dictionary keyed by <see cref="PatternKind"/>.
     /// </summary>
     /// <param name="patterns">
@@ -153,5 +103,55 @@ internal static class PatternsMerger {
             static kvp => kvp.Key,
             static kvp => kvp.Value.ToImmutableArray()
         );
+    }
+
+    /// <summary>
+    /// Validates that a <see cref="PatternInput"/> is consistent with
+    /// <see cref="PatternInterpretationMode.Specific"/> before compilation.
+    /// </summary>
+    /// <param name="patternInput">The pattern configuration.</param>
+    /// <param name="matchingMode">
+    /// The dialect selected for <see cref="PatternInterpretationMode.Specific"/>.
+    /// </param>
+    /// <exception cref="ArgumentNullException">
+    /// Thrown when <paramref name="patternInput"/> is <see langword="null"/>.
+    /// </exception>
+    /// <exception cref="PatternException">
+    /// Thrown when untyped patterns are present in Specific mode, or when a typed
+    /// pattern uses a dialect that does not match <paramref name="matchingMode"/>.
+    /// </exception>
+    public static void ValidateSpecificMode(
+        PatternInput patternInput,
+        PatternMatchingMode matchingMode
+    ) {
+        ArgumentNullException.ThrowIfNull(patternInput);
+
+        if(patternInput.InterpretationMode is not PatternInterpretationMode.Specific) {
+            return;
+        }
+
+        if(patternInput.Patterns.Count > 0) {
+            throw new PatternException(
+                $"Pattern '{patternInput.Patterns[0]}' requires an explicit PatternKind " +
+                "when interpretation mode is set to 'Specific'.");
+        }
+
+        var expectedKind = matchingMode switch {
+            PatternMatchingMode.GitIgnore => PatternKind.GitIgnore,
+            PatternMatchingMode.Glob => PatternKind.Glob,
+            PatternMatchingMode.Regex => PatternKind.Regex,
+            _ => PatternKind.Unknown
+        };
+
+        var mismatch = patternInput.TypedPatterns.Keys
+            .Where(kind => kind != expectedKind)
+            .Select(static kind => (PatternKind?)kind)
+            .FirstOrDefault();
+
+        if(mismatch is { } mismatchedKind) {
+            throw new PatternException(
+                $"Pattern kind '{mismatchedKind}' cannot be used when interpretation mode is " +
+                $"'Specific' and the matching mode is '{matchingMode}'.");
+        }
     }
 }

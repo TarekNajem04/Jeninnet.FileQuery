@@ -38,7 +38,7 @@ public class NegationRuleTests {
         var result = fileQueryEngine.Execute(new(env.Root, options), TestContext.CancellationToken).Order().ToList();
 
         TestAssertEx.HasCount(result, 2);
-        Assert.DoesNotContain(static x => x.EndsWith("b.txt", StringComparison.Ordinal), result);
+        result.Should().NotContain(static x => x.EndsWith("b.txt", StringComparison.Ordinal));
     }
 
     /// <summary>

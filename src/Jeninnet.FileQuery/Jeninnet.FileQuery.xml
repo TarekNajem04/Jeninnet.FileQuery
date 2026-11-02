@@ -602,6 +602,9 @@
             <exception cref="T:System.ArgumentNullException">
             Thrown when <paramref name="patterns"/> is <see langword="null"/>.
             </exception>
+            <exception cref="T:System.ArgumentException">
+            Thrown when <paramref name="patterns"/> contains empty or whitespace-only entries.
+            </exception>
         </member>
         <member name="M:Jeninnet.FileQuery.FileQueryBuilder.Where(Jeninnet.FileQuery.Enums.PatternKind,System.Collections.Generic.IEnumerable{System.String})">
             <summary>
@@ -994,6 +997,9 @@
             </summary>
             <param name="patternKind">The semantic type of the pattern.</param>
             <param name="patterns">A sequence of patterns to merge.</param>
+            <exception cref="T:System.ArgumentException">
+            Thrown when <paramref name="patterns"/> contains empty or whitespace-only entries.
+            </exception>
         </member>
         <member name="M:Jeninnet.FileQuery.FileQueryBuilder.GetSpecificPatternKind">
             <summary>
@@ -1010,6 +1016,9 @@
             <exception cref="T:System.InvalidOperationException">
             Thrown when the combination of <paramref name="patternKind"/> and
             <see cref="F:Jeninnet.FileQuery.FileQueryBuilder._patternMatchingMode"/> is invalid.
+            </exception>
+            <exception cref="T:System.ArgumentOutOfRangeException">
+            Thrown when <paramref name="patternKind"/> is not a defined value of <see cref="T:Jeninnet.FileQuery.Enums.PatternKind"/>.
             </exception>
         </member>
         <member name="T:Jeninnet.FileQuery.FileQueryDiagnostic">
@@ -2015,6 +2024,22 @@
             of pattern strings in the order they should be evaluated.
             </returns>
         </member>
+        <member name="M:Jeninnet.FileQuery.Internal.PatternsMerger.Merge(System.Collections.Generic.IEnumerable{System.String},System.Collections.Generic.IReadOnlyDictionary{Jeninnet.FileQuery.Enums.PatternKind,System.Collections.Generic.IEnumerable{System.String}})">
+            <summary>
+            Merges a raw pattern sequence and a typed-pattern dictionary into a single dictionary keyed by <see cref="T:Jeninnet.FileQuery.Enums.PatternKind"/>.
+            </summary>
+            <param name="patterns">
+            Untyped pattern strings. Each string is classified using
+            <see cref="T:Jeninnet.FileQuery.Patterns.Classification.PatternClassifier"/> to determine its dialect.
+            </param>
+            <param name="typedPatterns">
+            Explicitly typed patterns. These are seeded into their respective buckets
+            before untyped patterns are classified and appended.
+            </param>
+            <returns>
+            A dictionary mapping each <see cref="T:Jeninnet.FileQuery.Enums.PatternKind"/> to an immutable array of merged pattern strings.
+            </returns>
+        </member>
         <member name="M:Jeninnet.FileQuery.Internal.PatternsMerger.ValidateSpecificMode(Jeninnet.FileQuery.PatternInput,Jeninnet.FileQuery.Enums.PatternMatchingMode)">
             <summary>
             Validates that a <see cref="T:Jeninnet.FileQuery.PatternInput"/> is consistent with
@@ -2031,22 +2056,6 @@
             Thrown when untyped patterns are present in Specific mode, or when a typed
             pattern uses a dialect that does not match <paramref name="matchingMode"/>.
             </exception>
-        </member>
-        <member name="M:Jeninnet.FileQuery.Internal.PatternsMerger.Merge(System.Collections.Generic.IEnumerable{System.String},System.Collections.Generic.IReadOnlyDictionary{Jeninnet.FileQuery.Enums.PatternKind,System.Collections.Generic.IEnumerable{System.String}})">
-            <summary>
-            Merges a raw pattern sequence and a typed-pattern dictionary into a single dictionary keyed by <see cref="T:Jeninnet.FileQuery.Enums.PatternKind"/>.
-            </summary>
-            <param name="patterns">
-            Untyped pattern strings. Each string is classified using
-            <see cref="T:Jeninnet.FileQuery.Patterns.Classification.PatternClassifier"/> to determine its dialect.
-            </param>
-            <param name="typedPatterns">
-            Explicitly typed patterns. These are seeded into their respective buckets
-            before untyped patterns are classified and appended.
-            </param>
-            <returns>
-            A dictionary mapping each <see cref="T:Jeninnet.FileQuery.Enums.PatternKind"/> to an immutable array of merged pattern strings.
-            </returns>
         </member>
         <member name="T:Jeninnet.FileQuery.IO.FileSystem">
             <summary>
@@ -3576,6 +3585,9 @@
             <param name="interpretationMode">The pattern interpretation mode.</param>
             <param name="hasPatterns">Whether at least one pattern will be evaluated.</param>
             <returns>The selected matcher.</returns>
+            <exception cref="T:System.ArgumentOutOfRangeException">
+            Thrown when <paramref name="matchingMode"/> is not a defined value of <see cref="T:Jeninnet.FileQuery.Enums.PatternMatchingMode"/>.
+            </exception>
         </member>
         <member name="T:Jeninnet.FileQuery.PatternInput">
             <summary>
@@ -3702,6 +3714,9 @@
             <returns>A dictionary containing processed, read-only lists of patterns.</returns>
             <exception cref="T:System.ArgumentException">
             Thrown when a typed-pattern list contains an empty or whitespace-only pattern.
+            </exception>
+            <exception cref="T:System.ArgumentOutOfRangeException">
+            Thrown when <paramref name="TypedPatterns"/> contains an undefined PatternKind.
             </exception>
         </member>
         <member name="T:Jeninnet.FileQuery.Patterns.Analysis.IPatternAnalyzer">
@@ -6297,6 +6312,7 @@
             <summary>
             Replaces escaped characters with spaces so structural bracket checks ignore them.
             </summary>
+            <param name="pattern">The pattern span to process.</param>
         </member>
         <member name="M:Jeninnet.FileQuery.Patterns.Validation.PatternValidator.ValidateBraces(System.ReadOnlySpan{System.Char})">
             <summary>

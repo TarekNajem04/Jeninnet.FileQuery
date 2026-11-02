@@ -1,7 +1,9 @@
 # Tests Index
 
 The repository has seven test projects. They are intentionally split by surface area so failures
-point at one dependency boundary instead of a monolith.
+point at one dependency boundary instead of a monolith. All assertions use the
+`Jeninnet.Assertions` package (`Should()` / `FluentActions`); MSTest supplies only the test
+attributes and runner integration.
 
 | Project | Tests | Focus |
 |---|---|---|

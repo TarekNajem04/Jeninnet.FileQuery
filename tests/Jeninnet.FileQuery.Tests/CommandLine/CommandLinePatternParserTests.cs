@@ -39,9 +39,9 @@ public sealed class CommandLinePatternParserTests {
 
         var parsed = CommandLinePatternParser.Parse(result, options);
 
-        Assert.AreEqual("p1", parsed.Patterns);
-        Assert.AreEqual("g1", parsed.Gitignore);
-        Assert.AreEqual("g2", parsed.Glob);
-        Assert.AreEqual("r1", parsed.RegularExpression);
+        parsed.Patterns.Should().Be("p1");
+        parsed.Gitignore.Should().Be("g1");
+        parsed.Glob.Should().Be("g2");
+        parsed.RegularExpression.Should().Be("r1");
     }
 }

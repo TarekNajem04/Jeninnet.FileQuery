@@ -129,6 +129,7 @@ internal static partial class PatternValidator {
     /// <summary>
     /// Replaces escaped characters with spaces so structural bracket checks ignore them.
     /// </summary>
+    /// <param name="pattern">The pattern span to process.</param>
     private static string MaskEscapedCharacters(ReadOnlySpan<char> pattern) {
         var chars = pattern.ToArray();
         var i = 0;

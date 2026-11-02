@@ -33,7 +33,7 @@ public sealed class CliApplicationTests {
         var result = Run("--version");
 
         result.ExitCode.Should().Be(0);
-        Assert.IsFalse(string.IsNullOrWhiteSpace(result.Output));
+        string.IsNullOrWhiteSpace(result.Output).Should().BeFalse();
     }
 
     /// <summary>

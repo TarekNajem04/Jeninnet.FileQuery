@@ -18,24 +18,25 @@ public class PatternResultCoverageTests {
     [TestMethod]
     public void PatternResult_Success_Properties() {
         var result = PatternResult<string>.Success("ok");
-        Assert.IsTrue(result.IsSuccess);
-        Assert.AreEqual("ok", result.Value);
-        Assert.IsNull(result.Error);
+        result.IsSuccess.Should().BeTrue();
+        result.Value.Should().Be("ok");
+        result.Error.Should().BeNull();
     }
 
     /// <summary>
     /// Verifies that the <see cref="PatternResult{T}.Fail(string)"/> factory method correctly sets the failure state and error message.
     /// </summary>
+    /// <exception cref="AssertionFailedException">Thrown when the test assertion fails.</exception>
     [TestMethod]
     public void PatternResult_Failure_Properties() {
         const string error = "something went wrong";
         var result = PatternResult<string>.Fail(error);
-        Assert.IsFalse(result.IsSuccess);
-        Assert.AreEqual(error, result.Error);
+        result.IsSuccess.Should().BeFalse();
+        result.Error.Should().Be(error);
 
         try {
             _ = result.Value;
-            Assert.Fail("Should have thrown InvalidOperationException");
+            throw new AssertionFailedException("Should have thrown InvalidOperationException");
         }
         catch(InvalidOperationException) { /* Ignore */ }
     }
@@ -47,12 +48,12 @@ public class PatternResultCoverageTests {
     public void PatternException_Message_Preserved() {
         const string msg = "error msg";
         var ex = new PatternException(msg);
-        Assert.AreEqual(msg, ex.Message);
+        ex.Message.Should().Be(msg);
 
         var inner = new InvalidOperationException("inner");
         var ex2 = new PatternException(msg, inner);
-        Assert.AreEqual(msg, ex2.Message);
-        Assert.AreEqual(inner, ex2.InnerException);
+        ex2.Message.Should().Be(msg);
+        ex2.InnerException.Should().Be(inner);
     }
 
     /// <summary>
@@ -62,7 +63,7 @@ public class PatternResultCoverageTests {
     public void PatternSyntaxException_Message_Preserved() {
         const string msg = "syntax error";
         var ex = new PatternSyntaxException("*.txt", msg);
-        Assert.AreEqual(msg, ex.Message);
-        Assert.AreEqual("*.txt", ex.Pattern);
+        ex.Message.Should().Be(msg);
+        ex.Pattern.Should().Be("*.txt");
     }
 }

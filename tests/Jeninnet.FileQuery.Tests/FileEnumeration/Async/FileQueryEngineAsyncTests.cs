@@ -61,15 +61,11 @@ public class FileQueryEngineAsyncTests {
 
         // ASSERT
         // Both file1.txt and file3.txt are at the root and match "*.txt". Expected count is 2.
-        Assert.HasCount(2, results, "Should only return top-level matching files (file1.txt and file3.txt).");
-        Assert.AreSequenceEqual(
-            [
+        results.Should().HaveCount(2, because: "Should only return top-level matching files (file1.txt and file3.txt).");
+        results.Should().BeEquivalentTo((IEnumerable<string>)[
                 env.Abs("file1.txt"),
                 env.Abs("file3.txt")
-            ],
-            results,
-            SequenceOrder.InAnyOrder
-        );
+            ]);
         // env.Dispose() is called automatically at the end of the using block.
     }
 
@@ -109,16 +105,12 @@ public class FileQueryEngineAsyncTests {
 
         // ASSERT
         // The pattern "**/*.txt" matches all four .txt files in the hierarchy. Expected count is 4.
-        Assert.AreSequenceEqual(
-            [
+        results.Should().BeEquivalentTo((IEnumerable<string>)[
                 env.Abs("file1.txt"),
                 env.Abs("file3.txt"),
                 env.Abs("subdir", "file3.txt"),
                 env.Abs("bin", "file3.txt")
-            ],
-            results,
-            SequenceOrder.InAnyOrder
-        );
+            ]);
     }
 
     /// <summary>
@@ -153,11 +145,11 @@ public class FileQueryEngineAsyncTests {
 
         // ACT & ASSERT
         // Cancellation should throw OperationCanceledException
-        await Assert.ThrowsAsync<OperationCanceledException>(async () => {
+        await FluentActions.Awaiting(async () => {
             await foreach(var file in fileQueryEngine.ExecuteAsync(new(env.Root, options), cts.Token)) {
                 // Should never reach here
             }
-        });
+        }).Should().ThrowAsync<OperationCanceledException>();
     }
 
     /// <summary>
@@ -198,18 +190,15 @@ public class FileQueryEngineAsyncTests {
                                            .ToListAsync(TestContext.CancellationToken);
 
         // ASSERT
-        Assert.AreSequenceEqual(
-            [
+        results.Should().BeEquivalentTo((IEnumerable<string>)[
                 // 1. file1.txt is included by !file1.txt
                 env.Abs("file1.txt"),
                 // 2. file3.txt is included by ![fF]ile3.txt (at root)
                 env.Abs("file3.txt"),
                 // 3. bin/file3.txt is included by ![fF]ile3.txt (recursively) and is NOT pruned
                 env.Abs("bin","file3.txt") // This file MUST be included
-            ],
-            results,
-            SequenceOrder.InAnyOrder
-        );
-        Assert.HasCount(3, results, "Should return file1.txt, file3.txt (root) and bin/file3.txt after exclusions/pruning.");
+            ]);
+        results.Should().HaveCount(3, because: "Should return file1.txt, file3.txt (root) and bin/file3.txt after exclusions/pruning.");
     }
 }
+

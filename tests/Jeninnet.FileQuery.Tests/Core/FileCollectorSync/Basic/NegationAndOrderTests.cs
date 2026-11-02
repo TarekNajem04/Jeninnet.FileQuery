@@ -38,7 +38,7 @@ public class NegationAndOrderTests {
                                     .ToList();
 
         TestAssertEx.HasCount(result, 1);
-        Assert.EndsWith("a.txt", result.Single());
+        result.Single().Should().EndWith("a.txt");
     }
 
     /// <summary>

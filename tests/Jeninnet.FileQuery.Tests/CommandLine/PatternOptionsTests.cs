@@ -18,9 +18,9 @@ public sealed class PatternOptionsTests {
     [TestMethod]
     public void Record_ShouldBeInstantiable() {
         var options = new PatternOptions("p", "g", "gl", "r");
-        Assert.AreEqual("p", options.Patterns);
-        Assert.AreEqual("g", options.Gitignore);
-        Assert.AreEqual("gl", options.Glob);
-        Assert.AreEqual("r", options.RegularExpression);
+        options.Patterns.Should().Be("p");
+        options.Gitignore.Should().Be("g");
+        options.Glob.Should().Be("gl");
+        options.RegularExpression.Should().Be("r");
     }
 }

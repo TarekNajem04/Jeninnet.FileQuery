@@ -324,7 +324,7 @@ public void Should_ReturnEmptySet_When_InputIsEmpty() {
     var result = PatternCanonicalizer.Canonicalize(input);
 
     // Assert
-    Assert.IsEmpty(result);
+    result.Should().BeEmpty();
 }
 ```
 
@@ -361,15 +361,15 @@ Each `[TestMethod]` should verify exactly one behavior. Avoid testing multiple u
 
 ### Use descriptive assertions
 
-Prefer assertion messages and custom helpers over generic `Assert.IsTrue`:
+Prefer fluent assertions and custom helpers over generic boolean checks:
 
 ```csharp
 // Good
-Assert.Contains(result, x => x.EndsWith("expected.txt"));
+result.Should().Contain(x => x.EndsWith("expected.txt"));
 TestAssertEx.DoesNotContain(result, x => x.Contains("bin"));
 
 // Bad
-Assert.IsTrue(result.Count > 0);
+(result.Count > 0).Should().BeTrue();
 ```
 
 ### Keep tests deterministic
@@ -407,7 +407,7 @@ public void Should_EnumerateOnlyRoot_When_MaxDepthZero() {
 
     // Assert
     TestAssertEx.HasCount(results, 1);
-    Assert.Contains(results, x => x.EndsWith("root.txt"));
+    result.Should().Contain(x => x.EndsWith("root.txt"));
 }
 ```
 

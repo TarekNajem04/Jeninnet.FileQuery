@@ -97,6 +97,9 @@ public sealed class FileQueryBuilder {
     /// <exception cref="ArgumentNullException">
     /// Thrown when <paramref name="patterns"/> is <see langword="null"/>.
     /// </exception>
+    /// <exception cref="ArgumentException">
+    /// Thrown when <paramref name="patterns"/> contains empty or whitespace-only entries.
+    /// </exception>
     public FileQueryBuilder Where(params IEnumerable<string> patterns) {
         ArgumentNullException.ThrowIfNull(patterns);
 
@@ -714,6 +717,9 @@ public sealed class FileQueryBuilder {
     /// </summary>
     /// <param name="patternKind">The semantic type of the pattern.</param>
     /// <param name="patterns">A sequence of patterns to merge.</param>
+    /// <exception cref="ArgumentException">
+    /// Thrown when <paramref name="patterns"/> contains empty or whitespace-only entries.
+    /// </exception>
     private void MergeIntoTypedBucket(PatternKind patternKind, IEnumerable<string> patterns) {
         if(!_patternStorage.TryGetValue(patternKind, out var bucket)) {
             bucket = [];
@@ -754,6 +760,9 @@ public sealed class FileQueryBuilder {
     /// <exception cref="InvalidOperationException">
     /// Thrown when the combination of <paramref name="patternKind"/> and
     /// <see cref="_patternMatchingMode"/> is invalid.
+    /// </exception>
+    /// <exception cref="ArgumentOutOfRangeException">
+    /// Thrown when <paramref name="patternKind"/> is not a defined value of <see cref="PatternKind"/>.
     /// </exception>
     private void ValidatePatternType(PatternKind patternKind) {
         if(!Enum.IsDefined(patternKind)) {

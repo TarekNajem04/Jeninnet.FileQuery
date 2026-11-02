@@ -38,9 +38,9 @@ public sealed class PatternLiteralAnalyzerTests {
 
         var diagnostics = await AnalyzerTestHost.GetDiagnosticsAsync(source);
 
-        Assert.HasCount(1, diagnostics);
-        Assert.AreEqual(PatternLiteralAnalyzer.DiagnosticId, diagnostics[0].Id);
-        Assert.Contains("missing closing bracket", diagnostics[0].GetMessage(CultureInfo.InvariantCulture));
+        diagnostics.Should().HaveCount(1);
+        diagnostics[0].Id.Should().Be(PatternLiteralAnalyzer.DiagnosticId);
+        diagnostics[0].GetMessage(CultureInfo.InvariantCulture).Should().Contain("missing closing bracket");
     }
 
     /// <summary>
@@ -52,8 +52,8 @@ public sealed class PatternLiteralAnalyzerTests {
 
         var diagnostics = await AnalyzerTestHost.GetDiagnosticsAsync(source);
 
-        Assert.HasCount(1, diagnostics);
-        Assert.Contains("unescaped backslash", diagnostics[0].GetMessage(CultureInfo.InvariantCulture));
+        diagnostics.Should().HaveCount(1);
+        diagnostics[0].GetMessage(CultureInfo.InvariantCulture).Should().Contain("unescaped backslash");
     }
 
     /// <summary>
@@ -65,8 +65,8 @@ public sealed class PatternLiteralAnalyzerTests {
 
         var diagnostics = await AnalyzerTestHost.GetDiagnosticsAsync(source);
 
-        Assert.HasCount(1, diagnostics);
-        Assert.Contains("invalid range", diagnostics[0].GetMessage(CultureInfo.InvariantCulture));
+        diagnostics.Should().HaveCount(1);
+        diagnostics[0].GetMessage(CultureInfo.InvariantCulture).Should().Contain("invalid range");
     }
 
     /// <summary>
@@ -78,7 +78,7 @@ public sealed class PatternLiteralAnalyzerTests {
 
         var diagnostics = await AnalyzerTestHost.GetDiagnosticsAsync(source);
 
-        Assert.IsEmpty(diagnostics);
+        diagnostics.Should().BeEmpty();
     }
 
     /// <summary>
@@ -96,7 +96,7 @@ public sealed class PatternLiteralAnalyzerTests {
 
         var diagnostics = await AnalyzerTestHost.GetDiagnosticsAsync(source);
 
-        Assert.IsEmpty(diagnostics);
+        diagnostics.Should().BeEmpty();
     }
 
     /// <summary>
@@ -116,7 +116,7 @@ public sealed class PatternLiteralAnalyzerTests {
 
         var diagnostics = await AnalyzerTestHost.GetDiagnosticsAsync(source);
 
-        Assert.IsEmpty(diagnostics);
+        diagnostics.Should().BeEmpty();
     }
 
     /// <summary>
@@ -128,7 +128,7 @@ public sealed class PatternLiteralAnalyzerTests {
 
         var fixedSource = await AnalyzerTestHost.ApplyFirstFixAsync(source);
 
-        Assert.Contains("""["a[b]"]""", fixedSource);
+        fixedSource.Should().Contain("""["a[b]"]""");
     }
 
     /// <summary>

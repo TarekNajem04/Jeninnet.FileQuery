@@ -40,42 +40,16 @@ public sealed class RegressionTests {
         var typedPatterns = query.Options.PatternInput.TypedPatterns;
 
         // GitIgnore bucket must contain both patterns.
-        Assert.IsTrue(
-            typedPatterns.ContainsKey(PatternKind.GitIgnore),
-            "GitIgnore bucket must exist."
-        );
-
-        Assert.AreSequenceEqual(
-            ["**", "!*.log"],
-            [.. typedPatterns[PatternKind.GitIgnore]], SequenceOrder.InAnyOrder,
-            "GitIgnore bucket must contain patterns from both Where() calls."
-        );
+        typedPatterns.ContainsKey(PatternKind.GitIgnore).Should().BeTrue(because: "GitIgnore bucket must exist.");
+        typedPatterns[PatternKind.GitIgnore].Should().BeEquivalentTo((IEnumerable<string>)["**", "!*.log"], because: "GitIgnore bucket must contain patterns from both Where() calls.");
 
         // Glob bucket from the first call must still be present.
-        Assert.IsTrue(
-            typedPatterns.ContainsKey(PatternKind.Glob),
-            "Glob bucket must not be lost when a later Where() call merges a different key."
-        );
-
-        Assert.AreSequenceEqual(
-            ["*.cs"],
-            [.. typedPatterns[PatternKind.Glob]],
-            SequenceOrder.InAnyOrder,
-            "Glob bucket must be unchanged."
-        );
+        typedPatterns.ContainsKey(PatternKind.Glob).Should().BeTrue(because: "Glob bucket must not be lost when a later Where() call merges a different key.");
+        typedPatterns[PatternKind.Glob].Should().BeEquivalentTo((IEnumerable<string>)["*.cs"], because: "Glob bucket must be unchanged.");
 
         // Regex bucket added by the second call must be present.
-        Assert.IsTrue(
-            typedPatterns.ContainsKey(PatternKind.Regex),
-            "Regex bucket added in the second Where() call must not be silently dropped."
-        );
-
-        Assert.AreSequenceEqual(
-            ["r:^data.*"],
-            [.. typedPatterns[PatternKind.Regex]],
-            SequenceOrder.InAnyOrder,
-            "Regex bucket must contain the pattern from the second Where() call."
-        );
+        typedPatterns.ContainsKey(PatternKind.Regex).Should().BeTrue(because: "Regex bucket added in the second Where() call must not be silently dropped.");
+        typedPatterns[PatternKind.Regex].Should().BeEquivalentTo((IEnumerable<string>)["r:^data.*"], because: "Regex bucket must contain the pattern from the second Where() call.");
     }
 
     /// <summary>
@@ -98,13 +72,10 @@ public sealed class RegressionTests {
         var typedPatterns = query.Options.PatternInput.TypedPatterns;
 
         // Assert: all three keys must be present.
-        Assert.HasCount(3, typedPatterns,
-            "All three pattern-kind buckets must be created from a single Where() call.");
-        Assert.AreSequenceEqual(["**", "!*.cs"], [.. typedPatterns[PatternKind.GitIgnore]], SequenceOrder.InAnyOrder);
-
-        Assert.AreSequenceEqual(["src/**/*.ts"], [.. typedPatterns[PatternKind.Glob]], SequenceOrder.InAnyOrder);
-
-        Assert.AreSequenceEqual(["r:^temp_.*\\.txt$"], [.. typedPatterns[PatternKind.Regex]], SequenceOrder.InAnyOrder);
+        typedPatterns.Should().HaveCount(3, because: "All three pattern-kind buckets must be created from a single Where() call.");
+        typedPatterns[PatternKind.GitIgnore].Should().BeEquivalentTo((IEnumerable<string>)["**", "!*.cs"]);
+        typedPatterns[PatternKind.Glob].Should().BeEquivalentTo((IEnumerable<string>)["src/**/*.ts"]);
+        typedPatterns[PatternKind.Regex].Should().BeEquivalentTo((IEnumerable<string>)["r:^temp_.*\\.txt$"]);
     }
 
     /// <summary>
@@ -128,8 +99,7 @@ public sealed class RegressionTests {
         var gitIgnorePatterns = query.Options.PatternInput.TypedPatterns[PatternKind.GitIgnore].ToArray();
 
         // Assert: only three distinct patterns (no duplicates).
-        Assert.HasCount(3, gitIgnorePatterns,
-            "Duplicate patterns must not be added again. Expected: **, !*.log, !*.tmp.");
+        gitIgnorePatterns.Should().HaveCount(3, because: "Duplicate patterns must not be added again. Expected: **, !*.log, !*.tmp.");
     }
 
     private static RegexInstructionMatcher CreateRegexMatcher() => new();
@@ -153,19 +123,11 @@ public sealed class RegressionTests {
 
         // First call: sensitive — "readme.md" must NOT match "^README\.md$" (case-sensitive).
         var sensitiveResult = matcher.Match(patterns, FileContext("readme.md", CaseSensitivity.Sensitive));
-        Assert.AreEqual(
-            MatchOutcome.NoMatch,
-            sensitiveResult,
-            "Case-sensitive match of 'readme.md' against '^README\\.md$' must not match."
-        );
+        sensitiveResult.Should().Be(MatchOutcome.NoMatch, because: "Case-sensitive match of 'readme.md' against '^README\\.md$' must not match.");
 
         // Second call: insensitive — "readme.md" MUST match "^README\.md$" (case-insensitive).
         var insensitiveResult = matcher.Match(patterns, FileContext("readme.md", CaseSensitivity.Insensitive));
-        Assert.AreEqual(
-            MatchOutcome.Include,
-            insensitiveResult,
-            "Case-insensitive match of 'readme.md' against '^README\\.md$' must match."
-        );
+        insensitiveResult.Should().Be(MatchOutcome.Include, because: "Case-insensitive match of 'readme.md' against '^README\\.md$' must match.");
     }
 
     /// <summary>
@@ -186,16 +148,12 @@ public sealed class RegressionTests {
         var contextNoMatch = FileContext("test/Program.cs");
 
         // Both sets must match the same path.
-        Assert.AreEqual(MatchOutcome.Include, matcher.Match(patternSetA, contextMatch),
-            "First compiled set must match 'src/Program.cs'.");
-        Assert.AreEqual(MatchOutcome.Include, matcher.Match(patternSetB, contextMatch),
-            "Second compiled set (independently compiled) must also match 'src/Program.cs'.");
+        (matcher.Match(patternSetA, contextMatch)).Should().Be(MatchOutcome.Include, because: "First compiled set must match 'src/Program.cs'.");
+        (matcher.Match(patternSetB, contextMatch)).Should().Be(MatchOutcome.Include, because: "Second compiled set (independently compiled) must also match 'src/Program.cs'.");
 
         // Both sets must reject the same non-matching path.
-        Assert.AreEqual(MatchOutcome.NoMatch, matcher.Match(patternSetA, contextNoMatch),
-            "First compiled set must not match 'test/Program.cs'.");
-        Assert.AreEqual(MatchOutcome.NoMatch, matcher.Match(patternSetB, contextNoMatch),
-            "Second compiled set must not match 'test/Program.cs'.");
+        (matcher.Match(patternSetA, contextNoMatch)).Should().Be(MatchOutcome.NoMatch, because: "First compiled set must not match 'test/Program.cs'.");
+        (matcher.Match(patternSetB, contextNoMatch)).Should().Be(MatchOutcome.NoMatch, because: "Second compiled set must not match 'test/Program.cs'.");
     }
 
     /// <summary>
@@ -209,23 +167,13 @@ public sealed class RegressionTests {
         var patterns = CompileRegex(pattern);
 
         // Insensitive: lowercase subject must match.
-        Assert.AreEqual(
-            MatchOutcome.Include,
-            matcher.Match(patterns, FileContext("data_archive.log", CaseSensitivity.Insensitive)),
-            "Insensitive: 'data_archive.log' must match '^DATA_.*\\.log$'."
-        );
+        (matcher.Match(patterns, FileContext("data_archive.log", CaseSensitivity.Insensitive))).Should().Be(MatchOutcome.Include, because: "Insensitive: 'data_archive.log' must match '^DATA_.*\\.log$'.");
 
         // Sensitive: lowercase subject must NOT match uppercase pattern.
-        Assert.AreEqual(
-            MatchOutcome.NoMatch,
-            matcher.Match(patterns, FileContext("data_archive.log", CaseSensitivity.Sensitive)),
-            "Sensitive: 'data_archive.log' must NOT match '^DATA_.*\\.log$'.");
+        (matcher.Match(patterns, FileContext("data_archive.log", CaseSensitivity.Sensitive))).Should().Be(MatchOutcome.NoMatch, because: "Sensitive: 'data_archive.log' must NOT match '^DATA_.*\\.log$'.");
 
         // Insensitive again: still must match (correct cache entry reused).
-        Assert.AreEqual(
-            MatchOutcome.Include,
-            matcher.Match(patterns, FileContext("data_archive.log", CaseSensitivity.Insensitive)),
-            "Insensitive (second call): must still match using the correct cached Regex."
-        );
+        (matcher.Match(patterns, FileContext("data_archive.log", CaseSensitivity.Insensitive))).Should().Be(MatchOutcome.Include, because: "Insensitive (second call): must still match using the correct cached Regex.");
     }
 }
+

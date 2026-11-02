@@ -107,7 +107,7 @@ The 2026-11-02 local run used SonarQube Community Build 26.10 with `-Local -With
 | Quality Gate | **OK** |
 | Sonar coverage | **85.9%** (87.9% lines, 81.9% branches) |
 | Maintained lines (ncloc) | 9,059 |
-| Covered / uncovered lines | 4,505 / 618 |
+| Covered / uncovered lines | 4,504 / 618 |
 | Duplicated lines | **0.0%** (0 lines, 0 blocks) |
 | Bugs / vulnerabilities / code smells | 0 / 0 / 0 |
 

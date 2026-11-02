@@ -24,10 +24,10 @@ internal static class AnalyzerTestHost {
     public static async Task<ImmutableArray<Diagnostic>> GetDiagnosticsAsync(string source) {
         var document = CreateDocument(source);
         var compilation = await document.Project.GetCompilationAsync().ConfigureAwait(false);
-        Assert.IsNotNull(compilation);
+        compilation.Should().NotBeNull();
 
         var analyzer = new PatternLiteralAnalyzer();
-        return await compilation
+        return await compilation!
             .WithAnalyzers([analyzer])
             .GetAnalyzerDiagnosticsAsync()
             .ConfigureAwait(false);
@@ -41,13 +41,13 @@ internal static class AnalyzerTestHost {
     public static async Task<string> ApplyFirstFixAsync(string source) {
         var document = CreateDocument(source);
         var compilation = await document.Project.GetCompilationAsync().ConfigureAwait(false);
-        Assert.IsNotNull(compilation);
+        compilation.Should().NotBeNull();
 
-        var diagnostics = await compilation
+        var diagnostics = await compilation!
             .WithAnalyzers([new PatternLiteralAnalyzer()])
             .GetAnalyzerDiagnosticsAsync()
             .ConfigureAwait(false);
-        Assert.IsNotEmpty(diagnostics);
+        diagnostics.Should().NotBeEmpty();
         var diagnostic = diagnostics[0];
 
         var actions = new List<CodeAction>();
@@ -59,14 +59,14 @@ internal static class AnalyzerTestHost {
         var provider = new PatternLiteralCodeFixProvider();
         await provider.RegisterCodeFixesAsync(context).ConfigureAwait(false);
 
-        Assert.IsNotEmpty(actions);
+        actions.Should().NotBeEmpty();
 
         var operations = await actions[0].GetOperationsAsync(CancellationToken.None).ConfigureAwait(false);
         var apply = operations.OfType<ApplyChangesOperation>().Single();
         var changedDocument = apply.ChangedSolution.GetDocument(document.Id);
-        Assert.IsNotNull(changedDocument);
+        changedDocument.Should().NotBeNull();
 
-        var text = await changedDocument.GetTextAsync().ConfigureAwait(false);
+        var text = await changedDocument!.GetTextAsync().ConfigureAwait(false);
         return text.ToString();
     }
 
@@ -95,9 +95,9 @@ internal static class AnalyzerTestHost {
     /// </summary>
     private static ImmutableArray<MetadataReference> CreateReferences() {
         var trustedAssemblies = (string?)AppContext.GetData("TRUSTED_PLATFORM_ASSEMBLIES");
-        Assert.IsNotNull(trustedAssemblies);
+        trustedAssemblies.Should().NotBeNull();
 
-        var paths = trustedAssemblies
+        var paths = trustedAssemblies!
             .Split(Path.PathSeparator, StringSplitOptions.RemoveEmptyEntries)
             .Concat([typeof(FileQueryBuilder).Assembly.Location])
             .Distinct(StringComparer.OrdinalIgnoreCase);
@@ -105,3 +105,4 @@ internal static class AnalyzerTestHost {
         return [.. paths.Select(static path => MetadataReference.CreateFromFile(path))];
     }
 }
+

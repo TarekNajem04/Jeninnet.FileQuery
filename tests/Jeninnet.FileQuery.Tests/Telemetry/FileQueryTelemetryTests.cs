@@ -35,13 +35,13 @@ public sealed class FileQueryTelemetryTests {
 
         _ = engine.Execute(query, TestContext.CancellationToken).ToArray();
 
-        Assert.HasCount(1, activities);
+        activities.Should().HaveCount(1);
 
         var activity = activities[0];
-        Assert.AreEqual(FileQueryTelemetry.ExecuteActivityName, activity.OperationName);
-        Assert.AreEqual("Glob", activity.GetTagItem("filequery.matching_mode")?.ToString());
-        Assert.AreEqual("Specific", activity.GetTagItem("filequery.interpretation")?.ToString());
-        Assert.AreEqual("completed", activity.GetTagItem("filequery.outcome")?.ToString());
+        activity.OperationName.Should().Be(FileQueryTelemetry.ExecuteActivityName);
+        (activity.GetTagItem("filequery.matching_mode")?.ToString()).Should().Be("Glob");
+        (activity.GetTagItem("filequery.interpretation")?.ToString()).Should().Be("Specific");
+        (activity.GetTagItem("filequery.outcome")?.ToString()).Should().Be("completed");
     }
 
     /// <summary>
@@ -65,9 +65,9 @@ public sealed class FileQueryTelemetryTests {
             results.Add(path);
         }
 
-        Assert.HasCount(3, results);
-        Assert.HasCount(1, activities);
-        Assert.AreEqual(FileQueryTelemetry.ExecuteAsyncActivityName, activities[0].OperationName);
+        results.Should().HaveCount(3);
+        activities.Should().HaveCount(1);
+        activities[0].OperationName.Should().Be(FileQueryTelemetry.ExecuteAsyncActivityName);
     }
 
     /// <summary>
@@ -101,11 +101,11 @@ public sealed class FileQueryTelemetryTests {
 
         _ = engine.Execute(query, TestContext.CancellationToken).ToArray();
 
-        Assert.IsGreaterThanOrEqualTo(1, counters[FileQueryTelemetry.QueriesStartedMetric]);
-        Assert.IsGreaterThanOrEqualTo(1, counters[FileQueryTelemetry.QueriesCompletedMetric]);
-        Assert.IsGreaterThanOrEqualTo(1, counters[FileQueryTelemetry.EntriesScannedMetric]);
-        Assert.AreEqual(3, counters[FileQueryTelemetry.FilesMatchedMetric]);
-        Assert.IsGreaterThan(0, histograms[FileQueryTelemetry.QueryDurationMetric]);
+        counters[FileQueryTelemetry.QueriesStartedMetric].Should().BeGreaterThanOrEqualTo(1);
+        counters[FileQueryTelemetry.QueriesCompletedMetric].Should().BeGreaterThanOrEqualTo(1);
+        counters[FileQueryTelemetry.EntriesScannedMetric].Should().BeGreaterThanOrEqualTo(1);
+        counters[FileQueryTelemetry.FilesMatchedMetric].Should().Be(3);
+        histograms[FileQueryTelemetry.QueryDurationMetric].Should().BeGreaterThan(0);
     }
 
     /// <summary>
@@ -121,8 +121,8 @@ public sealed class FileQueryTelemetryTests {
         var counters = new ConcurrentDictionary<string, long>(StringComparer.Ordinal);
         using var listener = CreateLongCounterListener(counters);
 
-        Assert.ThrowsExactly<IOException>(() => results.ToList());
-        Assert.IsGreaterThanOrEqualTo(1, counters[FileQueryTelemetry.QueriesErrorsMetric]);
+        FluentActions.Invoking(() => { _ = results.ToList(); }).Should().ThrowExactly<IOException>();
+        counters[FileQueryTelemetry.QueriesErrorsMetric].Should().BeGreaterThanOrEqualTo(1);
     }
 
     /// <summary>
@@ -133,10 +133,10 @@ public sealed class FileQueryTelemetryTests {
         var query = FileQuery.From(Path.GetTempPath()).Build();
 
         // Warm up lazily initialized static state before measuring.
-        _ = FileQueryInstrumentation.StartActivity(FileQueryTelemetry.ExecuteActivityName, query.Options);
+        FileQueryInstrumentation.StartActivity(FileQueryTelemetry.ExecuteActivityName, query.Options);
         FileQueryInstrumentation.RecordTraversal(0, 0);
 
-        Assert.IsFalse(FileQueryInstrumentation.HasActivityListeners);
+        FileQueryInstrumentation.HasActivityListeners.Should().BeFalse();
 
         var startTimestamp = FileQueryInstrumentation.RecordStarted();
         var before = GC.GetAllocatedBytesForCurrentThread();
@@ -146,7 +146,7 @@ public sealed class FileQueryTelemetryTests {
 
         var after = GC.GetAllocatedBytesForCurrentThread();
 
-        Assert.AreEqual(before, after);
+        after.Should().Be(before);
     }
 
     /// <summary>

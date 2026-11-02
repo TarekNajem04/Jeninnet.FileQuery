@@ -13,8 +13,8 @@ namespace Jeninnet.FileQuery.Tests.FileEnumeration.Sync;
 /// </summary>
 [TestClass]
 public sealed class CrossDialectReinclusionTests {
-    private static readonly string[] ExpectedPaths = ["root.txt", "sub/a.cs"];
-    private static readonly string[] ExpectedLeadingDoubleStarPaths = ["other/src/a.cs", "root.txt"];
+    private static readonly string[] _expectedPaths = ["root.txt", "sub/a.cs"];
+    private static readonly string[] _expectedLeadingDoubleStarPaths = ["other/src/a.cs", "root.txt"];
 
     /// <summary>
     /// Gets the test context injected by MSTest.
@@ -38,14 +38,12 @@ public sealed class CrossDialectReinclusionTests {
                     })));
 
         var results = FileQueryRuntime.Create()
-            .Execute(new(environment.Root, options), TestContext.CancellationToken)
-            .Select(path => Path.GetRelativePath(environment.Root, path).Replace('\\', '/'))
-            .OrderBy(static path => path, StringComparer.Ordinal)
-            .ToArray();
+                                      .Execute(new(environment.Root, options), TestContext.CancellationToken)
+                                      .Select(path => Path.GetRelativePath(environment.Root, path).Replace('\\', '/'))
+                                      .OrderBy(static path => path, StringComparer.Ordinal)
+                                      .ToArray();
 
-        CollectionAssert.AreEqual(
-            ExpectedPaths,
-            results);
+        results.Should().Equal(_expectedPaths);
     }
 
     /// <summary>
@@ -71,9 +69,7 @@ public sealed class CrossDialectReinclusionTests {
             .OrderBy(static path => path, StringComparer.Ordinal)
             .ToArray();
 
-        CollectionAssert.AreEqual(
-            ExpectedLeadingDoubleStarPaths,
-            results);
+        results.Should().Equal(_expectedLeadingDoubleStarPaths);
     }
 
     /// <summary>
@@ -98,8 +94,6 @@ public sealed class CrossDialectReinclusionTests {
             .OrderBy(static path => path, StringComparer.Ordinal)
             .ToArray();
 
-        CollectionAssert.AreEqual(
-            ExpectedPaths,
-            results);
+        results.Should().Equal(_expectedPaths);
     }
 }

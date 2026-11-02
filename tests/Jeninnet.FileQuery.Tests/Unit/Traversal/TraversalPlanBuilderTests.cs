@@ -20,11 +20,8 @@ public sealed class TraversalPlanBuilderTests {
     /// A Windows drive root keeps its trailing separator instead of becoming a drive-relative path.
     /// </summary>
     [TestMethod]
+    [OSCondition(OperatingSystems.Windows)]
     public void Build_PreservesDriveRoot() {
-        if(!OperatingSystem.IsWindows()) {
-            return;
-        }
-
         var fileSystem = new RootFileSystem(@"C:\", '\\');
         var builder = new TraversalPlanBuilder(fileSystem);
         var plan = builder.Build(
@@ -32,7 +29,7 @@ public sealed class TraversalPlanBuilderTests {
                 @"C:\",
                 new FileQueryOptions(new FileQueryOptionsConfig(new PatternInput()))));
 
-        Assert.AreEqual(@"C:\", plan.RootDirectory);
+        plan.RootDirectory.Should().Be(@"C:\");
     }
 
     /// <summary>
@@ -51,7 +48,7 @@ public sealed class TraversalPlanBuilderTests {
                 root,
                 new FileQueryOptions(new FileQueryOptionsConfig(new PatternInput()))));
 
-        Assert.AreEqual(expected, plan.RootDirectory);
+        plan.RootDirectory.Should().Be(expected);
     }
 
     private sealed class RootFileSystem(string root, char separator) : IFileSystem {

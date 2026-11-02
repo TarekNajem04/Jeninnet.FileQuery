@@ -19,9 +19,9 @@ public sealed class CanonicalPatternInputTests {
     public void Should_SetEmptyPatternsAndInterpretationMode_When_DefaultConstructor() {
         var input = new CanonicalPatternInput();
 
-        Assert.IsEmpty(input.Patterns);
-        Assert.IsEmpty(input.TypedPatterns);
-        Assert.AreEqual(PatternInterpretationMode.Hybrid, input.InterpretationMode);
+        input.Patterns.Should().BeEmpty();
+        input.TypedPatterns.Should().BeEmpty();
+        input.InterpretationMode.Should().Be(PatternInterpretationMode.Hybrid);
     }
 
     /// <summary>Tests Should_SetPatterns_When_ConstructedWithPatterns.</summary>
@@ -33,9 +33,9 @@ public sealed class CanonicalPatternInputTests {
         string[] patterns = ["a", "b"];
         var input = new CanonicalPatternInput(patterns: patterns);
 
-        Assert.HasCount(2, input.Patterns);
-        Assert.AreEqual("a", input.Patterns[0]);
-        Assert.AreEqual("b", input.Patterns[1]);
+        input.Patterns.Should().HaveCount(2);
+        input.Patterns[0].Should().Be("a");
+        input.Patterns[1].Should().Be("b");
     }
 
     /// <summary>Tests Should_SetTypedPatterns_When_ConstructedWithTypedPatterns.</summary>
@@ -49,9 +49,9 @@ public sealed class CanonicalPatternInputTests {
         };
         var input = new CanonicalPatternInput(typedPatterns: typed);
 
-        Assert.HasCount(1, input.TypedPatterns);
-        Assert.IsTrue(input.TypedPatterns.ContainsKey(PatternKind.Glob));
-        Assert.AreEqual("*.txt", input.TypedPatterns[PatternKind.Glob][0]);
+        input.TypedPatterns.Should().HaveCount(1);
+        input.TypedPatterns.ContainsKey(PatternKind.Glob).Should().BeTrue();
+        input.TypedPatterns[PatternKind.Glob][0].Should().Be("*.txt");
     }
 
     /// <summary>Tests Should_SetEmptyList_When_ConstructedWithNullTypedPatterns.</summary>
@@ -65,8 +65,8 @@ public sealed class CanonicalPatternInputTests {
         };
         var input = new CanonicalPatternInput(typedPatterns: typed);
 
-        Assert.HasCount(1, input.TypedPatterns);
-        Assert.IsEmpty(input.TypedPatterns[PatternKind.Glob]);
+        input.TypedPatterns.Should().HaveCount(1);
+        input.TypedPatterns[PatternKind.Glob].Should().BeEmpty();
     }
 
     /// <summary>Tests Should_SetAllTypedPatterns_When_ConstructedWithMultiple.</summary>
@@ -81,9 +81,9 @@ public sealed class CanonicalPatternInputTests {
         };
         var input = new CanonicalPatternInput(typedPatterns: typed);
 
-        Assert.HasCount(2, input.TypedPatterns);
-        Assert.AreEqual("a", input.TypedPatterns[PatternKind.Glob][0]);
-        Assert.AreEqual("b", input.TypedPatterns[PatternKind.Regex][0]);
+        input.TypedPatterns.Should().HaveCount(2);
+        input.TypedPatterns[PatternKind.Glob][0].Should().Be("a");
+        input.TypedPatterns[PatternKind.Regex][0].Should().Be("b");
     }
 
     /// <summary>Tests Should_SetMode_When_ConstructedWithExplicitMode.</summary>
@@ -94,7 +94,7 @@ public sealed class CanonicalPatternInputTests {
     public void Should_SetMode_When_ConstructedWithExplicitMode() {
         var input = new CanonicalPatternInput(interpretationMode: PatternInterpretationMode.Specific);
 
-        Assert.AreEqual(PatternInterpretationMode.Specific, input.InterpretationMode);
+        input.InterpretationMode.Should().Be(PatternInterpretationMode.Specific);
     }
 
     /// <summary>Tests Should_SetEmptyTypedPatterns_When_ConstructedWithEmptyList.</summary>
@@ -105,6 +105,6 @@ public sealed class CanonicalPatternInputTests {
     public void Should_SetEmptyTypedPatterns_When_ConstructedWithEmptyList() {
         var input = new CanonicalPatternInput(typedPatterns: new Dictionary<PatternKind, IEnumerable<string>>());
 
-        Assert.IsEmpty(input.TypedPatterns);
+        input.TypedPatterns.Should().BeEmpty();
     }
 }

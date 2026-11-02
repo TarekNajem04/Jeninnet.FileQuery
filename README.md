@@ -200,7 +200,7 @@ This repository contains the core library and its companion packages:
 *   **[Documentation Suite (docs/)](./docs/README.md)**: Deep technical specifications, guides, and architectural whitepapers.
 *   **[Benchmark Suite](./src/Jeninnet.FileQuery.Benchmarks/README.md)**: Performance measurements and allocation verification.
 *   **[Samples](./samples/README.md)**: Thirteen runnable examples from hello-world to DI + evaluation.
-*   **[Test Suite](./tests/README.md)**: 1,166 tests across seven projects, with per-project guides.
+*   **[Test Suite](./tests/README.md)**: 1,166 tests across seven projects, with per-project guides. Every assertion uses the `Jeninnet.Assertions` fluent API (`Should()` / `FluentActions`); MSTest supplies only attributes and runner integration.
 
 ---
 
@@ -329,7 +329,7 @@ The project adheres to the **Jeninnet.FileQuery Constitution**:
 
 *   **TFM**: Runtime/tool packages target `.NET 10`; the Roslyn analyzer targets `netstandard2.0` for host compatibility.
 *   **Language**: `C# 14`
-*   **Test Suite**: MSTest + Moq + Coverlet
+*   **Test Suite**: MSTest + `Jeninnet.Assertions` + Moq + Coverlet
 *   **Enforcement**: Central Package Management (CPM), strict `.editorconfig` rules, and architecture tests enforcing zero allocations.
 
 ---

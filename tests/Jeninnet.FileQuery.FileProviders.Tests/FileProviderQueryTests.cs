@@ -24,12 +24,12 @@ public sealed class FileProviderQueryTests {
     public void Provider_EnumerationFailure_HonorsErrorRecovery() {
         var provider = new InMemoryFileProvider(throwOnEnumeration: true);
         var skipped = FileProviderQuery.From(provider).Execute(TestContext.CancellationToken).ToArray();
-        Assert.IsEmpty(skipped);
+        skipped.Should().BeEmpty();
 
         var aborting = FileProviderQuery.From(provider)
             .WithErrorRecovery(FileQueryErrorRecoveryOptions.Abort);
 
-        Assert.ThrowsExactly<UnauthorizedAccessException>(() => aborting.Execute(TestContext.CancellationToken).ToArray());
+        FluentActions.Invoking(() => { _ = aborting.Execute(TestContext.CancellationToken).ToArray(); }).Should().ThrowExactly<UnauthorizedAccessException>();
     }
 
     /// <summary>
@@ -37,8 +37,8 @@ public sealed class FileProviderQueryTests {
     /// </summary>
     [TestMethod]
     public void From_InvalidArguments_Throw() {
-        Assert.ThrowsExactly<ArgumentNullException>(() => FileProviderQuery.From(null!));
-        Assert.ThrowsExactly<ArgumentException>(() => FileProviderQuery.From(new InMemoryFileProvider(), " "));
+        FluentActions.Invoking(() => FileProviderQuery.From(null!)).Should().ThrowExactly<ArgumentNullException>();
+        FluentActions.Invoking(() => FileProviderQuery.From(new InMemoryFileProvider(), " ")).Should().ThrowExactly<ArgumentException>();
     }
 
     /// <summary>
@@ -59,10 +59,10 @@ public sealed class FileProviderQueryTests {
             .OrderBy(static entry => entry.RelativePath, StringComparer.Ordinal)
             .ToArray();
 
-        Assert.AreSequenceEqual(_physicalMatches, entries.Select(static entry => entry.RelativePath));
-        Assert.IsTrue(entries.All(static entry => entry.Length > 0));
-        Assert.IsTrue(entries.All(static entry => entry.LastWriteTimeUtc > DateTime.MinValue));
-        Assert.IsTrue(entries.All(static entry => entry.RootPath == "/"));
+        (entries.Select(static entry => entry.RelativePath)).Should().Equal(_physicalMatches);
+        (entries.All(static entry => entry.Length > 0)).Should().BeTrue();
+        (entries.All(static entry => entry.LastWriteTimeUtc > DateTime.MinValue)).Should().BeTrue();
+        (entries.All(static entry => entry.RootPath == "/")).Should().BeTrue();
     }
 
     /// <summary>
@@ -82,8 +82,8 @@ public sealed class FileProviderQueryTests {
             .OrderBy(static entry => entry.RelativePath, StringComparer.Ordinal)
             .ToArray();
 
-        Assert.HasCount(1, entries);
-        Assert.AreEqual("keep.cs", entries[0].RelativePath);
+        entries.Should().HaveCount(1);
+        entries[0].RelativePath.Should().Be("keep.cs");
     }
 
     /// <summary>
@@ -103,9 +103,8 @@ public sealed class FileProviderQueryTests {
             .OrderBy(static entry => entry.RelativePath, StringComparer.Ordinal)
             .ToArray();
 
-        Assert.AreSequenceEqual(
-            _memoryMatches, entries.Select(static entry => entry.RelativePath));
-        Assert.AreEqual("class B {}".Length, entries[0].Length);
+        (entries.Select(static entry => entry.RelativePath)).Should().Equal(_memoryMatches);
+        entries[0].Length.Should().Be("class B {}".Length);
     }
 
     /// <summary>
@@ -124,7 +123,7 @@ public sealed class FileProviderQueryTests {
             .OrderBy(static path => path, StringComparer.Ordinal)
             .ToArray();
 
-        Assert.AreSequenceEqual(_gitignoreMatches, paths);
+        paths.Should().Equal(_gitignoreMatches);
     }
 
     /// <summary>
@@ -145,7 +144,7 @@ public sealed class FileProviderQueryTests {
             .OrderBy(static path => path, StringComparer.Ordinal)
             .ToArray();
 
-        Assert.AreSequenceEqual(_scopedMatches, paths);
+        paths.Should().Equal(_scopedMatches);
     }
 
     /// <summary>
@@ -164,9 +163,9 @@ public sealed class FileProviderQueryTests {
             entries.Add(entry);
         }
 
-        Assert.Contains(static entry => entry.RelativePath == "src" && entry.IsDirectory, entries);
-        Assert.Contains(static entry => entry.RelativePath == "src/nested" && entry.IsDirectory, entries);
-        Assert.Contains(static entry => entry.RelativePath == "src/nested/b.cs" && !entry.IsDirectory, entries);
+        entries.Should().Contain(static entry => entry.RelativePath == "src" && entry.IsDirectory);
+        entries.Should().Contain(static entry => entry.RelativePath == "src/nested" && entry.IsDirectory);
+        entries.Should().Contain(static entry => entry.RelativePath == "src/nested/b.cs" && !entry.IsDirectory);
     }
 
     /// <summary>

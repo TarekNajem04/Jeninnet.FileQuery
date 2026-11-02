@@ -19,11 +19,11 @@ public sealed class PatternErrorPositionTests {
     public void PatternValidator_ReportsPositionAndSegment() {
         var (isMalformed, error, position, segment) = PatternValidator.Validate("src/[abc".AsSpan());
 
-        Assert.IsTrue(isMalformed);
-        Assert.IsNotNull(error);
-        Assert.Contains("Missing closing bracket", error);
-        Assert.AreEqual(4, position);
-        Assert.AreEqual(1, segment);
+        isMalformed.Should().BeTrue();
+        error.Should().NotBeNull();
+        error.Should().Contain("Missing closing bracket");
+        position.Should().Be(4);
+        segment.Should().Be(1);
     }
 
     /// <summary>
@@ -33,7 +33,7 @@ public sealed class PatternErrorPositionTests {
     public void PatternValidator_AcceptsEscapedBracket() {
         var (isMalformed, _, _, _) = PatternValidator.Validate(@"src/\[x".AsSpan());
 
-        Assert.IsFalse(isMalformed);
+        isMalformed.Should().BeFalse();
     }
 
     /// <summary>
@@ -43,7 +43,7 @@ public sealed class PatternErrorPositionTests {
     public void PatternValidator_AcceptsLiteralTrailingBackslash() {
         var (isMalformed, _, _, _) = PatternValidator.Validate(@"foo\\".AsSpan());
 
-        Assert.IsFalse(isMalformed);
+        isMalformed.Should().BeFalse();
     }
 
     /// <summary>
@@ -51,10 +51,10 @@ public sealed class PatternErrorPositionTests {
     /// </summary>
     [TestMethod]
     public void PatternException_CarriesPosition_ForParentTraversal() {
-        var exception = Assert.ThrowsExactly<PatternException>(() => CompileGlob("src/../file"));
+        var exception = FluentActions.Invoking(() => CompileGlob("src/../file")).Should().ThrowExactly<PatternException>().Which;
 
-        Assert.AreEqual(4, exception.Position);
-        Assert.AreEqual(1, exception.Segment);
+        exception.Position.Should().Be(4);
+        exception.Segment.Should().Be(1);
     }
 
     /// <summary>
@@ -62,10 +62,10 @@ public sealed class PatternErrorPositionTests {
     /// </summary>
     [TestMethod]
     public void PatternException_CarriesPosition_ForMixedRecursiveWildcard() {
-        var exception = Assert.ThrowsExactly<PatternException>(() => CompileGlob("src/a**"));
+        var exception = FluentActions.Invoking(() => CompileGlob("src/a**")).Should().ThrowExactly<PatternException>().Which;
 
-        Assert.AreEqual(5, exception.Position);
-        Assert.AreEqual(1, exception.Segment);
+        exception.Position.Should().Be(5);
+        exception.Segment.Should().Be(1);
     }
 
     /// <summary>
@@ -73,10 +73,10 @@ public sealed class PatternErrorPositionTests {
     /// </summary>
     [TestMethod]
     public void PatternException_CarriesPosition_ForInvalidRegex() {
-        var exception = Assert.ThrowsExactly<PatternException>(() => CompileRegex("r:["));
+        var exception = FluentActions.Invoking(() => CompileRegex("r:[")).Should().ThrowExactly<PatternException>().Which;
 
-        Assert.AreEqual(2, exception.Position);
-        Assert.AreEqual(0, exception.Segment);
+        exception.Position.Should().Be(2);
+        exception.Segment.Should().Be(0);
     }
 
     /// <summary>
@@ -86,8 +86,8 @@ public sealed class PatternErrorPositionTests {
     public void PatternException_WithoutPosition_LeavesValuesNull() {
         var exception = new PatternException("message");
 
-        Assert.IsNull(exception.Position);
-        Assert.IsNull(exception.Segment);
+        exception.Position.Should().BeNull();
+        exception.Segment.Should().BeNull();
     }
 
     /// <summary>
@@ -95,15 +95,15 @@ public sealed class PatternErrorPositionTests {
     /// </summary>
     [TestMethod]
     public void PatternException_ReportsReason_ForMalformedUntypedPattern() {
-        var exception = Assert.ThrowsExactly<PatternException>(() => CompileHybrid("src/[abc"));
+        var exception = FluentActions.Invoking(() => CompileHybrid("src/[abc")).Should().ThrowExactly<PatternException>().Which;
 
-        Assert.Contains("Missing closing bracket", exception.Message);
-        Assert.AreEqual(4, exception.Position);
-        Assert.AreEqual(1, exception.Segment);
+        exception.Message.Should().Contain("Missing closing bracket");
+        exception.Position.Should().Be(4);
+        exception.Segment.Should().Be(1);
     }
 
     private static void CompileGlob(string pattern) =>
-        _ = FileQueryPatternSet.Compile(
+        FileQueryPatternSet.Compile(
             new PatternInput(
                 TypedPatterns: new Dictionary<PatternKind, IEnumerable<string>> {
                     [PatternKind.Glob] = [pattern]
@@ -112,7 +112,7 @@ public sealed class PatternErrorPositionTests {
             PatternMatchingMode.Glob);
 
     private static void CompileRegex(string pattern) =>
-        _ = FileQueryPatternSet.Compile(
+        FileQueryPatternSet.Compile(
             new PatternInput(
                 TypedPatterns: new Dictionary<PatternKind, IEnumerable<string>> {
                     [PatternKind.Regex] = [pattern]
@@ -121,5 +121,5 @@ public sealed class PatternErrorPositionTests {
             PatternMatchingMode.Regex);
 
     private static void CompileHybrid(string pattern) =>
-        _ = FileQueryPatternSet.Compile([pattern]);
+        FileQueryPatternSet.Compile([pattern]);
 }

@@ -42,16 +42,16 @@ public class InaccessibleDirectoryTests {
                 _ = fileQueryEngine.Execute(new(env.Root, options), TestContext.CancellationToken).ToList();
 
                 // If we reach this point, no exception was thrown ? fail explicitly
-                throw new AssertFailedException("Expected an exception due to inaccessible directory, but none was thrown.");
+                throw new AssertionFailedException("Expected an exception due to inaccessible directory, but none was thrown.");
             }
             catch(Exception ex) when(ex is DirectoryNotFoundException or IOException or UnauthorizedAccessException) {
                 // Valid exception ? rethrow so Throws<T> can validate it
                 throw;
             }
             catch(Exception ex) {
-                // Unexpected exception ? wrap and rethrow (no Assert.Fail here)
+                // Unexpected exception ? wrap and rethrow (assertion exceptions are thrown explicitly)
 #pragma warning disable MSTEST0058 // Do not use asserts in catch blocks
-                throw new AssertFailedException(
+                throw new AssertionFailedException(
                     $"Caught unexpected exception: {ex.GetType().Name}", ex
                 );
 #pragma warning restore MSTEST0058 // Do not use asserts in catch blocks
@@ -87,7 +87,7 @@ public class InaccessibleDirectoryTests {
         var result = fileQueryEngine.Execute(new(env.Root, options), TestContext.CancellationToken).ToList();
 
         result.Should().HaveCount(1);
-        Assert.EndsWith("keep.txt", result.Single());
+        result.Single().Should().EndWith("keep.txt");
     }
 
     /// <summary>
@@ -96,3 +96,5 @@ public class InaccessibleDirectoryTests {
     /// </summary>
     public TestContext TestContext { get; set; } = null!;
 }
+
+

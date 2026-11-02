@@ -101,8 +101,8 @@ public sealed class PathRestrictionTests {
         using var environment = CreateEnvironment();
         var absolute = environment.Abs("a.txt");
 
-        var exception = Assert.Throws<ArgumentException>(() =>
-            FileQuery.From(environment.Root).RestrictToPaths([absolute]).Build());
+        var exception = FluentActions.Invoking(() =>
+            FileQuery.From(environment.Root).RestrictToPaths([absolute]).Build()).Should().Throw<ArgumentException>().Which;
 
         exception.Message.Should().Contain("relative");
     }
@@ -114,8 +114,8 @@ public sealed class PathRestrictionTests {
     public void RestrictToPaths_ShouldThrow_WhenPathContainsParentSegment() {
         using var environment = CreateEnvironment();
 
-        var exception = Assert.Throws<ArgumentException>(() =>
-            FileQuery.From(environment.Root).RestrictToPaths(["src/../a.txt"]).Build());
+        var exception = FluentActions.Invoking(() =>
+            FileQuery.From(environment.Root).RestrictToPaths(["src/../a.txt"]).Build()).Should().Throw<ArgumentException>().Which;
 
         exception.Message.Should().Contain("parent");
     }
@@ -127,8 +127,8 @@ public sealed class PathRestrictionTests {
     public void RestrictToPaths_ShouldThrow_WhenPathIsDirectory() {
         using var environment = CreateEnvironment();
 
-        var exception = Assert.Throws<ArgumentException>(() =>
-            FileQuery.From(environment.Root).RestrictToPaths(["src/"]).Build());
+        var exception = FluentActions.Invoking(() =>
+            FileQuery.From(environment.Root).RestrictToPaths(["src/"]).Build()).Should().Throw<ArgumentException>().Which;
 
         exception.Message.Should().Contain("files, not directories");
     }

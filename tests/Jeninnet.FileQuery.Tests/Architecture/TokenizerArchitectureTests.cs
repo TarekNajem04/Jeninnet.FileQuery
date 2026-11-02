@@ -43,28 +43,21 @@ public sealed class TokenizerArchitectureTests {
                     tokens);
 
                 if(accepted) {
-                    Assert.IsGreaterThan(
-                        i,
-                        index, $"""
+                    index.Should().BeGreaterThan(i, because: $"""
                         Tokenizer {tokenizer.GetType().Name} accepted input
                         but did not advance index.
 
                         Position: {i}
                         Input: "{input}"
-                        """
-                    );
+                        """);
                 } else {
-                    Assert.AreEqual(
-                        i,
-                        index,
-                        $"""
+                    index.Should().Be(i, because: $"""
                         Tokenizer {tokenizer.GetType().Name} declined input
                         but modified index.
 
                         Position: {i}
                         Input: "{input}"
-                        """
-                    );
+                        """);
                 }
             }
         }

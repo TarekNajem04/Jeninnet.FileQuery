@@ -48,8 +48,8 @@ public class SymlinkCycleTests {
         // Should find only one 'file1.txt' (at 'a/file1.txt')
         // If cycle detection fails, this will hang or throw StackOverflow (if recursive)
         // or just keep yielding 'a/link_to_a/link_to_a/...' if iterative but not detected.
-        Assert.HasCount(1, results);
-        Assert.EndsWith("file1.txt", results[0]);
+        results.Should().HaveCount(1);
+        results[0].Should().EndWith("file1.txt");
     }
 
     /// <summary>
@@ -80,8 +80,8 @@ public class SymlinkCycleTests {
 
         var results = await fileQueryEngine.ExecuteAsync(new(env.Root, options), TestContext.CancellationToken).ToListAsync(TestContext.CancellationToken);
 
-        Assert.HasCount(1, results);
-        Assert.EndsWith("file1.txt", results[0]);
+        results.Should().HaveCount(1);
+        results[0].Should().EndWith("file1.txt");
     }
 
     /// <summary>

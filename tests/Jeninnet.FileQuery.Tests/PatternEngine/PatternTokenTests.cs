@@ -28,7 +28,7 @@ public class PatternTokenTests {
                     );
         var token = new CharacterClassToken(cls);
 
-        Assert.IsTrue(token.Value.IsNegated);
+        token.Value.IsNegated.Should().BeTrue();
         TestAssertEx.ContainsSubset(token.Value.Elements, [new CharLiteral('a'), new CharLiteral('b')]);
         TestAssertEx.ContainsSubset(token.Value.Elements, [new CharRange('x', 'z')]);
     }
@@ -39,7 +39,7 @@ public class PatternTokenTests {
     [TestMethod]
     public void LiteralToken_ShouldStoreValue() {
         var token = new LiteralToken("hello");
-        Assert.AreEqual("hello", token.Text);
+        token.Text.Should().Be("hello");
     }
 
     /// <summary>
@@ -48,6 +48,6 @@ public class PatternTokenTests {
     [TestMethod]
     public void Wildcard_ShouldMatchEverything_ForSingleSegment() {
         var token = new WildcardToken();
-        Assert.IsNotNull(token);
+        token.Should().NotBeNull();
     }
 }

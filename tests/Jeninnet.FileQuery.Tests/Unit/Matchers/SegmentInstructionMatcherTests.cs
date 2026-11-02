@@ -22,8 +22,8 @@ public class SegmentInstructionMatcherTests {
         {
             new CharacterClassToken(new CharacterClass(false, [new PosixClass("digit")]))
         };
-        Assert.IsTrue(SegmentInstructionMatcher.MatchSegment("1", tokens, StringComparison.Ordinal));
-        Assert.IsFalse(SegmentInstructionMatcher.MatchSegment("a", tokens, StringComparison.Ordinal));
+        (SegmentInstructionMatcher.MatchSegment("1", tokens, StringComparison.Ordinal)).Should().BeTrue();
+        (SegmentInstructionMatcher.MatchSegment("a", tokens, StringComparison.Ordinal)).Should().BeFalse();
     }
 
     /// <summary>
@@ -35,7 +35,7 @@ public class SegmentInstructionMatcherTests {
         {
             new CharacterClassToken(new CharacterClass(false, [new PosixClass("unknown")]))
         };
-        Assert.IsFalse(SegmentInstructionMatcher.MatchSegment("a", tokens, StringComparison.Ordinal));
+        (SegmentInstructionMatcher.MatchSegment("a", tokens, StringComparison.Ordinal)).Should().BeFalse();
     }
 
     /// <summary>
@@ -47,7 +47,7 @@ public class SegmentInstructionMatcherTests {
         {
             new CharacterClassToken(new CharacterClass(true, [new CharLiteral('a')]))
         };
-        Assert.IsTrue(SegmentInstructionMatcher.MatchSegment("b", tokens, StringComparison.Ordinal));
-        Assert.IsFalse(SegmentInstructionMatcher.MatchSegment("a", tokens, StringComparison.Ordinal));
+        (SegmentInstructionMatcher.MatchSegment("b", tokens, StringComparison.Ordinal)).Should().BeTrue();
+        (SegmentInstructionMatcher.MatchSegment("a", tokens, StringComparison.Ordinal)).Should().BeFalse();
     }
 }

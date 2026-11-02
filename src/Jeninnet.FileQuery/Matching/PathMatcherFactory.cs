@@ -103,6 +103,9 @@ internal static class PathMatcherFactory {
     /// <param name="interpretationMode">The pattern interpretation mode.</param>
     /// <param name="hasPatterns">Whether at least one pattern will be evaluated.</param>
     /// <returns>The selected matcher.</returns>
+    /// <exception cref="ArgumentOutOfRangeException">
+    /// Thrown when <paramref name="matchingMode"/> is not a defined value of <see cref="PatternMatchingMode"/>.
+    /// </exception>
     public static IPathMatcher Create(
         PatternMatchingMode matchingMode,
         PatternInterpretationMode interpretationMode,
