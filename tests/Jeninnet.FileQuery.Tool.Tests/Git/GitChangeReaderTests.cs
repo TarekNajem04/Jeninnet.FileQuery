@@ -100,6 +100,24 @@ public sealed class GitChangeReaderTests {
     }
 
     /// <summary>
+    /// Verifies that a subdirectory query records its repository-relative prefix.
+    /// </summary>
+    [TestMethod]
+    public void Read_ShouldResolvePrefix_WhenDirectoryIsSubdirectory() {
+        using var repository = new TemporaryGitRepository();
+        repository.Write("sub/a.txt", "one");
+        repository.Commit("initial");
+
+        var changeSet = GitChangeReader.Read(
+            Path.Combine(repository.Root, "sub"),
+            "HEAD",
+            null,
+            includeUntracked: false);
+
+        changeSet.RootPrefix.Should().Be("sub/");
+    }
+
+    /// <summary>
     /// Verifies that the reader reports an unknown revision.
     /// </summary>
     [TestMethod]

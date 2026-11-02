@@ -133,7 +133,7 @@ Read [Engine architecture](architecture/engine-architecture.md) for the full des
 
 - [Samples](https://github.com/TarekNajem04/Jeninnet.FileQuery/tree/main/samples) — 13 runnable
   examples from hello-world to DI + evaluation.
-- [Test suite](https://github.com/TarekNajem04/Jeninnet.FileQuery/tree/main/tests) — 1,166 tests
+- [Test suite](https://github.com/TarekNajem04/Jeninnet.FileQuery/tree/main/tests) — 1,167 tests
   across seven projects.
 - [Root README](https://github.com/TarekNajem04/Jeninnet.FileQuery/blob/main/README.md)
 

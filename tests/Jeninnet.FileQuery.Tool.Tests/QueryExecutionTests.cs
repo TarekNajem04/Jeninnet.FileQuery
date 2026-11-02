@@ -325,15 +325,20 @@ public sealed class QueryExecutionTests {
         var lines = SplitLines(result.Output);
         lines.Count.Should().Be(5);
 
-        using var document = JsonDocument.Parse(lines[0]);
-        var root = document.RootElement;
-        root.GetProperty("path").GetString().Should().Be(environment.Abs("a.txt"));
-        root.GetProperty("relativePath").GetString().Should().Be("a.txt");
-        root.GetProperty("length").GetInt64().Should().Be(0L);
-        string.IsNullOrEmpty(root.GetProperty("createdUtc").GetString()).Should().BeFalse();
-        string.IsNullOrEmpty(root.GetProperty("modifiedUtc").GetString()).Should().BeFalse();
-        root.GetProperty("attributes").ValueKind.Should().Be(JsonValueKind.Array);
-        root.GetProperty("isDirectory").GetBoolean().Should().BeFalse();
+        var metadata = SplitLines(result.Output)
+            .Select(static line => {
+                using var document = JsonDocument.Parse(line);
+                return document.RootElement.Clone();
+            })
+            .Single(static element => element.GetProperty("relativePath").GetString() == "a.txt");
+
+        metadata.GetProperty("path").GetString().Should().Be(environment.Abs("a.txt"));
+        metadata.GetProperty("relativePath").GetString().Should().Be("a.txt");
+        metadata.GetProperty("length").GetInt64().Should().Be(0L);
+        string.IsNullOrEmpty(metadata.GetProperty("createdUtc").GetString()).Should().BeFalse();
+        string.IsNullOrEmpty(metadata.GetProperty("modifiedUtc").GetString()).Should().BeFalse();
+        metadata.GetProperty("attributes").ValueKind.Should().Be(JsonValueKind.Array);
+        metadata.GetProperty("isDirectory").GetBoolean().Should().BeFalse();
     }
 
     /// <summary>

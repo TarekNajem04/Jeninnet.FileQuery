@@ -11,9 +11,11 @@ namespace Jeninnet.FileQuery.Tool.Git;
 /// The set of files that changed between a Git baseline and the working tree.
 /// </summary>
 /// <param name="RepositoryRoot">The absolute repository root reported by Git.</param>
+/// <param name="RootPrefix">The forward-slash-terminated path from the repository root to the queried directory; empty at the repository root.</param>
 /// <param name="Changes">The individual changes, including deletions.</param>
 internal sealed record GitChangeSet(
     string RepositoryRoot,
+    string RootPrefix,
     IReadOnlyList<GitChange> Changes
 ) {
     /// <summary>

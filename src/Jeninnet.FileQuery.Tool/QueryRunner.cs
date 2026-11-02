@@ -276,36 +276,25 @@ internal static class QueryRunner {
             request.ChangedSinceDate,
             request.IncludeUntracked);
 
-        return RebaseToRoot(request.Root, changeSet);
+        return RebaseToRoot(changeSet);
     }
 
     /// <summary>
     /// Rebases repository-relative change paths onto the query root.
     /// </summary>
-    /// <param name="root">The query root.</param>
     /// <param name="changeSet">The change set reported by Git.</param>
-    /// <returns>The paths relative to <paramref name="root"/>.</returns>
-    /// <exception cref="GitException">Thrown when the query root is outside the repository.</exception>
-    private static IReadOnlyList<string> RebaseToRoot(string root, GitChangeSet changeSet) {
-        var relativeRoot = Path.GetRelativePath(changeSet.RepositoryRoot, root);
+    /// <returns>The paths relative to the queried directory.</returns>
+    private static IReadOnlyList<string> RebaseToRoot(GitChangeSet changeSet) {
+        var prefix = changeSet.RootPrefix;
 
-        if(relativeRoot is ".") {
+        if(prefix.Length == 0) {
             return changeSet.ExistingPaths;
         }
 
-        if(Path.IsPathRooted(relativeRoot) ||
-            relativeRoot == ".." ||
-            relativeRoot.StartsWith("../", StringComparison.Ordinal) ||
-            relativeRoot.StartsWith(@"..\", StringComparison.Ordinal)) {
-            throw new GitException(
-                $"The query root '{root}' is outside the Git repository '{changeSet.RepositoryRoot}'.");
-        }
-
-        // Windows path comparison is case-insensitive; Git reports the on-disk casing.
+        // Windows and macOS filesystems are case-insensitive; Git reports the on-disk casing.
         var comparison = OperatingSystem.IsLinux()
             ? StringComparison.Ordinal
             : StringComparison.OrdinalIgnoreCase;
-        var prefix = relativeRoot.Replace('\\', '/') + "/";
 
         return [.. changeSet.ExistingPaths
             .Where(path => path.StartsWith(prefix, comparison))

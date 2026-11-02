@@ -14,7 +14,7 @@
 [![NuGet downloads](https://img.shields.io/nuget/dt/Jeninnet.FileQuery)](https://www.nuget.org/packages/Jeninnet.FileQuery/)
 [![Documentation](https://img.shields.io/badge/docs-online-1f6feb)](https://tareknajem04.github.io/Jeninnet.FileQuery/)
 
-![architecture: invariants ok](badges/architecture.svg) ![target framework: net10.0](badges/frameworks.svg) ![API-documented projects: 5](badges/packages.svg) ![line coverage: 89.4%](badges/coverage.svg)
+![architecture: invariants ok](badges/architecture.svg) ![target framework: net10.0](badges/frameworks.svg) ![API-documented projects: 5](badges/packages.svg) ![line coverage: 89.5%](badges/coverage.svg)
 
 **A high-performance, deterministic file discovery and filtering engine for .NET.**
 
@@ -200,7 +200,7 @@ This repository contains the core library and its companion packages:
 *   **[Documentation Suite (docs/)](./docs/README.md)**: Deep technical specifications, guides, and architectural whitepapers.
 *   **[Benchmark Suite](./src/Jeninnet.FileQuery.Benchmarks/README.md)**: Performance measurements and allocation verification.
 *   **[Samples](./samples/README.md)**: Thirteen runnable examples from hello-world to DI + evaluation.
-*   **[Test Suite](./tests/README.md)**: 1,166 tests across seven projects, with per-project guides. Every assertion uses the `Jeninnet.Assertions` fluent API (`Should()` / `FluentActions`); MSTest supplies only attributes and runner integration.
+*   **[Test Suite](./tests/README.md)**: 1,167 tests across seven projects, with per-project guides. Every assertion uses the `Jeninnet.Assertions` fluent API (`Should()` / `FluentActions`); MSTest supplies only attributes and runner integration.
 
 ---
 

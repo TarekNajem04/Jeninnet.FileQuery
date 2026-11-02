@@ -35,6 +35,7 @@ internal static class GitChangeReader {
         }
 
         var repositoryRoot = ResolveRepositoryRoot(directory);
+        var rootPrefix = ResolveRootPrefix(directory);
         var baseline = ResolveBaseline(repositoryRoot, sinceCommit, sinceTimestamp);
         var changes = ParseNameStatus(RunOrThrow(
             repositoryRoot,
@@ -50,7 +51,7 @@ internal static class GitChangeReader {
             AppendUntracked(repositoryRoot, changes);
         }
 
-        return new GitChangeSet(repositoryRoot, changes);
+        return new GitChangeSet(repositoryRoot, rootPrefix, changes);
     }
 
     /// <summary>
@@ -68,6 +69,25 @@ internal static class GitChangeReader {
         }
 
         return Path.GetFullPath(result.StandardOutput.Trim());
+    }
+
+    /// <summary>
+    /// Resolves the path from the repository root to the queried directory.
+    /// </summary>
+    /// <param name="directory">A directory inside the repository.</param>
+    /// <returns>The forward-slash-terminated prefix, or an empty string at the repository root.</returns>
+    /// <exception cref="GitException">Thrown when Git cannot resolve the prefix.</exception>
+    private static string ResolveRootPrefix(string directory) {
+        var prefix = RunOrThrow(directory, "rev-parse", "--show-prefix")
+            .StandardOutput
+            .Trim()
+            .Replace('\\', '/');
+
+        if(prefix.Length == 0) {
+            return string.Empty;
+        }
+
+        return prefix.EndsWith('/') ? prefix : prefix + "/";
     }
 
     /// <summary>
@@ -213,12 +233,12 @@ internal static class GitChangeReader {
     /// <summary>
     /// Runs Git and throws when the command fails.
     /// </summary>
-    /// <param name="repositoryRoot">The repository root.</param>
+    /// <param name="workingDirectory">The directory in which Git runs.</param>
     /// <param name="arguments">The Git arguments.</param>
     /// <returns>The Git result.</returns>
     /// <exception cref="GitException">Thrown when the command exits with a non-zero code.</exception>
-    private static GitResult RunOrThrow(string repositoryRoot, params string[] arguments) {
-        var result = GitProcess.Run(repositoryRoot, arguments);
+    private static GitResult RunOrThrow(string workingDirectory, params string[] arguments) {
+        var result = GitProcess.Run(workingDirectory, arguments);
 
         if(result.ExitCode != 0) {
             throw new GitException(
