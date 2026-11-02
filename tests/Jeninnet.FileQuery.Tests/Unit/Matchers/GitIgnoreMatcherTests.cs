@@ -137,7 +137,7 @@ public class GitIgnoreMatcherTests {
         // 2. File to keep is included (Last rule wins)
         Assert.IsTrue(matcher.Match(patterns, CreateFileContext(path: "ignored_dir/keep.txt")).IsSuccess(), "File 'keep.txt' should be included by '!ignored_dir/keep.txt'.");
         // 3. File to exclude is excluded (matched by ignored_dir/)
-        Assert.IsTrue(matcher.Match(patterns, CreateFileContext(path: "ignored_dir/dump.txt")).IsSuccess(), "File 'dump.txt' should be included by default.");
+        Assert.IsFalse(matcher.Match(patterns, CreateFileContext(path: "ignored_dir/dump.txt")).IsSuccess(), "Files under an ignored directory are excluded.");
     }
 
     /// <summary>

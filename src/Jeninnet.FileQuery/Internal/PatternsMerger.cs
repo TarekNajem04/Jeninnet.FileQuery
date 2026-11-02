@@ -51,6 +51,56 @@ internal static class PatternsMerger {
         );
 
     /// <summary>
+    /// Validates that a <see cref="PatternInput"/> is consistent with
+    /// <see cref="PatternInterpretationMode.Specific"/> before compilation.
+    /// </summary>
+    /// <param name="patternInput">The pattern configuration.</param>
+    /// <param name="matchingMode">
+    /// The dialect selected for <see cref="PatternInterpretationMode.Specific"/>.
+    /// </param>
+    /// <exception cref="ArgumentNullException">
+    /// Thrown when <paramref name="patternInput"/> is <see langword="null"/>.
+    /// </exception>
+    /// <exception cref="PatternException">
+    /// Thrown when untyped patterns are present in Specific mode, or when a typed
+    /// pattern uses a dialect that does not match <paramref name="matchingMode"/>.
+    /// </exception>
+    public static void ValidateSpecificMode(
+        PatternInput patternInput,
+        PatternMatchingMode matchingMode
+    ) {
+        ArgumentNullException.ThrowIfNull(patternInput);
+
+        if(patternInput.InterpretationMode is not PatternInterpretationMode.Specific) {
+            return;
+        }
+
+        if(patternInput.Patterns.Count > 0) {
+            throw new PatternException(
+                $"Pattern '{patternInput.Patterns[0]}' requires an explicit PatternKind " +
+                "when interpretation mode is set to 'Specific'.");
+        }
+
+        var expectedKind = matchingMode switch {
+            PatternMatchingMode.GitIgnore => PatternKind.GitIgnore,
+            PatternMatchingMode.Glob => PatternKind.Glob,
+            PatternMatchingMode.Regex => PatternKind.Regex,
+            _ => PatternKind.Unknown
+        };
+
+        var mismatch = patternInput.TypedPatterns.Keys
+            .Where(kind => kind != expectedKind)
+            .Select(static kind => (PatternKind?)kind)
+            .FirstOrDefault();
+
+        if(mismatch is { } mismatchedKind) {
+            throw new PatternException(
+                $"Pattern kind '{mismatchedKind}' cannot be used when interpretation mode is " +
+                $"'Specific' and the matching mode is '{matchingMode}'.");
+        }
+    }
+
+    /// <summary>
     /// Merges a raw pattern sequence and a typed-pattern dictionary into a single dictionary keyed by <see cref="PatternKind"/>.
     /// </summary>
     /// <param name="patterns">
@@ -68,30 +118,35 @@ internal static class PatternsMerger {
         IEnumerable<string>? patterns,
         IReadOnlyDictionary<PatternKind, IEnumerable<string>>? typedPatterns
     ) {
-        var buckets = new Dictionary<PatternKind, HashSet<string>>();
+        // Lists preserve declaration order, which is semantically significant for
+        // last-match-wins dialects. A HashSet only provides de-duplication here.
+        var buckets = new Dictionary<PatternKind, List<string>>();
+        var seen = new Dictionary<PatternKind, HashSet<string>>();
 
-        HashSet<string> GetBucket(PatternKind kind) {
-            if(!buckets.TryGetValue(kind, out var set)) {
-                set = new HashSet<string>(StringComparer.Ordinal);
-                buckets[kind] = set;
+        void Add(PatternKind kind, string value) {
+            if(!buckets.TryGetValue(kind, out var list)) {
+                list = [];
+                buckets[kind] = list;
+                seen[kind] = new HashSet<string>(StringComparer.Ordinal);
             }
 
-            return set;
+            if(seen[kind].Add(value)) {
+                list.Add(value);
+            }
         }
 
         // Seed the dictionary with explicitly typed patterns first.
         if(typedPatterns is not null) {
             foreach(var (kind, values) in typedPatterns) {
-                var bucket = GetBucket(kind);
                 foreach(var val in (values ?? []).Where(v => v is not null)) {
-                    bucket.Add(val);
+                    Add(kind, val);
                 }
             }
         }
 
         // Classify and append each untyped pattern.
         foreach(var rawPattern in (patterns ?? []).Where(p => p is not null)) {
-            GetBucket(PatternClassifier.Classify(rawPattern)).Add(rawPattern);
+            Add(PatternClassifier.Classify(rawPattern), rawPattern);
         }
 
         return buckets.ToDictionary(

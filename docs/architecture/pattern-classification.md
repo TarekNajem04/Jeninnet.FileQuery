@@ -16,10 +16,10 @@ When the caller uses `PatternInput.TypedPatterns` or passes an explicit `Pattern
 
 Rules are evaluated in priority order:
 
-1. **Empty after trimming** → `GitIgnore` (a whitespace-only pattern is treated as a no-op GitIgnore entry)
+1. **Empty or whitespace-only** → rejected at the public boundary (`PatternInput`, `FileQueryBuilder.Where`) with an `ArgumentException`; such entries never reach classification
 2. **Starts with `r:`** → `Regex` (terminal — no further analysis)
 3. **Contains `]` without `[`** (stray closing bracket) → `Glob`
-4. **Contains `\` without leading `!` and without an escaped character** (Windows path separator) → `Glob`
+4. **Contains `\` without leading `!` and without an escaped character** (Windows path separator) → `Glob`; Glob compilation then rejects it with an actionable error — use `/` as the separator
 5. **Contains a leading `\` followed by an escapable character** → `GitIgnore` (escaped metacharacter)
 6. **Contains GitIgnore-specific syntax** (`!`, `#`, `**`, trailing `/`, leading `/`) → `GitIgnore`
 7. **Contains wildcards or brackets** (`*`, `?`, `[`) → `GitIgnore`

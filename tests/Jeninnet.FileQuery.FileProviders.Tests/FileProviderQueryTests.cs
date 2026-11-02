@@ -66,6 +66,27 @@ public sealed class FileProviderQueryTests {
     }
 
     /// <summary>
+    /// A physical provider accepts a scoped root and produces clean relative entry paths.
+    /// </summary>
+    [TestMethod]
+    public void PhysicalProvider_ScopedRoot_ReturnsRelativePaths() {
+        using var environment = new TestEnvironment();
+        environment.CreateFile("src/keep.cs", "class Keep {}");
+        environment.CreateFile("src/skip.txt", "skip");
+        using var provider = new PhysicalFileProvider(environment.Root);
+
+        var entries = FileProviderQuery.From(provider, "/src")
+            .UsingGlob()
+            .Where(PatternKind.Glob, ["**/*.cs"])
+            .ExecuteEntries(TestContext.CancellationToken)
+            .OrderBy(static entry => entry.RelativePath, StringComparer.Ordinal)
+            .ToArray();
+
+        Assert.HasCount(1, entries);
+        Assert.AreEqual("keep.cs", entries[0].RelativePath);
+    }
+
+    /// <summary>
     /// Queries an in-memory provider without materializing files.
     /// </summary>
     [TestMethod]

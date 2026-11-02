@@ -5,7 +5,7 @@ from the analyzer because code fixes require the Roslyn Workspaces libraries, wh
 itself must remain loadable in the compiler process without them.
 
 This project is **not published as its own package**. The
-[`Jeninnet.FileQuery.Analyzers`](../Jeninnet.FileQuery.Analyzers/README.md) package packs both
+[`Jeninnet.FileQuery.Analyzers`](https://github.com/TarekNajem04/Jeninnet.FileQuery/blob/main/src/Jeninnet.FileQuery.Analyzers/README.md) package packs both
 assemblies under `analyzers/dotnet/cs/`.
 
 ## What it does

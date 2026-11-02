@@ -16,7 +16,10 @@ public sealed record TraversalOptions {
     /// </summary>
     /// <param name="Strategy">The strategy used to visit directory nodes.</param>
     /// <param name="SymlinkPolicy">The policy for following or ignoring symbolic links.</param>
-    /// <param name="UseAsync">A value indicating whether to use asynchronous I/O where possible.</param>
+    /// <param name="UseAsync">
+    /// Reserved for a future asynchronous traversal path. The current engine selects synchronous
+    /// or asynchronous execution from the caller's <c>Execute</c>/<c>ExecuteAsync</c> call.
+    /// </param>
     public TraversalOptions(
         TraversalStrategy Strategy = TraversalStrategy.DepthFirst,
         SymlinkPolicy SymlinkPolicy = SymlinkPolicy.Ignore,
@@ -38,7 +41,8 @@ public sealed record TraversalOptions {
     public SymlinkPolicy SymlinkPolicy { get; }
 
     /// <summary>
-    /// Gets a value indicating whether to use asynchronous I/O where possible.
+    /// Gets a value reserved for a future asynchronous traversal path. The current engine uses
+    /// the caller-selected synchronous or asynchronous execution method.
     /// </summary>
     public bool UseAsync { get; }
 }

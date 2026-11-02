@@ -19,7 +19,7 @@ pwsh scripts/badges/generate.ps1 -SkipTests
 |---|---|
 | `badges/architecture.svg` | Architecture test gate (`FullyQualifiedName~Architecture`) |
 | `badges/frameworks.svg` | `TargetFramework` in `Directory.Build.props` |
-| `badges/packages.svg` | Documented project count in `docs/docfx.json` |
+| `badges/packages.svg` | API-documented project count in `docs/docfx.json` |
 | `badges/coverage.svg` | `Line coverage` in `artifacts/coverage/Summary.txt` (or `not run`) |
 
 The root README displays all four. `coverage.svg` requires a prior coverage run:

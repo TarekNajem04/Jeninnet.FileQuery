@@ -20,15 +20,14 @@ The project uses **MSTest** as the primary test runner and **Moq** for isolating
 ## Code Example: Integration Test
 ```csharp
 [TestMethod]
-public async Task EnumerateFilesAsync_HandlesMixedPatterns()
+public void Execute_HandlesMixedPatterns()
 {
-    var builder = new FileQueryBuilder()
-        .WithPattern("src/**/*.cs")
-        .WithPattern("!bin/")
-        .WithPattern("!obj/");
+    var query = FileQuery.From("C:\\Project")
+        .Where("src/**/*.cs", "!bin/", "!obj/")
+        .Build();
 
-    var engine = builder.Build();
-    var results = await engine.EnumerateFilesAsync("C:\\Project", CancellationToken.None);
+    var engine = FileQueryRuntime.Create();
+    var results = engine.Execute(query).ToList();
 
     Assert.IsFalse(results.Any(f => f.Contains("bin") || f.Contains("obj")));
 }

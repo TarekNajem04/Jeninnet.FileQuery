@@ -82,6 +82,16 @@ internal sealed class GitIgnoreImplicitRecursiveInvariant : IPatternInvariant {
             return PatternInvariantResult.Success;
         }
 
+        // A slash anywhere in the pattern anchors it to the directory containing the
+        // .gitignore file (Git semantics: only single-segment patterns are implicitly
+        // recursive). The scanner splits segments on '/', so more than one segment
+        // means the pattern contains a slash.
+        if(context.Tokens.Count > 1) {
+            // A slash anchors the rule to the directory containing the ignore file.
+            context.State = context.State with { IsRootAnchored = true };
+            return PatternInvariantResult.Success;
+        }
+
         // Prepend the implicit ** segment.
         context.Tokens.Insert(0, [new RecursiveWildcardToken()]);
 

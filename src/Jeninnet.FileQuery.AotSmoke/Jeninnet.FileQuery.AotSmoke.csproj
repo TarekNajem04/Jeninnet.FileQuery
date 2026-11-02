@@ -2,6 +2,7 @@
 
     <PropertyGroup>
         <OutputType>Exe</OutputType>
+        <IsPackable>false</IsPackable>
         <Version>2.0.0</Version>
 
         <!-- Native AOT validation: publish this host with -r linux-x64 in CI. -->

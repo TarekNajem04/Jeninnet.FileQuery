@@ -102,14 +102,11 @@ TraversalPlanBuilder.Build(query)
 ```csharp
 var engine = FileQueryRuntime.Create();
 
-var options = new FileQueryOptions {
-    PatternInput = new(patterns: [
-        "**",
-        "!*.txt"
-    ])
-};
+var query = FileQuery.From(rootPath)
+    .Where("**", "!*.txt")
+    .Build();
 
-var result = engine.Execute(new(root, options));
+var result = engine.Execute(query);
 ```
 
 `FileQueryRuntime.Create()` is the composition root. It wires the default

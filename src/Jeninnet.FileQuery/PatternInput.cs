@@ -35,8 +35,11 @@ namespace Jeninnet.FileQuery;
 /// the absence of explicitly typed patterns.
 /// </para>
 /// <para>
-/// <strong>Rule ordering:</strong> All patterns (untyped and typed) are evaluated
-/// sequentially in the order they were provided. The last matching rule wins.
+/// <strong>Rule ordering:</strong> Within each dialect, patterns are evaluated
+/// sequentially in the order they were provided and the last matching rule wins.
+/// Across dialects, the compiled subsets are evaluated in the fixed order
+/// GitIgnore → Glob → Regex; the first subset that returns <c>Include</c> wins.
+/// A later dialect can override an earlier Exclude, but not an earlier Include.
 /// </para>
 /// </remarks>
 /// <example>
@@ -108,14 +111,30 @@ public sealed record PatternInput {
     /// <param name="Patterns">An optional sequence of untyped pattern strings. When <see langword="null"/>, an empty list is used.</param>
     /// <param name="TypedPatterns">An optional dictionary of explicitly typed patterns. When <see langword="null"/>, an empty dictionary is used.</param>
     /// <param name="InterpretationMode">The classification mode for untyped patterns. Defaults to <see cref="PatternInterpretationMode.Hybrid"/>.</param>
+    /// <exception cref="ArgumentException">
+    /// Thrown when <paramref name="Patterns"/> or <paramref name="TypedPatterns"/> contains an
+    /// empty or whitespace-only pattern.
+    /// </exception>
+    /// <exception cref="ArgumentOutOfRangeException">
+    /// Thrown when <paramref name="TypedPatterns"/> uses an undefined <see cref="PatternKind"/>,
+    /// or when <paramref name="InterpretationMode"/> is not a defined
+    /// <see cref="PatternInterpretationMode"/> value.
+    /// </exception>
     public PatternInput(
         IEnumerable<string>? Patterns = null,
         IReadOnlyDictionary<PatternKind, IEnumerable<string>>? TypedPatterns = null,
         PatternInterpretationMode InterpretationMode = PatternInterpretationMode.Hybrid
     ) {
+        if(!Enum.IsDefined(InterpretationMode)) {
+            throw new ArgumentOutOfRangeException(
+                nameof(InterpretationMode),
+                InterpretationMode,
+                "Unknown pattern interpretation mode.");
+        }
+
         this.Patterns = Patterns is null
             ? _emptyPatterns
-            : Patterns.Where(static p => p is not null).ToList().AsReadOnly();
+            : MaterializePatterns(Patterns);
 
         this.TypedPatterns = TypedPatterns is null || TypedPatterns.Count == 0
             ? _emptyTypedPatterns
@@ -125,20 +144,73 @@ public sealed record PatternInput {
     }
 
     /// <summary>
-    /// Materializes <paramref name="source"/> into an immutable dictionary of
-    /// read-only lists, filtering out null entries.
+    /// Materializes untyped patterns and rejects empty or whitespace-only entries.
     /// </summary>
-    /// <param name="source">The source dictionary of typed patterns.</param>
-    /// <returns>A dictionary containing processed, read-only lists of patterns.</returns>
-    private static Dictionary<PatternKind, IReadOnlyList<string>> BuildTypedPatterns(IReadOnlyDictionary<PatternKind, IEnumerable<string>> source) {
-        var result = new Dictionary<PatternKind, IReadOnlyList<string>>(source.Count);
+    /// <param name="Patterns">The source patterns.</param>
+    /// <returns>A read-only list containing the patterns.</returns>
+    /// <exception cref="ArgumentException">
+    /// Thrown when <paramref name="Patterns"/> contains an empty or whitespace-only pattern.
+    /// </exception>
+    private static List<string> MaterializePatterns(IEnumerable<string> Patterns) {
+        var result = new List<string>();
 
-        foreach(var (kind, values) in source) {
+        foreach(var pattern in Patterns) {
+            if(pattern is null) {
+                continue;
+            }
+
+            if(string.IsNullOrWhiteSpace(pattern)) {
+                throw new ArgumentException(
+                    "Patterns cannot contain empty or whitespace-only entries.",
+                    nameof(Patterns));
+            }
+
+            result.Add(pattern);
+        }
+
+        return result;
+    }
+
+    /// <summary>
+    /// Materializes <paramref name="TypedPatterns"/> into an immutable dictionary of
+    /// read-only lists, filtering out null entries and rejecting empty or
+    /// whitespace-only patterns.
+    /// </summary>
+    /// <param name="TypedPatterns">The source dictionary of typed patterns.</param>
+    /// <returns>A dictionary containing processed, read-only lists of patterns.</returns>
+    /// <exception cref="ArgumentException">
+    /// Thrown when a typed-pattern list contains an empty or whitespace-only pattern.
+    /// </exception>
+    private static Dictionary<PatternKind, IReadOnlyList<string>> BuildTypedPatterns(IReadOnlyDictionary<PatternKind, IEnumerable<string>> TypedPatterns) {
+        var result = new Dictionary<PatternKind, IReadOnlyList<string>>(TypedPatterns.Count);
+
+        foreach(var (kind, values) in TypedPatterns) {
+            if(!Enum.IsDefined(kind)) {
+                throw new ArgumentOutOfRangeException(
+                    nameof(TypedPatterns),
+                    kind,
+                    "Typed patterns cannot use an undefined PatternKind.");
+            }
+
             if(values is null) {
                 continue;
             }
 
-            var list = values.Where(static p => p is not null).ToList();
+            var list = new List<string>();
+
+            foreach(var pattern in values) {
+                if(pattern is null) {
+                    continue;
+                }
+
+                if(string.IsNullOrWhiteSpace(pattern)) {
+                    throw new ArgumentException(
+                        "Typed patterns cannot contain empty or whitespace-only entries.",
+                        nameof(TypedPatterns));
+                }
+
+                list.Add(pattern);
+            }
 
             if(list.Count > 0) {
                 result[kind] = list.AsReadOnly();

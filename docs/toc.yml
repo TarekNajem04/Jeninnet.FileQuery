@@ -10,6 +10,8 @@
   href: performance/toc.yml
 - name: Reference
   href: reference/toc.yml
+- name: API Reference
+  href: api/toc.yml
 - name: Runtime
   href: runtime/toc.yml
 - name: Architecture

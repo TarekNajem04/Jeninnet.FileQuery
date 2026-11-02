@@ -100,6 +100,7 @@ public sealed record FileQueryOptions {
     /// <param name="config">The configuration object.</param>
     public FileQueryOptions(FileQueryOptionsConfig config) {
         ArgumentNullException.ThrowIfNull(config);
+        ArgumentNullException.ThrowIfNull(config.PatternInput);
 
         PatternInput = config.PatternInput;
         RecurseSubdirectories = config.RecurseSubdirectories;
@@ -241,10 +242,31 @@ public sealed record FileQueryOptions {
     /// </summary>
     /// <exception cref="ArgumentOutOfRangeException">
     /// Thrown when <see cref="MaxRecursionDepth"/> is less than
-    /// <see cref="UNLIMITED_RECURSION_DEPTH"/>.
+    /// <see cref="UNLIMITED_RECURSION_DEPTH"/>, or when a numeric option or enum value is invalid.
     /// </exception>
     internal void Validate() {
         ArgumentOutOfRangeException.ThrowIfLessThan(MaxRecursionDepth, UNLIMITED_RECURSION_DEPTH);
+
+        if(!Enum.IsDefined(PatternMatchingMode)) {
+            throw new ArgumentOutOfRangeException($"Unknown pattern matching mode: {PatternMatchingMode}.");
+        }
+
+        if(!Enum.IsDefined(CaseSensitivity)) {
+            throw new ArgumentOutOfRangeException($"Unknown case sensitivity: {CaseSensitivity}.");
+        }
+
+        if(!Enum.IsDefined(Traversal.Strategy)) {
+            throw new ArgumentOutOfRangeException($"Unknown traversal strategy: {Traversal.Strategy}.");
+        }
+
+        if(!Enum.IsDefined(Traversal.SymlinkPolicy)) {
+            throw new ArgumentOutOfRangeException($"Unknown symlink policy: {Traversal.SymlinkPolicy}.");
+        }
+
+        if(!Enum.IsDefined(ErrorRecovery.Action)) {
+            throw new ArgumentOutOfRangeException($"Unknown error recovery action: {ErrorRecovery.Action}.");
+        }
+
         ErrorRecovery.Validate();
         ValidateSizeRange(MinSize, MaxSize);
         ValidateModifiedRange(ModifiedAfter, ModifiedBefore);

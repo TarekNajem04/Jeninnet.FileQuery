@@ -5,15 +5,15 @@ point at one dependency boundary instead of a monolith.
 
 | Project | Tests | Focus |
 |---|---|---|
-| [Jeninnet.FileQuery.Tests](./Jeninnet.FileQuery.Tests/README.md) | 1,028 | Core engine, patterns, traversal, metadata, GitIgnore, telemetry, architecture |
-| [Jeninnet.FileQuery.Tool.Tests](./Jeninnet.FileQuery.Tool.Tests/README.md) | 52 | `dotnet-filequery` CLI and Git-aware queries |
-| [Jeninnet.FileQuery.Tooling.Tests](./Jeninnet.FileQuery.Tooling.Tests/README.md) | 20 | Pattern inspection SDK |
+| [Jeninnet.FileQuery.Tests](./Jeninnet.FileQuery.Tests/README.md) | 1,059 | Core engine, patterns, traversal, metadata, GitIgnore, telemetry, architecture |
+| [Jeninnet.FileQuery.Tool.Tests](./Jeninnet.FileQuery.Tool.Tests/README.md) | 54 | `dotnet-filequery` CLI and Git-aware queries |
+| [Jeninnet.FileQuery.Tooling.Tests](./Jeninnet.FileQuery.Tooling.Tests/README.md) | 22 | Pattern inspection SDK |
 | [Jeninnet.AdvancedUsage.Tests](./Jeninnet.AdvancedUsage.Tests/README.md) | 11 | Dataset generator and evaluation options |
 | [Jeninnet.FileQuery.Analyzers.Tests](./Jeninnet.FileQuery.Analyzers.Tests/README.md) | 7 | `JNQ1001` analyzer and code fix |
-| [Jeninnet.FileQuery.FileProviders.Tests](./Jeninnet.FileQuery.FileProviders.Tests/README.md) | 7 | `IFileProvider` adapter |
+| [Jeninnet.FileQuery.FileProviders.Tests](./Jeninnet.FileQuery.FileProviders.Tests/README.md) | 8 | `IFileProvider` adapter |
 | [Jeninnet.FileQuery.Build.Tests](./Jeninnet.FileQuery.Build.Tests/README.md) | 5 | MSBuild task and SARIF |
 
-**Total: 1,130 tests.**
+**Total: 1,166 tests.**
 
 ## Run everything
 
@@ -40,3 +40,4 @@ services, databases, or network access are required.
 - [Root README](../README.md)
 - [Samples](../samples/README.md)
 - [Contributing](https://github.com/TarekNajem04/Jeninnet.FileQuery/blob/main/CONTRIBUTING.md)
+

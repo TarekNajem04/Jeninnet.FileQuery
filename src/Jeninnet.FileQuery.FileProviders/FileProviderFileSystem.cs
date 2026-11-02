@@ -31,31 +31,41 @@ internal sealed class FileProviderFileSystem(IFileProvider provider) : IFileSyst
     ) {
         var attempts = GetMaxAttempts(errorRecovery);
         var attempt = 0;
+        var yielded = 0;
+        var skip = 0;
         IEnumerator<IFileInfo>? enumerator = null;
 
-        while(attempt < attempts) {
-            var result = TryMoveNext(
-                directory,
-                ref enumerator,
-                ignoreInaccessible,
-                errorRecovery,
-                ref attempt,
-                attempts,
-                out var info);
+        try {
+            while(attempt < attempts) {
+                var result = TryMoveNext(
+                    directory,
+                    ref enumerator,
+                    ignoreInaccessible,
+                    errorRecovery,
+                    ref attempt,
+                    attempts,
+                    ref skip,
+                    out var info);
 
-            if(result == EnumerationResult.Break) {
-                yield break;
+                if(result == EnumerationResult.Break) {
+                    yield break;
+                }
+
+                if(result == EnumerationResult.Continue) {
+                    skip = yielded;
+                    continue;
+                }
+
+                if(!info.Exists) {
+                    continue;
+                }
+
+                yielded++;
+                yield return ToEntry(directory, info);
             }
-
-            if(result == EnumerationResult.Continue) {
-                continue;
-            }
-
-            if(!info.Exists) {
-                continue;
-            }
-
-            yield return ToEntry(directory, info);
+        }
+        finally {
+            enumerator?.Dispose();
         }
     }
 
@@ -66,10 +76,13 @@ internal sealed class FileProviderFileSystem(IFileProvider provider) : IFileSyst
         FileQueryErrorRecoveryOptions errorRecovery,
         [System.Runtime.CompilerServices.EnumeratorCancellation] CancellationToken cancellationToken = default
     ) {
+        // Yield once so the first MoveNextAsync does not complete entirely on the
+        // caller's thread. Per-entry yielding forced a thread pool hop per file.
+        await Task.Yield();
+
         foreach(var entry in Enumerate(directory, ignoreInaccessible, errorRecovery)) {
             cancellationToken.ThrowIfCancellationRequested();
             yield return entry;
-            await Task.Yield();
         }
     }
 
@@ -85,8 +98,7 @@ internal sealed class FileProviderFileSystem(IFileProvider provider) : IFileSyst
             return true;
         }
 
-        var info = _provider.GetFileInfo(ToProviderPath(normalized));
-        return info.Exists && info.IsDirectory;
+        return _provider.GetDirectoryContents(ToProviderPath(normalized)).Exists;
     }
 
     /// <inheritdoc/>
@@ -144,10 +156,15 @@ internal sealed class FileProviderFileSystem(IFileProvider provider) : IFileSyst
     private IEnumerator<IFileInfo> CreateEnumerator(string directory) =>
         _provider.GetDirectoryContents(ToProviderPath(GetFullPath(directory))).GetEnumerator();
 
-    private static int GetMaxAttempts(FileQueryErrorRecoveryOptions errorRecovery) =>
-        errorRecovery.Action is FileQueryErrorAction.Retry
-            ? errorRecovery.MaxRetryAttempts + 1
-            : 1;
+    private static int GetMaxAttempts(FileQueryErrorRecoveryOptions errorRecovery) {
+        if(errorRecovery.Action is not FileQueryErrorAction.Retry) {
+            return 1;
+        }
+
+        return errorRecovery.MaxRetryAttempts == int.MaxValue
+            ? int.MaxValue
+            : errorRecovery.MaxRetryAttempts + 1;
+    }
 
     private EnumerationResult TryMoveNext(
         string directory,
@@ -156,12 +173,26 @@ internal sealed class FileProviderFileSystem(IFileProvider provider) : IFileSyst
         FileQueryErrorRecoveryOptions errorRecovery,
         ref int attempt,
         int attempts,
+        ref int skip,
         out IFileInfo info
     ) {
         info = null!;
 
         try {
-            enumerator ??= CreateEnumerator(directory);
+            if(enumerator is null) {
+                enumerator = CreateEnumerator(directory);
+
+                while(skip > 0) {
+                    if(!enumerator.MoveNext()) {
+                        enumerator.Dispose();
+                        enumerator = null;
+                        return EnumerationResult.Break;
+                    }
+
+                    skip--;
+                }
+            }
+
             if(enumerator.MoveNext()) {
                 info = enumerator.Current;
                 return EnumerationResult.Success;

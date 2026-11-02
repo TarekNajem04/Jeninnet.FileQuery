@@ -109,8 +109,8 @@ tests/FileQueryEngineTests.cs
 **;!**/*.cs;**/*Tests.cs
 ```
 
-`**` excludes everything, `!**/*.cs` includes C# files, and `**/*Tests.cs` excludes them again. The
-last matching rule decides.
+`**` excludes everything, `!**/*.cs` includes C# files, and `**/*Tests.cs` excludes them again. All
+three are GitIgnore rules, so the last matching GitIgnore rule decides.
 
 ### 3. Explain why `bin/` is excluded
 

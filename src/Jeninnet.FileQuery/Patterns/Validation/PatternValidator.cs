@@ -46,7 +46,14 @@ internal static partial class PatternValidator {
             return (false, null, null, null);
         }
 
-        if(EndsWithEscape(pattern)) {
+        // Regex syntax is validated by RegexSyntaxInvariant. Brace and bracket
+        // pairing rules are glob/GitIgnore grammar and do not apply to expressions
+        // such as r:^a}$ or r:a{2, where '}' and '{' are literal regex characters.
+        if(pattern.StartsWith("r:", StringComparison.Ordinal)) {
+            return (false, null, null, null);
+        }
+
+        if(EndsWithUnescapedBackslash(pattern)) {
             return (true, "Pattern ends with an unescaped backslash.", pattern.Length - 1, PatternTextPosition.SegmentAt(pattern, pattern.Length - 1));
         }
 
@@ -56,22 +63,21 @@ internal static partial class PatternValidator {
             return (true, braceError.Value.Message, position, PatternTextPosition.SegmentAt(pattern, position));
         }
 
-        if(!pattern.Contains('[')) {
+        var str = MaskEscapedCharacters(pattern);
+        var openingBracket = str.IndexOf('[');
+
+        if(openingBracket < 0) {
             return (false, null, null, null);
         }
 
-        var openingBracket = pattern.IndexOf('[');
-
-        if(!pattern.Contains(']')) {
+        if(str.IndexOf(']') < 0) {
             return (true, "Missing closing bracket ']' for an opening bracket '['.", openingBracket, PatternTextPosition.SegmentAt(pattern, openingBracket));
         }
 
-        if(ContainsEmptyBracket(pattern)) {
-            var emptyBracket = PatternTextPosition.Find(pattern, "[]")!.Value;
+        if(str.Contains("[]", StringComparison.Ordinal)) {
+            var emptyBracket = str.IndexOf("[]", StringComparison.Ordinal);
             return (true, "Empty bracket expression '[]' is not allowed.", emptyBracket, PatternTextPosition.SegmentAt(pattern, emptyBracket));
         }
-
-        var str = pattern.ToString();
 
         var nested = DetectNestedBrackets().Match(str);
         if(nested.Success) {
@@ -103,15 +109,67 @@ internal static partial class PatternValidator {
     /// without a corresponding opening bracket.
     /// </summary>
     /// <param name="pattern">The pattern span to check.</param>
-    public static bool HasStrayClosingBracket(ReadOnlySpan<char> pattern) => pattern.Contains(']') && !pattern.Contains('[');
+    public static bool HasStrayClosingBracket(ReadOnlySpan<char> pattern) =>
+        IndexOfUnescaped(pattern, ']') >= 0 && IndexOfUnescaped(pattern, '[') < 0;
 
     // ------------------------------------------------------------------
     // Span-based helpers (zero allocation)
     // ------------------------------------------------------------------
 
-    private static bool EndsWithEscape(ReadOnlySpan<char> pattern) => pattern[^1] == '\\';
+    private static bool EndsWithUnescapedBackslash(ReadOnlySpan<char> pattern) {
+        var count = 0;
 
-    private static bool ContainsEmptyBracket(ReadOnlySpan<char> pattern) => pattern.Contains("[]", StringComparison.Ordinal);
+        for(var i = pattern.Length - 1; i >= 0 && pattern[i] == '\\'; i--) {
+            count++;
+        }
+
+        return count % 2 != 0;
+    }
+
+    /// <summary>
+    /// Replaces escaped characters with spaces so structural bracket checks ignore them.
+    /// </summary>
+    private static string MaskEscapedCharacters(ReadOnlySpan<char> pattern) {
+        var chars = pattern.ToArray();
+        var i = 0;
+
+        while(i < chars.Length) {
+            if(chars[i] != '\\') {
+                i++;
+                continue;
+            }
+
+            chars[i] = ' ';
+
+            if(i + 1 < chars.Length) {
+                chars[i + 1] = ' ';
+                i += 2;
+            } else {
+                i++;
+            }
+        }
+
+        return new string(chars);
+    }
+
+    private static int IndexOfUnescaped(ReadOnlySpan<char> pattern, char value) {
+        var i = 0;
+
+        while(i < pattern.Length) {
+            if(pattern[i] == '\\') {
+                i += 2;
+                continue;
+            }
+
+            if(pattern[i] == value) {
+                return i;
+            }
+
+            i++;
+        }
+
+        return -1;
+    }
 
     /// <summary>
     /// Validates brace pairing outside character classes and escapes.

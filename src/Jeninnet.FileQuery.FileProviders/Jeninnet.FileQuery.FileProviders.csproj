@@ -7,6 +7,8 @@
             Query Microsoft.Extensions.FileProviders sources with Jeninnet.FileQuery: physical, embedded, and in-memory providers share the same matching, filtering, and metadata pipeline.
         </Description>
         <PackageTags>filequery;fileprovider;aspnetcore;embedded-files;in-memory;glob;gitignore</PackageTags>
+        <IncludeSymbols>true</IncludeSymbols>
+        <SymbolPackageFormat>snupkg</SymbolPackageFormat>
     </PropertyGroup>
 
     <ItemGroup>

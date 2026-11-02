@@ -85,5 +85,5 @@ The task calls `PatternInspector.Validate` and never traverses the filesystem.
 ## Related
 
 - [MSBuild validation and SARIF guide](https://github.com/TarekNajem04/Jeninnet.FileQuery/blob/main/docs/guides/msbuild-validation.md)
-- [Tooling SDK](../Jeninnet.FileQuery.Tooling/README.md)
-- [Roslyn analyzer](../Jeninnet.FileQuery.Analyzers/README.md)
+- [Tooling SDK](https://github.com/TarekNajem04/Jeninnet.FileQuery/blob/main/src/Jeninnet.FileQuery.Tooling/README.md)
+- [Roslyn analyzer](https://github.com/TarekNajem04/Jeninnet.FileQuery/blob/main/src/Jeninnet.FileQuery.Analyzers/README.md)

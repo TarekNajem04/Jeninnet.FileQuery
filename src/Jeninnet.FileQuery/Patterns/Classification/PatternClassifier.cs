@@ -86,25 +86,25 @@ internal static partial class PatternClassifier {
         }
 
         // ---------------------------------------------------------
-        // 3. Stray bracket → Glob
+        // 3. Escaped → GitIgnore
+        // ---------------------------------------------------------
+        if(analysis.HasEscapedCharacters) {
+            return PatternKind.GitIgnore;
+        }
+
+        // ---------------------------------------------------------
+        // 4. Stray bracket → Glob
         // ---------------------------------------------------------
         if(PatternValidator.HasStrayClosingBracket(span)) {
             return PatternKind.Glob;
         }
 
         // ---------------------------------------------------------
-        // 4. WINDOWS PATH RULE (HIGHEST PRIORITY)
+        // 5. WINDOWS PATH RULE (HIGHEST PRIORITY)
         // ---------------------------------------------------------
         // escaped-only case must NOT be treated as path
         if(analysis.HasBackslash && !analysis.HasEscapedCharacters && !analysis.IsNegated) {
             return PatternKind.Glob;
-        }
-
-        // ---------------------------------------------------------
-        // 5. Escaped → GitIgnore
-        // ---------------------------------------------------------
-        if(analysis.HasEscapedCharacters) {
-            return PatternKind.GitIgnore;
         }
 
         // ---------------------------------------------------------

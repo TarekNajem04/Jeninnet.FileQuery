@@ -9,7 +9,7 @@
 ![NuGet Version](https://img.shields.io/nuget/v/Jeninnet.FileQuery)
 [![NuGet downloads](https://img.shields.io/nuget/dt/Jeninnet.FileQuery)](https://www.nuget.org/packages/Jeninnet.FileQuery/)
 
-**Performance measurement and allocation tracking suite for [Jeninnet.FileQuery](../../README.md).**
+**Performance measurement and allocation tracking suite for [Jeninnet.FileQuery](https://github.com/TarekNajem04/Jeninnet.FileQuery/blob/main/README.md).**
 
 This project uses **BenchmarkDotNet** to measure execution speeds, evaluate memory consumption, and verify the zero-allocation guarantees of the file discovery engine.
 
@@ -32,15 +32,15 @@ dotnet run -c Release --project benchmarks/Jeninnet.FileQuery.Benchmarks.csproj
 
 The suite contains the following benchmarks under `benchmarks/`:
 
-1.  **[FileQueryBenchmark](./FileQueryBenchmark.cs)**: Measures end-to-end file queries using real directories.
-2.  **[GlobMatcherBenchmark](./GlobMatcherBenchmark.cs)**: Evaluates segment matching performance with glob patterns.
-3.  **[GitIgnoreMatcherBenchmark](./GitIgnoreMatcherBenchmark.cs)**: Tests GitIgnore matching and negations.
-4.  **[RegexMatcherBenchmark](./RegexMatcherBenchmark.cs)**: Measures regex engine matching overhead.
-5.  **[HybridMatcherBenchmark](./HybridMatcherBenchmark.cs)**: Measures routing overhead in the mixed pattern matcher.
-6.  **[PatternCompilationColdStartBenchmark](./PatternCompilationColdStartBenchmark.cs)**: Evaluates cold-start cost of tokenizing and compiling pattern syntax profiles.
-7.  **[PatternPipelineAllocationBenchmark](./PatternPipelineAllocationBenchmark.cs)**: Specifically tracks heap allocations during pattern compilation.
-8.  **[TraversalStrategyBenchmark](./TraversalStrategyBenchmark.cs)**: Compares `DepthFirst` (stack-based) vs. `BreadthFirst` (queue-based) search methods.
-9.  **[CharacterClassMatcherBenchmark](./CharacterClassMatcherBenchmark.cs)**: Evaluates range matchers, custom brackets, and POSIX class evaluations.
+1.  **[FileQueryBenchmark](https://github.com/TarekNajem04/Jeninnet.FileQuery/blob/main/src/Jeninnet.FileQuery.Benchmarks/FileQueryBenchmark.cs)**: Measures end-to-end file queries using real directories.
+2.  **[GlobMatcherBenchmark](https://github.com/TarekNajem04/Jeninnet.FileQuery/blob/main/src/Jeninnet.FileQuery.Benchmarks/GlobMatcherBenchmark.cs)**: Evaluates segment matching performance with glob patterns.
+3.  **[GitIgnoreMatcherBenchmark](https://github.com/TarekNajem04/Jeninnet.FileQuery/blob/main/src/Jeninnet.FileQuery.Benchmarks/GitIgnoreMatcherBenchmark.cs)**: Tests GitIgnore matching and negations.
+4.  **[RegexMatcherBenchmark](https://github.com/TarekNajem04/Jeninnet.FileQuery/blob/main/src/Jeninnet.FileQuery.Benchmarks/RegexMatcherBenchmark.cs)**: Measures regex engine matching overhead.
+5.  **[HybridMatcherBenchmark](https://github.com/TarekNajem04/Jeninnet.FileQuery/blob/main/src/Jeninnet.FileQuery.Benchmarks/HybridMatcherBenchmark.cs)**: Measures routing overhead in the mixed pattern matcher.
+6.  **[PatternCompilationColdStartBenchmark](https://github.com/TarekNajem04/Jeninnet.FileQuery/blob/main/src/Jeninnet.FileQuery.Benchmarks/PatternCompilationColdStartBenchmark.cs)**: Evaluates cold-start cost of tokenizing and compiling pattern syntax profiles.
+7.  **[PatternPipelineAllocationBenchmark](https://github.com/TarekNajem04/Jeninnet.FileQuery/blob/main/src/Jeninnet.FileQuery.Benchmarks/PatternPipelineAllocationBenchmark.cs)**: Specifically tracks heap allocations during pattern compilation.
+8.  **[TraversalStrategyBenchmark](https://github.com/TarekNajem04/Jeninnet.FileQuery/blob/main/src/Jeninnet.FileQuery.Benchmarks/TraversalStrategyBenchmark.cs)**: Compares `DepthFirst` (stack-based) vs. `BreadthFirst` (queue-based) search methods.
+9.  **[CharacterClassMatcherBenchmark](https://github.com/TarekNajem04/Jeninnet.FileQuery/blob/main/src/Jeninnet.FileQuery.Benchmarks/CharacterClassMatcherBenchmark.cs)**: Evaluates range matchers, custom brackets, and POSIX class evaluations.
 
 Phase 2 observability features are opt-in. Default benchmark paths remain focused on the non-diagnostic hot path; progress and audit sinks should be benchmarked separately when measuring instrumentation overhead.
 

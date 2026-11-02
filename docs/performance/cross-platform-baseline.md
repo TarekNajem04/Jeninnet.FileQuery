@@ -1,7 +1,8 @@
 # Cross-Platform Performance Baseline
 
-This page records the cross-platform traversal comparison for **Jeninnet.FileQuery 1.5.0**
-(.NET 10.0.14) and the regression baseline that future runs are compared against.
+This page records the cross-platform traversal comparison captured during the **Jeninnet.FileQuery
+1.5.0** cycle (.NET 10.0.14). The same measured baseline is the regression reference for v2.0.0,
+which does not change the traversal hot path.
 
 The comparison covers Windows x64, Ubuntu x64, and macOS Arm64. Two datasets are used because
 they answer different questions:

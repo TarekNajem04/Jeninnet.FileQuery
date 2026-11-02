@@ -24,7 +24,8 @@ public sealed class FileQueryBuilder {
     private IFileQueryEngine? _engine;
     private readonly IFileSystem _fileSystem;
     private readonly string _rootPath;
-    private readonly Dictionary<PatternKind, HashSet<string>> _patternStorage = [];
+    private readonly Dictionary<PatternKind, List<string>> _patternStorage = [];
+    private readonly Dictionary<PatternKind, HashSet<string>> _patternLookup = [];
     private PatternInterpretationMode _interpretationMode = PatternInterpretationMode.Hybrid;
     private PatternMatchingMode _patternMatchingMode = PatternMatchingMode.GitIgnore;
     private CaseSensitivity _caseSensitivity = CaseSensitivity.PlatformDefault;
@@ -100,7 +101,19 @@ public sealed class FileQueryBuilder {
         ArgumentNullException.ThrowIfNull(patterns);
 
         foreach(var pattern in patterns) {
-            var kind = PatternClassifier.Classify(pattern);
+            if(string.IsNullOrWhiteSpace(pattern)) {
+                throw new ArgumentException(
+                    "Patterns cannot contain empty or whitespace-only entries.",
+                    nameof(patterns));
+            }
+
+            // In Specific mode every untyped pattern is interpreted with the forced
+            // dialect. Classifying it would silently produce a mismatched bucket,
+            // which pattern validation rejects at Build time.
+            var kind = _interpretationMode is PatternInterpretationMode.Hybrid
+                ? PatternClassifier.Classify(pattern)
+                : GetSpecificPatternKind();
+
             MergeIntoTypedBucket(kind, [pattern]);
         }
 
@@ -613,6 +626,23 @@ public sealed class FileQueryBuilder {
         GetEngine().ExecuteEntriesAsync(Build(), cancellationToken);
 
     /// <summary>
+    /// Executes the query asynchronously and returns matching entries with metadata,
+    /// reporting traversal progress.
+    /// </summary>
+    /// <param name="progress">The progress sink that receives traversal snapshots.</param>
+    /// <param name="cancellationToken">A token to cancel the async enumeration.</param>
+    /// <returns>An async enumerable of matching entries.</returns>
+    /// <exception cref="ArgumentNullException">Thrown when <paramref name="progress"/> is <see langword="null"/>.</exception>
+    public IAsyncEnumerable<FileQueryEntry> ExecuteEntriesAsync(
+        IProgress<FileQueryProgress> progress,
+        CancellationToken cancellationToken = default
+    ) {
+        ArgumentNullException.ThrowIfNull(progress);
+
+        return GetEngine().ExecuteEntriesAsync(Build(), progress, cancellationToken);
+    }
+
+    /// <summary>
     /// Builds the immutable <see cref="FileQuery"/> descriptor from the current configuration.
     /// </summary>
     /// <remarks>
@@ -686,14 +716,35 @@ public sealed class FileQueryBuilder {
     /// <param name="patterns">A sequence of patterns to merge.</param>
     private void MergeIntoTypedBucket(PatternKind patternKind, IEnumerable<string> patterns) {
         if(!_patternStorage.TryGetValue(patternKind, out var bucket)) {
-            _patternStorage[patternKind] = [.. patterns];
-            return;
+            bucket = [];
+            _patternStorage[patternKind] = bucket;
+            _patternLookup[patternKind] = new HashSet<string>(StringComparer.Ordinal);
         }
 
+        var lookup = _patternLookup[patternKind];
+
         foreach(var pattern in patterns) {
-            bucket.Add(pattern);
+            if(string.IsNullOrWhiteSpace(pattern)) {
+                throw new ArgumentException(
+                    "Patterns cannot contain empty or whitespace-only entries.",
+                    nameof(patterns));
+            }
+
+            if(lookup.Add(pattern)) {
+                bucket.Add(pattern);
+            }
         }
     }
+
+    /// <summary>
+    /// Gets the pattern kind selected by <see cref="PatternMatchingMode"/> for
+    /// <see cref="PatternInterpretationMode.Specific"/> interpretation.
+    /// </summary>
+    private PatternKind GetSpecificPatternKind() => _patternMatchingMode switch {
+        PatternMatchingMode.Glob => PatternKind.Glob,
+        PatternMatchingMode.Regex => PatternKind.Regex,
+        _ => PatternKind.GitIgnore
+    };
 
     /// <summary>
     /// Validates that <paramref name="patternKind"/> is compatible with the current
@@ -705,6 +756,13 @@ public sealed class FileQueryBuilder {
     /// <see cref="_patternMatchingMode"/> is invalid.
     /// </exception>
     private void ValidatePatternType(PatternKind patternKind) {
+        if(!Enum.IsDefined(patternKind)) {
+            throw new ArgumentOutOfRangeException(
+                nameof(patternKind),
+                patternKind,
+                "Unknown pattern kind.");
+        }
+
         if(_interpretationMode != PatternInterpretationMode.Specific) {
             return;
         }

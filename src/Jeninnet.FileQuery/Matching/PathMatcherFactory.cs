@@ -108,6 +108,13 @@ internal static class PathMatcherFactory {
         PatternInterpretationMode interpretationMode,
         bool hasPatterns
     ) {
+        if(!Enum.IsDefined(matchingMode)) {
+            throw new ArgumentOutOfRangeException(
+                nameof(matchingMode),
+                matchingMode,
+                "Unknown pattern matching mode.");
+        }
+
         // When no patterns are configured, use the null-object matcher.
         // This avoids a conditional in the hot traversal loop.
         if(!hasPatterns) {

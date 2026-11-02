@@ -3,7 +3,7 @@
 End-to-end tests for the `dotnet-filequery` global tool: command-line parsing, output modes, exit
 codes, diff-aware Git queries, and the `--explain`/`--json` surfaces.
 
-**52 tests.**
+**54 tests.**
 
 ## What is covered
 

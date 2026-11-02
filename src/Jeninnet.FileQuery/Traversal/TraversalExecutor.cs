@@ -76,7 +76,7 @@ internal sealed class TraversalExecutor : ITraversalExecutor {
 
         using var buffer = new TraversalFrontier();
         var visited = plan.Traversal.SymlinkPolicy is SymlinkPolicy.FollowWithCycleDetection
-            ? new HashSet<string>(StringComparer.OrdinalIgnoreCase)
+            ? new HashSet<string>(GetPathComparer(plan.Matching.CaseSensitivity))
             : null;
 
         visited?.Add(plan.FileSystem.ResolveRealPath(plan.RootDirectory));
@@ -104,7 +104,7 @@ internal sealed class TraversalExecutor : ITraversalExecutor {
 
         using var buffer = new TraversalFrontier();
         var visited = plan.Traversal.SymlinkPolicy is SymlinkPolicy.FollowWithCycleDetection
-            ? new HashSet<string>(StringComparer.OrdinalIgnoreCase)
+            ? new HashSet<string>(GetPathComparer(plan.Matching.CaseSensitivity))
             : null;
 
         visited?.Add(plan.FileSystem.ResolveRealPath(plan.RootDirectory));
@@ -122,6 +122,11 @@ internal sealed class TraversalExecutor : ITraversalExecutor {
             yield return item;
         }
     }
+
+    private static StringComparer GetPathComparer(CaseSensitivity caseSensitivity) =>
+        caseSensitivity is CaseSensitivity.Insensitive
+            ? StringComparer.OrdinalIgnoreCase
+            : StringComparer.Ordinal;
 
     private static async IAsyncEnumerable<T> TraverseCoreAsync<T>(
         TraversalPlan plan,
@@ -380,8 +385,34 @@ internal sealed class TraversalExecutor : ITraversalExecutor {
 
         for(var i = 0; i < patterns.Count; i++) {
             var pattern = patterns[i];
+
+            // Glob and Regex are positive re-inclusion fallbacks. An excluded
+            // directory must still be traversed when one of them could match a
+            // descendant, otherwise the documented cross-dialect override could
+            // never see the file it is supposed to re-include.
+            if(pattern.PatternKind is PatternKind.Regex) {
+                return true;
+            }
+
+            if(pattern.PatternKind is PatternKind.Glob) {
+                if(CouldGlobMatchBelow(pattern, dirPath, comparison)) {
+                    return true;
+                }
+
+                continue;
+            }
+
             if(!pattern.IsNegated) {
                 continue;
+            }
+
+            // An unanchored negation (leading **) can match at any depth, so the
+            // concrete anchor is not a reliable directory prefix. Traverse rather
+            // than risk pruning a directory that contains a matching subtree.
+            if(pattern.Segments.Count > 0 &&
+                pattern.Segments[0].Count == 1 &&
+                pattern.Segments[0][0] is RecursiveWildcardToken) {
+                return true;
             }
 
             var anchor = GetConcretePathAnchor(pattern);
@@ -417,6 +448,59 @@ internal sealed class TraversalExecutor : ITraversalExecutor {
         }
 
         return false;
+    }
+
+    /// <summary>
+    /// Determines whether a Glob pattern could match a file below an excluded directory.
+    /// </summary>
+    /// <param name="pattern">The compiled Glob pattern.</param>
+    /// <param name="directoryPath">The normalized directory path without a trailing slash.</param>
+    /// <param name="comparison">The string comparison mode.</param>
+    /// <returns><see langword="true"/> when the directory must be traversed.</returns>
+    private static bool CouldGlobMatchBelow(
+        ICompiledPattern pattern,
+        ReadOnlySpan<char> directoryPath,
+        StringComparison comparison
+    ) {
+        var anchor = GetConcretePathAnchor(pattern);
+
+        // A leading ** makes the pattern match at any depth; its literal anchor is
+        // not a root prefix. Treat it like an unanchored pattern instead of
+        // rejecting directories that do not start with that literal.
+        var hasLeadingDoubleStar =
+            pattern.Segments.Count > 0 &&
+            pattern.Segments[0].Count == 1 &&
+            pattern.Segments[0][0] is RecursiveWildcardToken;
+
+        if(!hasLeadingDoubleStar &&
+            anchor.Length > 0 &&
+            !IsPathPrefixOrEqual(directoryPath, anchor, comparison) &&
+            !IsPathPrefixOrEqual(anchor, directoryPath, comparison)) {
+            return false;
+        }
+
+        var directoryDepth = directoryPath.IsEmpty ? 0 : 1;
+        var hasRecursiveWildcard = false;
+
+        for(var i = 0; i < directoryPath.Length; i++) {
+            if(directoryPath[i] == '/') {
+                directoryDepth++;
+            }
+        }
+
+        for(var i = 0; i < pattern.Segments.Count; i++) {
+            var segment = pattern.Segments[i];
+
+            if(segment.Count == 1 && segment[0] is RecursiveWildcardToken) {
+                hasRecursiveWildcard = true;
+                break;
+            }
+        }
+
+        // A recursive wildcard can consume any number of segments. Without one,
+        // the pattern needs at least directoryDepth + 1 segments to reach a file
+        // below this directory.
+        return hasRecursiveWildcard || pattern.Segments.Count >= directoryDepth + 1;
     }
 
     /// <summary>

@@ -24,7 +24,7 @@ jobs:
         with:
           patterns: '**;!*.cs'
           changed-since: origin/main
-          version: '1.5.0'
+          version: '2.0.0'
 
       - name: Use the result
         run: |

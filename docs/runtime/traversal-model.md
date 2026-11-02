@@ -9,11 +9,14 @@ The traversal layer is responsible for discovering filesystem paths. It is entir
 Two strategies are available, configured through `TraversalOptions`:
 
 ```csharp
-var options = new FileQueryOptions {
-    Traversal = new TraversalOptions(
-        Strategy: TraversalStrategy.DepthFirst   // default
+var options = new FileQueryOptions(
+    new FileQueryOptionsConfig(
+        PatternInput: new PatternInput(),
+        Traversal: new TraversalOptions(
+            Strategy: TraversalStrategy.DepthFirst   // default
+        )
     )
-};
+);
 ```
 
 ### DepthFirst (default)

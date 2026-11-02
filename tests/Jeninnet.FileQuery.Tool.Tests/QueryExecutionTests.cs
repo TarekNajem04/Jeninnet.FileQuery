@@ -263,6 +263,28 @@ public sealed class QueryExecutionTests {
     }
 
     /// <summary>
+    /// An explicit include-all pattern is honored even when ignore files are loaded.
+    /// </summary>
+    [TestMethod]
+    public void Run_ShouldHonorExplicitIncludeAll_WithIgnoreFiles() {
+        using var environment = CreateEnvironment();
+        environment.CreateFile(".gitignore", "*.log\n");
+
+        var result = Run("--root", environment.Root, "--ignore-files", "--patterns", "!**");
+
+        result.ExitCode.Should().Be(0);
+        AssertPaths(
+            result.Output,
+            environment,
+            ".gitignore",
+            "a.txt",
+            "b.log",
+            "src/c.cs",
+            "src/nested/d.cs",
+            "bin/e.txt");
+    }
+
+    /// <summary>
     /// Verifies that <c>--global-ignore</c> requires <c>--ignore-files</c>.
     /// </summary>
     [TestMethod]
@@ -273,6 +295,20 @@ public sealed class QueryExecutionTests {
 
         result.ExitCode.Should().Be(CliApplication.EXIT_USAGE);
         result.Error.Should().Contain("--global-ignore requires --ignore-files");
+    }
+
+    /// <summary>
+    /// Verifies that a forced non-GitIgnore dialect rejects <c>--ignore-files</c> at
+    /// parse time instead of failing later when the query is built.
+    /// </summary>
+    [TestMethod]
+    public void Run_ShouldReturnUsageError_WhenIgnoreFilesUsedWithForcedDialect() {
+        using var environment = CreateEnvironment();
+
+        var result = Run("--root", environment.Root, "--ignore-files", "--dialect", "glob");
+
+        result.ExitCode.Should().Be(CliApplication.EXIT_USAGE);
+        result.Error.Should().Contain("--ignore-files requires GitIgnore semantics");
     }
 
     /// <summary>

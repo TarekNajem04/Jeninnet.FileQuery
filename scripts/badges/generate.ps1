@@ -149,7 +149,7 @@ foreach ($metadata in @($configuration.metadata)) {
 }
 
 if ($documentedPackages -eq 0) {
-    throw "No documented packages were found in docs/docfx.json."
+    throw "No documented projects were found in docs/docfx.json."
 }
 
 $coverageValue = "not run"
@@ -181,7 +181,7 @@ if (Test-Path -LiteralPath $coverageSummary) {
 $badges = @{
     "architecture" = New-Badge -Label "architecture"       -Value "invariants ok" -Color "#4c1"
     "frameworks"   = New-Badge -Label "target framework"   -Value $targetFramework -Color "#1f6feb"
-    "packages"     = New-Badge -Label "documented packages" -Value "$documentedPackages" -Color "#1f6feb"
+    "packages"     = New-Badge -Label "API-documented projects" -Value "$documentedPackages" -Color "#1f6feb"
     "coverage"     = New-Badge -Label "line coverage"      -Value $coverageValue -Color $coverageColor
 }
 
@@ -197,7 +197,7 @@ Write-Host "Summary"
 Write-Host "---------------------------------------------"
 Write-Host ("architecture : invariants ok (gate: ArchitectureTests)")
 Write-Host ("frameworks   : {0}" -f $targetFramework)
-Write-Host ("packages     : {0} documented package(s) in docs/docfx.json" -f $documentedPackages)
+Write-Host ("packages     : {0} API-documented project(s) in docs/docfx.json" -f $documentedPackages)
 Write-Host ("coverage     : {0} (artifacts/coverage/Summary.txt)" -f $coverageValue)
 Write-Host "---------------------------------------------"
 Write-Host "Badges written to badges/ and referenced by README.md."

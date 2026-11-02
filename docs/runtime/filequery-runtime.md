@@ -50,6 +50,11 @@ public interface IFileQueryEngine
     IAsyncEnumerable<FileQueryEntry> ExecuteEntriesAsync(
         FileQuery query,
         CancellationToken cancellationToken = default);
+
+    IAsyncEnumerable<FileQueryEntry> ExecuteEntriesAsync(
+        FileQuery query,
+        IProgress<FileQueryProgress>? progress,
+        CancellationToken cancellationToken = default);
 }
 ```
 

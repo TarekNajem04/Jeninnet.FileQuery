@@ -9,12 +9,36 @@ Versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Breaking Changes
 
-- **`IFileQueryEngine` contract expanded**: custom engine implementations must add six new members:
+- **`IFileQueryEngine` contract expanded**: custom engine implementations must add seven new members:
   `Execute(query, CancellationToken)`, `Execute(query, IProgress<FileQueryProgress>, CancellationToken)`,
   `ExecuteEntries(query)`, `ExecuteEntries(query, CancellationToken)`,
-  `ExecuteEntries(query, IProgress<FileQueryProgress>, CancellationToken)`, and
-  `ExecuteEntriesAsync(query, CancellationToken)`. The built-in engine already implements them.
+  `ExecuteEntries(query, IProgress<FileQueryProgress>, CancellationToken)`,
+  `ExecuteEntriesAsync(query, CancellationToken)`, and
+  `ExecuteEntriesAsync(query, IProgress<FileQueryProgress>, CancellationToken)`.
+  The built-in engine already implements them.
   See [Migration.md](Migration.md#upgrading-to-v200).
+- **`Specific` pattern validation is enforced**: untyped patterns and typed dialects that do not
+  match the selected `PatternMatchingMode` now throw `PatternException` instead of being compiled
+  into buckets that can never match. `FileQueryBuilder.Where(string)` assigns the forced dialect
+  when `UsingGitIgnore`/`UsingGlob`/`UsingRegex` is active.
+- **Empty and whitespace-only patterns are rejected**: `PatternInput`, `FileQueryBuilder.Where`,
+  and the pattern-set compiler now throw `ArgumentException` instead of silently treating the
+  entry as a no-op.
+- **Windows separators in Glob patterns are rejected**: a backslash used as a path separator now
+  throws `PatternException` with an actionable message. Backslashes before glob metacharacters
+  (including escaped braces) remain valid escapes.
+- **GitIgnore directory-negation ordering corrected**: a later explicit rule now overrides an
+  earlier directory-only negation (`["**", "!keep/", "keep/file.txt"]` excludes the file), matching
+  Git's last-match-wins semantics.
+- **Non-matching later dialects preserve GitIgnore exclusions**: Glob/Regex fallbacks no longer
+  turn a GitIgnore `Exclude` into `NoMatch`, so explanations and directory pruning agree with the
+  documented precedence model. Glob/Regex can still re-include below a GitIgnore-excluded directory
+  when they could match a descendant.
+- **`FileQueryOptionsConfig` constructor expanded**: the record now has 17 positional parameters
+  (10 in v1.5.0), adding the metadata/filter, `.gitignore`, and directory-result options. Source
+  using named arguments or optional defaults usually recompiles, but precompiled consumers bind to
+  the old constructor/`Deconstruct` signatures and must be rebuilt. See
+  [Migration.md](Migration.md#2-rebuild-filequeryoptionsconfig-consumers).
 - **Regex timeout exception changed**: an expired `Regex` match now throws `PatternException` with the
   source pattern and an inner `RegexMatchTimeoutException`, instead of leaking the timeout exception.
   Update `catch(RegexMatchTimeoutException)` blocks.
@@ -27,7 +51,7 @@ Versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Added
 
-- **Global Tool**: Added `Jeninnet.FileQuery.Tool`, the `dotnet-filequery` .NET global tool. It exposes the engine in the terminal with Hybrid, GitIgnore, Glob, and Regex patterns plus `--root`, `--depth`, `--no-recursive`, `--ignore-case`, `--symlinks`, `--relative`, `--null`, and `--count`, and streams deterministic output for pipelines. Includes 28 tests, a package README, and a documentation guide.
+- **Global Tool**: Added `Jeninnet.FileQuery.Tool`, the `dotnet-filequery` .NET global tool. It exposes the engine in the terminal with Hybrid, GitIgnore, Glob, and Regex patterns plus `--root`, `--depth`, `--no-recursive`, `--ignore-case`, `--symlinks`, `--relative`, `--null`, and `--count`, and streams deterministic output for pipelines. Includes 52 tests, a package README, and a documentation guide.
 - **Diff-Aware Queries**: Added `FileQueryBuilder.RestrictToPaths` and `FileQueryOptionsConfig.IncludedPaths` to restrict a query to a root-relative allow-list, skipping unmatched files before pattern matching and pruning directories that cannot contain a listed file. The `dotnet-filequery` tool exposes it through `--changed-since <revision>` and `--changed-since-date <timestamp>`, reports added, modified, renamed, and copied files, excludes deletions, and includes untracked files unless `--no-untracked` is supplied.
 - **VS Code Extension**: Added `extensions/vscode`, a dependency-free extension with *Test File Pattern* and *Explain File Pattern* commands. It drives the global tool against the selected workspace folder and reports matches or per-file include/exclude reasons in the **Jeninnet FileQuery** output channel.
 - **Explain Mode**: Added `dotnet-filequery --explain`, which writes `<include|exclude>\t<path>\t<reason>` for every evaluated file. It reports the responsible pattern kind and cannot be combined with `--count` or `--null`.
@@ -64,11 +88,13 @@ Versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - **README Coverage and Package Front Pages**: Added READMEs for every src/test/sample project and the GitHub Action, rewrote the core package README with the current API, expanded the Analyzer/Build/FileProviders pages, and added sample/test indices. No runtime change.
 - **Solution Synchronization**: Added the new documentation, assets, GitHub Action files, and images to `Jeninnet.FileQuery.slnx` (229 unique entries). Project READMEs stay with their projects (included via `Directory.Build.props`); only the root README remains in **Solution Items**. No runtime change.
 - **VS Code Guide**: Expanded the VS Code chapter with installation, eight worked pattern examples, settings, output/limits, troubleshooting, architecture, and development/packaging instructions; linked it from the README, docs home, and extension README.
-- **Coverage Reporting**: Added `coverlet.collector` to the Analyzers, Build, and FileProviders test projects so every test project contributes coverage. The full report now covers 9 assemblies: **89.2% line**, **79.2% branch**, **92.2% method**.
+- **Coverage Reporting**: Added `coverlet.collector` to the Analyzers, Build, and FileProviders test projects so every test project contributes coverage. The full report now covers 9 assemblies: **89.4% line**, **79.7% branch**, **92.1% method**.
 - **Generated Badges**: `scripts/badges/generate.ps1` now reads `artifacts/coverage/Summary.txt`, renders `badges/coverage.svg`, and the root README displays all four generated badges. Added coverage/badge usage documentation.
 - **Analyzer Cleanup**: Resolved every IDE, MSTest, and Roslynator diagnostic in the solution, including collection expressions, primary constructors, exception documentation, naming conventions, `TestContext.CancellationToken` usage, and conditional-access/chaining rules. A refreshed export cleared the remaining 9 `IDE0305` collection hints and the `RCS1201` chaining warning. No runtime behavior change.
-- **Local Sonar Baseline**: Ran SonarQube Community Build locally with OpenCover coverage and exported issues: zero open issues, Quality Gate OK, 86.9% Sonar coverage, and 0.0% duplicated lines. Excluded the Soak and AotSmoke executable harnesses from the coverage metric while keeping them in issue analysis. Documented the Java 21, Git object-store, and re-query workflow in the Sonar tooling README.
+- **Local Sonar Baseline**: Ran SonarQube Community Build locally with OpenCover coverage and exported issues: zero open issues, Quality Gate OK, 85.9% Sonar coverage (87.9% lines, 81.9% branches), and 0.0% duplicated lines. Excluded the Soak and AotSmoke executable harnesses from the coverage metric while keeping them in issue analysis. Documented the Java 21, Git object-store, and re-query workflow in the Sonar tooling README.
 - **Duplication Elimination**: Extracted the shared brace scanner, traversal entry-processing step, and plan telemetry helpers. Sonar now reports zero duplicated lines and blocks, with no new issues.
+- **Release Packaging**: The tag publish workflow now includes `Jeninnet.FileQuery.Analyzers`, packs all eight packages, and ships the LICENSE file plus symbol packages for the six library/tool packages. CI validates the analyzer package and keeps the Sonar coverage exclusions aligned with the local script.
+- **Release Documentation**: Refreshed the current-release status, release checklist, Sonar baseline, package-version examples, architecture notice, and stale internal version references.
 - **Capability Review**: Added `docs/articles/library-capability-review.md`, comparing the library with `Microsoft.Extensions.FileSystemGlobbing`, `DotNet.Glob`, gitignore parsers, BCL enumeration, and `fd`/`ripgrep`, with a prioritized backlog and an audit of the published claims.
 - **Capability Review Refresh**: Updated the review to the v2.0.0 state: metadata/filters, `.gitignore` ingestion, single-path matching, directory results, `IFileProvider`, brace expansion, sync cancellation, JSON, analyzers, AOT, and MSBuild/SARIF are marked shipped; the claims audit is closed; Phase 2 statuses now reflect delivery by H-02/H-03/H-04; and both release checklists require the docs/claims/API checks.
 - **Documentation Refresh**: Rebuilt the documentation landing page and onboarding flow, added common recipes and error-handling guides, fixed stale API examples in quick-start/runtime/observability pages, added Runtime and Contributing navigation, and linked the published documentation from the root README.
@@ -83,6 +109,20 @@ Versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - **Regex Match Timeouts**: A `RegexMatchTimeoutException` during matching is now surfaced as a `PatternException` with the offending pattern instead of leaking an infrastructure exception.
 - **Malformed Pattern Diagnostics**: Untyped patterns that fail structural validation now report the specific reason and position instead of the generic "No compiler registered for pattern type 'Unknown'" message.
 - **Empty Pattern Analysis**: `PatternAnalysisResult.Empty()` now reports `IsEmpty: true`, matching its contract.
+- **Directory-Only Negation Ordering**: A later explicit rule now overrides an earlier directory-only negation, matching Git's last-match-wins model.
+- **Match Explanation Attribution**: `Explain` now attributes GitIgnore negations, Glob/Regex re-inclusions, and GitIgnore exclusions to the rule that actually decided the outcome.
+- **Pattern Order Preservation**: Builder and merger storage now preserves declaration order deterministically instead of relying on `HashSet` enumeration order.
+- **Retry Robustness**: Retry policies no longer overflow `int.MaxValue` attempts, and a retried directory enumeration skips already-yielded entries instead of duplicating them.
+- **Regex Cache Bound**: The shared regex cache now has an upper bound, preventing unbounded retention in long-running hosts that supply dynamic patterns.
+- **Git Ignore Repository Rules**: `.git/info/exclude` rules that target an ancestor of a deeper query root now exclude the query root instead of being silently dropped.
+- **Cross-Dialect Re-inclusion**: Glob/Regex fallbacks can now re-include files below a GitIgnore-excluded directory when they could match a descendant, while non-matching fallbacks preserve the exclusion.
+- **CLI Explicit Include-All**: An explicitly supplied `!**` pattern is no longer mistaken for the implicit fallback when `--ignore-files` is active.
+- **Forced-Dialect CLI Validation**: `--ignore-files` with a forced non-GitIgnore `--dialect` now fails during argument validation instead of later during query construction.
+- **Regex Literal Braces**: Untyped `r:` patterns with literal or quantifier braces are no longer misclassified as malformed by the glob structural validator.
+- **Empty-Set Root Outcome**: An empty pattern set now reports `Exclude` (not `NoMatch`) for the empty path, consistent with the resolver and documentation.
+- **File Provider Retry Parity**: The `IFileProvider` adapter now uses the same retry clamping and no-duplicate replay behavior as the physical file system.
+- **Native AOT Coverage**: The AOT smoke host now exercises Regex and GitIgnore matching in addition to Glob, covering the trimmed execution paths.
+- **Traversal Frontier Memory**: The BFS/DFS frontier now compacts consumed slots before growing, avoiding unnecessary array doubling.
 
 ### Removed
 
@@ -154,6 +194,10 @@ Versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - **All Analyzer Warnings**: Solution now builds with 0 warnings and 0 errors.
 
 ## [1.3.0] - 2026-07-26
+
+> **Historical correction:** The three capabilities below were announced in the 1.3.0 entry but
+> were not backed by shipped code at the time. They were delivered in v2.0.0 by H-02 (telemetry),
+> H-03 (Roslyn analyzers), and H-04 (Native AOT validation). See the v2.0.0 entry.
 
 ### Added
 

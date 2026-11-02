@@ -86,7 +86,7 @@ source-compatible.
 | Property | Meaning |
 |---|---|
 | `Kind` | The dialect used for tokenization |
-| `IsRegex` | Whether the source carried the `r:` prefix |
+| `IsRegex` | Whether the pattern is interpreted as a regular expression (classification or forced dialect) |
 | `IsNegated`, `IsRootAnchored`, `IsDirectoryOnly` | GitIgnore structural flags |
 | `HasGitIgnoreSyntax`, `HasWildcard`, `HasRecursiveWildcard`, `HasCharacterClass`, `HasEscapedCharacters`, `HasBraceAlternation` | Structural signals |
 | `SegmentCount`, `Segments` | Tokenized slash-separated segments |
@@ -143,8 +143,8 @@ analyzer, or in a language server.
 
 - The package follows SemVer and is versioned with the other Jeninnet.FileQuery packages.
 - The surface is additive: new members and token kinds are added without breaking existing code.
-- Forced `Regex` inspection expects the `r:` prefix; the SDK reports the pattern exactly as
-  supplied. The command-line tool adds the prefix for convenience.
+- Forced `Regex` inspection accepts the expression with or without the `r:` prefix; the SDK adds
+  the prefix before tokenization. The command-line tool does the same for `--regex` input.
 - No reflection, no filesystem access, no execution.
 
 ---

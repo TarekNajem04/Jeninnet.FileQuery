@@ -79,10 +79,11 @@ public static class PatternInspector {
     /// <returns>The full inspection, with <see cref="PatternInspection.Kind"/> set to <paramref name="kind"/>.</returns>
     /// <exception cref="ArgumentNullException">Thrown when <paramref name="pattern"/> is <see langword="null"/>.</exception>
     /// <exception cref="ArgumentException">Thrown when <paramref name="kind"/> is <see cref="PatternKind.Unknown"/>.</exception>
+    /// <exception cref="ArgumentOutOfRangeException">Thrown when <paramref name="kind"/> is not a defined value.</exception>
     /// <remarks>
-    /// A regex dialect expects the <c>r:</c> prefix; without it the segment is tokenized as literal
-    /// text. The command-line tool adds the prefix automatically, but this SDK reports the pattern
-    /// exactly as supplied.
+    /// A regex dialect accepts the expression with or without the <c>r:</c> prefix; the inspector
+    /// adds the prefix before tokenization so the reported tokens match compiler behavior. The
+    /// command-line tool does the same for <c>--regex</c> input.
     /// </remarks>
     public static PatternInspection Inspect(string pattern, PatternKind kind) {
         ArgumentNullException.ThrowIfNull(pattern);
@@ -91,6 +92,13 @@ public static class PatternInspector {
             throw new ArgumentException(
                 "The pattern kind must be GitIgnore, Glob, or Regex.",
                 nameof(kind));
+        }
+
+        if(!Enum.IsDefined(kind)) {
+            throw new ArgumentOutOfRangeException(
+                nameof(kind),
+                kind,
+                "Unknown pattern kind.");
         }
 
         return InspectCore(pattern, kind);
@@ -110,16 +118,25 @@ public static class PatternInspector {
             ? PatternSyntaxProfile.Default
             : PatternSyntaxProfile.GetProfileForPatternType(kind);
 
-        var context = new PatternCompilationContext(new ClassifiedPattern(pattern, kind));
+        // Mirror the compiler: a type-pinned Regex pattern does not need the "r:"
+        // prefix at the call site. Inspect the effective text so tooling sees the
+        // same tokens the matcher will use.
+        var regexText = kind is PatternKind.Regex ? pattern.Trim() : pattern;
+        var effectivePattern = kind is PatternKind.Regex &&
+            !regexText.StartsWith("r:", StringComparison.Ordinal)
+            ? "r:" + regexText
+            : regexText;
+
+        var context = new PatternCompilationContext(new ClassifiedPattern(effectivePattern, kind));
         PatternScanner.Scan(context, profile);
 
         var state = context.State;
-        var segments = pattern.Trim().Length == 0 ? [] : MapSegments(context.Tokens);
+        var segments = effectivePattern.Trim().Length == 0 ? [] : MapSegments(context.Tokens);
 
         return new PatternInspection(
             Pattern: pattern,
             Kind: kind,
-            IsRegex: analysis.IsRegex,
+            IsRegex: kind is PatternKind.Regex || analysis.IsRegex,
             IsNegated: state.IsNegated,
             IsRootAnchored: state.IsRootAnchored,
             IsDirectoryOnly: state.IsDirectoryOnly,

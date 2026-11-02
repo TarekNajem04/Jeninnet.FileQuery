@@ -1,6 +1,6 @@
 # Jeninnet.FileQuery.Tooling
 
-Build-tooling SDK for [Jeninnet.FileQuery](../Jeninnet.FileQuery/README.md). It exposes the
+Build-tooling SDK for [Jeninnet.FileQuery](https://github.com/TarekNajem04/Jeninnet.FileQuery/blob/main/src/Jeninnet.FileQuery/README.md). It exposes the
 engine's pattern classification, structural validation, and tokenization without executing a
 query, so build systems, linters, and IDE plugins can reuse the same semantics as the engine.
 
@@ -71,4 +71,4 @@ core engine. The surface is intentionally small; new members are additive and fo
 
 ## License
 
-MIT — see [`LICENSE`](../../LICENSE).
+MIT — see [`LICENSE`](https://github.com/TarekNajem04/Jeninnet.FileQuery/blob/main/LICENSE).

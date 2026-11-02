@@ -9,7 +9,7 @@
 ![NuGet Version](https://img.shields.io/nuget/v/Jeninnet.FileQuery)
 [![NuGet downloads](https://img.shields.io/nuget/dt/Jeninnet.FileQuery.CommandLine)](https://www.nuget.org/packages/Jeninnet.FileQuery.CommandLine/)
 
-**Command-line argument binding for [Jeninnet.FileQuery](../Jeninnet.FileQuery/README.md).**
+**Command-line argument binding for [Jeninnet.FileQuery](https://github.com/TarekNajem04/Jeninnet.FileQuery/blob/main/src/Jeninnet.FileQuery/README.md).**
 
 ---
 
@@ -37,7 +37,7 @@ dotnet add package Jeninnet.FileQuery.CommandLine
 
 ## Usage Example
 
-Because [CommandLinePatternOptions](./CommandLinePatternOptions.cs) uses a `protected` constructor to encourage customization, you must subclass it in your application.
+Because [CommandLinePatternOptions](https://github.com/TarekNajem04/Jeninnet.FileQuery/blob/main/src/Jeninnet.FileQuery.CommandLine/CommandLinePatternOptions.cs) uses a `protected` constructor to encourage customization, you must subclass it in your application.
 
 ### 1. Define CLI Options
 ```csharp
@@ -91,11 +91,11 @@ await rootCommand.InvokeAsync(args);
 
 ## Supported Command-Line Flags
 
-The following options are exposed by [CommandLinePatternOptions](./CommandLinePatternOptions.cs):
+The following options are exposed by [CommandLinePatternOptions](https://github.com/TarekNajem04/Jeninnet.FileQuery/blob/main/src/Jeninnet.FileQuery.CommandLine/CommandLinePatternOptions.cs):
 
 | Option Flag | Alias | Description | Pattern Interpretation |
 | --- | --- | --- | --- |
-| `--patterns` | `-p` | Semicolon-delimited pattern string. | **Auto-Classified** via [PatternClassifier](../Jeninnet.FileQuery/Patterns/Classification/PatternClassifier.cs) into GitIgnore, Glob, or Regex. |
+| `--patterns` | `-p` | Semicolon-delimited pattern string. | **Auto-Classified** via [PatternClassifier](https://github.com/TarekNajem04/Jeninnet.FileQuery/blob/main/src/Jeninnet.FileQuery/Patterns/Classification/PatternClassifier.cs) into GitIgnore, Glob, or Regex. |
 | `--gitignore` | | Semicolon-delimited exclude pattern list. | Forced to **GitIgnore** syntax. |
 | `--glob` | | Semicolon-delimited exclude pattern list. | Forced to **Glob** syntax. |
 | `--regex` | | Semicolon-delimited exclude pattern list. | Forced to **Regex** syntax. |
@@ -104,7 +104,7 @@ The following options are exposed by [CommandLinePatternOptions](./CommandLinePa
 
 ## Pattern Splitting and Fallback
 
-*   **Semicolon Splitting**: Delimited values (e.g., `-p "*.txt;*.md;!temp.txt"`) are split and trimmed by [PatternSplitter](./PatternSplitter.cs).
+*   **Semicolon Splitting**: Delimited values (e.g., `-p "*.txt;*.md;!temp.txt"`) are split and trimmed by [PatternSplitter](https://github.com/TarekNajem04/Jeninnet.FileQuery/blob/main/src/Jeninnet.FileQuery.CommandLine/PatternSplitter.cs).
 *   **Default Fallback**: If no pattern arguments are supplied by the user, the builder defaults to `!**` (GitIgnore syntax: include all files recursively).
 *   **Core Observability**: After CLI parsing, call `ExecuteAsync(query, progress, cancellationToken)` or configure `FileQueryBuilder.WithDiagnostics(...)` to inspect runtime traversal and match decisions.
 

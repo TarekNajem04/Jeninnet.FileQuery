@@ -101,4 +101,17 @@ public interface IFileQueryEngine {
     /// <param name="cancellationToken">The token to monitor for cancellation requests.</param>
     /// <returns>An async enumerable of matching entries.</returns>
     IAsyncEnumerable<FileQueryEntry> ExecuteEntriesAsync(FileQuery query, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Asynchronous entry enumeration with progress reporting.
+    /// </summary>
+    /// <param name="query">The query descriptor defining the search parameters.</param>
+    /// <param name="progress">The progress sink that receives traversal snapshots.</param>
+    /// <param name="cancellationToken">The token to monitor for cancellation requests.</param>
+    /// <returns>An async enumerable of matching entries.</returns>
+    IAsyncEnumerable<FileQueryEntry> ExecuteEntriesAsync(
+        FileQuery query,
+        IProgress<FileQueryProgress>? progress,
+        CancellationToken cancellationToken = default
+    );
 }

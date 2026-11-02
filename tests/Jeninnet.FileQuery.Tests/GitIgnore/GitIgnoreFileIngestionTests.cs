@@ -19,7 +19,7 @@ public sealed class GitIgnoreFileIngestionTests {
     private static readonly string[] _nestedNegationResult = ["b.log", "src/c.log", "src/keep.txt"];
     private static readonly string[] _buildIgnored = ["a.txt", "b.log", "src/c.log", "src/d.txt"];
     private static readonly string[] _anchoredFileResult = ["b.log", "src/a.txt", "src/c.log", "src/d.txt"];
-    private static readonly string[] _gitVectorResult = ["a.txt", "b.log", "doc/other.txt", "frotz/file.txt", "src/c.log", "src/d.txt"];
+    private static readonly string[] _gitVectorResult = ["a.txt", "b.log", "doc/other.txt", "frotz/file.txt", "other/doc/frotz/file.txt", "src/c.log", "src/d.txt"];
 
     /// <summary>
     /// The root <c>.gitignore</c> excludes files at every depth.
@@ -162,13 +162,42 @@ public sealed class GitIgnoreFileIngestionTests {
     }
 
     /// <summary>
+    /// Unsupported lines in a real ignore file are skipped instead of failing the whole query.
+    /// </summary>
+    [TestMethod]
+    public void UnsupportedRule_IsSkipped() {
+        using var environment = CreateRootEnvironment();
+        environment.CreateFile(".gitignore", "[abc\n*.log\n");
+
+        Assert.AreSequenceEqual(
+            _rootOnly, QueryFiles(environment));
+    }
+
+    /// <summary>
+    /// The Git metadata directory is always excluded, even without an explicit rule.
+    /// </summary>
+    [TestMethod]
+    public void UseGitIgnoreFiles_AlwaysExcludesGitDirectory() {
+        using var environment = CreateRootEnvironment();
+        environment.CreateFile(".git/config", "repository metadata");
+
+        var files = QueryFiles(environment);
+
+        Assert.DoesNotContain(".git/config", files);
+    }
+
+    /// <summary>
     /// Git documentation vectors keep their anchored-path semantics.
     /// </summary>
     [TestMethod]
     public void GitDocumentationVector_AnchoredDirectoryRule() {
         using var environment = CreateRootEnvironment();
         environment.CreateFile(".gitignore", "doc/frotz/\n");
-        environment.CreateFiles("doc/frotz/file.txt", "doc/other.txt", "frotz/file.txt");
+        environment.CreateFiles(
+            "doc/frotz/file.txt",
+            "doc/other.txt",
+            "frotz/file.txt",
+            "other/doc/frotz/file.txt");
 
         Assert.AreSequenceEqual(
             _gitVectorResult, QueryFiles(environment));
@@ -198,6 +227,27 @@ public sealed class GitIgnoreFileIngestionTests {
 
         Assert.AreSequenceEqual(
             _buildIgnored, QueryFiles(environment));
+    }
+
+    /// <summary>
+    /// A positive repository-level rule that targets an ancestor of the query root
+    /// excludes the whole query root, matching Git semantics.
+    /// </summary>
+    [TestMethod]
+    public void InfoExclude_AncestorDirectoryRule_ExcludesQueryRoot() {
+        using var environment = new TestEnvironment();
+        environment.CreateFile(".git/info/exclude", "ignored/\n");
+        environment.CreateFile("ignored/sub/a.txt", "excluded");
+
+        var queryRoot = Path.Combine(environment.Root, "ignored", "sub");
+
+        var files = FileQuery.From(queryRoot)
+            .UseGitIgnoreFiles()
+            .Execute()
+            .Select(path => Relative(queryRoot, path))
+            .ToArray();
+
+        Assert.IsEmpty(files);
     }
 
     /// <summary>

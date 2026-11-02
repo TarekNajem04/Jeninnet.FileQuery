@@ -20,7 +20,7 @@ dotnet add package Jeninnet.FileQuery.CommandLine
 | `CommandLinePatternParser` | Extracts raw string values from a `ParseResult` |
 | `PatternOptions` | Immutable container for the extracted raw values |
 | `PatternBuilder` | Classifies and groups patterns into a `Dictionary<PatternKind, List<string>>` |
-| `PatternSpliter` | Splits a semicolon-delimited pattern string into individual patterns |
+| `PatternSplitter` | Splits a semicolon-delimited pattern string into individual patterns |
 
 ---
 
@@ -31,7 +31,11 @@ using System.CommandLine;
 using Jeninnet.FileQuery;
 using Jeninnet.FileQuery.CommandLine;
 
-var patternOptions = new CommandLinePatternOptions();
+public sealed class AppCliOptions : CommandLinePatternOptions
+{
+}
+
+var patternOptions = new AppCliOptions();
 var rootCommand    = new RootCommand("File query tool");
 
 foreach (var option in patternOptions.GetCommandOptions())
@@ -87,16 +91,16 @@ All option values are split on `;` and trimmed. Empty entries are discarded:
 "**.cs ; !temp.cs ;"  →  ["**.cs", "!temp.cs"]
 ```
 
-Use `PatternSpliter.Split` if you need to split patterns outside the CLI context:
+Use `PatternSplitter.Split` if you need to split patterns outside the CLI context:
 
 ```csharp
-IEnumerable<string> patterns = PatternSpliter.Split("*.cs;!temp.cs");
+IEnumerable<string> patterns = PatternSplitter.Split("*.cs;!temp.cs");
 ```
 
 A custom separator character can be supplied as a second argument:
 
 ```csharp
-IEnumerable<string> patterns = PatternSpliter.Split("*.cs|!temp.cs", separator: '|');
+IEnumerable<string> patterns = PatternSplitter.Split("*.cs|!temp.cs", separator: '|');
 ```
 
 ---

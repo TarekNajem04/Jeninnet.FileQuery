@@ -101,6 +101,35 @@ public class NegationAndOrderTests {
     }
 
     /// <summary>
+    /// An unanchored directory negation can re-include a nested directory below an excluded sibling.
+    /// </summary>
+    [TestMethod]
+    public void Should_ReincludeNestedDirectory_When_NegationIsUnanchored() {
+        using var env = new TestEnvironment();
+        env.CreateFile("other/keep/inside.txt");
+
+        var fileQueryEngine = FileQueryRuntime.Create();
+        var options = new FileQueryOptions(
+            new FileQueryOptionsConfig(
+                PatternInput: new(
+                    Patterns: [
+                        "**",
+                        "!keep/"
+                    ]
+                ),
+                RecurseSubdirectories: true
+            )
+        );
+
+        var result = fileQueryEngine.Execute(new(env.Root, options), TestContext.CancellationToken)
+                                    .ToList();
+
+        TestAssertEx.Contains(
+            result,
+            static x => x.EndsWith(Path.Combine("other", "keep", "inside.txt"), StringComparison.Ordinal));
+    }
+
+    /// <summary>
     /// Gets or sets the test context, which provides information about the current test run.
     /// Used here primarily for accessing the <see cref="CancellationToken"/>.
     /// </summary>

@@ -49,6 +49,40 @@ try {
         return 1;
     }
 
+    // Regex semantics, including unprefixed typed patterns, must survive trimming/AOT.
+    var regexQuery = FileQuery.From(root)
+        .UsingRegex()
+        .Where(PatternKind.Regex, [@"^src/.*\.cs$"])
+        .Build();
+
+    var regexMatches = engine.Execute(regexQuery)
+        .Select(path => Path.GetRelativePath(root, path).Replace('\\', '/'))
+        .OrderBy(static path => path, StringComparer.Ordinal)
+        .ToArray();
+
+    string[] expectedRegex = ["src/a.cs"];
+
+    if(!regexMatches.SequenceEqual(expectedRegex, StringComparer.Ordinal)) {
+        await Console.Error.WriteLineAsync($"Unexpected regex matches: [{string.Join(", ", regexMatches)}]").ConfigureAwait(false);
+        return 1;
+    }
+
+    // GitIgnore last-match-wins and negation must also survive trimming/AOT.
+    var gitIgnoreQuery = FileQuery.From(root)
+        .UsingGitIgnore()
+        .Where(PatternKind.GitIgnore, ["**", "!**/*.cs"])
+        .Build();
+
+    var gitIgnoreMatches = engine.Execute(gitIgnoreQuery)
+        .Select(path => Path.GetRelativePath(root, path).Replace('\\', '/'))
+        .OrderBy(static path => path, StringComparer.Ordinal)
+        .ToArray();
+
+    if(!gitIgnoreMatches.SequenceEqual(expected, StringComparer.Ordinal)) {
+        await Console.Error.WriteLineAsync($"Unexpected GitIgnore matches: [{string.Join(", ", gitIgnoreMatches)}]").ConfigureAwait(false);
+        return 1;
+    }
+
     await Console.Out.WriteLineAsync($"AOT smoke passed: {string.Join(", ", matches)}").ConfigureAwait(false);
     return 0;
 }

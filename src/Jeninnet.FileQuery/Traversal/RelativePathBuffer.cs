@@ -60,7 +60,7 @@ internal sealed class RelativePathBuffer : IDisposable {
         var root = rootDir.AsSpan();
         var span = full[root.Length..];
 
-        if(span.Length > 0 && span[0] == Path.DirectorySeparatorChar) {
+        if(span.Length > 0 && span[0] is '/' or '\\') {
             span = span[1..];
         }
 
@@ -69,7 +69,7 @@ internal sealed class RelativePathBuffer : IDisposable {
         _written = 0;
 
         foreach(var ch in span) {
-            _buffer[_written++] = ch == Path.DirectorySeparatorChar ? '/' : ch;
+            _buffer[_written++] = ch is '/' or '\\' ? '/' : ch;
         }
 
         if(entry.IsDirectory) {

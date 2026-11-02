@@ -71,7 +71,7 @@ public class DirectoryOnlyPatternTests {
         var results = fileQueryEngine.Execute(new(env.Root, options), TestContext.CancellationToken).ToList();
 
         results.Should().Contain(static x => x.EndsWith("inside.txt", StringComparison.Ordinal));   // Included by negation "!sub/*.txt" rule
-        results.Should().Contain(static x => x.EndsWith("other.log", StringComparison.Ordinal));    // Excluded by default
+        results.Should().NotContain(static x => x.EndsWith("other.log", StringComparison.Ordinal)); // Excluded by the directory-only rule
         results.Should().ContainSingle(static x => x.EndsWith("x.txt", StringComparison.Ordinal));       // Included by default (not in 'sub/')
     }
 

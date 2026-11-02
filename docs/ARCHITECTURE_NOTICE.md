@@ -1,6 +1,10 @@
-# Architecture Notice
+# Architecture Notice (historical: v1.2.0)
 
-The matching and traversal architecture was enhanced during the v1.2 release. All documentation in this repository reflects the current 1.2.0 architecture.
+> This page records the v1.2.0 architecture changes and is kept for historical context. For the
+> current v2.0.0 architecture, see [Engine Architecture](architecture/engine-architecture.md) and the
+> [Migration Guide](https://github.com/TarekNajem04/Jeninnet.FileQuery/blob/main/Migration.md#upgrading-to-v200).
+
+The matching and traversal architecture was enhanced during the v1.2 release.
 
 ## Key Changes in 1.2.0
 
@@ -35,4 +39,5 @@ All matcher hot-path loops converted from `foreach` over `ICompiledPatternSet` (
 
 ## Current Documentation Status
 
-All documentation files are up to date with the 1.2.0 implementation. The architecture documents under `/docs/architecture/` reflect the current codebase.
+The architecture documents under `docs/architecture/` are the current reference and are verified
+against the v2.0.0 codebase.

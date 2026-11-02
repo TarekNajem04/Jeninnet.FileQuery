@@ -17,9 +17,11 @@ Jeninnet.FileQuery/
 │   ├── Jeninnet.FileQuery.Tooling/                 Build-tooling SDK
 │   ├── Jeninnet.FileQuery.Build/                   MSBuild/SARIF integration
 │   ├── Jeninnet.FileQuery.Analyzers/               Roslyn analyzer
+│   ├── Jeninnet.FileQuery.Analyzers.CodeFix/      Analyzer code fix
 │   ├── Jeninnet.FileQuery.Tool/                    Global tool
 │   ├── Jeninnet.FileQuery.Benchmarks/              BenchmarkDotNet benchmarks
-│   └── Jeninnet.FileQuery.Soak/                    Stability harness
+│   ├── Jeninnet.FileQuery.Soak/                    Stability harness
+│   └── Jeninnet.FileQuery.AotSmoke/                Native AOT smoke host
 │
 ├── tests/
 │   ├── Jeninnet.FileQuery.Tests/                   Unit and integration tests
@@ -28,6 +30,7 @@ Jeninnet.FileQuery/
 │   ├── Jeninnet.FileQuery.Tooling.Tests/           Build-tooling SDK tests
 │   ├── Jeninnet.FileQuery.Analyzers.Tests/         Roslyn analyzer tests
 │   ├── Jeninnet.FileQuery.Build.Tests/             MSBuild/SARIF tests
+│   ├── Jeninnet.FileQuery.FileProviders.Tests/     IFileProvider adapter tests
 │   └── Jeninnet.FileQuery.FileProviders.Tests/     IFileProvider adapter tests
 │
 ├── samples/                                        13 runnable samples + shared utilities
@@ -153,7 +156,7 @@ Jeninnet.FileQuery.Tests/
 
 ---
 
-## Benchmarks — `benchmarks/Jeninnet.FileQuery.Benchmarks`
+## Benchmarks — `src/Jeninnet.FileQuery.Benchmarks`
 
 One benchmark class per component:
 

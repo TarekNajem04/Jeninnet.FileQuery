@@ -23,9 +23,18 @@ internal sealed class TraversalPlanBuilder(IFileSystem fileSystem) : ITraversalP
         options.Validate();
 
         var resolvedRoot = fileSystem.GetFullPath(query.RootPath);
-        var rootDirectory = resolvedRoot.Length > 1
-            ? resolvedRoot.TrimEnd(fileSystem.DirectorySeparator)
-            : resolvedRoot;
+        var rootDirectory = resolvedRoot;
+
+        if(resolvedRoot.Length > 1 &&
+            resolvedRoot[^1] == fileSystem.DirectorySeparator) {
+            // Preserve semantic roots such as "C:/" and "//server/share/". Trimming them
+            // would change "C:/" to "C:" (the current directory on that drive).
+            var pathRoot = Path.GetPathRoot(resolvedRoot);
+
+            if(!string.Equals(pathRoot, resolvedRoot, StringComparison.Ordinal)) {
+                rootDirectory = resolvedRoot.TrimEnd(fileSystem.DirectorySeparator);
+            }
+        }
 
         // ===== Traversal configuration =====
         var traversalConfig = new TraversalConfiguration(
@@ -40,6 +49,7 @@ internal sealed class TraversalPlanBuilder(IFileSystem fileSystem) : ITraversalP
         );
 
         // ===== Matching configuration =====
+        PatternsMerger.ValidateSpecificMode(options.PatternInput, options.PatternMatchingMode);
         var resolvedCase = options.CaseSensitivity.Resolve();
         var typedPatterns = PatternsMerger.Merge(options.PatternInput);
 
@@ -108,15 +118,13 @@ internal sealed class TraversalPlanBuilder(IFileSystem fileSystem) : ITraversalP
 
         var loaded = GitIgnoreFileLoader.Load(options.GitIgnoreFiles, fileSystem, rootDirectory);
 
-        if(loaded.Count == 0) {
-            return;
-        }
-
         var existing = typedPatterns.TryGetValue(PatternKind.GitIgnore, out var current)
             ? current
             : [];
 
-        typedPatterns[PatternKind.GitIgnore] = [.. loaded, .. existing];
+        // Git never treats the repository metadata directory as worktree content. Keep the
+        // rule last so a user rule cannot accidentally re-include it.
+        typedPatterns[PatternKind.GitIgnore] = [.. loaded, .. existing, "/.git/"];
     }
 
     private void Validate(FileQuery query) {

@@ -5,6 +5,8 @@
 // Solution Repository: https://github.com/TarekNajem04/Jeninnet.FileQuery [LIVE]
 // Licensed under the MIT License.
 //
+using Jeninnet.FileQuery.Patterns.Exceptions;
+
 namespace Jeninnet.FileQuery.GitIgnore;
 
 /// <summary>
@@ -328,9 +330,33 @@ internal static class GitIgnoreFileLoader {
         foreach(var line in ReadPatternLines(path, fileSystem)) {
             var scoped = RewriteForBase(line, baseRelativePath);
 
-            if(scoped is not null) {
+            if(scoped is not null && IsSupportedRule(scoped)) {
                 patterns.Add(scoped);
             }
+        }
+    }
+
+    /// <summary>
+    /// Determines whether a GitIgnore rule can be compiled by the engine.
+    /// Ignore files in the wild sometimes contain patterns our stricter validator
+    /// rejects; dropping the unsupported line is preferable to failing the whole query.
+    /// </summary>
+    /// <param name="rule">The root-relative rule.</param>
+    /// <returns><see langword="true"/> when the rule compiles.</returns>
+    private static bool IsSupportedRule(string rule) {
+        try {
+            _ = FileQueryPatternSet.Compile(
+                new PatternInput(
+                    TypedPatterns: new Dictionary<PatternKind, IEnumerable<string>> {
+                        [PatternKind.GitIgnore] = [rule]
+                    },
+                    InterpretationMode: PatternInterpretationMode.Specific),
+                PatternMatchingMode.GitIgnore);
+
+            return true;
+        }
+        catch(PatternException) {
+            return false;
         }
     }
 
@@ -410,6 +436,23 @@ internal static class GitIgnoreFileLoader {
     }
 
     /// <summary>
+    /// Determines whether a rule target is a proper ancestor directory of the query root.
+    /// </summary>
+    /// <param name="candidate">The rule target, without a trailing slash.</param>
+    /// <param name="relativeRoot">The query root relative to the repository root.</param>
+    /// <param name="comparison">The path comparison mode.</param>
+    /// <returns><see langword="true"/> when the rule targets an ancestor of the query root.</returns>
+    private static bool IsAncestorRule(
+        string candidate,
+        string relativeRoot,
+        StringComparison comparison
+    ) =>
+        candidate.Length > 0 &&
+        relativeRoot.Length > candidate.Length &&
+        relativeRoot.StartsWith(candidate, comparison) &&
+        relativeRoot[candidate.Length] == '/';
+
+    /// <summary>
     /// Rebases a repository-root-relative rule onto a query root that may be deeper.
     /// </summary>
     /// <param name="pattern">The repository-relative rule.</param>
@@ -433,17 +476,28 @@ internal static class GitIgnoreFileLoader {
         var contentWithoutTrailingSlash = isDirectoryOnly ? content[..^1] : content;
         var containsSlash = contentWithoutTrailingSlash.Contains('/', StringComparison.Ordinal);
 
-        if(!wasRootAnchored && !containsSlash) {
-            return pattern;
-        }
-
         var comparison = OperatingSystem.IsLinux()
             ? StringComparison.Ordinal
             : StringComparison.OrdinalIgnoreCase;
 
+        if(!wasRootAnchored && !containsSlash) {
+            if(IsAncestorRule(contentWithoutTrailingSlash, relativeRoot, comparison)) {
+                return negated ? null : "/**";
+            }
+
+            return pattern;
+        }
+
         if(string.Equals(contentWithoutTrailingSlash, relativeRoot, comparison)) {
             // The rule targets the query root itself; every entry below it is affected.
             return negated ? "!/**" : "/**";
+        }
+
+        if(IsAncestorRule(contentWithoutTrailingSlash, relativeRoot, comparison)) {
+            // The rule targets an ancestor directory of the query root. Git cannot
+            // re-include below an excluded parent, so only a positive rule applies:
+            // it excludes the entire query root.
+            return negated ? null : "/**";
         }
 
         var prefix = $"{relativeRoot}/";

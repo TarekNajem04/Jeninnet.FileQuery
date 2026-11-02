@@ -6,7 +6,9 @@ This page introduces the Jeninnet.FileQuery pattern language through practical e
 
 ## The Golden Rule
 
-**Patterns are evaluated sequentially. The last matching rule wins.**
+**Within each dialect, patterns are evaluated sequentially and the last matching rule wins.**
+Across dialects, the subsets are evaluated GitIgnore → Glob → Regex and the first subset that
+returns Include wins. See [Pattern Precedence](../reference/pattern-precedence.md).
 
 ```
 **          ← Rule 1: exclude everything
@@ -14,9 +16,11 @@ This page introduces the Jeninnet.FileQuery pattern language through practical e
 data.log    ← Rule 3: exclude data.log specifically
 ```
 
-`data.log` is excluded because Rule 3 is the last rule that matches it.
-Every other `.log` file is included because Rule 2 matches them and no later rule overrides that.
-Every non-`.log` file is excluded because only Rule 1 matches them.
+This is a GitIgnore-only example. `data.log` is excluded because Rule 3 is the last GitIgnore rule
+that matches it. Every other `.log` file is included because Rule 2 matches them and no later
+GitIgnore rule overrides that. Every non-`.log` file is excluded because only Rule 1 matches them.
+A later Glob or Regex Include could override an Exclude, but a later dialect cannot exclude a
+path that GitIgnore already included.
 
 ---
 

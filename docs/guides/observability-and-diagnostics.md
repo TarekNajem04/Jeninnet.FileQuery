@@ -118,10 +118,12 @@ Configure how the engine handles IO errors (e.g., access denied, file locked) us
 
 ```csharp
 var options = new FileQueryOptions(
-    patternInput: myPatterns,
-    errorRecovery: new FileQueryErrorRecoveryOptions(
-        Action: FileQueryErrorAction.Skip, // Default: Skip, Retry, Abort
-        MaxRetries: 3
+    new FileQueryOptionsConfig(
+        PatternInput: myPatterns,
+        ErrorRecovery: new FileQueryErrorRecoveryOptions(
+            Action: FileQueryErrorAction.Skip, // Default: Skip, Retry, Abort
+            MaxRetryAttempts: 3
+        )
     )
 );
 ```

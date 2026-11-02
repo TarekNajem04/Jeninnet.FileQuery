@@ -6,9 +6,9 @@ This document records the architectural decisions made during the design of Jeni
 
 ## Goal 1 — Deterministic Rule Evaluation
 
-**Decision:** Adopt last-rule-wins semantics. Patterns are evaluated sequentially; the last matching rule determines the final inclusion state.
+**Decision:** Adopt last-rule-wins semantics **within each dialect**. Across dialects, evaluate the fixed subset order GitIgnore → Glob → Regex and stop at the first Include.
 
-**Reasoning:** Most file-matching libraries provide no documented guarantee about how conflicts between rules are resolved. The last-rule-wins model is explicit, predictable, and matches the mental model developers already have from `.gitignore` files. It requires no internal priority system and makes the behavior of any rule set derivable by reading it top to bottom.
+**Reasoning:** Most file-matching libraries provide no documented guarantee about how conflicts between rules are resolved. Last-rule-wins inside a dialect is explicit, predictable, and matches the `.gitignore` mental model. The fixed cross-dialect order gives each dialect a documented role: GitIgnore inclusions are final, while Glob and Regex can act as fallback includes and can override an earlier Exclude.
 
 ---
 
@@ -66,8 +66,8 @@ This document records the architectural decisions made during the design of Jeni
 
 **File content inspection.** The engine works with paths only. Content-based filtering is outside scope.
 
-**Parallel traversal.** The v1.0 traversal model is single-threaded. A parallel executor using `Channel<string>` is planned for v1.1.
+**Parallel traversal.** Traversal remains single-threaded by design; a parallel executor is not scheduled.
 
 **Mutable filesystem operations.** The engine is strictly read-only.
 
-**Pattern caching across queries.** Each `FileQuery` compiles its own pattern set. A `PrecompiledQuery` API that allows one compilation to serve multiple root paths is planned for v1.1.
+**Pattern caching across queries.** Each `FileQuery` compiles its own pattern set; a `PrecompiledQuery` API is a future consideration, not a current promise.

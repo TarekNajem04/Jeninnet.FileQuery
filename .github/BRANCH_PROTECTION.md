@@ -1,6 +1,7 @@
 # Branch Protection and Repository Security
 
-This repository requires owner-managed branch protection for `main`, `master`, and `develop` if the branch exists.
+This repository requires owner-managed branch protection for `main`. (`master`/`develop` are not
+used; create protection for any additional long-lived branch if one is introduced.)
 
 ## Required Branch Protection
 
@@ -32,9 +33,14 @@ Recommended required status checks:
 - `FileQuery Action`
 - `Native AOT Smoke (linux-x64)`
 - `Analyzer Package`
+- `Build Package`
 - `Long-Running Stability`
 - `Package Validation`
 - `Build Documentation`
+- `Build, Test, Analyze` (SonarCloud, when the token is configured)
+
+`auto-approve-dependabot.yml` is the documented exception to the “no auto-merge” rule: it is
+restricted to Dependabot-authored patch updates and still requires the protected-branch checks.
 
 ## Repository Settings
 
@@ -54,12 +60,14 @@ Disable:
 - Direct pushes to protected branches.
 - Force pushes.
 - Branch deletion.
-- Auto-merge unless owner-approved policy explicitly allows it.
 - Admin bypass for branch protection.
+- Auto-merge except the Dependabot patch-update workflow documented above.
 
 ## GitHub Actions Policy
 
-Repository-level Actions permissions must default to read-only. Workflows must declare `permissions: read-all` and grant write permissions only at job scope when required, such as GitHub Pages deployment or release creation.
+Repository-level Actions permissions must default to read-only. Workflows declare `contents: read`
+by default and grant write permissions only at job scope when required, such as GitHub Pages
+deployment or release creation.
 
 Changes under `.github/workflows/` require owner review through CODEOWNERS and must be merged only after required checks pass.
 

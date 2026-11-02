@@ -10,8 +10,8 @@ This review answers two questions:
 2. Which additions would make it materially more useful, and in what order?
 
 The original review identified two gaps: **trust in the published claims** and **one-pass results
-with metadata**. Both were closed during the v2.0.0 hardening cycle. The only capability still
-deliberately deferred is watch mode.
+with metadata**. Both were closed during the v2.0.0 hardening cycle. The only runtime capability
+still deliberately deferred is watch mode; the Visual Studio extension is also deferred.
 
 ---
 
@@ -21,7 +21,7 @@ deliberately deferred is watch mode.
 |---|---|
 | Pattern dialects | GitIgnore (negation, anchoring, directory-only), Glob (`*`, `**`, `?`, character classes incl. POSIX), Regex (`r:` prefix), Hybrid auto-classification |
 | Pattern features | Brace alternation `{a,b}` for Glob/GitIgnore; validation errors with position and segment |
-| Precedence | Deterministic GitIgnore → Glob → Regex, last-match-wins within GitIgnore |
+| Precedence | Deterministic GitIgnore → Glob → Regex; last-match-wins within each dialect; first Include across subsets |
 | Traversal | DFS/BFS, depth limit, symlink policies (ignore/follow/cycle-safe), inaccessible-entry recovery (skip/retry/abort) |
 | Results | Path-only streaming plus `FileQueryEntry` metadata (`Length`, creation/last-write timestamps, attributes, directory state, root) |
 | Filters | `MinSize`, `MaxSize`, `ModifiedAfter`, `ModifiedBefore`, `AttributesToSkip`, all applied in the existing pass |
@@ -36,7 +36,7 @@ deliberately deferred is watch mode.
 | Build integration | Roslyn analyzer (`JNQ1001`), MSBuild task and SARIF 2.1.0 exporter |
 | Performance | Zero-allocation matching, pooled relative paths, literal-suffix fast path, measured 10k/1M baselines |
 | Platform | .NET 10 / C# 14, AOT-ready by design, Native AOT publish/run smoke test in CI |
-| Quality | 0-warning build, 1,130 tests, DocFX with warnings-as-errors, cross-platform and soak baselines |
+| Quality | 0-warning build, 1,166 tests, DocFX with warnings-as-errors, cross-platform and soak baselines |
 
 ---
 
@@ -60,7 +60,7 @@ assessed for that row.
 | Diff-aware queries | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ (external `git` piping) |
 | AOT-ready | ✅ (design + CI smoke) | ✅ | ✅ | ✅ | ✅ | n/a |
 | CLI / tooling | ✅ | ❌ | ❌ | ❌ | ❌ | ✅ (tools) |
-| Target frameworks | net10.0 | netstandard2.0, net462+ | netstandard1.1+ (stale) | netstandard1.3 / net8.0 | net8+ | binaries |
+| Target frameworks | net10.0 runtime/tool packages; netstandard2.0 analyzer | netstandard2.0, net462+ | netstandard1.1+ (stale) | netstandard1.3 / net8.0 | net8+ | binaries |
 
 ### Additional capabilities shipped in v2.0.0
 
@@ -144,7 +144,7 @@ from returning silently.
 
 ## 5. What not to add
 
-- **`netstandard2.0` / .NET Framework targets** — the engine’s span/async/regex design would be
+- **`netstandard2.0` / .NET Framework runtime targets** — the engine’s span/async/regex design would be
   rewritten for a shrinking audience.
 - **Native enumeration** — rejected with measurements (see
   [Native Enumeration Research](../performance/native-enumeration-research.md)).
@@ -179,3 +179,4 @@ from returning silently.
 - Test and release evidence: `private/TESTING.md`, `private/CHANGELOG.md`.
 - Peer sources: Microsoft Learn (`Microsoft.Extensions.FileSystemGlobbing.Matcher`), DotNet.Glob
   GitHub/NuGet, GitignoreParserNet NuGet/GitHub, MAB.DotIgnore NuGet, `fd`/`ripgrep` documentation.
+

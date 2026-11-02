@@ -91,6 +91,12 @@ internal sealed class RelativePathFilter {
     private static string Normalize(string path) {
         ArgumentException.ThrowIfNullOrWhiteSpace(path);
 
+        if(path[^1] is '/' or '\\') {
+            throw new ArgumentException(
+                $"Included paths must identify files, not directories: '{path}'.",
+                nameof(path));
+        }
+
         if(Path.IsPathRooted(path)) {
             throw new ArgumentException(
                 $"Included paths must be relative to the query root: '{path}'.",

@@ -52,7 +52,13 @@ internal sealed class GitIgnoreInstructionMatcher : SegmentMatchEngine {
         var pathView = new PathView(context.Path, context.PathKind == PathKind.Directory);
         var comparison = context.CaseSensitivity.GetStringComparison();
 
-        if(!MatchPathAgainstCompiledPattern(pattern, pathView, comparison)) {
+        // Mirror MatchCore exactly: directory-only rules are matched against the
+        // ancestor directory for files, and the same depth exception applies.
+        var matches = pattern.DirectoryOnly && !pathView.IsDirectory
+            ? MatchesAncestorDirectory(pattern, pathView, comparison)
+            : MatchPathAgainstCompiledPattern(pattern, pathView, comparison);
+
+        if(!matches) {
             return false;
         }
 
@@ -85,7 +91,11 @@ internal sealed class GitIgnoreInstructionMatcher : SegmentMatchEngine {
             // Resetting it (the original bug) turned a prior Exclude into NoMatch
             // when a non-matching pattern followed, allowing traversal into pruned
             // directories like .xx/ after .*/  was followed by *.xxx.
-            if(!MatchPathAgainstCompiledPattern(pattern, pathView, comparison)) {
+            var matches = pattern.DirectoryOnly && !pathView.IsDirectory
+                ? MatchesAncestorDirectory(pattern, pathView, comparison)
+                : MatchPathAgainstCompiledPattern(pattern, pathView, comparison);
+
+            if(!matches) {
                 continue;
             }
 
@@ -106,82 +116,39 @@ internal sealed class GitIgnoreInstructionMatcher : SegmentMatchEngine {
             }
         }
 
-        _ = TryApplyDirectoryInclusionOverride(ref result, patterns, pathView, comparison);
         return result;
     }
 
     /// <summary>
-    /// Attempts to override an excluded file result by checking whether any
-    /// directory-only inclusion rule applies to the file's parent directory.
+    /// Checks whether a directory-only pattern matches any ancestor directory of a file path.
+    /// This lets the single-path matcher apply GitIgnore subtree exclusion without a traversal.
     /// </summary>
-    /// <param name="result">The match result to be updated.</param>
-    /// <param name="patterns">The compiled patterns to evaluate.</param>
-    /// <param name="pathView">The path view being evaluated.</param>
-    /// <param name="comparison">The string comparison to use.</param>
-    /// <returns>
-    /// <see langword="true"/> if the result was overridden to
-    /// <see cref="MatchResult.Include()"/>; otherwise <see langword="false"/>.
-    /// </returns>
-    private bool TryApplyDirectoryInclusionOverride(
-        ref MatchResult result,
-        IReadOnlyList<ICompiledPattern> patterns,
-        PathView pathView,
-        StringComparison comparison
-    ) {
-        if(pathView.IsDirectory || result.IsIncluded) {
-            return false;
-        }
-
-        if(pathView.SegmentCount <= 1) {
-            return false;
-        }
-
-        // INDEX-BASED LOOP — same rationale as in MatchCore.
-        // When the file is excluded (result.IsIncluded = false),
-        // this loop runs searching for a negated directory-only rule.
-        // Avoiding a second enumerator here eliminates another 40 B allocation,
-        // confirmed by the HybridMatcher benchmark showing 120 B (80 B from the
-        // two GitIgnore loops + 40 B from the Regex loop).
-        for(var i = 0; i < patterns.Count; i++) {
-            var pattern = patterns[i];
-
-            // Only directory-only inclusion rules (!dir/) are relevant.
-            if(!pattern.IsNegated || !pattern.DirectoryOnly) {
-                continue;
-            }
-
-            if(MatchParentDirectory(pattern, pathView, comparison)) {
-                result.Include();
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    /// <summary>
-    /// Matches a pattern against the parent directory of the current path.
-    /// </summary>
-    /// <param name="pattern">The compiled pattern.</param>
-    /// <param name="pathView">The view of the path segments.</param>
+    /// <param name="pattern">The compiled directory-only pattern.</param>
+    /// <param name="pathView">The file path being evaluated.</param>
     /// <param name="comparison">The string comparison rules.</param>
-    /// <returns>True if the pattern matches; otherwise, false.</returns>
-    private bool MatchParentDirectory(
+    /// <returns><see langword="true"/> when an ancestor directory matches.</returns>
+    private bool MatchesAncestorDirectory(
         ICompiledPattern pattern,
         PathView pathView,
         StringComparison comparison
     ) {
-        var enumerator = pathView.EnumerateSegments();
-        var remaining = pathView.SegmentCount - 1;
+        var end = pathView.Path.Length;
 
-        return MatchRecursiveSegments(
-            pattern,
-            patternIndex: 0,
-            comparison,
-            enumerator,
-            remaining,
-            isDirectory: true
-        );
+        while(true) {
+            var slash = pathView.Path[..end].LastIndexOf('/');
+
+            if(slash <= 0) {
+                return false;
+            }
+
+            var ancestor = new PathView(pathView.Path[..slash], isDirectory: true);
+
+            if(MatchPathAgainstCompiledPattern(pattern, ancestor, comparison)) {
+                return true;
+            }
+
+            end = slash;
+        }
     }
 
     /// <summary>

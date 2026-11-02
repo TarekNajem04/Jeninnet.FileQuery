@@ -33,26 +33,21 @@ internal sealed class FileQueryEngine(
         return EnumeratePlan(query.Options, traversal.Execute(plan, cancellationToken).GetEnumerator());
     }
 
-    public async IAsyncEnumerable<string> ExecuteAsync(FileQuery query, [EnumeratorCancellation] CancellationToken cancellationToken = default) {
-        await foreach(var result in ExecuteAsync(query, progress: null, cancellationToken)) {
-            yield return result;
-        }
-    }
+    public IAsyncEnumerable<string> ExecuteAsync(FileQuery query, CancellationToken cancellationToken = default) =>
+        ExecuteAsync(query, progress: null, cancellationToken);
 
-    public async IAsyncEnumerable<string> ExecuteAsync(
+    public IAsyncEnumerable<string> ExecuteAsync(
         FileQuery query,
         IProgress<FileQueryProgress>? progress,
-        [EnumeratorCancellation] CancellationToken cancellationToken = default
+        CancellationToken cancellationToken = default
     ) {
+        // Build eagerly so argument, option, and root validation fail at the call site,
+        // matching the synchronous overloads. Only enumeration is deferred.
         var plan = planBuilder.Build(query, progress);
-        var enumerator = traversal.ExecuteAsync(plan, cancellationToken).GetAsyncEnumerator(cancellationToken);
-
-        await foreach(var result in EnumeratePlanAsync(
+        return EnumeratePlanAsync(
             query.Options,
-            enumerator,
-            FileQueryTelemetry.ExecuteAsyncActivityName).ConfigureAwait(false)) {
-            yield return result;
-        }
+            traversal.ExecuteAsync(plan, cancellationToken).GetAsyncEnumerator(cancellationToken),
+            FileQueryTelemetry.ExecuteAsyncActivityName);
     }
 
     public IEnumerable<FileQueryEntry> ExecuteEntries(FileQuery query) => ExecuteEntries(query, progress: null, CancellationToken.None);
@@ -69,19 +64,22 @@ internal sealed class FileQueryEngine(
         return EnumeratePlan(query.Options, traversal.ExecuteEntries(plan, cancellationToken).GetEnumerator());
     }
 
-    public async IAsyncEnumerable<FileQueryEntry> ExecuteEntriesAsync(
+    public IAsyncEnumerable<FileQueryEntry> ExecuteEntriesAsync(
         FileQuery query,
-        [EnumeratorCancellation] CancellationToken cancellationToken = default
-    ) {
-        var plan = planBuilder.Build(query);
-        var enumerator = traversal.ExecuteEntriesAsync(plan, cancellationToken).GetAsyncEnumerator(cancellationToken);
+        CancellationToken cancellationToken = default
+    ) => ExecuteEntriesAsync(query, progress: null, cancellationToken);
 
-        await foreach(var result in EnumeratePlanAsync(
+    public IAsyncEnumerable<FileQueryEntry> ExecuteEntriesAsync(
+        FileQuery query,
+        IProgress<FileQueryProgress>? progress,
+        CancellationToken cancellationToken = default
+    ) {
+        // Build eagerly so validation timing matches the synchronous entry overloads.
+        var plan = planBuilder.Build(query, progress);
+        return EnumeratePlanAsync(
             query.Options,
-            enumerator,
-            FileQueryTelemetry.ExecuteAsyncActivityName).ConfigureAwait(false)) {
-            yield return result;
-        }
+            traversal.ExecuteEntriesAsync(plan, cancellationToken).GetAsyncEnumerator(cancellationToken),
+            FileQueryTelemetry.ExecuteAsyncActivityName);
     }
 
     /// <summary>

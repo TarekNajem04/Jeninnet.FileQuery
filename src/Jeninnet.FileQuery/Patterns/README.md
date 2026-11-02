@@ -1,6 +1,6 @@
 # Patterns Compiler Subsystem
 
-This folder contains the **Patterns Compiler** subsystem for [Jeninnet.FileQuery](../README.md).
+This folder contains the **Patterns Compiler** subsystem for [Jeninnet.FileQuery](https://github.com/TarekNajem04/Jeninnet.FileQuery/blob/main/src/Jeninnet.FileQuery/README.md).
 
 It is responsible for parsing raw string inputs, checking them against structural invariants, and outputting immutable, compiled pattern structures.
 
@@ -18,9 +18,9 @@ The patterns layer acts as the **front gate** of the query engine:
 
 ## 🎯 Primary Responsibilities
 
-1.  **Lexical Analysis**: [PatternScanner](./Tokenization/PatternScanner.cs) reads raw characters (utilizing `ReadOnlySpan<char>`) and generates token sequences without raising exceptions.
-2.  **Structural Validation**: Independent checks implement [IPatternInvariant](./Invariants/Definition/IPatternInvariant.cs) to verify semantic rules (e.g., character class range bounds, recursive wildcard boundary checks, regex validity).
-3.  **Compilation**: Converts validated token collections into compiled matcher representations (e.g., [CompiledPattern](./Compiled/CompiledPattern.cs)).
+1.  **Lexical Analysis**: [PatternScanner](https://github.com/TarekNajem04/Jeninnet.FileQuery/blob/main/src/Jeninnet.FileQuery/Patterns/Tokenization/PatternScanner.cs) reads raw characters (utilizing `ReadOnlySpan<char>`) and generates token sequences without raising exceptions.
+2.  **Structural Validation**: Independent checks implement [IPatternInvariant](https://github.com/TarekNajem04/Jeninnet.FileQuery/blob/main/src/Jeninnet.FileQuery/Patterns/Invariants/Definition/IPatternInvariant.cs) to verify semantic rules (e.g., character class range bounds, recursive wildcard boundary checks, regex validity).
+3.  **Compilation**: Converts validated token collections into compiled matcher representations (e.g., [CompiledPattern](https://github.com/TarekNajem04/Jeninnet.FileQuery/blob/main/src/Jeninnet.FileQuery/Patterns/Compiled/CompiledPattern.cs)).
 4.  **Diagnostic Metadata**: Preserves source pattern text and source order on compiled patterns so optional runtime audit mode can explain responsible match decisions.
 
 ---
@@ -35,6 +35,6 @@ The patterns layer acts as the **front gate** of the query engine:
 
 ## 🧬 Sub-Components
 
-*   **[Syntax Profiling](./Syntax/PatternSyntaxProfile.cs)**: Identifies dialetical structures (Glob, GitIgnore, and Regex).
-*   **[Invariants Subsystem](./Invariants/Definition/IPatternInvariant.cs)**: Houses structural, semantic, and lexical validation routines.
-*   **[Tokenization Subsystem](./Tokenization/IPatternTokenizer.cs)**: Readers for literals, escape symbols, ranges, wildcards, and POSIX class expressions.
+*   **[Syntax Profiling](https://github.com/TarekNajem04/Jeninnet.FileQuery/blob/main/src/Jeninnet.FileQuery/Patterns/Syntax/PatternSyntaxProfile.cs)**: Identifies dialetical structures (Glob, GitIgnore, and Regex).
+*   **[Invariants Subsystem](https://github.com/TarekNajem04/Jeninnet.FileQuery/blob/main/src/Jeninnet.FileQuery/Patterns/Invariants/Definition/IPatternInvariant.cs)**: Houses structural, semantic, and lexical validation routines.
+*   **[Tokenization Subsystem](https://github.com/TarekNajem04/Jeninnet.FileQuery/blob/main/src/Jeninnet.FileQuery/Patterns/Tokenization/IPatternTokenizer.cs)**: Readers for literals, escape symbols, ranges, wildcards, and POSIX class expressions.

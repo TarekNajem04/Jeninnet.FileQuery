@@ -39,6 +39,34 @@ public sealed class BraceExpansionTests {
     }
 
     /// <summary>
+    /// Regex patterns are not subject to glob bracket/brace pairing rules.
+    /// </summary>
+    [TestMethod]
+    public void Compile_RegexWithLiteralBrace_IsValid() {
+        var patterns = FileQueryPatternSet.Compile(["r:^a}$"]);
+
+        Assert.IsTrue(patterns.IsMatch("a}"));
+        Assert.IsFalse(patterns.IsMatch("a"));
+    }
+
+    /// <summary>
+    /// Typed regex patterns trim surrounding whitespace before adding the prefix.
+    /// </summary>
+    [TestMethod]
+    public void Compile_TypedRegex_TrimsSurroundingWhitespace() {
+        var patterns = FileQueryPatternSet.Compile(
+            new PatternInput(
+                TypedPatterns: new Dictionary<PatternKind, IEnumerable<string>> {
+                    [PatternKind.Regex] = ["  ^a$  "]
+                },
+                InterpretationMode: PatternInterpretationMode.Specific),
+            PatternMatchingMode.Regex);
+
+        Assert.IsTrue(patterns.IsMatch("a"));
+        Assert.IsFalse(patterns.IsMatch(" a"));
+    }
+
+    /// <summary>
     /// Escaped braces remain literal.
     /// </summary>
     [TestMethod]

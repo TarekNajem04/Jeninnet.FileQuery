@@ -63,10 +63,25 @@ internal sealed class TraversalFrontier(int initialCapacity = 64) : IDisposable 
             return;
         }
 
+        // Compact consumed frames first. BFS advances _head continuously; growing
+        // without compaction would double the rented array even though most of it
+        // is dead space.
+        var oldTail = _tail;
+
+        if(_head > 0) {
+            var count = _tail - _head;
+            Array.Copy(_buffer, _head, _buffer, 0, count);
+            Array.Clear(_buffer, count, oldTail - count);
+            _tail = count;
+            _head = 0;
+
+            if(_tail < _buffer.Length) {
+                return;
+            }
+        }
+
         var newBuffer = ArrayPool<TraversalFrame>.Shared.Rent(_buffer.Length * 2);
-        Array.Copy(_buffer, _head, newBuffer, 0, _tail - _head);
-        _tail -= _head;
-        _head = 0;
+        Array.Copy(_buffer, 0, newBuffer, 0, _tail);
         ArrayPool<TraversalFrame>.Shared.Return(_buffer, clearArray: true);
         _buffer = newBuffer;
     }

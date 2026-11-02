@@ -27,6 +27,26 @@ public sealed class PatternErrorPositionTests {
     }
 
     /// <summary>
+    /// Escaped brackets are literals and must not be reported as malformed.
+    /// </summary>
+    [TestMethod]
+    public void PatternValidator_AcceptsEscapedBracket() {
+        var (isMalformed, _, _, _) = PatternValidator.Validate(@"src/\[x".AsSpan());
+
+        Assert.IsFalse(isMalformed);
+    }
+
+    /// <summary>
+    /// An even number of trailing backslashes represents a literal backslash and is valid.
+    /// </summary>
+    [TestMethod]
+    public void PatternValidator_AcceptsLiteralTrailingBackslash() {
+        var (isMalformed, _, _, _) = PatternValidator.Validate(@"foo\\".AsSpan());
+
+        Assert.IsFalse(isMalformed);
+    }
+
+    /// <summary>
     /// Pattern exceptions report the offending character and segment.
     /// </summary>
     [TestMethod]

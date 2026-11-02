@@ -40,5 +40,5 @@ The run exits `0` only when:
 `soak-report.json` and `soak-report.md` are written to the output directory. The `soak` CI job runs
 a shorter session and uploads the report.
 
-See [Long-Running Stability](../../docs/performance/long-running-stability.md) for the recorded
+See [Long-Running Stability](https://github.com/TarekNajem04/Jeninnet.FileQuery/blob/main/docs/performance/long-running-stability.md) for the recorded
 run, interpretation, and limitations.

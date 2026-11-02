@@ -160,11 +160,32 @@ public sealed class PatternInspectorTests {
     }
 
     /// <summary>
+    /// A forced Regex dialect accepts an unprefixed expression, matching the compiler.
+    /// </summary>
+    [TestMethod]
+    public void Inspect_ShouldAddRegexPrefix_WhenForcedRegexHasNoPrefix() {
+        var inspection = PatternInspector.Inspect("^a.*$", PatternKind.Regex);
+
+        inspection.Kind.Should().Be(PatternKind.Regex);
+        inspection.IsRegex.Should().BeTrue();
+        inspection.Pattern.Should().Be("^a.*$");
+        inspection.Segments[0].Tokens.Should().Contain(
+            new PatternTokenInfo(PatternTokenKind.RegularExpression, "^a.*$"));
+    }
+
+    /// <summary>
     /// Verifies that a forced unknown dialect is rejected.
     /// </summary>
     [TestMethod]
     public void Inspect_ShouldRejectForcedUnknownDialect() => Assert.Throws<ArgumentException>(() =>
             PatternInspector.Inspect("*.cs", PatternKind.Unknown));
+
+    /// <summary>
+    /// Verifies that an undefined forced dialect is rejected.
+    /// </summary>
+    [TestMethod]
+    public void Inspect_ShouldRejectUndefinedDialect() => Assert.Throws<ArgumentOutOfRangeException>(() =>
+            PatternInspector.Inspect("*.cs", (PatternKind)99));
 
     /// <summary>
     /// Verifies malformed pattern reporting.

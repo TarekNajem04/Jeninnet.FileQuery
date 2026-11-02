@@ -70,53 +70,88 @@ internal static class PatternLiteralValidator {
             return null;
         }
 
-        if(pattern[pattern.Length - 1] == '\\') {
+        if(EndsWithUnescapedBackslash(pattern)) {
             return new PatternIssue(
                 TRAILING_BACKSLASH,
                 "the pattern ends with an unescaped backslash.");
         }
 
-        if(pattern.IndexOf('[') < 0) {
+        var masked = MaskEscapedCharacters(pattern);
+
+        if(masked.IndexOf('[') < 0) {
             return null;
         }
 
-        if(pattern.IndexOf(']') < 0) {
+        if(masked.IndexOf(']') < 0) {
             return new PatternIssue(
                 MISSING_CLOSING_BRACKET,
                 "missing closing bracket ']' for an opening bracket '['.");
         }
 
-        if(pattern.IndexOf("[]", System.StringComparison.Ordinal) >= 0) {
+        if(masked.IndexOf("[]", System.StringComparison.Ordinal) >= 0) {
             return new PatternIssue(
                 EMPTY_BRACKET,
                 "empty bracket expression '[]' is not allowed.");
         }
 
-        if(_nestedBrackets.IsMatch(pattern)) {
+        if(_nestedBrackets.IsMatch(masked)) {
             return new PatternIssue(
                 NESTED_BRACKETS,
                 "nested brackets are not supported (e.g. '[[a-z]]').");
         }
 
-        if(_invalidRange.IsMatch(pattern)) {
+        if(_invalidRange.IsMatch(masked)) {
             return new PatternIssue(
                 INVALID_RANGE,
                 "invalid range syntax detected (e.g. '[a-]').");
         }
 
-        if(_missingRangeOperand.IsMatch(pattern)) {
+        if(_missingRangeOperand.IsMatch(masked)) {
             return new PatternIssue(
                 MISSING_RANGE_OPERAND,
                 "range missing left operand (e.g. '[-z]').");
         }
 
-        if(_nonsenseDash.IsMatch(pattern)) {
+        if(_nonsenseDash.IsMatch(masked)) {
             return new PatternIssue(
                 NONSENSE_DASH,
                 "nonsensical double-dash sequence detected (e.g. '[--]').");
         }
 
         return null;
+    }
+
+    private static bool EndsWithUnescapedBackslash(string pattern) {
+        var count = 0;
+
+        for(var i = pattern.Length - 1; i >= 0 && pattern[i] == '\\'; i--) {
+            count++;
+        }
+
+        return count % 2 != 0;
+    }
+
+    private static string MaskEscapedCharacters(string pattern) {
+        var chars = pattern.ToCharArray();
+        var i = 0;
+
+        while(i < chars.Length) {
+            if(chars[i] != '\\') {
+                i++;
+                continue;
+            }
+
+            chars[i] = ' ';
+
+            if(i + 1 < chars.Length) {
+                chars[i + 1] = ' ';
+                i += 2;
+            } else {
+                i++;
+            }
+        }
+
+        return new string(chars);
     }
 }
 

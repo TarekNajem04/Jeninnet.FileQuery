@@ -55,6 +55,19 @@ internal sealed class PatternPipeline {
     public ICompiledPattern Compile(ClassifiedPattern pattern) {
         ArgumentNullException.ThrowIfNull(pattern);
 
+        // Typed regex patterns do not need the "r:" prefix at the call site; normalize
+        // here so UsingRegex()/Where(PatternKind.Regex, ...) cannot silently produce a no-op.
+        // Trim first: the scanner trims raw pattern text, so prefixing untrimmed text
+        // would leave leading/trailing spaces inside the actual regex expression.
+        if(pattern.Type is PatternKind.Regex) {
+            var regexText = pattern.Text.Trim();
+            pattern = pattern with {
+                Text = regexText.StartsWith("r:", StringComparison.Ordinal)
+                    ? regexText
+                    : "r:" + regexText
+            };
+        }
+
         if(pattern.Type is PatternKind.Unknown) {
             var (_, error, position, segment) = PatternValidator.Validate(pattern.Text.AsSpan());
             var message = error is not null
@@ -169,6 +182,7 @@ internal sealed class PatternPipeline {
             new LiteralNormalizationInvariant(),
             new RegexSyntaxInvariant(),             // fixed: strips r: prefix
             new EmptyPatternInvariant(),
+            new GlobPathSeparatorInvariant(),        // rejects Windows-style path separators
 
             // ---- Structural phase ----
             new CharacterClassRangeInvariant(),

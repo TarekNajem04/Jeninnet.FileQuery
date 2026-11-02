@@ -52,11 +52,11 @@ Report from `2026-11-02`:
 
 | Metric | Value |
 |---|---|
-| Line coverage | **89.2%** (5,596 of 6,267) |
-| Branch coverage | **79.2%** (2,104 of 2,655) |
-| Method coverage | **92.2%** (942 of 1,021) |
+| Line coverage | **89.4%** (5,852 of 6,540) |
+| Branch coverage | **79.7%** (2,277 of 2,855) |
+| Method coverage | **92.1%** (967 of 1,049) |
 | Assemblies | 9 |
-| Classes | 173 |
+| Classes | 175 |
 
 The report is generated from all seven test projects after the `coverlet.collector` wiring. The
 core engine, CommandLine, DependencyInjection, Tool, Tooling, FileProviders, Build, and Analyzers

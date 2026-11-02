@@ -34,23 +34,34 @@ internal sealed class FileSystem : IFileSystem {
     ) {
         var attempts = GetMaxAttempts(errorRecovery);
         var attempt = 0;
+        var yielded = 0;
+        var skip = 0;
         IEnumerator<FileSystemEntry>? enumerator = null;
 
-        while(attempt < attempts) {
-            var res = TryMoveNext(directory, ref enumerator, ignoreInaccessible, errorRecovery, ref attempt, attempts, out var entry);
-            if(res == EnumerationResult.Break) {
-                yield break;
-            }
+        try {
+            while(attempt < attempts) {
+                var res = TryMoveNext(directory, ref enumerator, ignoreInaccessible, errorRecovery, ref attempt, attempts, ref skip, out var entry);
+                if(res == EnumerationResult.Break) {
+                    yield break;
+                }
 
-            if(res == EnumerationResult.Continue) {
-                continue;
-            }
+                if(res == EnumerationResult.Continue) {
+                    // A retry restarts the directory enumerator. Skip the entries that
+                    // were already yielded so callers never observe duplicates.
+                    skip = yielded;
+                    continue;
+                }
 
-            if(entry.IsDirectory && !TryEnsureAccessible(entry.FullPath, ignoreInaccessible, errorRecovery)) {
-                continue;
-            }
+                if(entry.IsDirectory && !TryEnsureAccessible(entry.FullPath, ignoreInaccessible, errorRecovery)) {
+                    continue;
+                }
 
-            yield return entry;
+                yielded++;
+                yield return entry;
+            }
+        }
+        finally {
+            enumerator?.Dispose();
         }
     }
 
@@ -65,28 +76,41 @@ internal sealed class FileSystem : IFileSystem {
             yield break;
         }
 
+        // Yield once so the first MoveNextAsync does not complete entirely on the
+        // caller's thread. Per-entry yielding was removed because it forced a thread
+        // pool hop for every file and dominated async enumeration cost.
+        await Task.Yield();
+
         var attempts = GetMaxAttempts(errorRecovery);
         var attempt = 0;
+        var yielded = 0;
+        var skip = 0;
         IEnumerator<FileSystemEntry>? enumerator = null;
 
-        while(attempt < attempts) {
-            cancellationToken.ThrowIfCancellationRequested();
+        try {
+            while(attempt < attempts) {
+                cancellationToken.ThrowIfCancellationRequested();
 
-            var res = TryMoveNext(directory, ref enumerator, ignoreInaccessible, errorRecovery, ref attempt, attempts, out var entry);
-            if(res == EnumerationResult.Break) {
-                yield break;
+                var res = TryMoveNext(directory, ref enumerator, ignoreInaccessible, errorRecovery, ref attempt, attempts, ref skip, out var entry);
+                if(res == EnumerationResult.Break) {
+                    yield break;
+                }
+
+                if(res == EnumerationResult.Continue) {
+                    skip = yielded;
+                    continue;
+                }
+
+                if(entry.IsDirectory && !TryEnsureAccessible(entry.FullPath, ignoreInaccessible, errorRecovery)) {
+                    continue;
+                }
+
+                yielded++;
+                yield return entry;
             }
-
-            if(res == EnumerationResult.Continue) {
-                continue;
-            }
-
-            if(entry.IsDirectory && !TryEnsureAccessible(entry.FullPath, ignoreInaccessible, errorRecovery)) {
-                continue;
-            }
-
-            yield return entry;
-            await Task.Yield();
+        }
+        finally {
+            enumerator?.Dispose();
         }
     }
 
@@ -118,7 +142,7 @@ internal sealed class FileSystem : IFileSystem {
                 return target?.FullName ?? path;
             }
         }
-        catch {
+        catch(Exception ex) when(FileSystemGuards.IsRecoverable(ex)) {
             // If we cannot resolve (e.g. permission error), return the original path.
             // The engine will handle the access error during enumeration.
         }
@@ -135,7 +159,18 @@ internal sealed class FileSystem : IFileSystem {
     /// <inheritdoc/>
     public string GetFullPath(string path, string basePath) => Path.GetFullPath(path, basePath);
 
-    private static int GetMaxAttempts(FileQueryErrorRecoveryOptions errorRecovery) => errorRecovery.Action is FileQueryErrorAction.Retry ? errorRecovery.MaxRetryAttempts + 1 : 1;
+    private static int GetMaxAttempts(FileQueryErrorRecoveryOptions errorRecovery) {
+        if(errorRecovery.Action is not FileQueryErrorAction.Retry) {
+            return 1;
+        }
+
+        // MaxRetryAttempts is user-supplied and may be int.MaxValue. Clamp the
+        // inclusive attempt count instead of overflowing to a negative value,
+        // which would silently enumerate nothing.
+        return errorRecovery.MaxRetryAttempts == int.MaxValue
+            ? int.MaxValue
+            : errorRecovery.MaxRetryAttempts + 1;
+    }
 
     private enum EnumerationResult { Success = 0, Break = 1, Continue = 2 }
 
@@ -146,11 +181,25 @@ internal sealed class FileSystem : IFileSystem {
         FileQueryErrorRecoveryOptions errorRecovery,
         ref int attempt,
         int attempts,
+        ref int skip,
         out FileSystemEntry entry
     ) {
         entry = default;
         try {
-            enumerator ??= CreateEnumerator(directory);
+            if(enumerator is null) {
+                enumerator = CreateEnumerator(directory);
+
+                while(skip > 0) {
+                    if(!enumerator.MoveNext()) {
+                        enumerator.Dispose();
+                        enumerator = null;
+                        return EnumerationResult.Break;
+                    }
+
+                    skip--;
+                }
+            }
+
             if(enumerator.MoveNext()) {
                 entry = enumerator.Current;
                 return EnumerationResult.Success;

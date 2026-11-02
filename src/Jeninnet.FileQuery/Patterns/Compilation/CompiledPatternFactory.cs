@@ -28,37 +28,9 @@ namespace Jeninnet.FileQuery.Patterns.Compilation;
 /// </para>
 /// </remarks>
 internal static class CompiledPatternFactory {
-    private static PatternPipeline? _pipeline = PatternPipeline.CreateDefault();
+    private const PatternKind DEFAULT_PATTERN_TYPE = PatternKind.GitIgnore;
 
-    /// <summary>
-    /// Gets or sets the default pattern kind used for untyped
-    /// <see cref="Compile(string)"/> calls.
-    /// </summary>
-    public static PatternKind DefaultPatternType { get; set; } = PatternKind.GitIgnore;
-
-    /// <summary>
-    /// Configures the compilation pipeline used by this facade.
-    /// Must be called exactly once during application startup.
-    /// </summary>
-    /// <param name="pipeline">The pipeline to use for compilation.</param>
-    /// <exception cref="InvalidOperationException">
-    /// Thrown when the factory has already been configured.
-    /// </exception>
-    public static void Configure(PatternPipeline pipeline) {
-        ArgumentNullException.ThrowIfNull(pipeline);
-
-        if(_pipeline is not null) {
-            throw new InvalidOperationException(
-                "CompiledPatternFactory has already been configured.");
-        }
-
-        _pipeline = pipeline;
-    }
-
-    private static PatternPipeline Pipeline =>
-        _pipeline ?? throw new InvalidOperationException(
-            "CompiledPatternFactory has not been configured. " +
-            "Call Configure(...) during application startup.");
+    private static readonly PatternPipeline Pipeline = PatternPipeline.CreateDefault();
 
     /// <summary>
     /// Compiles a <see cref="ClassifiedPatternSet"/> through the full pipeline.
@@ -67,10 +39,10 @@ internal static class CompiledPatternFactory {
     public static ICompiledPatternSet Compile(ClassifiedPatternSet patterns) => Pipeline.Compile(patterns);
 
     /// <summary>
-    /// Compiles a single untyped pattern using <see cref="DefaultPatternType"/>.
+    /// Compiles a single untyped pattern using <see cref="PatternKind.GitIgnore"/>.
     /// </summary>
     /// <param name="pattern">The pattern string to compile.</param>
-    public static ICompiledPatternSet Compile(string pattern) => Compile(DefaultPatternType, pattern);
+    public static ICompiledPatternSet Compile(string pattern) => Compile(DEFAULT_PATTERN_TYPE, pattern);
 
     /// <summary>
     /// Compiles a single pattern of the specified <paramref name="type"/>.

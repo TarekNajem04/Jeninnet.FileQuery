@@ -52,6 +52,13 @@ internal sealed class RegexInstructionMatcher : PathMatcher {
     private readonly ConcurrentDictionary<RegexCacheKey, Regex> _regexCache = new();
 
     /// <summary>
+    /// Upper bound on cached <see cref="Regex"/> instances. The cache is process-wide
+    /// through the shared matcher, so an unbounded cache would retain a compiled
+    /// expression for every distinct pattern text a long-running host ever supplies.
+    /// </summary>
+    private const int MAX_CACHED_REGEXES = 512;
+
+    /// <summary>
     /// Initializes a new instance of the <see cref="RegexInstructionMatcher"/>.
     /// </summary>
     /// <remarks>
@@ -135,6 +142,13 @@ internal sealed class RegexInstructionMatcher : PathMatcher {
     /// </param>
     private Regex GetOrCreateRegex(string patternText, CaseSensitivity caseSensitivity) {
         var key = new RegexCacheKey(patternText, caseSensitivity);
+
+        // Bounded cache: when the cap is reached, drop the whole cache instead of
+        // growing without limit. Cached Regex instances are immutable, so concurrent
+        // readers that already hold one continue to use it safely.
+        if(_regexCache.Count >= MAX_CACHED_REGEXES) {
+            _regexCache.Clear();
+        }
 
         return _regexCache.GetOrAdd(key, static k => {
             var options = RegexOptions.Compiled | RegexOptions.CultureInvariant;

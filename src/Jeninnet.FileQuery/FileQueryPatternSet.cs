@@ -56,12 +56,23 @@ public sealed class FileQueryPatternSet {
     /// <param name="caseSensitivity">The case-sensitivity behavior. Platform defaults are resolved once.</param>
     /// <returns>The compiled pattern set.</returns>
     /// <exception cref="ArgumentNullException">Thrown when <paramref name="patternInput"/> is <see langword="null"/>.</exception>
+    /// <exception cref="ArgumentOutOfRangeException">
+    /// Thrown when <paramref name="matchingMode"/> or <paramref name="caseSensitivity"/> is not a defined value.
+    /// </exception>
     public static FileQueryPatternSet Compile(
         PatternInput patternInput,
         PatternMatchingMode matchingMode = PatternMatchingMode.GitIgnore,
         CaseSensitivity caseSensitivity = CaseSensitivity.PlatformDefault
     ) {
         ArgumentNullException.ThrowIfNull(patternInput);
+        PatternsMerger.ValidateSpecificMode(patternInput, matchingMode);
+
+        if(!Enum.IsDefined(caseSensitivity)) {
+            throw new ArgumentOutOfRangeException(
+                nameof(caseSensitivity),
+                caseSensitivity,
+                "Unknown case sensitivity mode.");
+        }
 
         var resolvedCase = caseSensitivity.Resolve();
         var typedPatterns = PatternsMerger.Merge(patternInput);

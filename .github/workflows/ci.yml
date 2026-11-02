@@ -206,10 +206,18 @@ jobs:
 
     timeout-minutes: 10
 
+    needs:
+      - build-and-test
+
     steps:
 
       - name: Checkout
         uses: actions/checkout@v7.0.1
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v7.1.0
+        with:
+          node-version: 24
 
       - name: Run extension tests
         run: node --test "extensions/vscode/test/*.test.js"
@@ -221,6 +229,9 @@ jobs:
     runs-on: ubuntu-latest
 
     timeout-minutes: 15
+
+    needs:
+      - build-and-test
 
     steps:
 
@@ -327,8 +338,8 @@ jobs:
       - name: Pack the library and analyzer
         run: |
           set -euo pipefail
-          dotnet pack src/Jeninnet.FileQuery/Jeninnet.FileQuery.csproj -c Release -o artifacts/packages
-          dotnet pack src/Jeninnet.FileQuery.Analyzers/Jeninnet.FileQuery.Analyzers.csproj -c Release -o artifacts/packages
+          dotnet pack src/Jeninnet.FileQuery/Jeninnet.FileQuery.csproj -c Release -o artifacts/packages /p:EnablePackageValidation=true
+          dotnet pack src/Jeninnet.FileQuery.Analyzers/Jeninnet.FileQuery.Analyzers.csproj -c Release -o artifacts/packages /p:EnablePackageValidation=true
 
       - name: Verify the analyzer package contents
         run: |
@@ -374,6 +385,50 @@ jobs:
           fi
           grep -q 'JNQ1001' malformed.log
 
+  build-package:
+
+    name: Build Package
+
+    runs-on: ubuntu-latest
+
+    timeout-minutes: 20
+
+    needs:
+      - build-and-test
+
+    steps:
+
+      - name: Checkout
+        uses: actions/checkout@v7.0.1
+
+      - name: Setup .NET SDK (global.json)
+        uses: actions/setup-dotnet@v6.0.0
+        with:
+          global-json-file: global.json
+
+      - name: Pack the Build package
+        run: dotnet pack src/Jeninnet.FileQuery.Build/Jeninnet.FileQuery.Build.csproj -c Release -o artifacts/packages /p:EnablePackageValidation=true
+
+      - name: Build a consumer with the Build package installed
+        shell: bash
+        run: |
+          set -euo pipefail
+          version=$(dotnet msbuild src/Jeninnet.FileQuery.Build/Jeninnet.FileQuery.Build.csproj -getProperty:Version -nologo -verbosity:quiet)
+          mkdir -p artifacts/build-consumer
+          cd artifacts/build-consumer
+          dotnet new classlib --framework net10.0 --no-restore
+          dotnet add package Jeninnet.FileQuery.Build --version "$version" --no-restore
+          sed -i 's#</Project>#  <PropertyGroup><FileQueryPatterns>**/*.cs;!bin/</FileQueryPatterns><FileQuerySarifOutput>$(MSBuildProjectDirectory)/artifacts/filequery.sarif</FileQuerySarifOutput></PropertyGroup>\n</Project>#' build-consumer.csproj
+          dotnet restore --source ../../artifacts/packages --source https://api.nuget.org/v3/index.json
+          dotnet build --no-restore
+          test -f artifacts/filequery.sarif
+          sed -i 's#\*\*/\*.cs;!bin/#**/*.cs;[abc#' build-consumer.csproj
+          if dotnet build --no-restore > malformed.log 2>&1; then
+            echo "Expected the malformed pattern build to fail."
+            exit 1
+          fi
+          grep -q 'JNQ2001' malformed.log
+
   soak:
 
     name: Long-Running Stability
@@ -381,6 +436,9 @@ jobs:
     runs-on: ubuntu-latest
 
     timeout-minutes: 15
+
+    needs:
+      - build-and-test
 
     steps:
 
@@ -463,5 +521,9 @@ jobs:
             /p:EnablePackageValidation=true
 
           dotnet pack src/Jeninnet.FileQuery.FileProviders/Jeninnet.FileQuery.FileProviders.csproj \
+            -c Release \
+            /p:EnablePackageValidation=true
+
+          dotnet pack src/Jeninnet.FileQuery.Analyzers/Jeninnet.FileQuery.Analyzers.csproj \
             -c Release \
             /p:EnablePackageValidation=true

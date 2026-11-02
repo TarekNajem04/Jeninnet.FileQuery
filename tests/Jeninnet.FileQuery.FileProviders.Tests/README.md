@@ -3,7 +3,7 @@
 Tests for the `IFileProvider` adapter: physical and in-memory providers, scoped roots, metadata
 filters, directory results, async execution, GitIgnore ingestion, and error recovery.
 
-**7 tests.**
+**8 tests.**
 
 ## What is covered
 

@@ -12,6 +12,9 @@ GitIgnore, Glob, and Regex patterns, with metadata results, directory output, `.
 ingestion, cancellation, progress, and first-class diagnostics.
 
 ```csharp
+using Jeninnet.FileQuery;
+using Jeninnet.FileQuery.Enums;
+
 var files = FileQuery.From(@"C:\src\MyProject")
     .UsingGlob()
     .Where(PatternKind.Glob, ["**/*.cs", "!**/obj/**"])

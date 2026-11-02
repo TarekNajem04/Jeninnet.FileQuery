@@ -1,7 +1,7 @@
 # Jeninnet.FileQuery.Tool
 
 `dotnet-filequery` is a terminal file discovery tool built on the
-[Jeninnet.FileQuery](../Jeninnet.FileQuery/README.md) engine. It matches GitIgnore, Glob, and
+[Jeninnet.FileQuery](https://github.com/TarekNajem04/Jeninnet.FileQuery/blob/main/src/Jeninnet.FileQuery/README.md) engine. It matches GitIgnore, Glob, and
 Regex patterns and streams the results to standard output so they compose with the rest of your
 shell tooling.
 
@@ -65,6 +65,9 @@ dotnet-filequery "**;!*.log" --null | xargs -0 wc -l
 | `--changed-since <revision>` | | Limit the query to files changed since a commit, tag, or branch. |
 | `--changed-since-date <timestamp>` | | Limit the query to files changed since an ISO 8601 timestamp. |
 | `--no-untracked` | off | Exclude untracked files from a change-set query. |
+| `--ignore-files` | off | Load root/nested `.gitignore` files and `.git/info/exclude`. |
+| `--global-ignore <path>` | | Add an optional global Git ignore file. |
+| `--json` | off | Write newline-delimited JSON objects with entry metadata; conflicts with `--null` and `--count`. |
 | `--explain` | off | Write one line per file with its include/exclude outcome and reason instead of paths. |
 
 Patterns supplied through `--gitignore`, `--glob`, or `--regex` are typed explicitly and cannot be
@@ -88,7 +91,7 @@ dotnet-filequery --changed-since-date 2026-10-01T00:00:00Z --no-untracked
 ```
 
 The root may be a subdirectory of the repository; change paths are rebased onto it automatically.
-See the [diff-aware guide](../../docs/guides/diff-aware-queries.md) for the full semantics.
+See the [diff-aware guide](https://github.com/TarekNajem04/Jeninnet.FileQuery/blob/main/docs/guides/diff-aware-queries.md) for the full semantics.
 
 ## Explaining matches
 
@@ -103,7 +106,7 @@ The first field is `include` or `exclude`, the second is the path relative to th
 third is the reason reported by the engine (including the responsible pattern kind). Directories
 are not reported. `--explain` cannot be combined with `--count` or `--null`.
 
-This is the mode used by the [VS Code extension](../../docs/guides/ide-extension.md).
+This is the mode used by the [VS Code extension](https://github.com/TarekNajem04/Jeninnet.FileQuery/blob/main/docs/guides/ide-extension.md).
 
 ## Output and exit codes
 
@@ -116,10 +119,10 @@ This is the mode used by the [VS Code extension](../../docs/guides/ide-extension
 
 ## Related packages
 
-- [Jeninnet.FileQuery](../Jeninnet.FileQuery/README.md) — the matching engine.
-- [Jeninnet.FileQuery.CommandLine](../Jeninnet.FileQuery.CommandLine/README.md) — the
+- [Jeninnet.FileQuery](https://github.com/TarekNajem04/Jeninnet.FileQuery/blob/main/src/Jeninnet.FileQuery/README.md) — the matching engine.
+- [Jeninnet.FileQuery.CommandLine](https://github.com/TarekNajem04/Jeninnet.FileQuery/blob/main/src/Jeninnet.FileQuery.CommandLine/README.md) — the
   `System.CommandLine` integration used by this tool.
 
 ## License
 
-MIT — see [`LICENSE`](../../LICENSE).
+MIT — see [`LICENSE`](https://github.com/TarekNajem04/Jeninnet.FileQuery/blob/main/LICENSE).

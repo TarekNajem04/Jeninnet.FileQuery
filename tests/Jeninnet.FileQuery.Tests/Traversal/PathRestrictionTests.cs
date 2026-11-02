@@ -121,6 +121,19 @@ public sealed class PathRestrictionTests {
     }
 
     /// <summary>
+    /// Verifies that directory entries are rejected instead of being treated as files.
+    /// </summary>
+    [TestMethod]
+    public void RestrictToPaths_ShouldThrow_WhenPathIsDirectory() {
+        using var environment = CreateEnvironment();
+
+        var exception = Assert.Throws<ArgumentException>(() =>
+            FileQuery.From(environment.Root).RestrictToPaths(["src/"]).Build());
+
+        exception.Message.Should().Contain("files, not directories");
+    }
+
+    /// <summary>
     /// Verifies that case-sensitive matching does not fold listed paths.
     /// </summary>
     [TestMethod]

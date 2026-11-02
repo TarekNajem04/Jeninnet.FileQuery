@@ -161,6 +161,11 @@ internal sealed record QueryRequest(
             return false;
         }
 
+        if(ignoreFiles && dialect is not null && dialect.MatchingMode is not PatternMatchingMode.GitIgnore) {
+            error = "--ignore-files requires GitIgnore semantics. Remove the forced --dialect or use --dialect gitignore.";
+            return false;
+        }
+
         var gitignore = parseResult.GetValue(options.Gitignore);
         var glob = parseResult.GetValue(options.Glob);
         var regex = parseResult.GetValue(options.RegularExpression);
@@ -192,7 +197,7 @@ internal sealed record QueryRequest(
             ? BuildHybridPatterns(parseResult, options)
             : BuildSpecificPatterns(parseResult, options, dialect);
 
-        if(ignoreFiles) {
+        if(ignoreFiles && !HasExplicitPatterns(parseResult, options, gitignore, glob, regex)) {
             RemoveFallbackIncludeAll(typedPatterns);
         }
 
@@ -218,6 +223,26 @@ internal sealed record QueryRequest(
 
         return true;
     }
+
+    /// <summary>
+    /// Determines whether the caller supplied any pattern explicitly.
+    /// </summary>
+    /// <param name="parseResult">The parsed command line.</param>
+    /// <param name="options">The tool option definitions.</param>
+    /// <param name="gitignore">The GitIgnore option value.</param>
+    /// <param name="glob">The Glob option value.</param>
+    /// <param name="regex">The Regex option value.</param>
+    /// <returns><see langword="true"/> when at least one pattern source is present.</returns>
+    private static bool HasExplicitPatterns(
+        ParseResult parseResult,
+        ToolOptions options,
+        string? gitignore,
+        string? glob,
+        string? regex
+    ) =>
+        (parseResult.GetValue(options.PositionalPatterns)?.Length ?? 0) > 0 ||
+        !string.IsNullOrWhiteSpace(parseResult.GetValue(options.Patterns)) ||
+        HasTypedPatternOption(gitignore, glob, regex);
 
     /// <summary>
     /// Removes the CLI's implicit include-all fallback so that loaded ignore rules can exclude files.

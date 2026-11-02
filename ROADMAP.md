@@ -98,7 +98,7 @@ The resulting performance measurements and engineering decisions are documented 
 
 *Goal: Make the published claims true, close the highest-value capability gaps, and raise the
 adoption ceiling before v2.0.0. Every item is free of paid services and new runtime dependencies
-unless stated. Detailed tasks for H-01…H-15 live in `private/Tasks/pre-v2-hardening/`; watch mode
+unless stated. Detailed tasks for H-01…H-33 live in `private/Tasks/pre-v2-hardening/`; watch mode
 (H-16) is tracked under `private/Tasks/post-v2.0.0/`.*
 
 ### Credibility (P0 — required before v2.0.0)
@@ -145,7 +145,7 @@ unless stated. Detailed tasks for H-01…H-15 live in `private/Tasks/pre-v2-hard
 
 - **v2.0.0 targets .NET 10.0 only.** .NET 8 reaches end of support on 2026-11-10 and .NET 9 on 2026-05-12, so neither is added as a package target. A `net8.0` target is technically feasible (one `GetAlternateLookup` fallback) but would extend support beyond Microsoft's lifecycle and add a permanent verification matrix.
 - **The release after v2.0.0 adds .NET 11.** It multi-targets `net10.0;net11.0`, keeps .NET 10 LTS as the baseline, and still does not target .NET 8/9.
-- **No `netstandard2.0` or .NET Framework targets.** The engine relies on spans, `IAsyncEnumerable`, `GeneratedRegex`, and modern file enumeration; supporting them would be a rewrite.
+- **No `netstandard2.0` or .NET Framework runtime targets.** The engine relies on spans, `IAsyncEnumerable`, `GeneratedRegex`, and modern file enumeration; supporting them would be a rewrite. The Roslyn analyzer/code-fix package is the documented exception: it targets `netstandard2.0` so it can load in the Roslyn host.
 
 ---
 

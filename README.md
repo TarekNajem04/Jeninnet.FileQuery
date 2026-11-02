@@ -11,10 +11,10 @@
 [![GitHub license](https://img.shields.io/github/license/TarekNajem04/Jeninnet.FileQuery)](https://github.com/TarekNajem04/Jeninnet.FileQuery/blob/main/LICENSE)
 
 ![NuGet Version](https://img.shields.io/nuget/v/Jeninnet.FileQuery)
-[![NuGet downloads](https://img.shields.io/nuget/dt/Jeninnet.FileQuery)](https://www.nuget.org/packages/Jeninnet.FileQuery.CommandLine/)
+[![NuGet downloads](https://img.shields.io/nuget/dt/Jeninnet.FileQuery)](https://www.nuget.org/packages/Jeninnet.FileQuery/)
 [![Documentation](https://img.shields.io/badge/docs-online-1f6feb)](https://tareknajem04.github.io/Jeninnet.FileQuery/)
 
-![architecture: invariants ok](badges/architecture.svg) ![target framework: net10.0](badges/frameworks.svg) ![documented packages: 5](badges/packages.svg) ![line coverage: 89.2%](badges/coverage.svg)
+![architecture: invariants ok](badges/architecture.svg) ![target framework: net10.0](badges/frameworks.svg) ![API-documented projects: 5](badges/packages.svg) ![line coverage: 89.4%](badges/coverage.svg)
 
 **A high-performance, deterministic file discovery and filtering engine for .NET.**
 
@@ -200,7 +200,7 @@ This repository contains the core library and its companion packages:
 *   **[Documentation Suite (docs/)](./docs/README.md)**: Deep technical specifications, guides, and architectural whitepapers.
 *   **[Benchmark Suite](./src/Jeninnet.FileQuery.Benchmarks/README.md)**: Performance measurements and allocation verification.
 *   **[Samples](./samples/README.md)**: Thirteen runnable examples from hello-world to DI + evaluation.
-*   **[Test Suite](./tests/README.md)**: 1,130 tests across seven projects, with per-project guides.
+*   **[Test Suite](./tests/README.md)**: 1,166 tests across seven projects, with per-project guides.
 
 ---
 
@@ -296,9 +296,9 @@ By using the [`IFileSystem`](./src/Jeninnet.FileQuery/IO/IFileSystem.cs) interfa
 
 ## 📋 Project Status
 
-**Current release: v1.5.0** — This release completes a focused performance engineering cycle for large-scale filesystem traversal and pattern matching.
+**Current release: v2.0.0** — This major release adds entry metadata and filters, directory results, `.gitignore` ingestion, the `IFileProvider` adapter, multiple roots, synchronous cancellation/progress, brace expansion, the global tool, the VS Code extension, the Tooling/Build/Analyzers packages, and OpenTelemetry instrumentation. The `IFileQueryEngine` contract, regex-timeout exception, and character-class case folding are breaking changes; see the [Migration Guide](./Migration.md#upgrading-to-v200).
 
-The optimization cycle was validated against a reproducible **1,000,000-file / 4,096-directory** dataset and included:
+The v1.5.0 performance cycle was validated against a reproducible **1,000,000-file / 4,096-directory** dataset and included:
 
 - Elimination of redundant per-entry filesystem attribute lookups.
 - Removal of per-entry relative-path string allocations through pooled path buffering.
@@ -327,7 +327,7 @@ The project adheres to the **Jeninnet.FileQuery Constitution**:
 
 ## 🏛️ Compatibility & Tech Stack
 
-*   **TFM**: `.NET 10`
+*   **TFM**: Runtime/tool packages target `.NET 10`; the Roslyn analyzer targets `netstandard2.0` for host compatibility.
 *   **Language**: `C# 14`
 *   **Test Suite**: MSTest + Moq + Coverlet
 *   **Enforcement**: Central Package Management (CPM), strict `.editorconfig` rules, and architecture tests enforcing zero allocations.
@@ -344,3 +344,4 @@ The project adheres to the **Jeninnet.FileQuery Constitution**:
 ## 📜 License
 
 This project is licensed under the MIT License. See **[LICENSE](./LICENSE)** for details.
+

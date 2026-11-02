@@ -86,4 +86,4 @@ pattern is intentionally supplied as a constant that the analyzer cannot prove s
 
 - [Roslyn analyzer guide](https://github.com/TarekNajem04/Jeninnet.FileQuery/blob/main/docs/guides/roslyn-analyzers.md)
 - [MSBuild validation and SARIF](https://github.com/TarekNajem04/Jeninnet.FileQuery/blob/main/docs/guides/msbuild-validation.md)
-- [Core package](../Jeninnet.FileQuery/README.md)
+- [Core package](https://github.com/TarekNajem04/Jeninnet.FileQuery/blob/main/src/Jeninnet.FileQuery/README.md)

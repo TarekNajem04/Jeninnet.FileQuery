@@ -140,12 +140,27 @@ public sealed class FileQueryBatch {
     public async IAsyncEnumerable<FileQueryEntry> ExecuteEntriesAsync(
         [EnumeratorCancellation] CancellationToken cancellationToken = default
     ) {
+        await foreach(var entry in ExecuteEntriesAsync(progress: null, cancellationToken).ConfigureAwait(false)) {
+            yield return entry;
+        }
+    }
+
+    /// <summary>
+    /// Executes every query in order asynchronously and yields entries with metadata.
+    /// </summary>
+    /// <param name="progress">Optional progress sink; counters restart for each root.</param>
+    /// <param name="cancellationToken">A token to cancel the batch.</param>
+    /// <returns>An async enumerable of matching entries.</returns>
+    public async IAsyncEnumerable<FileQueryEntry> ExecuteEntriesAsync(
+        IProgress<FileQueryProgress>? progress,
+        [EnumeratorCancellation] CancellationToken cancellationToken = default
+    ) {
         var engine = FileQueryRuntime.Create();
 
         foreach(var query in _queries) {
             cancellationToken.ThrowIfCancellationRequested();
 
-            await foreach(var entry in engine.ExecuteEntriesAsync(query, cancellationToken).ConfigureAwait(false)) {
+            await foreach(var entry in engine.ExecuteEntriesAsync(query, progress, cancellationToken).ConfigureAwait(false)) {
                 yield return entry;
             }
         }

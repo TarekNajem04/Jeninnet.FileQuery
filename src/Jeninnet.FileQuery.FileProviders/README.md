@@ -4,7 +4,7 @@
 ![NuGet Downloads](https://img.shields.io/nuget/dt/Jeninnet.FileQuery.FileProviders?label=Jeninnet.FileQuery.FileProviders)
 
 Query `Microsoft.Extensions.FileProviders.IFileProvider` sources with
-[Jeninnet.FileQuery](../Jeninnet.FileQuery/README.md). ASP.NET Core static files, Razor assets,
+[Jeninnet.FileQuery](https://github.com/TarekNajem04/Jeninnet.FileQuery/blob/main/src/Jeninnet.FileQuery/README.md). ASP.NET Core static files, Razor assets,
 embedded resources, and custom in-memory providers share the same patterns, metadata filters,
 directory results, GitIgnore ingestion, and error recovery as disk queries.
 
@@ -101,5 +101,5 @@ public sealed class StaticAssetScanner(IFileProvider provider)
 ## Related
 
 - [Querying `IFileProvider` sources](https://github.com/TarekNajem04/Jeninnet.FileQuery/blob/main/docs/guides/file-provider-adapter.md)
-- [Core package](../Jeninnet.FileQuery/README.md)
-- [Tests](../../tests/Jeninnet.FileQuery.FileProviders.Tests/README.md)
+- [Core package](https://github.com/TarekNajem04/Jeninnet.FileQuery/blob/main/src/Jeninnet.FileQuery/README.md)
+- [Tests](https://github.com/TarekNajem04/Jeninnet.FileQuery/blob/main/tests/Jeninnet.FileQuery.FileProviders.Tests/README.md)

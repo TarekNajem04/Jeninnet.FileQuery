@@ -533,6 +533,14 @@
             <param name="cancellationToken">A token to cancel the batch.</param>
             <returns>An async enumerable of matching entries.</returns>
         </member>
+        <member name="M:Jeninnet.FileQuery.FileQueryBatch.ExecuteEntriesAsync(System.IProgress{Jeninnet.FileQuery.FileQueryProgress},System.Threading.CancellationToken)">
+            <summary>
+            Executes every query in order asynchronously and yields entries with metadata.
+            </summary>
+            <param name="progress">Optional progress sink; counters restart for each root.</param>
+            <param name="cancellationToken">A token to cancel the batch.</param>
+            <returns>An async enumerable of matching entries.</returns>
+        </member>
         <member name="T:Jeninnet.FileQuery.FileQueryBuilder">
             <summary>
             Provides a fluent API for configuring file system queries.
@@ -953,6 +961,16 @@
             <param name="cancellationToken">A token to cancel the async enumeration.</param>
             <returns>An async enumerable of matching entries.</returns>
         </member>
+        <member name="M:Jeninnet.FileQuery.FileQueryBuilder.ExecuteEntriesAsync(System.IProgress{Jeninnet.FileQuery.FileQueryProgress},System.Threading.CancellationToken)">
+            <summary>
+            Executes the query asynchronously and returns matching entries with metadata,
+            reporting traversal progress.
+            </summary>
+            <param name="progress">The progress sink that receives traversal snapshots.</param>
+            <param name="cancellationToken">A token to cancel the async enumeration.</param>
+            <returns>An async enumerable of matching entries.</returns>
+            <exception cref="T:System.ArgumentNullException">Thrown when <paramref name="progress"/> is <see langword="null"/>.</exception>
+        </member>
         <member name="M:Jeninnet.FileQuery.FileQueryBuilder.Build">
             <summary>
             Builds the immutable <see cref="T:Jeninnet.FileQuery.FileQuery"/> descriptor from the current configuration.
@@ -976,6 +994,12 @@
             </summary>
             <param name="patternKind">The semantic type of the pattern.</param>
             <param name="patterns">A sequence of patterns to merge.</param>
+        </member>
+        <member name="M:Jeninnet.FileQuery.FileQueryBuilder.GetSpecificPatternKind">
+            <summary>
+            Gets the pattern kind selected by <see cref="T:Jeninnet.FileQuery.Enums.PatternMatchingMode"/> for
+            <see cref="F:Jeninnet.FileQuery.Enums.PatternInterpretationMode.Specific"/> interpretation.
+            </summary>
         </member>
         <member name="M:Jeninnet.FileQuery.FileQueryBuilder.ValidatePatternType(Jeninnet.FileQuery.Enums.PatternKind)">
             <summary>
@@ -1487,7 +1511,7 @@
             </summary>
             <exception cref="T:System.ArgumentOutOfRangeException">
             Thrown when <see cref="P:Jeninnet.FileQuery.FileQueryOptions.MaxRecursionDepth"/> is less than
-            <see cref="F:Jeninnet.FileQuery.FileQueryOptions.UNLIMITED_RECURSION_DEPTH"/>.
+            <see cref="F:Jeninnet.FileQuery.FileQueryOptions.UNLIMITED_RECURSION_DEPTH"/>, or when a numeric option or enum value is invalid.
             </exception>
         </member>
         <member name="M:Jeninnet.FileQuery.FileQueryOptions.ValidateSizeRange(System.Nullable{System.Int64},System.Nullable{System.Int64})">
@@ -1594,6 +1618,9 @@
             <param name="caseSensitivity">The case-sensitivity behavior. Platform defaults are resolved once.</param>
             <returns>The compiled pattern set.</returns>
             <exception cref="T:System.ArgumentNullException">Thrown when <paramref name="patternInput"/> is <see langword="null"/>.</exception>
+            <exception cref="T:System.ArgumentOutOfRangeException">
+            Thrown when <paramref name="matchingMode"/> or <paramref name="caseSensitivity"/> is not a defined value.
+            </exception>
         </member>
         <member name="M:Jeninnet.FileQuery.FileQueryPatternSet.Compile(System.Collections.Generic.IEnumerable{System.String},Jeninnet.FileQuery.Enums.CaseSensitivity)">
             <summary>
@@ -1809,6 +1836,15 @@
             <param name="fileSystem">The filesystem abstraction.</param>
             <param name="patterns">The target pattern list.</param>
         </member>
+        <member name="M:Jeninnet.FileQuery.GitIgnore.GitIgnoreFileLoader.IsSupportedRule(System.String)">
+            <summary>
+            Determines whether a GitIgnore rule can be compiled by the engine.
+            Ignore files in the wild sometimes contain patterns our stricter validator
+            rejects; dropping the unsupported line is preferable to failing the whole query.
+            </summary>
+            <param name="rule">The root-relative rule.</param>
+            <returns><see langword="true"/> when the rule compiles.</returns>
+        </member>
         <member name="M:Jeninnet.FileQuery.GitIgnore.GitIgnoreFileLoader.ParseLine(System.String)">
             <summary>
             Removes comments and insignificant trailing whitespace from a raw ignore-file line.
@@ -1823,6 +1859,15 @@
             <param name="pattern">The raw rule.</param>
             <param name="baseRelativePath">The directory containing the ignore file, relative to the query root.</param>
             <returns>The scoped rule, or <see langword="null"/> when the rule is empty.</returns>
+        </member>
+        <member name="M:Jeninnet.FileQuery.GitIgnore.GitIgnoreFileLoader.IsAncestorRule(System.String,System.String,System.StringComparison)">
+            <summary>
+            Determines whether a rule target is a proper ancestor directory of the query root.
+            </summary>
+            <param name="candidate">The rule target, without a trailing slash.</param>
+            <param name="relativeRoot">The query root relative to the repository root.</param>
+            <param name="comparison">The path comparison mode.</param>
+            <returns><see langword="true"/> when the rule targets an ancestor of the query root.</returns>
         </member>
         <member name="M:Jeninnet.FileQuery.GitIgnore.GitIgnoreFileLoader.RewriteRepositoryRule(System.String,System.String)">
             <summary>
@@ -1925,6 +1970,15 @@
             <param name="cancellationToken">The token to monitor for cancellation requests.</param>
             <returns>An async enumerable of matching entries.</returns>
         </member>
+        <member name="M:Jeninnet.FileQuery.IFileQueryEngine.ExecuteEntriesAsync(Jeninnet.FileQuery.FileQuery,System.IProgress{Jeninnet.FileQuery.FileQueryProgress},System.Threading.CancellationToken)">
+            <summary>
+            Asynchronous entry enumeration with progress reporting.
+            </summary>
+            <param name="query">The query descriptor defining the search parameters.</param>
+            <param name="progress">The progress sink that receives traversal snapshots.</param>
+            <param name="cancellationToken">The token to monitor for cancellation requests.</param>
+            <returns>An async enumerable of matching entries.</returns>
+        </member>
         <member name="T:Jeninnet.FileQuery.Internal.PatternsMerger">
             <summary>
             Merges untyped and explicitly typed patterns into a single dictionary
@@ -1960,6 +2014,23 @@
             A dictionary mapping each <see cref="T:Jeninnet.FileQuery.Enums.PatternKind"/> to an immutable array
             of pattern strings in the order they should be evaluated.
             </returns>
+        </member>
+        <member name="M:Jeninnet.FileQuery.Internal.PatternsMerger.ValidateSpecificMode(Jeninnet.FileQuery.PatternInput,Jeninnet.FileQuery.Enums.PatternMatchingMode)">
+            <summary>
+            Validates that a <see cref="T:Jeninnet.FileQuery.PatternInput"/> is consistent with
+            <see cref="F:Jeninnet.FileQuery.Enums.PatternInterpretationMode.Specific"/> before compilation.
+            </summary>
+            <param name="patternInput">The pattern configuration.</param>
+            <param name="matchingMode">
+            The dialect selected for <see cref="F:Jeninnet.FileQuery.Enums.PatternInterpretationMode.Specific"/>.
+            </param>
+            <exception cref="T:System.ArgumentNullException">
+            Thrown when <paramref name="patternInput"/> is <see langword="null"/>.
+            </exception>
+            <exception cref="T:Jeninnet.FileQuery.Patterns.Exceptions.PatternException">
+            Thrown when untyped patterns are present in Specific mode, or when a typed
+            pattern uses a dialect that does not match <paramref name="matchingMode"/>.
+            </exception>
         </member>
         <member name="M:Jeninnet.FileQuery.Internal.PatternsMerger.Merge(System.Collections.Generic.IEnumerable{System.String},System.Collections.Generic.IReadOnlyDictionary{Jeninnet.FileQuery.Enums.PatternKind,System.Collections.Generic.IEnumerable{System.String}})">
             <summary>
@@ -2505,28 +2576,15 @@
         <member name="M:Jeninnet.FileQuery.Matching.Compiled.GitIgnoreInstructionMatcher.MatchCore(Jeninnet.FileQuery.Matching.ICompiledPatternSet,Jeninnet.FileQuery.Matching.PathMatchContext)">
             <inheritdoc/>
         </member>
-        <member name="M:Jeninnet.FileQuery.Matching.Compiled.GitIgnoreInstructionMatcher.TryApplyDirectoryInclusionOverride(Jeninnet.FileQuery.Matching.MatchResult@,System.Collections.Generic.IReadOnlyList{Jeninnet.FileQuery.Matching.ICompiledPattern},Jeninnet.FileQuery.IO.PathView,System.StringComparison)">
+        <member name="M:Jeninnet.FileQuery.Matching.Compiled.GitIgnoreInstructionMatcher.MatchesAncestorDirectory(Jeninnet.FileQuery.Matching.ICompiledPattern,Jeninnet.FileQuery.IO.PathView,System.StringComparison)">
             <summary>
-            Attempts to override an excluded file result by checking whether any
-            directory-only inclusion rule applies to the file's parent directory.
+            Checks whether a directory-only pattern matches any ancestor directory of a file path.
+            This lets the single-path matcher apply GitIgnore subtree exclusion without a traversal.
             </summary>
-            <param name="result">The match result to be updated.</param>
-            <param name="patterns">The compiled patterns to evaluate.</param>
-            <param name="pathView">The path view being evaluated.</param>
-            <param name="comparison">The string comparison to use.</param>
-            <returns>
-            <see langword="true"/> if the result was overridden to
-            <see cref="M:Jeninnet.FileQuery.Matching.MatchResult.Include"/>; otherwise <see langword="false"/>.
-            </returns>
-        </member>
-        <member name="M:Jeninnet.FileQuery.Matching.Compiled.GitIgnoreInstructionMatcher.MatchParentDirectory(Jeninnet.FileQuery.Matching.ICompiledPattern,Jeninnet.FileQuery.IO.PathView,System.StringComparison)">
-            <summary>
-            Matches a pattern against the parent directory of the current path.
-            </summary>
-            <param name="pattern">The compiled pattern.</param>
-            <param name="pathView">The view of the path segments.</param>
+            <param name="pattern">The compiled directory-only pattern.</param>
+            <param name="pathView">The file path being evaluated.</param>
             <param name="comparison">The string comparison rules.</param>
-            <returns>True if the pattern matches; otherwise, false.</returns>
+            <returns><see langword="true"/> when an ancestor directory matches.</returns>
         </member>
         <member name="M:Jeninnet.FileQuery.Matching.Compiled.GitIgnoreInstructionMatcher.MatchPathAgainstCompiledPattern(Jeninnet.FileQuery.Matching.ICompiledPattern,Jeninnet.FileQuery.IO.PathView,System.StringComparison)">
             <summary>
@@ -2702,12 +2760,12 @@
             <param name="patterns">Ignored.</param>
             <param name="context">Ignored.</param>
             <returns>
-            Always returns a successful result, effectively treating all paths as included.
+            Returns an inclusive result for non-empty paths and a matched exclusion for the empty path,
+            matching the engine's default root-exclusion contract.
             </returns>
             <remarks>
-            This behavior is intentional: when no patterns are configured, the engine
-            should not filter out any paths. Centralizing this logic here keeps the
-            traversal code simple and free of special cases.
+            Non-empty paths are never filtered when no patterns are configured. Centralizing this
+            logic here keeps the traversal code simple and free of special cases.
             </remarks>
         </member>
         <member name="T:Jeninnet.FileQuery.Matching.Compiled.PathMatcher">
@@ -2791,6 +2849,13 @@
         <member name="F:Jeninnet.FileQuery.Matching.Compiled.RegexInstructionMatcher._regexCache">
             <summary>
             Thread-safe cache of compiled <see cref="T:System.Text.RegularExpressions.Regex"/> instances.
+            </summary>
+        </member>
+        <member name="F:Jeninnet.FileQuery.Matching.Compiled.RegexInstructionMatcher.MAX_CACHED_REGEXES">
+            <summary>
+            Upper bound on cached <see cref="T:System.Text.RegularExpressions.Regex"/> instances. The cache is process-wide
+            through the shared matcher, so an unbounded cache would retain a compiled
+            expression for every distinct pattern text a long-running host ever supplies.
             </summary>
         </member>
         <member name="M:Jeninnet.FileQuery.Matching.Compiled.RegexInstructionMatcher.#ctor">
@@ -3236,7 +3301,8 @@
             <list type="bullet">
             <item><description>Instructions are evaluated in order: GitIgnore → Glob → Regex.</description></item>
             <item><description>The first sub-set that returns <see cref="F:Jeninnet.FileQuery.Enums.MatchOutcome.Include"/> wins.</description></item>
-            <item><description>If nothing matches, the outcome defaults to <see cref="F:Jeninnet.FileQuery.Enums.MatchOutcome.Include"/>.</description></item>
+            <item><description>A non-matching later sub-set does not erase an earlier <see cref="F:Jeninnet.FileQuery.Enums.MatchOutcome.Exclude"/>.</description></item>
+            <item><description>When no pattern set exists, the outcome defaults to <see cref="F:Jeninnet.FileQuery.Enums.MatchOutcome.Include"/>.</description></item>
             </list>
             </remarks>
         </member>
@@ -3540,8 +3606,11 @@
             the absence of explicitly typed patterns.
             </para>
             <para>
-            <strong>Rule ordering:</strong> All patterns (untyped and typed) are evaluated
-            sequentially in the order they were provided. The last matching rule wins.
+            <strong>Rule ordering:</strong> Within each dialect, patterns are evaluated
+            sequentially in the order they were provided and the last matching rule wins.
+            Across dialects, the compiled subsets are evaluated in the fixed order
+            GitIgnore → Glob → Regex; the first subset that returns <c>Include</c> wins.
+            A later dialect can override an earlier Exclude, but not an earlier Include.
             </para>
             </remarks>
             <example>
@@ -3603,14 +3672,37 @@
             <param name="Patterns">An optional sequence of untyped pattern strings. When <see langword="null"/>, an empty list is used.</param>
             <param name="TypedPatterns">An optional dictionary of explicitly typed patterns. When <see langword="null"/>, an empty dictionary is used.</param>
             <param name="InterpretationMode">The classification mode for untyped patterns. Defaults to <see cref="F:Jeninnet.FileQuery.Enums.PatternInterpretationMode.Hybrid"/>.</param>
+            <exception cref="T:System.ArgumentException">
+            Thrown when <paramref name="Patterns"/> or <paramref name="TypedPatterns"/> contains an
+            empty or whitespace-only pattern.
+            </exception>
+            <exception cref="T:System.ArgumentOutOfRangeException">
+            Thrown when <paramref name="TypedPatterns"/> uses an undefined <see cref="T:Jeninnet.FileQuery.Enums.PatternKind"/>,
+            or when <paramref name="InterpretationMode"/> is not a defined
+            <see cref="T:Jeninnet.FileQuery.Enums.PatternInterpretationMode"/> value.
+            </exception>
+        </member>
+        <member name="M:Jeninnet.FileQuery.PatternInput.MaterializePatterns(System.Collections.Generic.IEnumerable{System.String})">
+            <summary>
+            Materializes untyped patterns and rejects empty or whitespace-only entries.
+            </summary>
+            <param name="Patterns">The source patterns.</param>
+            <returns>A read-only list containing the patterns.</returns>
+            <exception cref="T:System.ArgumentException">
+            Thrown when <paramref name="Patterns"/> contains an empty or whitespace-only pattern.
+            </exception>
         </member>
         <member name="M:Jeninnet.FileQuery.PatternInput.BuildTypedPatterns(System.Collections.Generic.IReadOnlyDictionary{Jeninnet.FileQuery.Enums.PatternKind,System.Collections.Generic.IEnumerable{System.String}})">
             <summary>
-            Materializes <paramref name="source"/> into an immutable dictionary of
-            read-only lists, filtering out null entries.
+            Materializes <paramref name="TypedPatterns"/> into an immutable dictionary of
+            read-only lists, filtering out null entries and rejecting empty or
+            whitespace-only patterns.
             </summary>
-            <param name="source">The source dictionary of typed patterns.</param>
+            <param name="TypedPatterns">The source dictionary of typed patterns.</param>
             <returns>A dictionary containing processed, read-only lists of patterns.</returns>
+            <exception cref="T:System.ArgumentException">
+            Thrown when a typed-pattern list contains an empty or whitespace-only pattern.
+            </exception>
         </member>
         <member name="T:Jeninnet.FileQuery.Patterns.Analysis.IPatternAnalyzer">
             <summary>
@@ -4114,22 +4206,6 @@
             </para>
             </remarks>
         </member>
-        <member name="P:Jeninnet.FileQuery.Patterns.Compilation.CompiledPatternFactory.DefaultPatternType">
-            <summary>
-            Gets or sets the default pattern kind used for untyped
-            <see cref="M:Jeninnet.FileQuery.Patterns.Compilation.CompiledPatternFactory.Compile(System.String)"/> calls.
-            </summary>
-        </member>
-        <member name="M:Jeninnet.FileQuery.Patterns.Compilation.CompiledPatternFactory.Configure(Jeninnet.FileQuery.Patterns.Compilation.PatternPipeline)">
-            <summary>
-            Configures the compilation pipeline used by this facade.
-            Must be called exactly once during application startup.
-            </summary>
-            <param name="pipeline">The pipeline to use for compilation.</param>
-            <exception cref="T:System.InvalidOperationException">
-            Thrown when the factory has already been configured.
-            </exception>
-        </member>
         <member name="M:Jeninnet.FileQuery.Patterns.Compilation.CompiledPatternFactory.Compile(Jeninnet.FileQuery.Patterns.Classification.ClassifiedPatternSet)">
             <summary>
             Compiles a <see cref="T:Jeninnet.FileQuery.Patterns.Classification.ClassifiedPatternSet"/> through the full pipeline.
@@ -4138,7 +4214,7 @@
         </member>
         <member name="M:Jeninnet.FileQuery.Patterns.Compilation.CompiledPatternFactory.Compile(System.String)">
             <summary>
-            Compiles a single untyped pattern using <see cref="P:Jeninnet.FileQuery.Patterns.Compilation.CompiledPatternFactory.DefaultPatternType"/>.
+            Compiles a single untyped pattern using <see cref="F:Jeninnet.FileQuery.Enums.PatternKind.GitIgnore"/>.
             </summary>
             <param name="pattern">The pattern string to compile.</param>
         </member>
@@ -4966,6 +5042,39 @@
         </member>
         <member name="M:Jeninnet.FileQuery.Patterns.Invariants.Dialects.GitIgnorePatternInvariant.Validate(Jeninnet.FileQuery.Patterns.Compilation.PatternCompilationContext)">
             <inheritdoc/>
+        </member>
+        <member name="T:Jeninnet.FileQuery.Patterns.Invariants.Dialects.GlobPathSeparatorInvariant">
+            <summary>
+            Rejects Windows-style path separators in Glob patterns.
+            </summary>
+            <remarks>
+            <para>
+            Glob patterns use <c>/</c> as the path separator and reserve <c>\</c> for escaping
+            glob metacharacters. Without this guard, a Windows-style pattern such as
+            <c>src\*.cs</c> compiles to a literal backslash and silently never matches a
+            normalized path.
+            </para>
+            <para>
+            A backslash followed by a glob metacharacter (<c>*</c>, <c>?</c>, <c>!</c>,
+            <c>#</c>, <c>[</c>, <c>]</c>, <c>\</c>, <c>{</c>, or <c>}</c>) remains a valid
+            escape and is left untouched.
+            </para>
+            </remarks>
+        </member>
+        <member name="P:Jeninnet.FileQuery.Patterns.Invariants.Dialects.GlobPathSeparatorInvariant.Phase">
+            <inheritdoc/>
+        </member>
+        <member name="P:Jeninnet.FileQuery.Patterns.Invariants.Dialects.GlobPathSeparatorInvariant.AppliesTo">
+            <inheritdoc/>
+        </member>
+        <member name="M:Jeninnet.FileQuery.Patterns.Invariants.Dialects.GlobPathSeparatorInvariant.Validate(Jeninnet.FileQuery.Patterns.Compilation.PatternCompilationContext)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Jeninnet.FileQuery.Patterns.Invariants.Dialects.GlobPathSeparatorInvariant.IsEscapable(System.Char)">
+            <summary>
+            Determines whether <paramref name="value"/> may follow a backslash escape.
+            </summary>
+            <param name="value">The character following the backslash.</param>
         </member>
         <member name="T:Jeninnet.FileQuery.Patterns.Invariants.Dialects.GlobPatternInvariant">
             <summary>
@@ -6184,6 +6293,11 @@
             </summary>
             <param name="pattern">The pattern span to check.</param>
         </member>
+        <member name="M:Jeninnet.FileQuery.Patterns.Validation.PatternValidator.MaskEscapedCharacters(System.ReadOnlySpan{System.Char})">
+            <summary>
+            Replaces escaped characters with spaces so structural bracket checks ignore them.
+            </summary>
+        </member>
         <member name="M:Jeninnet.FileQuery.Patterns.Validation.PatternValidator.ValidateBraces(System.ReadOnlySpan{System.Char})">
             <summary>
             Validates brace pairing outside character classes and escapes.
@@ -6823,6 +6937,15 @@
             <param name="directoryRelativePath">The directory path relative to the root.</param>
             <param name="comparison">The string comparison mode.</param>
         </member>
+        <member name="M:Jeninnet.FileQuery.Traversal.TraversalExecutor.CouldGlobMatchBelow(Jeninnet.FileQuery.Matching.ICompiledPattern,System.ReadOnlySpan{System.Char},System.StringComparison)">
+            <summary>
+            Determines whether a Glob pattern could match a file below an excluded directory.
+            </summary>
+            <param name="pattern">The compiled Glob pattern.</param>
+            <param name="directoryPath">The normalized directory path without a trailing slash.</param>
+            <param name="comparison">The string comparison mode.</param>
+            <returns><see langword="true"/> when the directory must be traversed.</returns>
+        </member>
         <member name="M:Jeninnet.FileQuery.Traversal.TraversalExecutor.ContainsSegmentEndingWith(System.ReadOnlySpan{System.Char},System.String,System.StringComparison)">
             <summary>
             Determines whether any segment of <paramref name="path"/> ends with
@@ -6945,7 +7068,10 @@
             </summary>
             <param name="Strategy">The strategy used to visit directory nodes.</param>
             <param name="SymlinkPolicy">The policy for following or ignoring symbolic links.</param>
-            <param name="UseAsync">A value indicating whether to use asynchronous I/O where possible.</param>
+            <param name="UseAsync">
+            Reserved for a future asynchronous traversal path. The current engine selects synchronous
+            or asynchronous execution from the caller's <c>Execute</c>/<c>ExecuteAsync</c> call.
+            </param>
         </member>
         <member name="P:Jeninnet.FileQuery.Traversal.TraversalOptions.Strategy">
             <summary>
@@ -6959,7 +7085,8 @@
         </member>
         <member name="P:Jeninnet.FileQuery.Traversal.TraversalOptions.UseAsync">
             <summary>
-            Gets a value indicating whether to use asynchronous I/O where possible.
+            Gets a value reserved for a future asynchronous traversal path. The current engine uses
+            the caller-selected synchronous or asynchronous execution method.
             </summary>
         </member>
         <member name="T:Jeninnet.FileQuery.Traversal.TraversalPlan">

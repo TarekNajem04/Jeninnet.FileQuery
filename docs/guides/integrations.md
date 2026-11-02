@@ -37,11 +37,11 @@ jobs:
 
       - name: Collect changed C# files
         id: files
-        uses: TarekNajem04/Jeninnet.FileQuery/.github/actions/filequery@main
+        uses: TarekNajem04/Jeninnet.FileQuery/.github/actions/filequery@v2.0.0
         with:
           patterns: '**;!*.cs'
           changed-since: origin/main
-          version: '1.5.0'
+          version: '2.0.0'
 
       - name: Use the result
         run: |
@@ -49,7 +49,7 @@ jobs:
           echo "${{ steps.files.outputs.files }}"
 ```
 
-Pin `@main` to a release tag or commit in real workflows.
+Pin `@main` to a release tag or commit in real workflows; the example uses `v2.0.0`.
 
 ### Inputs
 
@@ -85,25 +85,30 @@ installs it from that source, runs the action, and asserts the outputs.
 
 ### Limitations
 
-- **Shell**: the composite steps use `bash`. GitHub-hosted Linux, macOS, and Windows runners all
-  provide it, but minimal self-hosted runners may not.
+- **Shell**: the composite steps use `bash`; Linux and macOS runners are supported. Windows runners
+  are not supported by the action (use the global tool directly there).
 - **Global install**: the tool is installed into `~/.dotnet/tools` and added to `PATH` for later
   steps. A cached install is a possible follow-up.
 - **Newline-delimited output**: paths are newline-separated (the tool's `--null` mode is not used
   here), so pathological file names containing newlines are not represented faithfully.
 - **Diff baselines** need a full checkout (`fetch-depth: 0`) so the baseline revision exists.
-- **No SARIF** yet: validation results are plain messages, not code-scanning annotations.
+- **SARIF**: the composite action itself does not emit SARIF. Use
+  [`Jeninnet.FileQuery.Build`](msbuild-validation.md) for MSBuild-time `JNQ2001` diagnostics and
+  SARIF output for code scanning.
 
 ---
 
-## Next steps
+## Shipped and next steps
 
-1. **MSBuild task**: ship `Jeninnet.FileQuery.MSBuild` with a `ValidatePatterns` task and an
-   `UsingTask` sample, reusing the Tooling SDK for classification/validation.
-2. **SARIF exporter**: map `PatternValidation.Error` to a SARIF result, then feed
-   `github/codeql-action/upload-sarif`.
-3. **Azure DevOps task**: wrap the same CLI contract as the GitHub Action.
-4. **Caching**: add an optional tool cache to the action to skip the install step on warm runners.
+Shipped in v2.0.0:
+
+1. **MSBuild validation + SARIF** — [`Jeninnet.FileQuery.Build`](msbuild-validation.md).
+2. **Roslyn analyzer + code fix** — [`Jeninnet.FileQuery.Analyzers`](roslyn-analyzers.md).
+
+Next candidates:
+
+1. **Azure DevOps task**: wrap the same CLI contract as the GitHub Action.
+2. **Caching**: add an optional tool cache to the action to skip the install step on warm runners.
 
 Each candidate should meet the same bar as the GitHub Action: no forked semantics, a pinned tool
 version, an end-to-end test in this repository, and documented limitations.

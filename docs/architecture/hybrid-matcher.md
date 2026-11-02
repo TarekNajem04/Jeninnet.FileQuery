@@ -113,29 +113,29 @@ Once this pipeline is built, it can evaluate any number of paths efficiently.
 
 One of the most important guarantees provided by the engine is **deterministic rule evaluation**.
 
-Patterns are evaluated in the exact order provided by the user.
+Within each dialect, patterns are evaluated in the order provided by the user and the last matching
+rule wins. For example, in the GitIgnore subset:
 
-Each rule updates the inclusion state of the current path.
-
-For example:
-
-```
+```text
 **
 !*.log
 data.log
 ```
 
-Evaluation proceeds as follows.
+Evaluation proceeds as follows:
 
-First the engine includes all files.
+1. `**` excludes everything.
+2. `!*.log` re-includes `.log` files.
+3. `data.log` excludes that specific file again.
 
-Second it excludes files matching the `.log` extension.
+The final result for `data.log` is **Exclude**; other `.log` files are **Include**.
 
-Third it explicitly includes `data.log`.
+Across dialects, the compiled subsets are evaluated in the fixed order GitIgnore → Glob → Regex.
+The first subset that returns **Include** wins. A later subset can override an earlier Exclude,
+but not an earlier Include. See [Pattern Precedence](../reference/pattern-precedence.md) for the
+complete table and examples.
 
-The final inclusion state determines whether the file is returned by the query.
-
-This rule model ensures that behavior remains predictable even when complex rule sets are used.
+This two-level model keeps behavior predictable even when complex rule sets are used.
 
 ---
 

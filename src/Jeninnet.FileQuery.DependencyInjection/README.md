@@ -9,7 +9,7 @@
 ![NuGet Version](https://img.shields.io/nuget/v/Jeninnet.FileQuery)
 [![NuGet downloads](https://img.shields.io/nuget/dt/Jeninnet.FileQuery.DependencyInjection)](https://www.nuget.org/packages/Jeninnet.FileQuery.DependencyInjection/)
 
-**Dependency Injection bindings for [Jeninnet.FileQuery](../Jeninnet.FileQuery/README.md).**
+**Dependency Injection bindings for [Jeninnet.FileQuery](https://github.com/TarekNajem04/Jeninnet.FileQuery/blob/main/src/Jeninnet.FileQuery/README.md).**
 
 ---
 
@@ -39,7 +39,7 @@ dotnet add package Jeninnet.FileQuery.DependencyInjection
 
 ### 1. Service Registration
 
-Register the subsystem on startup using [ServiceCollectionExtensions.AddFileQuery](./Extensions/ServiceCollectionExtensions.cs):
+Register the subsystem on startup using [ServiceCollectionExtensions.AddFileQuery](https://github.com/TarekNajem04/Jeninnet.FileQuery/blob/main/src/Jeninnet.FileQuery.DependencyInjection/Extensions/ServiceCollectionExtensions.cs):
 
 ```csharp
 using Microsoft.Extensions.Hosting;
@@ -56,7 +56,7 @@ await host.RunAsync();
 
 ### 2. Service Consumption
 
-Inject [IFileQueryEngine](../Jeninnet.FileQuery/IFileQueryEngine.cs) into your services:
+Inject [IFileQueryEngine](https://github.com/TarekNajem04/Jeninnet.FileQuery/blob/main/src/Jeninnet.FileQuery/IFileQueryEngine.cs) into your services:
 
 ```csharp
 using Jeninnet.FileQuery;
@@ -116,7 +116,7 @@ Calling `AddFileQuery()` registers the following components in the container:
 
 | Registered Interface | Concrete Type | Lifetime | Purpose |
 | --- | --- | --- | --- |
-| [IFileQueryEngine](../Jeninnet.FileQuery/IFileQueryEngine.cs) | `FileQueryEngine` | `Singleton` | Primary engine executing queries. |
+| [IFileQueryEngine](https://github.com/TarekNajem04/Jeninnet.FileQuery/blob/main/src/Jeninnet.FileQuery/IFileQueryEngine.cs) | `FileQueryEngine` | `Singleton` | Primary engine executing queries. |
 | `IFileSystem` | `FileSystem` | `Singleton` | Decoupled platform IO actions. |
 | `ITraversalPlanBuilder` | `TraversalPlanBuilder` | `Singleton` | Prepares traversal steps. |
 | `ITraversalExecutor` | `TraversalExecutor` | `Singleton` | Drives physical/virtual path discovery. |

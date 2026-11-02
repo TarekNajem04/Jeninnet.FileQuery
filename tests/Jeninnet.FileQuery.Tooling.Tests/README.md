@@ -3,7 +3,7 @@
 Tests for the Tooling SDK: pattern classification, structural validation, inspection flags,
 tokenization, and SARIF projection.
 
-**20 tests.**
+**22 tests.**
 
 ## What is covered
 

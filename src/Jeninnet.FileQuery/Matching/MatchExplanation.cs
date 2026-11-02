@@ -33,14 +33,28 @@ internal static class MatchExplanation {
 
         var lastGitIgnoreMatch = FindLastGitIgnoreMatch(patterns, context);
 
-        if(lastGitIgnoreMatch is not null && finalOutcome is MatchOutcome.Include) {
-            return lastGitIgnoreMatch;
+        if(finalOutcome is MatchOutcome.Include) {
+            // A GitIgnore Include short-circuits resolution. It is produced either
+            // by the last matching negation rule or by the default-include state
+            // when no GitIgnore rule matched.
+            if(lastGitIgnoreMatch is not null) {
+                if(lastGitIgnoreMatch.IsNegated) {
+                    return lastGitIgnoreMatch;
+                }
+            } else if(patterns.GitIgnoreSubSet is { Count: > 0 }) {
+                // The GitIgnore subset returned its default Include without a rule
+                // match, so Glob and Regex were never consulted.
+                return null;
+            }
+
+            // GitIgnore excluded the path (or has no subset); a Glob/Regex rule
+            // re-included it and is the deciding pattern.
+            return FindMatchInBuckets(patterns, context);
         }
 
-        var match = FindMatchInBuckets(patterns, context);
-        return match ?? (finalOutcome is MatchOutcome.Exclude
-            ? lastGitIgnoreMatch
-            : null);
+        // Only the GitIgnore subset can produce an Exclude. Glob and Regex act as
+        // re-inclusion fallbacks, so the last applying GitIgnore rule is responsible.
+        return finalOutcome is MatchOutcome.Exclude ? lastGitIgnoreMatch : null;
     }
 
     /// <summary>
