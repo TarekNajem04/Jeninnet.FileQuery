@@ -14,7 +14,7 @@
 [![NuGet downloads](https://img.shields.io/nuget/dt/Jeninnet.FileQuery)](https://www.nuget.org/packages/Jeninnet.FileQuery.CommandLine/)
 [![Documentation](https://img.shields.io/badge/docs-online-1f6feb)](https://tareknajem04.github.io/Jeninnet.FileQuery/)
 
-![architecture: invariants ok](badges/architecture.svg) ![target framework: net10.0](badges/frameworks.svg) ![documented packages: 5](badges/packages.svg)
+![architecture: invariants ok](badges/architecture.svg) ![target framework: net10.0](badges/frameworks.svg) ![documented packages: 5](badges/packages.svg) ![line coverage: 89.2%](badges/coverage.svg)
 
 **A high-performance, deterministic file discovery and filtering engine for .NET.**
 

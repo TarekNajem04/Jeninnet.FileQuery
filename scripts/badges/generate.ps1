@@ -9,9 +9,10 @@
       2. Runs the architecture test gate.
       3. Reads the target framework from Directory.Build.props and the documented package
          set from docs/docfx.json.
-      4. Renders three SVG badges under badges/ referenced by README.md.
+      4. Reads the last coverage report (artifacts/coverage/Summary.txt) when available.
+      5. Renders four SVG badges under badges/ referenced by README.md.
 
-    Use -SkipTests to re-render badges from the last build without re-running the gate.
+    Use -SkipTests to re-render badges from the last build/coverage without re-running the gate.
 #>
 
 [CmdletBinding()]
@@ -151,10 +152,37 @@ if ($documentedPackages -eq 0) {
     throw "No documented packages were found in docs/docfx.json."
 }
 
+$coverageValue = "not run"
+$coverageColor = "#9f9f9f"
+$coverageSummary = Join-Path $root "artifacts\coverage\Summary.txt"
+
+if (Test-Path -LiteralPath $coverageSummary) {
+    $summaryText = Get-Content -LiteralPath $coverageSummary -Raw
+    $coverageMatch = [regex]::Match($summaryText, 'Line coverage:\s*([0-9]+(?:\.[0-9]+)?%)')
+
+    if ($coverageMatch.Success) {
+        $coverageValue = $coverageMatch.Groups[1].Value
+        $coverageNumber = [double]::Parse(
+            $coverageValue.TrimEnd('%'),
+            [System.Globalization.CultureInfo]::InvariantCulture)
+
+        if ($coverageNumber -ge 85) {
+            $coverageColor = "#4c1"
+        }
+        elseif ($coverageNumber -ge 70) {
+            $coverageColor = "#dfb317"
+        }
+        else {
+            $coverageColor = "#e05d44"
+        }
+    }
+}
+
 $badges = @{
     "architecture" = New-Badge -Label "architecture"       -Value "invariants ok" -Color "#4c1"
     "frameworks"   = New-Badge -Label "target framework"   -Value $targetFramework -Color "#1f6feb"
     "packages"     = New-Badge -Label "documented packages" -Value "$documentedPackages" -Color "#1f6feb"
+    "coverage"     = New-Badge -Label "line coverage"      -Value $coverageValue -Color $coverageColor
 }
 
 foreach ($entry in $badges.GetEnumerator()) {
@@ -170,6 +198,7 @@ Write-Host "---------------------------------------------"
 Write-Host ("architecture : invariants ok (gate: ArchitectureTests)")
 Write-Host ("frameworks   : {0}" -f $targetFramework)
 Write-Host ("packages     : {0} documented package(s) in docs/docfx.json" -f $documentedPackages)
+Write-Host ("coverage     : {0} (artifacts/coverage/Summary.txt)" -f $coverageValue)
 Write-Host "---------------------------------------------"
 Write-Host "Badges written to badges/ and referenced by README.md."
 Write-Host "============================================="
