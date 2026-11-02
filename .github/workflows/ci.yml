@@ -354,11 +354,13 @@ jobs:
         run: |
           set -euo pipefail
           version=$(sed -n 's:.*<Version>\(.*\)</Version>.*:\1:p' src/Jeninnet.FileQuery.Analyzers/Jeninnet.FileQuery.Analyzers.csproj | head -n 1)
-          mkdir -p artifacts/analyzer-consumer
-          cd artifacts/analyzer-consumer
+          consumer="$RUNNER_TEMP/analyzer-consumer"
+          rm -rf "$consumer"
+          mkdir -p "$consumer"
+          cd "$consumer"
           dotnet new classlib --framework net10.0 --no-restore
-          dotnet add package Jeninnet.FileQuery --version "$version" --source ../../artifacts/packages
-          dotnet add package Jeninnet.FileQuery.Analyzers --version "$version" --source ../../artifacts/packages
+          dotnet add package Jeninnet.FileQuery --version "$version" --source "$GITHUB_WORKSPACE/artifacts/packages"
+          dotnet add package Jeninnet.FileQuery.Analyzers --version "$version" --source "$GITHUB_WORKSPACE/artifacts/packages"
           rm Class1.cs
 
           cat > Class1.cs <<'EOF'
@@ -414,12 +416,14 @@ jobs:
         run: |
           set -euo pipefail
           version=$(dotnet msbuild src/Jeninnet.FileQuery.Build/Jeninnet.FileQuery.Build.csproj -getProperty:Version -nologo -verbosity:quiet)
-          mkdir -p artifacts/build-consumer
-          cd artifacts/build-consumer
+          consumer="$RUNNER_TEMP/build-consumer"
+          rm -rf "$consumer"
+          mkdir -p "$consumer"
+          cd "$consumer"
           dotnet new classlib --framework net10.0 --no-restore
           dotnet add package Jeninnet.FileQuery.Build --version "$version" --no-restore
           sed -i 's#</Project>#  <PropertyGroup><FileQueryPatterns>**/*.cs;!bin/</FileQueryPatterns><FileQuerySarifOutput>$(MSBuildProjectDirectory)/artifacts/filequery.sarif</FileQuerySarifOutput></PropertyGroup>\n</Project>#' build-consumer.csproj
-          dotnet restore --source ../../artifacts/packages --source https://api.nuget.org/v3/index.json
+          dotnet restore --source "$GITHUB_WORKSPACE/artifacts/packages" --source https://api.nuget.org/v3/index.json
           dotnet build --no-restore
           test -f artifacts/filequery.sarif
           sed -i 's#\*\*/\*.cs;!bin/#**/*.cs;[abc#' build-consumer.csproj
