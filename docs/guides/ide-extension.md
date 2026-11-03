@@ -263,7 +263,7 @@ npx @vscode/vsce package
 ```
 
 Publishing is automated by
-[`vscode-extension-publish.yml`](../../.github/workflows/vscode-extension-publish.yml)
+[`vscode-extension-publish.yml`](https://github.com/TarekNajem04/Jeninnet.FileQuery/blob/main/.github/workflows/vscode-extension-publish.yml)
 using **Trusted Publishing through GitHub Actions OIDC** — no Personal Access Token (PAT)
 is stored or used.
 
