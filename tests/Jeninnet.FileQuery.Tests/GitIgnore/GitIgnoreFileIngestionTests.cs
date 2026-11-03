@@ -238,6 +238,66 @@ public sealed class GitIgnoreFileIngestionTests {
     }
 
     /// <summary>
+    /// Unanchored repository-level rules remain effective for a subdirectory query.
+    /// </summary>
+    [TestMethod]
+    public void InfoExclude_SubdirectoryQuery_PreservesUnanchoredRule() {
+        using var environment = new TestEnvironment();
+        environment.CreateFile(".git/info/exclude", "*.bak\n");
+        environment.CreateFiles("sub/drop.bak", "sub/keep.txt");
+
+        QuerySubdirectory(environment, "sub").Should().Equal("keep.txt");
+    }
+
+    /// <summary>
+    /// Root-anchored rules are rebased onto a subdirectory query.
+    /// </summary>
+    [TestMethod]
+    public void InfoExclude_SubdirectoryQuery_RebasesAnchoredRule() {
+        using var environment = new TestEnvironment();
+        environment.CreateFile(".git/info/exclude", "/sub/*.bak\n");
+        environment.CreateFiles("sub/drop.bak", "sub/keep.txt");
+
+        QuerySubdirectory(environment, "sub").Should().Equal("keep.txt");
+    }
+
+    /// <summary>
+    /// Root-anchored rules outside the query root are ignored.
+    /// </summary>
+    [TestMethod]
+    public void InfoExclude_SubdirectoryQuery_IgnoresRuleOutsideRoot() {
+        using var environment = new TestEnvironment();
+        environment.CreateFile(".git/info/exclude", "/other/*.bak\n");
+        environment.CreateFiles("sub/drop.bak", "sub/keep.txt");
+
+        QuerySubdirectory(environment, "sub").Should().Equal("drop.bak", "keep.txt");
+    }
+
+    /// <summary>
+    /// A repository-level rule that targets the query root excludes the whole query root.
+    /// </summary>
+    [TestMethod]
+    public void InfoExclude_RootTargetingRule_ExcludesQueryRoot() {
+        using var environment = new TestEnvironment();
+        environment.CreateFile(".git/info/exclude", "/sub/\n");
+        environment.CreateFiles("sub/drop.txt", "sub/keep.txt");
+
+        QuerySubdirectory(environment, "sub").Should().BeEmpty();
+    }
+
+    /// <summary>
+    /// Malformed repository-level rules are ignored instead of failing the query.
+    /// </summary>
+    [TestMethod]
+    public void InfoExclude_MalformedRules_AreIgnored() {
+        using var environment = new TestEnvironment();
+        environment.CreateFile(".git/info/exclude", "!\n/\n");
+        environment.CreateFiles("sub/drop.txt", "sub/keep.txt");
+
+        QuerySubdirectory(environment, "sub").Should().Equal("drop.txt", "keep.txt");
+    }
+
+    /// <summary>
     /// Creates a small repository-like tree.
     /// </summary>
     private static TestEnvironment CreateRootEnvironment() {
@@ -257,6 +317,23 @@ public sealed class GitIgnoreFileIngestionTests {
             .Select(path => Relative(environment.Root, path))
             .Where(static path => !IsIgnoreMetadata(path))
             .OrderBy(static path => path, StringComparer.Ordinal)];
+
+    /// <summary>
+    /// Runs an ignore-aware query rooted at a subdirectory of the test repository.
+    /// </summary>
+    /// <param name="environment">The test environment.</param>
+    /// <param name="subdirectory">The repository-relative query root.</param>
+    /// <returns>The sorted relative paths below the query root.</returns>
+    private static string[] QuerySubdirectory(TestEnvironment environment, string subdirectory) {
+        var queryRoot = Path.Combine(environment.Root, subdirectory);
+
+        return [.. FileQuery.From(queryRoot)
+            .UseGitIgnoreFiles()
+            .Execute()
+            .Select(path => Relative(queryRoot, path))
+            .Where(static path => !IsIgnoreMetadata(path))
+            .OrderBy(static path => path, StringComparer.Ordinal)];
+    }
 
     private static string Relative(string root, string path) =>
         Path.GetRelativePath(root, path).Replace('\\', '/');

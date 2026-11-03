@@ -510,11 +510,7 @@ internal static class GitIgnoreFileLoader {
             : StringComparison.OrdinalIgnoreCase;
 
         if(!rule.WasRootAnchored && !rule.ContainsSlash) {
-            if(IsAncestorRule(rule.ContentWithoutTrailingSlash, relativeRoot, comparison)) {
-                return rule.Negated ? null : "/**";
-            }
-
-            return pattern;
+            return RewriteUnanchoredRule(pattern, rule, relativeRoot, comparison);
         }
 
         if(string.Equals(rule.ContentWithoutTrailingSlash, relativeRoot, comparison)) {
@@ -529,6 +525,42 @@ internal static class GitIgnoreFileLoader {
             return rule.Negated ? null : "/**";
         }
 
+        return RebaseRuleContent(rule, relativeRoot, comparison);
+    }
+
+    /// <summary>
+    /// Rewrites an unanchored single-segment rule for a deeper query root.
+    /// </summary>
+    /// <param name="pattern">The original rule.</param>
+    /// <param name="rule">The parsed rule.</param>
+    /// <param name="relativeRoot">The query root relative to the repository root.</param>
+    /// <param name="comparison">The path comparison mode.</param>
+    /// <returns>The rewritten rule, or <see langword="null"/> when it is a negated ancestor.</returns>
+    private static string? RewriteUnanchoredRule(
+        string pattern,
+        RepositoryRule rule,
+        string relativeRoot,
+        StringComparison comparison
+    ) {
+        if(!IsAncestorRule(rule.ContentWithoutTrailingSlash, relativeRoot, comparison)) {
+            return pattern;
+        }
+
+        return rule.Negated ? null : "/**";
+    }
+
+    /// <summary>
+    /// Rebases a root-anchored or multi-segment rule onto the query root.
+    /// </summary>
+    /// <param name="rule">The parsed rule.</param>
+    /// <param name="relativeRoot">The query root relative to the repository root.</param>
+    /// <param name="comparison">The path comparison mode.</param>
+    /// <returns>The rebased rule, or <see langword="null"/> when it is outside the query root.</returns>
+    private static string? RebaseRuleContent(
+        RepositoryRule rule,
+        string relativeRoot,
+        StringComparison comparison
+    ) {
         var prefix = $"{relativeRoot}/";
 
         if(!rule.Content.StartsWith(prefix, comparison)) {
