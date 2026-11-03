@@ -1907,6 +1907,25 @@
             <param name="relativeRoot">The query root relative to the repository root.</param>
             <returns>The rebased rule, or <see langword="null"/> when it cannot affect the query root.</returns>
         </member>
+        <member name="M:Jeninnet.FileQuery.GitIgnore.GitIgnoreFileLoader.RewriteUnanchoredRule(System.String,Jeninnet.FileQuery.GitIgnore.GitIgnoreFileLoader.RepositoryRule,System.String,System.StringComparison)">
+            <summary>
+            Rewrites an unanchored single-segment rule for a deeper query root.
+            </summary>
+            <param name="pattern">The original rule.</param>
+            <param name="rule">The parsed rule.</param>
+            <param name="relativeRoot">The query root relative to the repository root.</param>
+            <param name="comparison">The path comparison mode.</param>
+            <returns>The rewritten rule, or <see langword="null"/> when it is a negated ancestor.</returns>
+        </member>
+        <member name="M:Jeninnet.FileQuery.GitIgnore.GitIgnoreFileLoader.RebaseRuleContent(Jeninnet.FileQuery.GitIgnore.GitIgnoreFileLoader.RepositoryRule,System.String,System.StringComparison)">
+            <summary>
+            Rebases a root-anchored or multi-segment rule onto the query root.
+            </summary>
+            <param name="rule">The parsed rule.</param>
+            <param name="relativeRoot">The query root relative to the repository root.</param>
+            <param name="comparison">The path comparison mode.</param>
+            <returns>The rebased rule, or <see langword="null"/> when it is outside the query root.</returns>
+        </member>
         <member name="M:Jeninnet.FileQuery.GitIgnore.GitIgnoreFileLoader.TryParseRepositoryRule(System.String,Jeninnet.FileQuery.GitIgnore.GitIgnoreFileLoader.RepositoryRule@)">
             <summary>
             Parses the structural parts of a repository-relative ignore rule.
