@@ -74,16 +74,9 @@ internal sealed class TraversalExecutor : ITraversalExecutor {
     ) {
         cancellationToken.ThrowIfCancellationRequested();
 
-        using var buffer = new TraversalFrontier();
-        var visited = plan.Traversal.SymlinkPolicy is SymlinkPolicy.FollowWithCycleDetection
-            ? new HashSet<string>(GetPathComparer(plan.Matching.CaseSensitivity))
-            : null;
+        using var session = new TraversalSession<T>(plan, project, cancellationToken);
 
-        visited?.Add(plan.FileSystem.ResolveRealPath(plan.RootDirectory));
-
-        var state = new TraversalProgressState();
-
-        foreach(var item in TraverseCore(plan, plan.RootDirectory, buffer, visited, state, project, cancellationToken)) {
+        foreach(var item in TraverseCore(session, plan.RootDirectory)) {
             yield return item;
         }
     }
@@ -102,108 +95,69 @@ internal sealed class TraversalExecutor : ITraversalExecutor {
     ) {
         cancellationToken.ThrowIfCancellationRequested();
 
-        using var buffer = new TraversalFrontier();
-        var visited = plan.Traversal.SymlinkPolicy is SymlinkPolicy.FollowWithCycleDetection
-            ? new HashSet<string>(GetPathComparer(plan.Matching.CaseSensitivity))
-            : null;
+        using var session = new TraversalSession<T>(plan, project, cancellationToken);
 
-        visited?.Add(plan.FileSystem.ResolveRealPath(plan.RootDirectory));
-
-        var state = new TraversalProgressState();
-
-        await foreach(var item in TraverseCoreAsync(
-            plan,
-            plan.RootDirectory,
-            buffer,
-            visited,
-            state,
-            project,
-            cancellationToken).ConfigureAwait(false)) {
+        await foreach(var item in TraverseCoreAsync(session, plan.RootDirectory).ConfigureAwait(false)) {
             yield return item;
         }
     }
 
-    private static StringComparer GetPathComparer(CaseSensitivity caseSensitivity) =>
-        caseSensitivity is CaseSensitivity.Insensitive
-            ? StringComparer.OrdinalIgnoreCase
-            : StringComparer.Ordinal;
-
     private static async IAsyncEnumerable<T> TraverseCoreAsync<T>(
-        TraversalPlan plan,
-        string startDir,
-        TraversalFrontier buffer,
-        HashSet<string>? visited,
-        TraversalProgressState state,
-        Func<FileSystemEntry, RelativePathBuffer, T> project,
-        [EnumeratorCancellation] CancellationToken cancellationToken
+        TraversalSession<T> session,
+        string startDir
     ) {
-        using var pathBuffer = new RelativePathBuffer();
-        buffer.Push(new TraversalFrame(startDir, Depth: 0));
-        var entriesScanned = 0L;
-        var filesMatched = 0L;
+        session.Frontier.Push(new TraversalFrame(startDir, Depth: 0));
 
         try {
-            while(!buffer.IsEmpty) {
-                cancellationToken.ThrowIfCancellationRequested();
-                var frame = TakeFrame(buffer, plan.Traversal);
-                state.DirectoriesVisited++;
-                ReportProgress(plan, state, frame.Directory);
+            while(!session.Frontier.IsEmpty) {
+                session.CancellationToken.ThrowIfCancellationRequested();
+                var frame = TakeFrame(session.Frontier, session.Plan.Traversal);
+                session.State.DirectoriesVisited++;
+                ReportProgress(session.Plan, session.State, frame.Directory);
 
-                await foreach(var entry in plan.FileSystem.EnumerateAsync(
+                await foreach(var entry in session.Plan.FileSystem.EnumerateAsync(
                     frame.Directory,
-                    plan.Traversal.IgnoreInaccessible,
-                    plan.Traversal.ErrorRecovery,
-                    cancellationToken
+                    session.Plan.Traversal.IgnoreInaccessible,
+                    session.Plan.Traversal.ErrorRecovery,
+                    session.CancellationToken
                 )) {
-                    if(TryAdvance(
-                        plan, entry, frame, buffer, visited, pathBuffer, state,
-                        ref entriesScanned, ref filesMatched, project, cancellationToken, out var result)) {
+                    if(TryAdvance(session, entry, frame, out var result)) {
                         yield return result;
                     }
                 }
             }
         }
         finally {
-            FileQueryInstrumentation.RecordTraversal(entriesScanned, filesMatched);
+            FileQueryInstrumentation.RecordTraversal(session.EntriesScanned, session.FilesMatched);
         }
     }
 
     private static IEnumerable<T> TraverseCore<T>(
-        TraversalPlan plan,
-        string startDir,
-        TraversalFrontier buffer,
-        HashSet<string>? visited,
-        TraversalProgressState state,
-        Func<FileSystemEntry, RelativePathBuffer, T> project,
-        CancellationToken cancellationToken
+        TraversalSession<T> session,
+        string startDir
     ) {
-        using var pathBuffer = new RelativePathBuffer();
-        buffer.Push(new TraversalFrame(startDir, Depth: 0));
-        var entriesScanned = 0L;
-        var filesMatched = 0L;
+        session.Frontier.Push(new TraversalFrame(startDir, Depth: 0));
 
         try {
-            while(!buffer.IsEmpty) {
-                cancellationToken.ThrowIfCancellationRequested();
-                var frame = TakeFrame(buffer, plan.Traversal);
-                state.DirectoriesVisited++;
-                ReportProgress(plan, state, frame.Directory);
+            while(!session.Frontier.IsEmpty) {
+                session.CancellationToken.ThrowIfCancellationRequested();
+                var frame = TakeFrame(session.Frontier, session.Plan.Traversal);
+                session.State.DirectoriesVisited++;
+                ReportProgress(session.Plan, session.State, frame.Directory);
 
-                foreach(var entry in plan.FileSystem.Enumerate(
+                foreach(var entry in session.Plan.FileSystem.Enumerate(
                     frame.Directory,
-                    plan.Traversal.IgnoreInaccessible,
-                    plan.Traversal.ErrorRecovery
+                    session.Plan.Traversal.IgnoreInaccessible,
+                    session.Plan.Traversal.ErrorRecovery
                 )) {
-                    if(TryAdvance(
-                        plan, entry, frame, buffer, visited, pathBuffer, state,
-                        ref entriesScanned, ref filesMatched, project, cancellationToken, out var result)) {
+                    if(TryAdvance(session, entry, frame, out var result)) {
                         yield return result;
                     }
                 }
             }
         }
         finally {
-            FileQueryInstrumentation.RecordTraversal(entriesScanned, filesMatched);
+            FileQueryInstrumentation.RecordTraversal(session.EntriesScanned, session.FilesMatched);
         }
     }
 
@@ -211,58 +165,32 @@ internal sealed class TraversalExecutor : ITraversalExecutor {
     /// Processes one filesystem entry and projects it when the entry is yielded.
     /// </summary>
     /// <typeparam name="T">The result type.</typeparam>
-    /// <param name="plan">The traversal plan.</param>
+    /// <param name="session">The active traversal session.</param>
     /// <param name="entry">The filesystem entry to process.</param>
     /// <param name="frame">The current traversal frame.</param>
-    /// <param name="buffer">The traversal frontier buffer.</param>
-    /// <param name="visited">The set of visited directory paths (for symlink cycle detection).</param>
-    /// <param name="pathBuffer">The reusable buffer used to compose the root-relative path.</param>
-    /// <param name="state">The shared traversal progress state.</param>
-    /// <param name="entriesScanned">The running entry count.</param>
-    /// <param name="filesMatched">The running match count.</param>
-    /// <param name="project">The projection applied to each matched entry.</param>
-    /// <param name="cancellationToken">Token to monitor for cancellation requests.</param>
     /// <param name="result">The projected result when the entry is yielded.</param>
     /// <returns><see langword="true"/> when the entry produces a result.</returns>
     private static bool TryAdvance<T>(
-        TraversalPlan plan,
+        TraversalSession<T> session,
         FileSystemEntry entry,
         TraversalFrame frame,
-        TraversalFrontier buffer,
-        HashSet<string>? visited,
-        RelativePathBuffer pathBuffer,
-        TraversalProgressState state,
-        ref long entriesScanned,
-        ref long filesMatched,
-        Func<FileSystemEntry, RelativePathBuffer, T> project,
-        CancellationToken cancellationToken,
         out T result
     ) {
-        cancellationToken.ThrowIfCancellationRequested();
-        state.EntriesScanned++;
-        entriesScanned++;
-        ReportProgress(plan, state, entry.FullPath);
+        session.CancellationToken.ThrowIfCancellationRequested();
+        session.State.EntriesScanned++;
+        session.EntriesScanned++;
+        ReportProgress(session.Plan, session.State, entry.FullPath);
 
-        if(
-            !TryProcessEntry(
-                plan,
-                entry,
-                frame,
-                buffer,
-                visited,
-                pathBuffer,
-                out var yieldedEntry
-            ) ||
-            !yieldedEntry.HasValue
-        ) {
+        if(!TryProcessEntry(session, entry, frame, out var yieldedEntry) ||
+            !yieldedEntry.HasValue) {
             result = default!;
             return false;
         }
 
-        state.FilesMatched++;
-        filesMatched++;
-        ReportProgress(plan, state, yieldedEntry.Value.FullPath);
-        result = project(yieldedEntry.Value, pathBuffer);
+        session.State.FilesMatched++;
+        session.FilesMatched++;
+        ReportProgress(session.Plan, session.State, yieldedEntry.Value.FullPath);
+        result = session.Project(yieldedEntry.Value, session.PathBuffer);
 
         return true;
     }
@@ -280,49 +208,75 @@ internal sealed class TraversalExecutor : ITraversalExecutor {
     /// <summary>
     /// Processes a single filesystem entry, potentially adding it to the frontier or yielding it if it matches.
     /// </summary>
-    /// <param name="plan">The traversal plan.</param>
+    /// <typeparam name="T">The result type.</typeparam>
+    /// <param name="session">The active traversal session.</param>
     /// <param name="entry">The filesystem entry to process.</param>
     /// <param name="frame">The current traversal frame.</param>
-    /// <param name="buffer">The traversal frontier buffer.</param>
-    /// <param name="visited">The set of visited directory paths (for symlink cycle detection).</param>
-    /// <param name="pathBuffer">The reusable buffer used to compose the root-relative path.</param>
     /// <param name="yieldedEntry">The resulting entry if a result was matched.</param>
-    private static bool TryProcessEntry(
-        TraversalPlan plan,
+    private static bool TryProcessEntry<T>(
+        TraversalSession<T> session,
         FileSystemEntry entry,
         TraversalFrame frame,
-        TraversalFrontier buffer,
-        HashSet<string>? visited,
-        RelativePathBuffer pathBuffer,
         out FileSystemEntry? yieldedEntry
     ) {
         yieldedEntry = null;
+        var plan = session.Plan;
 
-        if(IsIgnoredSymlink(entry, plan.Traversal)) {
+        if(IsIgnoredSymlink(entry, plan.Traversal) || !plan.EntryFilter.ShouldInclude(entry)) {
             return false;
         }
 
-        // Metadata filters prune before matching and before composing a relative path.
-        if(!plan.EntryFilter.ShouldInclude(entry)) {
+        var relativePath = session.PathBuffer.BuildRelativePath(plan.RootDirectory, entry);
+
+        if(!PassesPathFilter(plan.PathFilter, entry, relativePath)) {
             return false;
         }
 
-        var relativePath = pathBuffer.BuildRelativePath(plan.RootDirectory, entry);
+        var matchOutcome = ResolveMatchOutcome(plan, entry, relativePath);
+        var decision = plan.Evaluator.Evaluate(matchOutcome, entry.PathKind, frame.Depth);
 
-        // An allow-list restricts both matching and traversal: files outside it are never
-        // matched, and directories that cannot contain a listed file are pruned.
-        if(plan.PathFilter is not null) {
-            if(entry.IsDirectory) {
-                if(!plan.PathFilter.CanContainFiles(relativePath)) {
-                    return false;
-                }
-            } else if(!plan.PathFilter.ContainsFile(relativePath)) {
-                return false;
-            }
+        if(decision.ShouldTraverse && !TryQueueDirectory(session, entry, frame)) {
+            return false;
         }
 
+        if(decision.ShouldYield) {
+            yieldedEntry = entry;
+        }
+
+        return true;
+    }
+
+    /// <summary>
+    /// Applies the optional allow-list filter to an entry.
+    /// </summary>
+    /// <param name="filter">The allow-list filter, when configured.</param>
+    /// <param name="entry">The filesystem entry.</param>
+    /// <param name="relativePath">The root-relative path.</param>
+    /// <returns><see langword="true"/> when the entry may continue through the pipeline.</returns>
+    private static bool PassesPathFilter(
+        RelativePathFilter? filter,
+        FileSystemEntry entry,
+        ReadOnlySpan<char> relativePath
+    ) =>
+        filter is null ||
+        (entry.IsDirectory ? filter.CanContainFiles(relativePath) : filter.ContainsFile(relativePath));
+
+    /// <summary>
+    /// Matches one entry and reports its diagnostic.
+    /// </summary>
+    /// <param name="plan">The traversal plan.</param>
+    /// <param name="entry">The filesystem entry.</param>
+    /// <param name="relativePath">The root-relative path.</param>
+    /// <returns>The effective match outcome.</returns>
+    private static MatchOutcome ResolveMatchOutcome(
+        TraversalPlan plan,
+        FileSystemEntry entry,
+        ReadOnlySpan<char> relativePath
+    ) {
         var pathMatchContext = new PathMatchContext(
-            relativePath, entry.PathKind, plan.Matching.CaseSensitivity.Resolve());
+            relativePath,
+            entry.PathKind,
+            plan.Matching.CaseSensitivity.Resolve());
         var matchOutcome = plan.Matcher.Match(plan.CompiledPatterns, pathMatchContext);
         ReportDiagnostic(plan, entry, relativePath, pathMatchContext, matchOutcome);
 
@@ -335,36 +289,41 @@ internal sealed class TraversalExecutor : ITraversalExecutor {
         //
         // The traversal check is separate from the matcher result so that unit tests
         // checking IsSuccess() (which returns IsIncluded) remain unaffected.
-        if(
-            entry.IsDirectory && matchOutcome is MatchOutcome.Exclude &&
+        if(entry.IsDirectory && matchOutcome is MatchOutcome.Exclude &&
             HasPotentialReInclusionInside(
                 plan.CompiledPatterns,
                 relativePath,
-                plan.Matching.CaseSensitivity.GetStringComparison()
-            )
-        ) {
-            matchOutcome = MatchOutcome.NoMatch;  // allow traversal
+                plan.Matching.CaseSensitivity.GetStringComparison())) {
+            return MatchOutcome.NoMatch;  // allow traversal
         }
 
-        var decision = plan.Evaluator.Evaluate(matchOutcome, entry.PathKind, frame.Depth);
+        return matchOutcome;
+    }
 
-        if(decision.ShouldTraverse) {
-            if(visited is not null && entry.IsDirectory) {
-                var realPath = entry.IsReparsePoint
-                    ? plan.FileSystem.ResolveRealPath(entry.FullPath)
-                    : entry.FullPath;
-                if(!visited.Add(realPath)) {
-                    return false;
-                }
+    /// <summary>
+    /// Queues a directory for traversal, guarding against symlink cycles.
+    /// </summary>
+    /// <typeparam name="T">The result type.</typeparam>
+    /// <param name="session">The active traversal session.</param>
+    /// <param name="entry">The directory entry.</param>
+    /// <param name="frame">The current traversal frame.</param>
+    /// <returns><see langword="false"/> when a symlink cycle was detected.</returns>
+    private static bool TryQueueDirectory<T>(
+        TraversalSession<T> session,
+        FileSystemEntry entry,
+        TraversalFrame frame
+    ) {
+        if(session.Visited is not null && entry.IsDirectory) {
+            var realPath = entry.IsReparsePoint
+                ? session.Plan.FileSystem.ResolveRealPath(entry.FullPath)
+                : entry.FullPath;
+
+            if(!session.Visited.Add(realPath)) {
+                return false;
             }
-
-            buffer.Push(new TraversalFrame(entry.FullPath, frame.Depth + 1));
         }
 
-        if(decision.ShouldYield) {
-            yieldedEntry = entry;
-        }
-
+        session.Frontier.Push(new TraversalFrame(entry.FullPath, frame.Depth + 1));
         return true;
     }
 
@@ -384,70 +343,79 @@ internal sealed class TraversalExecutor : ITraversalExecutor {
         var dirPath = directoryRelativePath.TrimEnd('/');
 
         for(var i = 0; i < patterns.Count; i++) {
-            var pattern = patterns[i];
-
-            // Glob and Regex are positive re-inclusion fallbacks. An excluded
-            // directory must still be traversed when one of them could match a
-            // descendant, otherwise the documented cross-dialect override could
-            // never see the file it is supposed to re-include.
-            if(pattern.PatternKind is PatternKind.Regex) {
-                return true;
-            }
-
-            if(pattern.PatternKind is PatternKind.Glob) {
-                if(CouldGlobMatchBelow(pattern, dirPath, comparison)) {
-                    return true;
-                }
-
-                continue;
-            }
-
-            if(!pattern.IsNegated) {
-                continue;
-            }
-
-            // An unanchored negation (leading **) can match at any depth, so the
-            // concrete anchor is not a reliable directory prefix. Traverse rather
-            // than risk pruning a directory that contains a matching subtree.
-            if(pattern.Segments.Count > 0 &&
-                pattern.Segments[0].Count == 1 &&
-                pattern.Segments[0][0] is RecursiveWildcardToken) {
-                return true;
-            }
-
-            var anchor = GetConcretePathAnchor(pattern);
-
-            // A broad wildcard (e.g. !** or !**/*.txt) has no concrete anchor
-            // and can match inside any directory.
-            if(anchor.Length == 0) {
-                // For directory-only negated patterns (e.g. !*.github/), the last
-                // segment constrains which directories can match via its literal
-                // suffix.  Extract that suffix and verify at least one path
-                // segment of the candidate directory ends with it, so we don't
-                // unnecessarily traverse unrelated excluded directories.
-                if(pattern.DirectoryOnly &&
-                    pattern.Segments.Count > 0 &&
-                    TryGetLiteralSuffix(pattern.Segments[^1], out var suffix)) {
-                    return ContainsSegmentEndingWith(dirPath, suffix, comparison);
-                }
-
-                // Non-directory-only patterns (e.g. !**/*.txt) or patterns
-                // without a literal suffix — can't narrow down, traverse all.
-                return true;
-            }
-
-            // The negated pattern could match inside this directory if:
-            // - The directory IS the anchor target, or a parent of it
-            //   ("ignore_me" is a parent of "ignore_me/recover")
-            // - The directory IS inside the anchor target area
-            //   ("ignore_me/recover/deep" is inside "ignore_me/recover")
-            if(IsPathPrefixOrEqual(dirPath, anchor, comparison) ||
-                IsPathPrefixOrEqual(anchor, dirPath, comparison)) {
+            if(CanPatternMatchInside(patterns[i], dirPath, comparison)) {
                 return true;
             }
         }
 
         return false;
+    }
+
+    /// <summary>
+    /// Determines whether one compiled pattern could match below a directory.
+    /// </summary>
+    /// <param name="pattern">The compiled pattern.</param>
+    /// <param name="directoryPath">The normalized directory path without a trailing slash.</param>
+    /// <param name="comparison">The string comparison mode.</param>
+    /// <returns><see langword="true"/> when the pattern could match below the directory.</returns>
+    private static bool CanPatternMatchInside(
+        ICompiledPattern pattern,
+        ReadOnlySpan<char> directoryPath,
+        StringComparison comparison
+    ) {
+        // Glob and Regex are positive re-inclusion fallbacks. An excluded
+        // directory must still be traversed when one of them could match a
+        // descendant, otherwise the documented cross-dialect override could
+        // never see the file it is supposed to re-include.
+        if(pattern.PatternKind is PatternKind.Regex) {
+            return true;
+        }
+
+        if(pattern.PatternKind is PatternKind.Glob) {
+            return CouldGlobMatchBelow(pattern, directoryPath, comparison);
+        }
+
+        if(!pattern.IsNegated) {
+            return false;
+        }
+
+        // An unanchored negation (leading **) can match at any depth, so the
+        // concrete anchor is not a reliable directory prefix. Traverse rather
+        // than risk pruning a directory that contains a matching subtree.
+        if(pattern.Segments.Count > 0 &&
+            pattern.Segments[0].Count == 1 &&
+            pattern.Segments[0][0] is RecursiveWildcardToken) {
+            return true;
+        }
+
+        var anchor = GetConcretePathAnchor(pattern);
+
+        // A broad wildcard (e.g. !** or !**/*.txt) has no concrete anchor
+        // and can match inside any directory.
+        if(anchor.Length == 0) {
+            // For directory-only negated patterns (e.g. !*.github/), the last
+            // segment constrains which directories can match via its literal
+            // suffix. Extract that suffix and verify at least one path
+            // segment of the candidate directory ends with it, so we don't
+            // unnecessarily traverse unrelated excluded directories.
+            if(pattern.DirectoryOnly &&
+                pattern.Segments.Count > 0 &&
+                TryGetLiteralSuffix(pattern.Segments[^1], out var suffix)) {
+                return ContainsSegmentEndingWith(directoryPath, suffix, comparison);
+            }
+
+            // Non-directory-only patterns (e.g. !**/*.txt) or patterns
+            // without a literal suffix — can't narrow down, traverse all.
+            return true;
+        }
+
+        // The negated pattern could match inside this directory if:
+        // - The directory IS the anchor target, or a parent of it
+        //   ("ignore_me" is a parent of "ignore_me/recover")
+        // - The directory IS inside the anchor target area
+        //   ("ignore_me/recover/deep" is inside "ignore_me/recover")
+        return IsPathPrefixOrEqual(directoryPath, anchor, comparison) ||
+               IsPathPrefixOrEqual(anchor, directoryPath, comparison);
     }
 
     /// <summary>
@@ -742,6 +710,43 @@ internal sealed class TraversalExecutor : ITraversalExecutor {
             Attributes = entry.Attributes,
             IsDirectory = entry.IsDirectory
         });
+    }
+
+    private sealed class TraversalSession<T> : IDisposable {
+        public TraversalSession(
+            TraversalPlan plan,
+            Func<FileSystemEntry, RelativePathBuffer, T> project,
+            CancellationToken cancellationToken
+        ) {
+            Plan = plan;
+            Project = project;
+            CancellationToken = cancellationToken;
+            Visited = plan.Traversal.SymlinkPolicy is SymlinkPolicy.FollowWithCycleDetection
+                ? new HashSet<string>(GetPathComparer(plan.Matching.CaseSensitivity))
+                : null;
+
+            Visited?.Add(plan.FileSystem.ResolveRealPath(plan.RootDirectory));
+        }
+
+        public TraversalPlan Plan { get; }
+        public Func<FileSystemEntry, RelativePathBuffer, T> Project { get; }
+        public CancellationToken CancellationToken { get; }
+        public TraversalFrontier Frontier { get; } = new();
+        public RelativePathBuffer PathBuffer { get; } = new();
+        public HashSet<string>? Visited { get; }
+        public TraversalProgressState State { get; } = new();
+        public long EntriesScanned;
+        public long FilesMatched;
+
+        private static StringComparer GetPathComparer(CaseSensitivity caseSensitivity) =>
+            caseSensitivity is CaseSensitivity.Insensitive
+                ? StringComparer.OrdinalIgnoreCase
+                : StringComparer.Ordinal;
+
+        public void Dispose() {
+            PathBuffer.Dispose();
+            Frontier.Dispose();
+        }
     }
 
     private sealed class TraversalProgressState {

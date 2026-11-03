@@ -1785,6 +1785,27 @@
             <param name="queryRoot">The absolute query root.</param>
             <param name="patterns">The target pattern list.</param>
         </member>
+        <member name="M:Jeninnet.FileQuery.GitIgnore.GitIgnoreFileLoader.LoadNestedDirectory(Jeninnet.FileQuery.IO.IFileSystem,System.ValueTuple{System.String,System.String},System.Collections.Generic.List{System.String},Jeninnet.FileQuery.FileQueryPatternSet,System.Collections.Generic.Queue{System.ValueTuple{System.String,System.String}})">
+            <summary>
+            Loads nested ignore files for one directory and queues its descendants.
+            </summary>
+            <param name="fileSystem">The filesystem abstraction.</param>
+            <param name="directory">The directory and its path relative to the query root.</param>
+            <param name="patterns">The target pattern list.</param>
+            <param name="matcher">The compiled matcher for directory pruning.</param>
+            <param name="pending">The directories still to visit.</param>
+            <returns>The updated matcher.</returns>
+        </member>
+        <member name="M:Jeninnet.FileQuery.GitIgnore.GitIgnoreFileLoader.TryResolveNestedDirectory(Jeninnet.FileQuery.IO.FileSystemEntry,System.String,Jeninnet.FileQuery.FileQueryPatternSet,System.String@)">
+            <summary>
+            Determines whether an entry is a directory that should be visited for nested ignore files.
+            </summary>
+            <param name="entry">The filesystem entry.</param>
+            <param name="parentRelativePath">The parent path relative to the query root.</param>
+            <param name="matcher">The compiled matcher for directory pruning.</param>
+            <param name="childRelativePath">The child path relative to the query root.</param>
+            <returns><see langword="true"/> when the directory should be visited.</returns>
+        </member>
         <member name="M:Jeninnet.FileQuery.GitIgnore.GitIgnoreFileLoader.CompileMatcher(System.Collections.Generic.List{System.String})">
             <summary>
             Compiles the rules collected so far for directory pruning.
@@ -1885,6 +1906,49 @@
             <param name="pattern">The repository-relative rule.</param>
             <param name="relativeRoot">The query root relative to the repository root.</param>
             <returns>The rebased rule, or <see langword="null"/> when it cannot affect the query root.</returns>
+        </member>
+        <member name="M:Jeninnet.FileQuery.GitIgnore.GitIgnoreFileLoader.TryParseRepositoryRule(System.String,Jeninnet.FileQuery.GitIgnore.GitIgnoreFileLoader.RepositoryRule@)">
+            <summary>
+            Parses the structural parts of a repository-relative ignore rule.
+            </summary>
+            <param name="pattern">The repository-relative rule.</param>
+            <param name="rule">The parsed rule.</param>
+            <returns><see langword="true"/> when the rule has a non-empty body.</returns>
+        </member>
+        <member name="T:Jeninnet.FileQuery.GitIgnore.GitIgnoreFileLoader.RepositoryRule">
+            <summary>
+            The structural parts of a repository-relative ignore rule.
+            </summary>
+            <param name="Negated">Whether the rule starts with <c>!</c>.</param>
+            <param name="Content">The rule body without the negation and optional leading slash.</param>
+            <param name="WasRootAnchored">Whether the rule had a leading slash.</param>
+            <param name="ContentWithoutTrailingSlash">The rule body without a trailing directory slash.</param>
+            <param name="ContainsSlash">Whether the rule body contains a path separator.</param>
+        </member>
+        <member name="M:Jeninnet.FileQuery.GitIgnore.GitIgnoreFileLoader.RepositoryRule.#ctor(System.Boolean,System.String,System.Boolean,System.String,System.Boolean)">
+            <summary>
+            The structural parts of a repository-relative ignore rule.
+            </summary>
+            <param name="Negated">Whether the rule starts with <c>!</c>.</param>
+            <param name="Content">The rule body without the negation and optional leading slash.</param>
+            <param name="WasRootAnchored">Whether the rule had a leading slash.</param>
+            <param name="ContentWithoutTrailingSlash">The rule body without a trailing directory slash.</param>
+            <param name="ContainsSlash">Whether the rule body contains a path separator.</param>
+        </member>
+        <member name="P:Jeninnet.FileQuery.GitIgnore.GitIgnoreFileLoader.RepositoryRule.Negated">
+            <summary>Whether the rule starts with <c>!</c>.</summary>
+        </member>
+        <member name="P:Jeninnet.FileQuery.GitIgnore.GitIgnoreFileLoader.RepositoryRule.Content">
+            <summary>The rule body without the negation and optional leading slash.</summary>
+        </member>
+        <member name="P:Jeninnet.FileQuery.GitIgnore.GitIgnoreFileLoader.RepositoryRule.WasRootAnchored">
+            <summary>Whether the rule had a leading slash.</summary>
+        </member>
+        <member name="P:Jeninnet.FileQuery.GitIgnore.GitIgnoreFileLoader.RepositoryRule.ContentWithoutTrailingSlash">
+            <summary>The rule body without a trailing directory slash.</summary>
+        </member>
+        <member name="P:Jeninnet.FileQuery.GitIgnore.GitIgnoreFileLoader.RepositoryRule.ContainsSlash">
+            <summary>Whether the rule body contains a path separator.</summary>
         </member>
         <member name="M:Jeninnet.FileQuery.GitIgnore.GitIgnoreFileLoader.ResolvePath(System.String,System.String,Jeninnet.FileQuery.IO.IFileSystem)">
             <summary>
@@ -4887,6 +4951,22 @@
         <member name="M:Jeninnet.FileQuery.Patterns.Invariants.CharacterClassStructureInvariant.Validate(Jeninnet.FileQuery.Patterns.Compilation.PatternCompilationContext)">
             <inheritdoc/>
         </member>
+        <member name="M:Jeninnet.FileQuery.Patterns.Invariants.CharacterClassStructureInvariant.ValidateCharacterClass(Jeninnet.FileQuery.Patterns.Compilation.PatternCompilationContext,Jeninnet.FileQuery.Patterns.Syntax.CharacterClasses.CharacterClass)">
+            <summary>
+            Validates one parsed character class.
+            </summary>
+            <param name="context">The compilation context.</param>
+            <param name="characterClass">The parsed character class.</param>
+            <returns>The failure result, or <see langword="null"/> when the class is valid.</returns>
+        </member>
+        <member name="M:Jeninnet.FileQuery.Patterns.Invariants.CharacterClassStructureInvariant.CreateFailure(Jeninnet.FileQuery.Patterns.Compilation.PatternCompilationContext,System.String)">
+            <summary>
+            Creates a failure result located at the first opening bracket.
+            </summary>
+            <param name="context">The compilation context.</param>
+            <param name="message">The failure message.</param>
+            <returns>The failure result.</returns>
+        </member>
         <member name="T:Jeninnet.FileQuery.Patterns.Invariants.CurrentDirectoryInvariant">
             <summary>
             Ensures that patterns don’t illegally reference current directory sequences.
@@ -5182,6 +5262,28 @@
             <summary>
             Ensures recursive wildcards (**) are not redundantly specified.
             </summary>
+        </member>
+        <member name="M:Jeninnet.FileQuery.Patterns.Invariants.RecursiveWildcardRedundancyInvariant.HasMultipleRecursiveWildcards(System.Collections.Generic.List{Jeninnet.FileQuery.Matching.IPatternToken})">
+            <summary>
+            Determines whether a segment contains more than one recursive wildcard token.
+            </summary>
+            <param name="segment">The pattern segment.</param>
+            <returns><see langword="true"/> when the segment contains duplicate recursive wildcards.</returns>
+        </member>
+        <member name="M:Jeninnet.FileQuery.Patterns.Invariants.RecursiveWildcardRedundancyInvariant.IsWholeRecursiveWildcard(System.Collections.Generic.List{Jeninnet.FileQuery.Matching.IPatternToken})">
+            <summary>
+            Determines whether a segment consists of exactly one recursive wildcard token.
+            </summary>
+            <param name="segment">The pattern segment.</param>
+            <returns><see langword="true"/> when the segment is a standalone recursive wildcard.</returns>
+        </member>
+        <member name="M:Jeninnet.FileQuery.Patterns.Invariants.RecursiveWildcardRedundancyInvariant.CreateFailure(Jeninnet.FileQuery.Patterns.Compilation.PatternCompilationContext,System.String)">
+            <summary>
+            Creates a failure result for the second recursive wildcard occurrence.
+            </summary>
+            <param name="context">The compilation context.</param>
+            <param name="message">The failure message.</param>
+            <returns>The failure result.</returns>
         </member>
         <member name="T:Jeninnet.FileQuery.Patterns.Invariants.RegexSyntaxInvariant">
             <summary>
@@ -6321,6 +6423,14 @@
             <param name="pattern">The raw pattern text.</param>
             <returns>An error message and position, or <see langword="null"/> when braces are balanced.</returns>
         </member>
+        <member name="M:Jeninnet.FileQuery.Patterns.Validation.PatternValidator.SkipCharacterClass(System.ReadOnlySpan{System.Char},System.Int32)">
+            <summary>
+            Returns the index immediately after a character class that starts at <paramref name="start"/>.
+            </summary>
+            <param name="pattern">The raw pattern text.</param>
+            <param name="start">The index of the opening bracket.</param>
+            <returns>The index after the closing bracket, or the pattern length when unterminated.</returns>
+        </member>
         <member name="M:Jeninnet.FileQuery.Patterns.Validation.PatternValidator.DetectNestedBrackets">
             <remarks>
             Pattern:<br/>
@@ -6905,22 +7015,14 @@
             <param name="project">The projection applied to each matched entry.</param>
             <param name="cancellationToken">Token to monitor for cancellation requests.</param>
         </member>
-        <member name="M:Jeninnet.FileQuery.Traversal.TraversalExecutor.TryAdvance``1(Jeninnet.FileQuery.Traversal.TraversalPlan,Jeninnet.FileQuery.IO.FileSystemEntry,Jeninnet.FileQuery.Traversal.TraversalFrame,Jeninnet.FileQuery.Traversal.TraversalFrontier,System.Collections.Generic.HashSet{System.String},Jeninnet.FileQuery.Traversal.RelativePathBuffer,Jeninnet.FileQuery.Traversal.TraversalExecutor.TraversalProgressState,System.Int64@,System.Int64@,System.Func{Jeninnet.FileQuery.IO.FileSystemEntry,Jeninnet.FileQuery.Traversal.RelativePathBuffer,``0},System.Threading.CancellationToken,``0@)">
+        <member name="M:Jeninnet.FileQuery.Traversal.TraversalExecutor.TryAdvance``1(Jeninnet.FileQuery.Traversal.TraversalExecutor.TraversalSession{``0},Jeninnet.FileQuery.IO.FileSystemEntry,Jeninnet.FileQuery.Traversal.TraversalFrame,``0@)">
             <summary>
             Processes one filesystem entry and projects it when the entry is yielded.
             </summary>
             <typeparam name="T">The result type.</typeparam>
-            <param name="plan">The traversal plan.</param>
+            <param name="session">The active traversal session.</param>
             <param name="entry">The filesystem entry to process.</param>
             <param name="frame">The current traversal frame.</param>
-            <param name="buffer">The traversal frontier buffer.</param>
-            <param name="visited">The set of visited directory paths (for symlink cycle detection).</param>
-            <param name="pathBuffer">The reusable buffer used to compose the root-relative path.</param>
-            <param name="state">The shared traversal progress state.</param>
-            <param name="entriesScanned">The running entry count.</param>
-            <param name="filesMatched">The running match count.</param>
-            <param name="project">The projection applied to each matched entry.</param>
-            <param name="cancellationToken">Token to monitor for cancellation requests.</param>
             <param name="result">The projected result when the entry is yielded.</param>
             <returns><see langword="true"/> when the entry produces a result.</returns>
         </member>
@@ -6931,17 +7033,43 @@
             <param name="buffer">The traversal frontier buffer.</param>
             <param name="options">The traversal configuration options.</param>
         </member>
-        <member name="M:Jeninnet.FileQuery.Traversal.TraversalExecutor.TryProcessEntry(Jeninnet.FileQuery.Traversal.TraversalPlan,Jeninnet.FileQuery.IO.FileSystemEntry,Jeninnet.FileQuery.Traversal.TraversalFrame,Jeninnet.FileQuery.Traversal.TraversalFrontier,System.Collections.Generic.HashSet{System.String},Jeninnet.FileQuery.Traversal.RelativePathBuffer,System.Nullable{Jeninnet.FileQuery.IO.FileSystemEntry}@)">
+        <member name="M:Jeninnet.FileQuery.Traversal.TraversalExecutor.TryProcessEntry``1(Jeninnet.FileQuery.Traversal.TraversalExecutor.TraversalSession{``0},Jeninnet.FileQuery.IO.FileSystemEntry,Jeninnet.FileQuery.Traversal.TraversalFrame,System.Nullable{Jeninnet.FileQuery.IO.FileSystemEntry}@)">
             <summary>
             Processes a single filesystem entry, potentially adding it to the frontier or yielding it if it matches.
             </summary>
-            <param name="plan">The traversal plan.</param>
+            <typeparam name="T">The result type.</typeparam>
+            <param name="session">The active traversal session.</param>
             <param name="entry">The filesystem entry to process.</param>
             <param name="frame">The current traversal frame.</param>
-            <param name="buffer">The traversal frontier buffer.</param>
-            <param name="visited">The set of visited directory paths (for symlink cycle detection).</param>
-            <param name="pathBuffer">The reusable buffer used to compose the root-relative path.</param>
             <param name="yieldedEntry">The resulting entry if a result was matched.</param>
+        </member>
+        <member name="M:Jeninnet.FileQuery.Traversal.TraversalExecutor.PassesPathFilter(Jeninnet.FileQuery.Traversal.RelativePathFilter,Jeninnet.FileQuery.IO.FileSystemEntry,System.ReadOnlySpan{System.Char})">
+            <summary>
+            Applies the optional allow-list filter to an entry.
+            </summary>
+            <param name="filter">The allow-list filter, when configured.</param>
+            <param name="entry">The filesystem entry.</param>
+            <param name="relativePath">The root-relative path.</param>
+            <returns><see langword="true"/> when the entry may continue through the pipeline.</returns>
+        </member>
+        <member name="M:Jeninnet.FileQuery.Traversal.TraversalExecutor.ResolveMatchOutcome(Jeninnet.FileQuery.Traversal.TraversalPlan,Jeninnet.FileQuery.IO.FileSystemEntry,System.ReadOnlySpan{System.Char})">
+            <summary>
+            Matches one entry and reports its diagnostic.
+            </summary>
+            <param name="plan">The traversal plan.</param>
+            <param name="entry">The filesystem entry.</param>
+            <param name="relativePath">The root-relative path.</param>
+            <returns>The effective match outcome.</returns>
+        </member>
+        <member name="M:Jeninnet.FileQuery.Traversal.TraversalExecutor.TryQueueDirectory``1(Jeninnet.FileQuery.Traversal.TraversalExecutor.TraversalSession{``0},Jeninnet.FileQuery.IO.FileSystemEntry,Jeninnet.FileQuery.Traversal.TraversalFrame)">
+            <summary>
+            Queues a directory for traversal, guarding against symlink cycles.
+            </summary>
+            <typeparam name="T">The result type.</typeparam>
+            <param name="session">The active traversal session.</param>
+            <param name="entry">The directory entry.</param>
+            <param name="frame">The current traversal frame.</param>
+            <returns><see langword="false"/> when a symlink cycle was detected.</returns>
         </member>
         <member name="M:Jeninnet.FileQuery.Traversal.TraversalExecutor.HasPotentialReInclusionInside(Jeninnet.FileQuery.Matching.ICompiledPatternSet,System.ReadOnlySpan{System.Char},System.StringComparison)">
             <summary>
@@ -6952,6 +7080,15 @@
             <param name="patterns">The compiled patterns.</param>
             <param name="directoryRelativePath">The directory path relative to the root.</param>
             <param name="comparison">The string comparison mode.</param>
+        </member>
+        <member name="M:Jeninnet.FileQuery.Traversal.TraversalExecutor.CanPatternMatchInside(Jeninnet.FileQuery.Matching.ICompiledPattern,System.ReadOnlySpan{System.Char},System.StringComparison)">
+            <summary>
+            Determines whether one compiled pattern could match below a directory.
+            </summary>
+            <param name="pattern">The compiled pattern.</param>
+            <param name="directoryPath">The normalized directory path without a trailing slash.</param>
+            <param name="comparison">The string comparison mode.</param>
+            <returns><see langword="true"/> when the pattern could match below the directory.</returns>
         </member>
         <member name="M:Jeninnet.FileQuery.Traversal.TraversalExecutor.CouldGlobMatchBelow(Jeninnet.FileQuery.Matching.ICompiledPattern,System.ReadOnlySpan{System.Char},System.StringComparison)">
             <summary>

@@ -33,14 +33,12 @@ internal sealed class FileSystem : IFileSystem {
         FileQueryErrorRecoveryOptions errorRecovery
     ) {
         var attempts = GetMaxAttempts(errorRecovery);
-        var attempt = 0;
         var yielded = 0;
-        var skip = 0;
-        IEnumerator<FileSystemEntry>? enumerator = null;
+        var state = new EnumerationState();
 
         try {
-            while(attempt < attempts) {
-                var res = TryMoveNext(directory, ref enumerator, ignoreInaccessible, errorRecovery, ref attempt, attempts, ref skip, out var entry);
+            while(state.Attempt < attempts) {
+                var res = TryMoveNext(directory, state, ignoreInaccessible, errorRecovery, attempts, out var entry);
                 if(res == EnumerationResult.Break) {
                     yield break;
                 }
@@ -48,7 +46,7 @@ internal sealed class FileSystem : IFileSystem {
                 if(res == EnumerationResult.Continue) {
                     // A retry restarts the directory enumerator. Skip the entries that
                     // were already yielded so callers never observe duplicates.
-                    skip = yielded;
+                    state.Skip = yielded;
                     continue;
                 }
 
@@ -61,7 +59,7 @@ internal sealed class FileSystem : IFileSystem {
             }
         }
         finally {
-            enumerator?.Dispose();
+            state.Enumerator?.Dispose();
         }
     }
 
@@ -82,22 +80,20 @@ internal sealed class FileSystem : IFileSystem {
         await Task.Yield();
 
         var attempts = GetMaxAttempts(errorRecovery);
-        var attempt = 0;
         var yielded = 0;
-        var skip = 0;
-        IEnumerator<FileSystemEntry>? enumerator = null;
+        var state = new EnumerationState();
 
         try {
-            while(attempt < attempts) {
+            while(state.Attempt < attempts) {
                 cancellationToken.ThrowIfCancellationRequested();
 
-                var res = TryMoveNext(directory, ref enumerator, ignoreInaccessible, errorRecovery, ref attempt, attempts, ref skip, out var entry);
+                var res = TryMoveNext(directory, state, ignoreInaccessible, errorRecovery, attempts, out var entry);
                 if(res == EnumerationResult.Break) {
                     yield break;
                 }
 
                 if(res == EnumerationResult.Continue) {
-                    skip = yielded;
+                    state.Skip = yielded;
                     continue;
                 }
 
@@ -110,7 +106,7 @@ internal sealed class FileSystem : IFileSystem {
             }
         }
         finally {
-            enumerator?.Dispose();
+            state.Enumerator?.Dispose();
         }
     }
 
@@ -174,50 +170,54 @@ internal sealed class FileSystem : IFileSystem {
 
     private enum EnumerationResult { Success = 0, Break = 1, Continue = 2 }
 
+    private sealed class EnumerationState {
+        public IEnumerator<FileSystemEntry>? Enumerator;
+        public int Attempt;
+        public int Skip;
+    }
+
     private static EnumerationResult TryMoveNext(
         string directory,
-        ref IEnumerator<FileSystemEntry>? enumerator,
+        EnumerationState state,
         bool ignoreInaccessible,
         FileQueryErrorRecoveryOptions errorRecovery,
-        ref int attempt,
         int attempts,
-        ref int skip,
         out FileSystemEntry entry
     ) {
         entry = default;
         try {
-            if(enumerator is null) {
-                enumerator = CreateEnumerator(directory);
+            if(state.Enumerator is null) {
+                state.Enumerator = CreateEnumerator(directory);
 
-                while(skip > 0) {
-                    if(!enumerator.MoveNext()) {
-                        enumerator.Dispose();
-                        enumerator = null;
+                while(state.Skip > 0) {
+                    if(!state.Enumerator.MoveNext()) {
+                        state.Enumerator.Dispose();
+                        state.Enumerator = null;
                         return EnumerationResult.Break;
                     }
 
-                    skip--;
+                    state.Skip--;
                 }
             }
 
-            if(enumerator.MoveNext()) {
-                entry = enumerator.Current;
+            if(state.Enumerator.MoveNext()) {
+                entry = state.Enumerator.Current;
                 return EnumerationResult.Success;
             }
 
-            enumerator.Dispose();
+            state.Enumerator.Dispose();
             return EnumerationResult.Break;
         }
         catch(Exception ex) when(FileSystemGuards.IsRecoverable(ex)) {
-            enumerator?.Dispose();
-            enumerator = null;
+            state.Enumerator?.Dispose();
+            state.Enumerator = null;
 
-            if(FileSystemGuards.ShouldSkip(ignoreInaccessible, errorRecovery, attempt, attempts)) {
+            if(FileSystemGuards.ShouldSkip(ignoreInaccessible, errorRecovery, state.Attempt, attempts)) {
                 return EnumerationResult.Break;
             }
 
-            if(errorRecovery.Action is FileQueryErrorAction.Retry && attempt < attempts - 1) {
-                attempt++;
+            if(errorRecovery.Action is FileQueryErrorAction.Retry && state.Attempt < attempts - 1) {
+                state.Attempt++;
                 return EnumerationResult.Continue;
             }
 

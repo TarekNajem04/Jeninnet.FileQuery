@@ -92,13 +92,14 @@ internal static class SoakRunner {
 
             var analysis = SoakAnalysis.Create(
                 options,
-                iterations,
-                expectedMatches,
-                observedMatches,
-                times,
-                samples,
-                allocated,
-                measure.Elapsed.TotalSeconds);
+                new SoakMeasurement(
+                    iterations,
+                    expectedMatches,
+                    observedMatches,
+                    times,
+                    samples,
+                    allocated,
+                    measure.Elapsed.TotalSeconds));
 
             var report = new SoakReport(
                 StartedAtUtc: startedAt.ToString("O", CultureInfo.InvariantCulture),

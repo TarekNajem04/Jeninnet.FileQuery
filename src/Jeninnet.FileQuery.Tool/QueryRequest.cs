@@ -82,122 +82,45 @@ internal sealed record QueryRequest(
         request = null;
         error = null;
 
-        var dialectValue = parseResult.GetValue(options.Dialect) ?? DIALECT_HYBRID;
-        if(!TryParseDialect(dialectValue, out var dialect)) {
-            error = $"Invalid --dialect value '{dialectValue}'. Use hybrid, gitignore, glob, or regex.";
+        if(!TryReadDialect(parseResult, options, out var dialect, out error)) {
             return false;
         }
 
-        var symlinkValue = parseResult.GetValue(options.Symlinks) ?? SYMLINKS_IGNORE;
-        if(!TryParseSymlinkPolicy(symlinkValue, out var symlinkPolicy)) {
-            error = $"Invalid --symlinks value '{symlinkValue}'. Use ignore, follow, or follow-with-cycle-detection.";
+        if(!TryReadSymlinkPolicy(parseResult, options, out var symlinkPolicy, out error)) {
             return false;
         }
 
-        var noRecursive = parseResult.GetValue(options.NoRecursive);
-        var depth = parseResult.GetValue(options.Depth);
-
-        if(noRecursive && depth.HasValue) {
-            error = "Use either --no-recursive or --depth, not both.";
+        if(!TryReadTraversal(parseResult, options, out var noRecursive, out var depth, out error)) {
             return false;
         }
 
-        if(depth is < 0) {
-            error = "--depth must be zero or greater.";
+        if(!TryReadChangeBaseline(parseResult, options, out var changedSince, out var changedSinceDate, out error)) {
             return false;
         }
 
-        var changedSince = parseResult.GetValue(options.ChangedSince);
-        var changedSinceDateValue = parseResult.GetValue(options.ChangedSinceDate);
-
-        if(!string.IsNullOrWhiteSpace(changedSince) && !string.IsNullOrWhiteSpace(changedSinceDateValue)) {
-            error = "Use either --changed-since or --changed-since-date, not both.";
+        if(!TryReadOutputModes(parseResult, options, out var explain, out var jsonOutput, out error)) {
             return false;
         }
 
-        DateTimeOffset? changedSinceDate = null;
-
-        if(!string.IsNullOrWhiteSpace(changedSinceDateValue)) {
-            if(!DateTimeOffset.TryParse(
-                changedSinceDateValue,
-                CultureInfo.InvariantCulture,
-                DateTimeStyles.AssumeLocal,
-                out var parsedTimestamp)) {
-                error = $"Invalid --changed-since-date value '{changedSinceDateValue}'. Use an ISO 8601 timestamp.";
-                return false;
-            }
-
-            changedSinceDate = parsedTimestamp;
-        }
-
-        var explain = parseResult.GetValue(options.Explain);
-        var jsonOutput = parseResult.GetValue(options.JsonOutput);
-
-        if(explain && parseResult.GetValue(options.Count)) {
-            error = "--explain cannot be combined with --count.";
+        if(!TryReadIgnoreOptions(
+            parseResult,
+            options,
+            dialect,
+            out var ignoreFiles,
+            out var gitIgnoreOptions,
+            out error)) {
             return false;
         }
 
-        if(explain && parseResult.GetValue(options.NullSeparated)) {
-            error = "--explain cannot be combined with --null.";
+        if(!TryResolveRoot(parseResult, options, out var root, out error)) {
             return false;
-        }
-
-        if(jsonOutput && parseResult.GetValue(options.Count)) {
-            error = "--json cannot be combined with --count.";
-            return false;
-        }
-
-        if(jsonOutput && parseResult.GetValue(options.NullSeparated)) {
-            error = "--json cannot be combined with --null.";
-            return false;
-        }
-
-        var ignoreFiles = parseResult.GetValue(options.IgnoreFiles);
-        var globalIgnore = parseResult.GetValue(options.GlobalIgnore);
-
-        if(!ignoreFiles && !string.IsNullOrWhiteSpace(globalIgnore)) {
-            error = "--global-ignore requires --ignore-files.";
-            return false;
-        }
-
-        if(ignoreFiles && dialect is not null && dialect.MatchingMode is not PatternMatchingMode.GitIgnore) {
-            error = "--ignore-files requires GitIgnore semantics. Remove the forced --dialect or use --dialect gitignore.";
-            return false;
-        }
-
-        var gitignore = parseResult.GetValue(options.Gitignore);
-        var glob = parseResult.GetValue(options.Glob);
-        var regex = parseResult.GetValue(options.RegularExpression);
-
-        if(dialect is not null && HasTypedPatternOption(gitignore, glob, regex)) {
-            error = "The --gitignore, --glob, and --regex options cannot be combined with a forced --dialect.";
-            return false;
-        }
-
-        var rootValue = parseResult.GetValue(options.Root) ?? ".";
-        string root;
-        try {
-            root = Path.GetFullPath(rootValue);
-        }
-        catch(Exception exception) when(exception is ArgumentException or NotSupportedException or PathTooLongException) {
-            error = $"Invalid --root value '{rootValue}': {exception.Message}";
-            return false;
-        }
-
-        GitIgnoreOptions? gitIgnoreOptions = null;
-
-        if(ignoreFiles) {
-            gitIgnoreOptions = new GitIgnoreOptions {
-                GlobalExcludesFile = string.IsNullOrWhiteSpace(globalIgnore) ? null : globalIgnore.Trim()
-            };
         }
 
         var typedPatterns = dialect is null
             ? BuildHybridPatterns(parseResult, options)
             : BuildSpecificPatterns(parseResult, options, dialect);
 
-        if(ignoreFiles && !HasExplicitPatterns(parseResult, options, gitignore, glob, regex)) {
+        if(ignoreFiles && !HasExplicitPatterns(parseResult, options)) {
             RemoveFallbackIncludeAll(typedPatterns);
         }
 
@@ -225,24 +148,277 @@ internal sealed record QueryRequest(
     }
 
     /// <summary>
+    /// Reads and validates the forced dialect option.
+    /// </summary>
+    /// <param name="parseResult">The parsed command line.</param>
+    /// <param name="options">The tool option definitions.</param>
+    /// <param name="dialect">The parsed dialect, or <see langword="null"/> for Hybrid mode.</param>
+    /// <param name="error">The validation error, when any.</param>
+    /// <returns><see langword="true"/> when the value is valid.</returns>
+    private static bool TryReadDialect(
+        ParseResult parseResult,
+        ToolOptions options,
+        out Dialect? dialect,
+        out string? error
+    ) {
+        var value = parseResult.GetValue(options.Dialect) ?? DIALECT_HYBRID;
+
+        if(TryParseDialect(value, out dialect)) {
+            error = null;
+            return true;
+        }
+
+        error = $"Invalid --dialect value '{value}'. Use hybrid, gitignore, glob, or regex.";
+        return false;
+    }
+
+    /// <summary>
+    /// Reads and validates the symlink policy option.
+    /// </summary>
+    /// <param name="parseResult">The parsed command line.</param>
+    /// <param name="options">The tool option definitions.</param>
+    /// <param name="policy">The parsed policy.</param>
+    /// <param name="error">The validation error, when any.</param>
+    /// <returns><see langword="true"/> when the value is valid.</returns>
+    private static bool TryReadSymlinkPolicy(
+        ParseResult parseResult,
+        ToolOptions options,
+        out SymlinkPolicy policy,
+        out string? error
+    ) {
+        var value = parseResult.GetValue(options.Symlinks) ?? SYMLINKS_IGNORE;
+
+        if(TryParseSymlinkPolicy(value, out policy)) {
+            error = null;
+            return true;
+        }
+
+        error = $"Invalid --symlinks value '{value}'. Use ignore, follow, or follow-with-cycle-detection.";
+        return false;
+    }
+
+    /// <summary>
+    /// Reads and validates the recursion options.
+    /// </summary>
+    /// <param name="parseResult">The parsed command line.</param>
+    /// <param name="options">The tool option definitions.</param>
+    /// <param name="noRecursive">Whether recursion is disabled.</param>
+    /// <param name="depth">The maximum depth, when supplied.</param>
+    /// <param name="error">The validation error, when any.</param>
+    /// <returns><see langword="true"/> when the values are valid.</returns>
+    private static bool TryReadTraversal(
+        ParseResult parseResult,
+        ToolOptions options,
+        out bool noRecursive,
+        out int? depth,
+        out string? error
+    ) {
+        noRecursive = parseResult.GetValue(options.NoRecursive);
+        depth = parseResult.GetValue(options.Depth);
+
+        if(noRecursive && depth.HasValue) {
+            error = "Use either --no-recursive or --depth, not both.";
+            return false;
+        }
+
+        if(depth is < 0) {
+            error = "--depth must be zero or greater.";
+            return false;
+        }
+
+        error = null;
+        return true;
+    }
+
+    /// <summary>
+    /// Reads and validates the Git change baseline options.
+    /// </summary>
+    /// <param name="parseResult">The parsed command line.</param>
+    /// <param name="options">The tool option definitions.</param>
+    /// <param name="changedSince">The commit baseline, when supplied.</param>
+    /// <param name="changedSinceDate">The timestamp baseline, when supplied.</param>
+    /// <param name="error">The validation error, when any.</param>
+    /// <returns><see langword="true"/> when the values are valid.</returns>
+    private static bool TryReadChangeBaseline(
+        ParseResult parseResult,
+        ToolOptions options,
+        out string? changedSince,
+        out DateTimeOffset? changedSinceDate,
+        out string? error
+    ) {
+        changedSince = parseResult.GetValue(options.ChangedSince);
+        var changedSinceDateValue = parseResult.GetValue(options.ChangedSinceDate);
+        changedSinceDate = null;
+
+        if(!string.IsNullOrWhiteSpace(changedSince) && !string.IsNullOrWhiteSpace(changedSinceDateValue)) {
+            error = "Use either --changed-since or --changed-since-date, not both.";
+            return false;
+        }
+
+        if(!string.IsNullOrWhiteSpace(changedSinceDateValue)) {
+            if(!DateTimeOffset.TryParse(
+                changedSinceDateValue,
+                CultureInfo.InvariantCulture,
+                DateTimeStyles.AssumeLocal,
+                out var parsedTimestamp)) {
+                error = $"Invalid --changed-since-date value '{changedSinceDateValue}'. Use an ISO 8601 timestamp.";
+                return false;
+            }
+
+            changedSinceDate = parsedTimestamp;
+        }
+
+        error = null;
+        return true;
+    }
+
+    /// <summary>
+    /// Reads and validates the output mode options.
+    /// </summary>
+    /// <param name="parseResult">The parsed command line.</param>
+    /// <param name="options">The tool option definitions.</param>
+    /// <param name="explain">Whether explain output is enabled.</param>
+    /// <param name="jsonOutput">Whether JSON output is enabled.</param>
+    /// <param name="error">The validation error, when any.</param>
+    /// <returns><see langword="true"/> when the values are valid.</returns>
+    private static bool TryReadOutputModes(
+        ParseResult parseResult,
+        ToolOptions options,
+        out bool explain,
+        out bool jsonOutput,
+        out string? error
+    ) {
+        explain = parseResult.GetValue(options.Explain);
+        jsonOutput = parseResult.GetValue(options.JsonOutput);
+        error = GetOutputConflict(
+            explain,
+            jsonOutput,
+            parseResult.GetValue(options.Count),
+            parseResult.GetValue(options.NullSeparated));
+
+        return error is null;
+    }
+
+    /// <summary>
+    /// Returns the validation error for incompatible output modes.
+    /// </summary>
+    /// <param name="explain">Whether explain output is enabled.</param>
+    /// <param name="jsonOutput">Whether JSON output is enabled.</param>
+    /// <param name="countOnly">Whether count-only output is enabled.</param>
+    /// <param name="nullSeparated">Whether NUL-separated output is enabled.</param>
+    /// <returns>The conflict message, or <see langword="null"/> when the modes are compatible.</returns>
+    private static string? GetOutputConflict(bool explain, bool jsonOutput, bool countOnly, bool nullSeparated) {
+        if(explain && countOnly) {
+            return "--explain cannot be combined with --count.";
+        }
+
+        if(explain && nullSeparated) {
+            return "--explain cannot be combined with --null.";
+        }
+
+        if(jsonOutput && countOnly) {
+            return "--json cannot be combined with --count.";
+        }
+
+        if(jsonOutput && nullSeparated) {
+            return "--json cannot be combined with --null.";
+        }
+
+        return null;
+    }
+
+    /// <summary>
+    /// Reads and validates the Git ignore-file options.
+    /// </summary>
+    /// <param name="parseResult">The parsed command line.</param>
+    /// <param name="options">The tool option definitions.</param>
+    /// <param name="dialect">The forced dialect, or <see langword="null"/> for Hybrid mode.</param>
+    /// <param name="ignoreFiles">Whether ignore-file loading is enabled.</param>
+    /// <param name="gitIgnoreOptions">The ignore-file options, when enabled.</param>
+    /// <param name="error">The validation error, when any.</param>
+    /// <returns><see langword="true"/> when the values are valid.</returns>
+    private static bool TryReadIgnoreOptions(
+        ParseResult parseResult,
+        ToolOptions options,
+        Dialect? dialect,
+        out bool ignoreFiles,
+        out GitIgnoreOptions? gitIgnoreOptions,
+        out string? error
+    ) {
+        ignoreFiles = parseResult.GetValue(options.IgnoreFiles);
+        var globalIgnore = parseResult.GetValue(options.GlobalIgnore);
+        gitIgnoreOptions = null;
+
+        if(!ignoreFiles && !string.IsNullOrWhiteSpace(globalIgnore)) {
+            error = "--global-ignore requires --ignore-files.";
+            return false;
+        }
+
+        if(ignoreFiles && dialect is not null && dialect.MatchingMode is not PatternMatchingMode.GitIgnore) {
+            error = "--ignore-files requires GitIgnore semantics. Remove the forced --dialect or use --dialect gitignore.";
+            return false;
+        }
+
+        if(dialect is not null && HasTypedPatternOption(
+            parseResult.GetValue(options.Gitignore),
+            parseResult.GetValue(options.Glob),
+            parseResult.GetValue(options.RegularExpression))) {
+            error = "The --gitignore, --glob, and --regex options cannot be combined with a forced --dialect.";
+            return false;
+        }
+
+        if(ignoreFiles) {
+            gitIgnoreOptions = new GitIgnoreOptions {
+                GlobalExcludesFile = string.IsNullOrWhiteSpace(globalIgnore) ? null : globalIgnore.Trim()
+            };
+        }
+
+        error = null;
+        return true;
+    }
+
+    /// <summary>
+    /// Resolves and validates the query root.
+    /// </summary>
+    /// <param name="parseResult">The parsed command line.</param>
+    /// <param name="options">The tool option definitions.</param>
+    /// <param name="root">The absolute query root.</param>
+    /// <param name="error">The validation error, when any.</param>
+    /// <returns><see langword="true"/> when the root is valid.</returns>
+    private static bool TryResolveRoot(
+        ParseResult parseResult,
+        ToolOptions options,
+        out string root,
+        out string? error
+    ) {
+        var rootValue = parseResult.GetValue(options.Root) ?? ".";
+        root = string.Empty;
+
+        try {
+            root = Path.GetFullPath(rootValue);
+        }
+        catch(Exception exception) when(exception is ArgumentException or NotSupportedException or PathTooLongException) {
+            error = $"Invalid --root value '{rootValue}': {exception.Message}";
+            return false;
+        }
+
+        error = null;
+        return true;
+    }
+
+    /// <summary>
     /// Determines whether the caller supplied any pattern explicitly.
     /// </summary>
     /// <param name="parseResult">The parsed command line.</param>
     /// <param name="options">The tool option definitions.</param>
-    /// <param name="gitignore">The GitIgnore option value.</param>
-    /// <param name="glob">The Glob option value.</param>
-    /// <param name="regex">The Regex option value.</param>
     /// <returns><see langword="true"/> when at least one pattern source is present.</returns>
-    private static bool HasExplicitPatterns(
-        ParseResult parseResult,
-        ToolOptions options,
-        string? gitignore,
-        string? glob,
-        string? regex
-    ) =>
+    private static bool HasExplicitPatterns(ParseResult parseResult, ToolOptions options) =>
         (parseResult.GetValue(options.PositionalPatterns)?.Length ?? 0) > 0 ||
         !string.IsNullOrWhiteSpace(parseResult.GetValue(options.Patterns)) ||
-        HasTypedPatternOption(gitignore, glob, regex);
+        HasTypedPatternOption(
+            parseResult.GetValue(options.Gitignore),
+            parseResult.GetValue(options.Glob),
+            parseResult.GetValue(options.RegularExpression));
 
     /// <summary>
     /// Removes the CLI's implicit include-all fallback so that loaded ignore rules can exclude files.

@@ -180,7 +180,6 @@ internal static partial class PatternValidator {
     private static (string Message, int Position)? ValidateBraces(ReadOnlySpan<char> pattern) {
         var depth = 0;
         var firstOpen = -1;
-        var inCharacterClass = false;
         var i = 0;
 
         while(i < pattern.Length) {
@@ -192,19 +191,7 @@ internal static partial class PatternValidator {
             }
 
             if(c == '[') {
-                inCharacterClass = true;
-                i++;
-                continue;
-            }
-
-            if(c == ']' && inCharacterClass) {
-                inCharacterClass = false;
-                i++;
-                continue;
-            }
-
-            if(inCharacterClass) {
-                i++;
+                i = SkipCharacterClass(pattern, i);
                 continue;
             }
 
@@ -230,6 +217,31 @@ internal static partial class PatternValidator {
         }
 
         return null;
+    }
+
+    /// <summary>
+    /// Returns the index immediately after a character class that starts at <paramref name="start"/>.
+    /// </summary>
+    /// <param name="pattern">The raw pattern text.</param>
+    /// <param name="start">The index of the opening bracket.</param>
+    /// <returns>The index after the closing bracket, or the pattern length when unterminated.</returns>
+    private static int SkipCharacterClass(ReadOnlySpan<char> pattern, int start) {
+        var i = start + 1;
+
+        while(i < pattern.Length) {
+            if(pattern[i] == '\\') {
+                i += 2;
+                continue;
+            }
+
+            if(pattern[i] == ']') {
+                return i + 1;
+            }
+
+            i++;
+        }
+
+        return pattern.Length;
     }
 
     // ------------------------------------------------------------------

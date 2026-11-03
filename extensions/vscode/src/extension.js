@@ -18,8 +18,8 @@ let output;
  */
 function activate(context) {
     output = vscode.window.createOutputChannel(OUTPUT_NAME);
-    context.subscriptions.push(output);
     context.subscriptions.push(
+        output,
         vscode.commands.registerCommand('jeninnet.testPattern', () => runPattern({ explain: false })),
         vscode.commands.registerCommand('jeninnet.explainPattern', () => runPattern({ explain: true }))
     );
@@ -130,12 +130,17 @@ function writeResult(pattern, stdout, explain) {
  * @returns {string} The message shown to the user.
  */
 function describeFailure(error, executable) {
-    if (error && error.code === 'ENOENT') {
+    if (error?.code === 'ENOENT') {
         return `The executable "${executable}" was not found. Install the tool with "dotnet tool install --global Jeninnet.FileQuery.Tool" or set "jeninnet.executable".`;
     }
 
-    const standardError = error && typeof error.stderr === 'string' ? error.stderr.trim() : '';
-    return standardError.length > 0 ? standardError : String(error && error.message ? error.message : error);
+    const standardError = typeof error?.stderr === 'string' ? error.stderr.trim() : '';
+
+    if (standardError.length > 0) {
+        return standardError;
+    }
+
+    return error?.message ? String(error.message) : String(error);
 }
 
 /**
