@@ -22,7 +22,7 @@ dotnet build -c Release
 dotnet test -c Release
 ```
 
-All 1,167 tests must pass before submitting a pull request.
+All 1,172 tests must pass before submitting a pull request.
 
 ---
 

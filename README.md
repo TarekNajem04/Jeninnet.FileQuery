@@ -200,7 +200,7 @@ This repository contains the core library and its companion packages:
 *   **[Documentation Suite (docs/)](./docs/README.md)**: Deep technical specifications, guides, and architectural whitepapers.
 *   **[Benchmark Suite](./src/Jeninnet.FileQuery.Benchmarks/README.md)**: Performance measurements and allocation verification.
 *   **[Samples](./samples/README.md)**: Thirteen runnable examples from hello-world to DI + evaluation.
-*   **[Test Suite](./tests/README.md)**: 1,167 tests across seven projects, with per-project guides. Every assertion uses the `Jeninnet.Assertions` fluent API (`Should()` / `FluentActions`); MSTest supplies only attributes and runner integration.
+*   **[Test Suite](./tests/README.md)**: 1,172 tests across seven projects, with per-project guides. Every assertion uses the `Jeninnet.Assertions` fluent API (`Should()` / `FluentActions`); MSTest supplies only attributes and runner integration.
 
 ---
 
