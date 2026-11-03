@@ -90,8 +90,8 @@ internal sealed class CharacterClassStructureInvariant : IPatternInvariant {
     /// <returns>The failure result.</returns>
     private static PatternInvariantResult CreateFailure(PatternCompilationContext context, string message) {
         var span = context.Pattern.Text.AsSpan();
-        int? position = PatternTextPosition.Find(span, "[");
-        int? segment = position is { } value ? PatternTextPosition.SegmentAt(span, value) : null;
+        var position = PatternTextPosition.Find(span, "[");
+        var segment = position is { } value ? PatternTextPosition.SegmentAt(span, value) : (int?)null;
 
         return PatternInvariantResult.Fail(message, position, segment);
     }

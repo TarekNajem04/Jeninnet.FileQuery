@@ -70,11 +70,11 @@ internal sealed class RecursiveWildcardRedundancyInvariant : IPatternInvariant {
     /// <returns>The failure result.</returns>
     private static PatternInvariantResult CreateFailure(PatternCompilationContext context, string message) {
         var span = context.Pattern.Text.AsSpan();
-        int? first = PatternTextPosition.Find(span, "**");
+        var first = PatternTextPosition.Find(span, "**");
         var second = first is { } start
             ? PatternTextPosition.FindAfter(span, "**", start + 2)
-            : null;
-        int? segment = second is { } value ? PatternTextPosition.SegmentAt(span, value) : null;
+            : (int?)null;
+        var segment = second is { } value ? PatternTextPosition.SegmentAt(span, value) : (int?)null;
 
         return PatternInvariantResult.Fail(message, second, segment);
     }
