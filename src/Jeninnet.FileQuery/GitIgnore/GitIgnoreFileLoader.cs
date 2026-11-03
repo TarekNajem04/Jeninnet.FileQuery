@@ -85,47 +85,85 @@ internal static class GitIgnoreFileLoader {
         pending.Enqueue((queryRoot, string.Empty));
 
         while(pending.Count > 0) {
-            var (directory, relativePath) = pending.Dequeue();
-
-            foreach(var entry in fileSystem.Enumerate(
-                directory,
-                ignoreInaccessible: true,
-                FileQueryErrorRecoveryOptions.Skip)) {
-                if(!entry.IsDirectory || entry.IsReparsePoint) {
-                    continue;
-                }
-
-                var name = Path.GetFileName(entry.FullPath);
-
-                if(string.Equals(name, GIT_DIRECTORY, StringComparison.Ordinal)) {
-                    continue;
-                }
-
-                var childRelativePath = relativePath.Length == 0
-                    ? name
-                    : $"{relativePath}/{name}";
-
-                // Git does not read nested ignore files (and does not descend) inside an
-                // ignored directory. Evaluating the directory before loading its own rules
-                // reproduces that behavior.
-                if(matcher?.IsMatch($"{childRelativePath}/") == false) {
-                    continue;
-                }
-
-                var ignoreFile = Path.Combine(entry.FullPath, GIT_IGNORE_FILE);
-
-                if(fileSystem.FileExists(ignoreFile)) {
-                    var previousCount = patterns.Count;
-                    AddFile(ignoreFile, childRelativePath, fileSystem, patterns);
-
-                    if(patterns.Count != previousCount) {
-                        matcher = CompileMatcher(patterns);
-                    }
-                }
-
-                pending.Enqueue((entry.FullPath, childRelativePath));
-            }
+            matcher = LoadNestedDirectory(fileSystem, pending.Dequeue(), patterns, matcher, pending);
         }
+    }
+
+    /// <summary>
+    /// Loads nested ignore files for one directory and queues its descendants.
+    /// </summary>
+    /// <param name="fileSystem">The filesystem abstraction.</param>
+    /// <param name="directory">The directory and its path relative to the query root.</param>
+    /// <param name="patterns">The target pattern list.</param>
+    /// <param name="matcher">The compiled matcher for directory pruning.</param>
+    /// <param name="pending">The directories still to visit.</param>
+    /// <returns>The updated matcher.</returns>
+    private static FileQueryPatternSet? LoadNestedDirectory(
+        IFileSystem fileSystem,
+        (string Directory, string RelativePath) directory,
+        List<string> patterns,
+        FileQueryPatternSet? matcher,
+        Queue<(string Directory, string RelativePath)> pending
+    ) {
+        foreach(var entry in fileSystem.Enumerate(
+            directory.Directory,
+            ignoreInaccessible: true,
+            FileQueryErrorRecoveryOptions.Skip)) {
+            if(!TryResolveNestedDirectory(entry, directory.RelativePath, matcher, out var childRelativePath)) {
+                continue;
+            }
+
+            var ignoreFile = Path.Combine(entry.FullPath, GIT_IGNORE_FILE);
+
+            if(fileSystem.FileExists(ignoreFile)) {
+                var previousCount = patterns.Count;
+                AddFile(ignoreFile, childRelativePath, fileSystem, patterns);
+
+                if(patterns.Count != previousCount) {
+                    matcher = CompileMatcher(patterns);
+                }
+            }
+
+            pending.Enqueue((entry.FullPath, childRelativePath));
+        }
+
+        return matcher;
+    }
+
+    /// <summary>
+    /// Determines whether an entry is a directory that should be visited for nested ignore files.
+    /// </summary>
+    /// <param name="entry">The filesystem entry.</param>
+    /// <param name="parentRelativePath">The parent path relative to the query root.</param>
+    /// <param name="matcher">The compiled matcher for directory pruning.</param>
+    /// <param name="childRelativePath">The child path relative to the query root.</param>
+    /// <returns><see langword="true"/> when the directory should be visited.</returns>
+    private static bool TryResolveNestedDirectory(
+        FileSystemEntry entry,
+        string parentRelativePath,
+        FileQueryPatternSet? matcher,
+        out string childRelativePath
+    ) {
+        childRelativePath = string.Empty;
+
+        if(!entry.IsDirectory || entry.IsReparsePoint) {
+            return false;
+        }
+
+        var name = Path.GetFileName(entry.FullPath);
+
+        if(string.Equals(name, GIT_DIRECTORY, StringComparison.Ordinal)) {
+            return false;
+        }
+
+        childRelativePath = parentRelativePath.Length == 0
+            ? name
+            : $"{parentRelativePath}/{name}";
+
+        // Git does not read nested ignore files (and does not descend) inside an
+        // ignored directory. Evaluating the directory before loading its own rules
+        // reproduces that behavior.
+        return matcher?.IsMatch($"{childRelativePath}/") != false;
     }
 
     /// <summary>
@@ -463,52 +501,94 @@ internal static class GitIgnoreFileLoader {
             return pattern;
         }
 
-        var negated = pattern[0] == '!';
-        var body = negated ? pattern[1..] : pattern;
-
-        if(body.Length == 0) {
+        if(!TryParseRepositoryRule(pattern, out var rule)) {
             return null;
         }
-
-        var wasRootAnchored = body[0] == '/';
-        var content = wasRootAnchored ? body[1..] : body;
-        var isDirectoryOnly = content.Length > 0 && content[^1] == '/';
-        var contentWithoutTrailingSlash = isDirectoryOnly ? content[..^1] : content;
-        var containsSlash = contentWithoutTrailingSlash.Contains('/', StringComparison.Ordinal);
 
         var comparison = OperatingSystem.IsLinux()
             ? StringComparison.Ordinal
             : StringComparison.OrdinalIgnoreCase;
 
-        if(!wasRootAnchored && !containsSlash) {
-            if(IsAncestorRule(contentWithoutTrailingSlash, relativeRoot, comparison)) {
-                return negated ? null : "/**";
+        if(!rule.WasRootAnchored && !rule.ContainsSlash) {
+            if(IsAncestorRule(rule.ContentWithoutTrailingSlash, relativeRoot, comparison)) {
+                return rule.Negated ? null : "/**";
             }
 
             return pattern;
         }
 
-        if(string.Equals(contentWithoutTrailingSlash, relativeRoot, comparison)) {
+        if(string.Equals(rule.ContentWithoutTrailingSlash, relativeRoot, comparison)) {
             // The rule targets the query root itself; every entry below it is affected.
-            return negated ? "!/**" : "/**";
+            return rule.Negated ? "!/**" : "/**";
         }
 
-        if(IsAncestorRule(contentWithoutTrailingSlash, relativeRoot, comparison)) {
+        if(IsAncestorRule(rule.ContentWithoutTrailingSlash, relativeRoot, comparison)) {
             // The rule targets an ancestor directory of the query root. Git cannot
             // re-include below an excluded parent, so only a positive rule applies:
             // it excludes the entire query root.
-            return negated ? null : "/**";
+            return rule.Negated ? null : "/**";
         }
 
         var prefix = $"{relativeRoot}/";
 
-        if(!content.StartsWith(prefix, comparison)) {
+        if(!rule.Content.StartsWith(prefix, comparison)) {
             return null;
         }
 
-        var remainder = content[prefix.Length..];
-        return negated ? $"!/{remainder}" : $"/{remainder}";
+        var remainder = rule.Content[prefix.Length..];
+        return rule.Negated ? $"!/{remainder}" : $"/{remainder}";
     }
+
+    /// <summary>
+    /// Parses the structural parts of a repository-relative ignore rule.
+    /// </summary>
+    /// <param name="pattern">The repository-relative rule.</param>
+    /// <param name="rule">The parsed rule.</param>
+    /// <returns><see langword="true"/> when the rule has a non-empty body.</returns>
+    private static bool TryParseRepositoryRule(string pattern, out RepositoryRule rule) {
+        rule = default;
+
+        if(pattern.Length == 0) {
+            return false;
+        }
+
+        var negated = pattern[0] == '!';
+        var body = negated ? pattern[1..] : pattern;
+
+        if(body.Length == 0) {
+            return false;
+        }
+
+        var wasRootAnchored = body[0] == '/';
+        var content = wasRootAnchored ? body[1..] : body;
+        var contentWithoutTrailingSlash = content.Length > 0 && content[^1] == '/'
+            ? content[..^1]
+            : content;
+
+        rule = new RepositoryRule(
+            negated,
+            content,
+            wasRootAnchored,
+            contentWithoutTrailingSlash,
+            contentWithoutTrailingSlash.Contains('/', StringComparison.Ordinal));
+        return true;
+    }
+
+    /// <summary>
+    /// The structural parts of a repository-relative ignore rule.
+    /// </summary>
+    /// <param name="Negated">Whether the rule starts with <c>!</c>.</param>
+    /// <param name="Content">The rule body without the negation and optional leading slash.</param>
+    /// <param name="WasRootAnchored">Whether the rule had a leading slash.</param>
+    /// <param name="ContentWithoutTrailingSlash">The rule body without a trailing directory slash.</param>
+    /// <param name="ContainsSlash">Whether the rule body contains a path separator.</param>
+    private readonly record struct RepositoryRule(
+        bool Negated,
+        string Content,
+        bool WasRootAnchored,
+        string ContentWithoutTrailingSlash,
+        bool ContainsSlash
+    );
 
     /// <summary>
     /// Resolves an optional path against the query root.

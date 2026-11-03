@@ -30,21 +30,17 @@ internal sealed class FileProviderFileSystem(IFileProvider provider) : IFileSyst
         FileQueryErrorRecoveryOptions errorRecovery
     ) {
         var attempts = GetMaxAttempts(errorRecovery);
-        var attempt = 0;
         var yielded = 0;
-        var skip = 0;
-        IEnumerator<IFileInfo>? enumerator = null;
+        var state = new EnumerationState();
 
         try {
-            while(attempt < attempts) {
+            while(state.Attempt < attempts) {
                 var result = TryMoveNext(
                     directory,
-                    ref enumerator,
+                    state,
                     ignoreInaccessible,
                     errorRecovery,
-                    ref attempt,
                     attempts,
-                    ref skip,
                     out var info);
 
                 if(result == EnumerationResult.Break) {
@@ -52,7 +48,7 @@ internal sealed class FileProviderFileSystem(IFileProvider provider) : IFileSyst
                 }
 
                 if(result == EnumerationResult.Continue) {
-                    skip = yielded;
+                    state.Skip = yielded;
                     continue;
                 }
 
@@ -65,7 +61,7 @@ internal sealed class FileProviderFileSystem(IFileProvider provider) : IFileSyst
             }
         }
         finally {
-            enumerator?.Dispose();
+            state.Enumerator?.Dispose();
         }
     }
 
@@ -166,51 +162,55 @@ internal sealed class FileProviderFileSystem(IFileProvider provider) : IFileSyst
             : errorRecovery.MaxRetryAttempts + 1;
     }
 
+    private sealed class EnumerationState {
+        public IEnumerator<IFileInfo>? Enumerator;
+        public int Attempt;
+        public int Skip;
+    }
+
     private EnumerationResult TryMoveNext(
         string directory,
-        ref IEnumerator<IFileInfo>? enumerator,
+        EnumerationState state,
         bool ignoreInaccessible,
         FileQueryErrorRecoveryOptions errorRecovery,
-        ref int attempt,
         int attempts,
-        ref int skip,
         out IFileInfo info
     ) {
         info = null!;
 
         try {
-            if(enumerator is null) {
-                enumerator = CreateEnumerator(directory);
+            if(state.Enumerator is null) {
+                state.Enumerator = CreateEnumerator(directory);
 
-                while(skip > 0) {
-                    if(!enumerator.MoveNext()) {
-                        enumerator.Dispose();
-                        enumerator = null;
+                while(state.Skip > 0) {
+                    if(!state.Enumerator.MoveNext()) {
+                        state.Enumerator.Dispose();
+                        state.Enumerator = null;
                         return EnumerationResult.Break;
                     }
 
-                    skip--;
+                    state.Skip--;
                 }
             }
 
-            if(enumerator.MoveNext()) {
-                info = enumerator.Current;
+            if(state.Enumerator.MoveNext()) {
+                info = state.Enumerator.Current;
                 return EnumerationResult.Success;
             }
 
-            enumerator.Dispose();
+            state.Enumerator.Dispose();
             return EnumerationResult.Break;
         }
         catch(Exception ex) when(FileSystemGuards.IsRecoverable(ex)) {
-            enumerator?.Dispose();
-            enumerator = null;
+            state.Enumerator?.Dispose();
+            state.Enumerator = null;
 
-            if(FileSystemGuards.ShouldSkip(ignoreInaccessible, errorRecovery, attempt, attempts)) {
+            if(FileSystemGuards.ShouldSkip(ignoreInaccessible, errorRecovery, state.Attempt, attempts)) {
                 return EnumerationResult.Break;
             }
 
-            if(errorRecovery.Action is FileQueryErrorAction.Retry && attempt < attempts - 1) {
-                attempt++;
+            if(errorRecovery.Action is FileQueryErrorAction.Retry && state.Attempt < attempts - 1) {
+                state.Attempt++;
                 return EnumerationResult.Continue;
             }
 

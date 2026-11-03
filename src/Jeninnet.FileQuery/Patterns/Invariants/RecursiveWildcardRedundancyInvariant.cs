@@ -25,38 +25,57 @@ internal sealed class RecursiveWildcardRedundancyInvariant : IPatternInvariant {
             var segment = segments[i];
 
             // Rule 1: multiple ** in same segment
-            if(segment.Count(static t => t is RecursiveWildcardToken) > 1) {
-                var first = PatternTextPosition.Find(context.Pattern.Text.AsSpan(), "**");
-                var second = first is { } start
-                    ? PatternTextPosition.FindAfter(context.Pattern.Text.AsSpan(), "**", start + 2)
-                    : null;
-
-                return PatternInvariantResult.Fail(
-                    "Recursive wildcard (**) must not appear more than once in the same segment.",
-                    second,
-                    second is { } value ? PatternTextPosition.SegmentAt(context.Pattern.Text.AsSpan(), value) : null);
+            if(HasMultipleRecursiveWildcards(segment)) {
+                return CreateFailure(
+                    context,
+                    "Recursive wildcard (**) must not appear more than once in the same segment.");
             }
 
-            var currentIsRecursive =
-                segment.Count == 1 &&
-                segment[0] is RecursiveWildcardToken;
+            var currentIsRecursive = IsWholeRecursiveWildcard(segment);
 
             // Rule 2: adjacent ** segments
             if(previousWasRecursive && currentIsRecursive) {
-                var first = PatternTextPosition.Find(context.Pattern.Text.AsSpan(), "**");
-                var second = first is { } start
-                    ? PatternTextPosition.FindAfter(context.Pattern.Text.AsSpan(), "**", start + 2)
-                    : null;
-
-                return PatternInvariantResult.Fail(
-                    "Redundant recursive wildcard (**/**) detected.",
-                    second,
-                    second is { } value ? PatternTextPosition.SegmentAt(context.Pattern.Text.AsSpan(), value) : null);
+                return CreateFailure(
+                    context,
+                    "Redundant recursive wildcard (**/**) detected.");
             }
 
             previousWasRecursive = currentIsRecursive;
         }
 
         return PatternInvariantResult.Success;
+    }
+
+    /// <summary>
+    /// Determines whether a segment contains more than one recursive wildcard token.
+    /// </summary>
+    /// <param name="segment">The pattern segment.</param>
+    /// <returns><see langword="true"/> when the segment contains duplicate recursive wildcards.</returns>
+    private static bool HasMultipleRecursiveWildcards(List<IPatternToken> segment) =>
+        segment.Count(static token => token is RecursiveWildcardToken) > 1;
+
+    /// <summary>
+    /// Determines whether a segment consists of exactly one recursive wildcard token.
+    /// </summary>
+    /// <param name="segment">The pattern segment.</param>
+    /// <returns><see langword="true"/> when the segment is a standalone recursive wildcard.</returns>
+    private static bool IsWholeRecursiveWildcard(List<IPatternToken> segment) =>
+        segment.Count == 1 && segment[0] is RecursiveWildcardToken;
+
+    /// <summary>
+    /// Creates a failure result for the second recursive wildcard occurrence.
+    /// </summary>
+    /// <param name="context">The compilation context.</param>
+    /// <param name="message">The failure message.</param>
+    /// <returns>The failure result.</returns>
+    private static PatternInvariantResult CreateFailure(PatternCompilationContext context, string message) {
+        var span = context.Pattern.Text.AsSpan();
+        var first = PatternTextPosition.Find(span, "**");
+        var second = first is { } start
+            ? PatternTextPosition.FindAfter(span, "**", start + 2)
+            : (int?)null;
+        var segment = second is { } value ? PatternTextPosition.SegmentAt(span, value) : (int?)null;
+
+        return PatternInvariantResult.Fail(message, second, segment);
     }
 }

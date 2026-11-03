@@ -15,6 +15,26 @@ namespace Jeninnet.FileQuery.Soak;
 internal sealed record SoakSample(long Iteration, long ManagedHeapBytes);
 
 /// <summary>
+/// The measurements collected during the soak run.
+/// </summary>
+/// <param name="Iterations">Measured iterations.</param>
+/// <param name="ExpectedMatches">The probe match count.</param>
+/// <param name="ObservedMatches">The last iteration's match count.</param>
+/// <param name="Times">Per-iteration durations in milliseconds.</param>
+/// <param name="Samples">Managed-heap samples.</param>
+/// <param name="AllocatedBytes">Total bytes allocated during the measured phase.</param>
+/// <param name="ElapsedSeconds">Measured elapsed seconds.</param>
+internal sealed record SoakMeasurement(
+    long Iterations,
+    int ExpectedMatches,
+    int ObservedMatches,
+    IReadOnlyList<double> Times,
+    IReadOnlyList<SoakSample> Samples,
+    long AllocatedBytes,
+    double ElapsedSeconds
+);
+
+/// <summary>
 /// The computed soak result.
 /// </summary>
 /// <param name="Iterations">Measured iterations.</param>
@@ -60,25 +80,14 @@ internal sealed record SoakAnalysis(
     /// Computes the analysis and applies the stability rules.
     /// </summary>
     /// <param name="options">The soak options.</param>
-    /// <param name="iterations">Measured iterations.</param>
-    /// <param name="expectedMatches">The match count of the probe run.</param>
-    /// <param name="observedMatches">The match count of the last iteration.</param>
-    /// <param name="times">Per-iteration durations in milliseconds.</param>
-    /// <param name="samples">Managed-heap samples.</param>
-    /// <param name="allocatedBytes">Total bytes allocated during the measured phase.</param>
-    /// <param name="elapsedSeconds">Measured elapsed seconds.</param>
+    /// <param name="measurement">The collected measurements.</param>
     /// <returns>The computed analysis.</returns>
-    public static SoakAnalysis Create(
-        SoakOptions options,
-        long iterations,
-        int expectedMatches,
-        int observedMatches,
-        IReadOnlyList<double> times,
-        IReadOnlyList<SoakSample> samples,
-        long allocatedBytes,
-        double elapsedSeconds
-    ) {
+    public static SoakAnalysis Create(SoakOptions options, SoakMeasurement measurement) {
         ArgumentNullException.ThrowIfNull(options);
+        ArgumentNullException.ThrowIfNull(measurement);
+
+        var (iterations, expectedMatches, observedMatches, times, samples, allocatedBytes, elapsedSeconds) = measurement;
+
         ArgumentNullException.ThrowIfNull(times);
         ArgumentNullException.ThrowIfNull(samples);
 

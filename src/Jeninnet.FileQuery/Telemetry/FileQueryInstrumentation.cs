@@ -21,6 +21,8 @@ namespace Jeninnet.FileQuery.Telemetry;
 /// </para>
 /// </remarks>
 internal static class FileQueryInstrumentation {
+    private const string QUERY_UNIT = "{query}";
+
     private static readonly ActivitySource _activitySource = new(
         FileQueryTelemetry.ActivitySourceName,
         FileQueryTelemetry.InstrumentationVersion);
@@ -31,22 +33,22 @@ internal static class FileQueryInstrumentation {
 
     private static readonly Counter<long> _queriesStarted = _meter.CreateCounter<long>(
         FileQueryTelemetry.QueriesStartedMetric,
-        unit: "{query}",
+        unit: QUERY_UNIT,
         description: "Number of file queries that started enumeration.");
 
     private static readonly Counter<long> _queriesCompleted = _meter.CreateCounter<long>(
         FileQueryTelemetry.QueriesCompletedMetric,
-        unit: "{query}",
+        unit: QUERY_UNIT,
         description: "Number of file queries that completed without an exception.");
 
     private static readonly Counter<long> _queriesErrors = _meter.CreateCounter<long>(
         FileQueryTelemetry.QueriesErrorsMetric,
-        unit: "{query}",
+        unit: QUERY_UNIT,
         description: "Number of file queries that failed with an exception.");
 
     private static readonly Counter<long> _queriesCancelled = _meter.CreateCounter<long>(
         FileQueryTelemetry.QueriesCancelledMetric,
-        unit: "{query}",
+        unit: QUERY_UNIT,
         description: "Number of file queries that were cancelled.");
 
     private static readonly Histogram<double> _queryDuration = _meter.CreateHistogram<double>(

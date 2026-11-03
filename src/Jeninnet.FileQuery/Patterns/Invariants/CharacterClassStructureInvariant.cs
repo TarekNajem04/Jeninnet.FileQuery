@@ -47,32 +47,52 @@ internal sealed class CharacterClassStructureInvariant : IPatternInvariant {
         foreach(var segment in context.Tokens!) {
 #pragma warning disable S3267
             foreach(var token in segment.OfType<CharacterClassToken>()) {
-                // Guard against an unexpectedly empty element list.
-                if(token.Value.Elements.Count == 0) {
-                    var position = PatternTextPosition.Find(context.Pattern.Text.AsSpan(), "[");
-                    return PatternInvariantResult.Fail(
-                        "Empty character class is not allowed.",
-                        position,
-                        position is { } value ? PatternTextPosition.SegmentAt(context.Pattern.Text.AsSpan(), value) : null);
-                }
+                var failure = ValidateCharacterClass(context, token.Value);
 
-                // Surface any parse error recorded by CharacterClassParser.
-                var parseError = token.Value
-                                      .Elements
-                                      .OfType<CharacterClassParseError>()
-                                      .FirstOrDefault();
-
-                if(parseError is not null) {
-                    var position = PatternTextPosition.Find(context.Pattern.Text.AsSpan(), "[");
-                    return PatternInvariantResult.Fail(
-                        parseError.Message,
-                        position,
-                        position is { } value ? PatternTextPosition.SegmentAt(context.Pattern.Text.AsSpan(), value) : null);
+                if(failure is not null) {
+                    return failure.Value;
                 }
             }
 #pragma warning restore S3267
         }
 
         return PatternInvariantResult.Success;
+    }
+
+    /// <summary>
+    /// Validates one parsed character class.
+    /// </summary>
+    /// <param name="context">The compilation context.</param>
+    /// <param name="characterClass">The parsed character class.</param>
+    /// <returns>The failure result, or <see langword="null"/> when the class is valid.</returns>
+    private static PatternInvariantResult? ValidateCharacterClass(
+        PatternCompilationContext context,
+        CharacterClass characterClass
+    ) {
+        if(characterClass.Elements.Count == 0) {
+            return CreateFailure(context, "Empty character class is not allowed.");
+        }
+
+        var parseError = characterClass.Elements
+            .OfType<CharacterClassParseError>()
+            .FirstOrDefault();
+
+        return parseError is null
+            ? null
+            : CreateFailure(context, parseError.Message);
+    }
+
+    /// <summary>
+    /// Creates a failure result located at the first opening bracket.
+    /// </summary>
+    /// <param name="context">The compilation context.</param>
+    /// <param name="message">The failure message.</param>
+    /// <returns>The failure result.</returns>
+    private static PatternInvariantResult CreateFailure(PatternCompilationContext context, string message) {
+        var span = context.Pattern.Text.AsSpan();
+        var position = PatternTextPosition.Find(span, "[");
+        var segment = position is { } value ? PatternTextPosition.SegmentAt(span, value) : (int?)null;
+
+        return PatternInvariantResult.Fail(message, position, segment);
     }
 }

@@ -13,6 +13,8 @@ namespace Jeninnet.FileQuery.Tool.Git;
 /// Reads the files that changed between a Git baseline and the working tree.
 /// </summary>
 internal static class GitChangeReader {
+    private const string REV_PARSE = "rev-parse";
+
     /// <summary>
     /// Reads the change set for a repository.
     /// </summary>
@@ -61,7 +63,7 @@ internal static class GitChangeReader {
     /// <returns>The absolute repository root.</returns>
     /// <exception cref="GitException">Thrown when the directory is not inside a Git repository.</exception>
     private static string ResolveRepositoryRoot(string directory) {
-        var result = GitProcess.Run(directory, "rev-parse", "--show-toplevel");
+        var result = GitProcess.Run(directory, REV_PARSE, "--show-toplevel");
 
         if(result.ExitCode != 0) {
             throw new GitException(
@@ -78,7 +80,7 @@ internal static class GitChangeReader {
     /// <returns>The forward-slash-terminated prefix, or an empty string at the repository root.</returns>
     /// <exception cref="GitException">Thrown when Git cannot resolve the prefix.</exception>
     private static string ResolveRootPrefix(string directory) {
-        var prefix = RunOrThrow(directory, "rev-parse", "--show-prefix")
+        var prefix = RunOrThrow(directory, REV_PARSE, "--show-prefix")
             .StandardOutput
             .Trim()
             .Replace('\\', '/');
@@ -104,7 +106,7 @@ internal static class GitChangeReader {
         DateTimeOffset? sinceTimestamp
     ) {
         if(sinceCommit is not null) {
-            var verify = GitProcess.Run(repositoryRoot, "rev-parse", "--verify", $"{sinceCommit}^{{commit}}");
+            var verify = GitProcess.Run(repositoryRoot, REV_PARSE, "--verify", $"{sinceCommit}^{{commit}}");
 
             if(verify.ExitCode != 0) {
                 throw new GitException($"Unknown Git revision: '{sinceCommit}'.");
@@ -127,7 +129,7 @@ internal static class GitChangeReader {
             return EmptyTree(repositoryRoot);
         }
 
-        var head = GitProcess.Run(repositoryRoot, "rev-parse", "--verify", "HEAD");
+        var head = GitProcess.Run(repositoryRoot, REV_PARSE, "--verify", "HEAD");
 
         return head.ExitCode == 0 && head.StandardOutput.Trim().Length > 0
             ? head.StandardOutput.Trim()

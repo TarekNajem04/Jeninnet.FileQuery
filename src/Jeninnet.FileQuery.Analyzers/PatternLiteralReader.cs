@@ -95,39 +95,18 @@ internal static class PatternLiteralReader {
     /// Enumerates the element expressions of supported collection syntaxes.
     /// </summary>
     /// <param name="expression">The argument expression.</param>
-    private static IEnumerable<ExpressionSyntax> EnumerateElements(ExpressionSyntax expression) {
-        if(expression is CollectionExpressionSyntax collection) {
-            foreach(var element in collection.Elements) {
-                if(element is ExpressionElementSyntax expressionElement) {
-                    yield return expressionElement.Expression;
-                }
-            }
-
-            yield break;
-        }
-
-        if(expression is ArrayCreationExpressionSyntax arrayCreation && arrayCreation.Initializer is not null) {
-            foreach(var element in arrayCreation.Initializer.Expressions) {
-                yield return element;
-            }
-
-            yield break;
-        }
-
-        if(expression is ImplicitArrayCreationExpressionSyntax implicitArray) {
-            foreach(var element in implicitArray.Initializer.Expressions) {
-                yield return element;
-            }
-
-            yield break;
-        }
-
-        if(expression is ObjectCreationExpressionSyntax objectCreation && objectCreation.Initializer is not null) {
-            foreach(var element in objectCreation.Initializer.Expressions) {
-                yield return element;
-            }
-        }
-    }
+    private static IEnumerable<ExpressionSyntax> EnumerateElements(ExpressionSyntax expression) =>
+        expression switch {
+            CollectionExpressionSyntax collection =>
+                collection.Elements.OfType<ExpressionElementSyntax>().Select(static element => element.Expression),
+            ArrayCreationExpressionSyntax { Initializer: { } initializer } =>
+                initializer.Expressions,
+            ImplicitArrayCreationExpressionSyntax implicitArray =>
+                implicitArray.Initializer.Expressions,
+            ObjectCreationExpressionSyntax { Initializer: { } initializer } =>
+                initializer.Expressions,
+            _ => []
+        };
 
     /// <summary>
     /// Resolves the separator used by the delimited overload.

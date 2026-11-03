@@ -73,7 +73,7 @@ internal sealed record SoakOptions(
     public static bool TryParse(string[] args, out SoakOptions? options, out string? error) {
         ArgumentNullException.ThrowIfNull(args);
 
-        options = Default;
+        var current = Default;
         error = null;
         var index = 0;
 
@@ -81,88 +81,160 @@ internal sealed record SoakOptions(
             var argument = args[index++];
 
             if(argument is "--help" or "-h") {
+                options = current;
                 error = USAGE;
                 return false;
             }
 
             if(index >= args.Length) {
+                options = current;
                 error = $"Missing value for '{argument}'.";
                 return false;
             }
 
             var value = args[index++];
 
-            switch(argument) {
-                case "--duration-seconds":
-                    if(!TryParseInt(value, 1, out var duration)) {
-                        error = $"Invalid --duration-seconds value '{value}'.";
-                        return false;
-                    }
-
-                    options = options with { DurationSeconds = duration };
-                    break;
-                case "--warmup-seconds":
-                    if(!TryParseInt(value, 0, out var warmup)) {
-                        error = $"Invalid --warmup-seconds value '{value}'.";
-                        return false;
-                    }
-
-                    options = options with { WarmupSeconds = warmup };
-                    break;
-                case "--directories":
-                    if(!TryParseInt(value, 1, out var directories)) {
-                        error = $"Invalid --directories value '{value}'.";
-                        return false;
-                    }
-
-                    options = options with { Directories = directories };
-                    break;
-                case "--files-per-directory":
-                    if(!TryParseInt(value, 1, out var files)) {
-                        error = $"Invalid --files-per-directory value '{value}'.";
-                        return false;
-                    }
-
-                    options = options with { FilesPerDirectory = files };
-                    break;
-                case "--max-growth-mb":
-                    if(!double.TryParse(value, System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture, out var growth) || growth < 0) {
-                        error = $"Invalid --max-growth-mb value '{value}'.";
-                        return false;
-                    }
-
-                    options = options with { MaxGrowthMegabytes = growth };
-                    break;
-                case "--sample-interval":
-                    if(!TryParseInt(value, 1, out var interval)) {
-                        error = $"Invalid --sample-interval value '{value}'.";
-                        return false;
-                    }
-
-                    options = options with { SampleInterval = interval };
-                    break;
-                case "--query":
-                    if(string.IsNullOrWhiteSpace(value)) {
-                        error = "--query must not be empty.";
-                        return false;
-                    }
-
-                    options = options with { Query = value };
-                    break;
-                case "--output":
-                    if(string.IsNullOrWhiteSpace(value)) {
-                        error = "--output must not be empty.";
-                        return false;
-                    }
-
-                    options = options with { OutputDirectory = value };
-                    break;
-                default:
-                    error = $"Unknown option '{argument}'.";
-                    return false;
+            if(!TryApplyOption(argument, value, current, out var updated, out error)) {
+                options = current;
+                return false;
             }
+
+            current = updated;
         }
 
+        options = current;
+        return true;
+    }
+
+    /// <summary>
+    /// Applies one command-line option to the current options.
+    /// </summary>
+    /// <param name="argument">The option name.</param>
+    /// <param name="value">The option value.</param>
+    /// <param name="options">The current options.</param>
+    /// <param name="updated">The updated options.</param>
+    /// <param name="error">The parse error, when any.</param>
+    /// <returns><see langword="true"/> when the option was valid.</returns>
+    private static bool TryApplyOption(
+        string argument,
+        string value,
+        SoakOptions options,
+        out SoakOptions updated,
+        out string? error
+    ) {
+        switch(argument) {
+            case "--duration-seconds":
+                return TryApplyIntOption(value, 1, argument, options, static (current, parsed) => current with { DurationSeconds = parsed }, out updated, out error);
+            case "--warmup-seconds":
+                return TryApplyIntOption(value, 0, argument, options, static (current, parsed) => current with { WarmupSeconds = parsed }, out updated, out error);
+            case "--directories":
+                return TryApplyIntOption(value, 1, argument, options, static (current, parsed) => current with { Directories = parsed }, out updated, out error);
+            case "--files-per-directory":
+                return TryApplyIntOption(value, 1, argument, options, static (current, parsed) => current with { FilesPerDirectory = parsed }, out updated, out error);
+            case "--max-growth-mb":
+                return TryApplyGrowthOption(value, options, out updated, out error);
+            case "--sample-interval":
+                return TryApplyIntOption(value, 1, argument, options, static (current, parsed) => current with { SampleInterval = parsed }, out updated, out error);
+            case "--query":
+                return TryApplyStringOption(value, argument, options, static (current, parsed) => current with { Query = parsed }, out updated, out error);
+            case "--output":
+                return TryApplyStringOption(value, argument, options, static (current, parsed) => current with { OutputDirectory = parsed }, out updated, out error);
+            default:
+                updated = options;
+                error = $"Unknown option '{argument}'.";
+                return false;
+        }
+    }
+
+    /// <summary>
+    /// Applies an integer option with a lower bound.
+    /// </summary>
+    /// <param name="value">The raw value.</param>
+    /// <param name="minimum">The inclusive minimum.</param>
+    /// <param name="option">The option name.</param>
+    /// <param name="options">The current options.</param>
+    /// <param name="update">The update operation.</param>
+    /// <param name="updated">The updated options.</param>
+    /// <param name="error">The parse error, when any.</param>
+    /// <returns><see langword="true"/> when the value was valid.</returns>
+    private static bool TryApplyIntOption(
+        string value,
+        int minimum,
+        string option,
+        SoakOptions options,
+        Func<SoakOptions, int, SoakOptions> update,
+        out SoakOptions updated,
+        out string? error
+    ) {
+        updated = options;
+
+        if(!TryParseInt(value, minimum, out var parsed)) {
+            error = $"Invalid {option} value '{value}'.";
+            return false;
+        }
+
+        updated = update(options, parsed);
+        error = null;
+        return true;
+    }
+
+    /// <summary>
+    /// Applies the managed-heap growth option.
+    /// </summary>
+    /// <param name="value">The raw value.</param>
+    /// <param name="options">The current options.</param>
+    /// <param name="updated">The updated options.</param>
+    /// <param name="error">The parse error, when any.</param>
+    /// <returns><see langword="true"/> when the value was valid.</returns>
+    private static bool TryApplyGrowthOption(
+        string value,
+        SoakOptions options,
+        out SoakOptions updated,
+        out string? error
+    ) {
+        updated = options;
+
+        if(!double.TryParse(
+            value,
+            System.Globalization.NumberStyles.Float,
+            System.Globalization.CultureInfo.InvariantCulture,
+            out var growth) || growth < 0) {
+            error = $"Invalid --max-growth-mb value '{value}'.";
+            return false;
+        }
+
+        updated = options with { MaxGrowthMegabytes = growth };
+        error = null;
+        return true;
+    }
+
+    /// <summary>
+    /// Applies a non-empty string option.
+    /// </summary>
+    /// <param name="value">The raw value.</param>
+    /// <param name="option">The option name.</param>
+    /// <param name="options">The current options.</param>
+    /// <param name="update">The update operation.</param>
+    /// <param name="updated">The updated options.</param>
+    /// <param name="error">The parse error, when any.</param>
+    /// <returns><see langword="true"/> when the value was valid.</returns>
+    private static bool TryApplyStringOption(
+        string value,
+        string option,
+        SoakOptions options,
+        Func<SoakOptions, string, SoakOptions> update,
+        out SoakOptions updated,
+        out string? error
+    ) {
+        updated = options;
+
+        if(string.IsNullOrWhiteSpace(value)) {
+            error = $"{option} must not be empty.";
+            return false;
+        }
+
+        updated = update(options, value);
+        error = null;
         return true;
     }
 
