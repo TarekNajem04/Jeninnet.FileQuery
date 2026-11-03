@@ -256,15 +256,27 @@ The tests cover:
 
 The editor UI itself is verified manually in the Extension Development Host (`F5`).
 
-### Packaging
+### Packaging and publishing
 
 ```bash
 npx @vscode/vsce package
-npx @vscode/vsce publish --packagePath jeninnet-filequery-0.1.0.vsix
 ```
 
-The Marketplace publisher is `jeninnet`; the first publish needs a publisher and a
-`VSCE_PAT` access token. The extension version is independent of the NuGet package version.
+Publishing is automated by
+[`vscode-extension-publish.yml`](../../../.github/workflows/vscode-extension-publish.yml)
+using **Trusted Publishing through GitHub Actions OIDC** — no Personal Access Token (PAT)
+is stored or used.
+
+The workflow runs when the `version` in `extensions/vscode/package.json` changes on `main`,
+or when started manually. It tests and packages the VSIX, then publishes it with:
+
+```bash
+npx @vscode/vsce publish --oidc
+```
+
+One-time setup: create a Trusted Publishing policy in the `jeninnet` Marketplace publisher
+for repository `TarekNajem04/Jeninnet.FileQuery` and workflow
+`vscode-extension-publish.yml`. The extension version is independent of the NuGet package version.
 
 ---
 

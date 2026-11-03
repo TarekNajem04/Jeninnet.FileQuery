@@ -1,0 +1,130 @@
+name: Publish VS Code Extension
+
+# Publishes the extension with Marketplace Trusted Publishing (GitHub OIDC).
+# No Personal Access Token (PAT) or long-lived publishing secret is stored.
+#
+# One-time setup in the Visual Studio Marketplace publisher portal:
+#   Publisher:  jeninnet
+#   Repository owner: TarekNajem04
+#   Repository: Jeninnet.FileQuery
+#   Workflow: vscode-extension-publish.yml
+#   Environment: leave empty
+#
+# The workflow publishes when extensions/vscode/package.json changes version on
+# main, or when it is started manually. A rerun for an existing version is a
+# no-op thanks to --skip-duplicate.
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'extensions/vscode/package.json'
+      - 'extensions/vscode/**'
+      - '.github/workflows/vscode-extension-publish.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: vscode-extension-publish
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    name: Publish to VS Code Marketplace
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      contents: read
+      id-token: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7.0.1
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v7.1.0
+        with:
+          node-version: 24
+
+      - name: Detect extension version change
+        id: version
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          manifest='extensions/vscode/package.json'
+          current=$(node -p "require('./${manifest}').version")
+          echo "version=$current" >> "$GITHUB_OUTPUT"
+
+          if [ "${{ github.event_name }}" = 'workflow_dispatch' ]; then
+            echo "previous=manual" >> "$GITHUB_OUTPUT"
+            echo "publish=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          before='${{ github.event.before }}'
+          if [ -z "$before" ] || [ "$before" = '0000000000000000000000000000000000000000' ]; then
+            before=$(git rev-parse HEAD^)
+          fi
+
+          previous=$(git show "${before}:${manifest}" 2>/dev/null |
+            node -p "JSON.parse(require('fs').readFileSync(0, 'utf8')).version" || true)
+
+          echo "previous=${previous:-unknown}" >> "$GITHUB_OUTPUT"
+
+          if [ -n "$previous" ] && [ "$current" = "$previous" ]; then
+            echo "publish=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "publish=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Run extension tests
+        if: steps.version.outputs.publish == 'true'
+        run: node --test "extensions/vscode/test/*.test.js"
+
+      - name: Package VSIX
+        if: steps.version.outputs.publish == 'true'
+        working-directory: extensions/vscode
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$GITHUB_WORKSPACE/artifacts/vscode-extension"
+          npx --yes @vscode/vsce@4.1.0 package \
+            --out "$GITHUB_WORKSPACE/artifacts/vscode-extension/jeninnet-filequery-${{ steps.version.outputs.version }}.vsix"
+
+      - name: Upload VSIX artifact
+        if: steps.version.outputs.publish == 'true'
+        uses: actions/upload-artifact@v7.0.2
+        with:
+          name: jeninnet-filequery-vsix-${{ steps.version.outputs.version }}
+          path: artifacts/vscode-extension/*.vsix
+          if-no-files-found: error
+          retention-days: 30
+
+      - name: Publish with Trusted Publishing (OIDC)
+        if: steps.version.outputs.publish == 'true'
+        working-directory: extensions/vscode
+        shell: bash
+        run: |
+          set -euo pipefail
+          npx --yes @vscode/vsce@4.1.0 publish \
+            --oidc \
+            --packagePath "$GITHUB_WORKSPACE/artifacts/vscode-extension/jeninnet-filequery-${{ steps.version.outputs.version }}.vsix" \
+            --skip-duplicate
+
+      - name: Write summary
+        if: steps.version.outputs.publish == 'true'
+        shell: bash
+        run: |
+          {
+            echo "## VS Code extension publish"
+            echo
+            echo "- Version: **${{ steps.version.outputs.version }}**"
+            echo "- Authentication: Trusted Publishing (GitHub OIDC)"
+            echo "- Marketplace: https://marketplace.visualstudio.com/items?itemName=jeninnet.jeninnet-filequery"
+          } >> "$GITHUB_STEP_SUMMARY"

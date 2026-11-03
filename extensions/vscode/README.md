@@ -57,14 +57,20 @@ This produces `jeninnet-filequery-0.1.0.vsix`, installable with:
 code --install-extension jeninnet-filequery-0.1.0.vsix
 ```
 
-Publishing to the Visual Studio Marketplace uses the `jeninnet` publisher:
+Publishing to the Visual Studio Marketplace uses the `jeninnet` publisher and
+**Trusted Publishing through GitHub Actions OIDC** — no Personal Access Token (PAT)
+is stored or used.
+
+The [`vscode-extension-publish.yml`](../../.github/workflows/vscode-extension-publish.yml)
+workflow publishes automatically when the `version` in `package.json` changes on `main`,
+or when it is started manually. It packages and tests the VSIX first, then publishes with:
 
 ```bash
-npx @vscode/vsce publish --packagePath jeninnet-filequery-0.1.0.vsix
+npx @vscode/vsce publish --oidc
 ```
 
-The first publish requires a Marketplace publisher and an access token; pass it through the
-`VSCE_PAT` environment variable.
+The Marketplace publisher must have a Trusted Publishing policy for this repository and the
+`vscode-extension-publish.yml` workflow.
 
 ## Scope
 
